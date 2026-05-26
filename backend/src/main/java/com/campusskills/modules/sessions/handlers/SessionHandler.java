@@ -20,9 +20,12 @@ public class SessionHandler {
             JsonObject body = ctx.body().asJsonObject();
             Session session = body.mapTo(Session.class);
             String authId = ctx.get("authenticatedUserId");
-            String requesterId = authId != null ? authId : body.getString("requesterId");
+            if (authId == null) {
+                ApiResponse.forbidden(ctx, "Unauthorized");
+                return;
+            }
             
-            sessionService.createSession(session, requesterId)
+            sessionService.createSession(session, authId)
                 .onSuccess(id -> ApiResponse.created(ctx, new JsonObject().put("id", id).put("message", "Session created")))
                 .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
         } catch (Exception e) {
@@ -43,66 +46,78 @@ public class SessionHandler {
 
     public void acceptSession(RoutingContext ctx) {
         String sessionId = ctx.pathParam("sessionId");
-        JsonObject body = ctx.body().asJsonObject();
         String authId = ctx.get("authenticatedUserId");
-        String requesterId = authId != null ? authId : (body != null ? body.getString("requesterId") : null);
+        if (authId == null) {
+            ApiResponse.forbidden(ctx, "Unauthorized");
+            return;
+        }
         
-        sessionService.acceptSession(sessionId, requesterId)
+        sessionService.acceptSession(sessionId, authId)
             .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("message", "Session accepted")))
             .onFailure(err -> handleSessionFailure(ctx, err));
     }
 
     public void rejectSession(RoutingContext ctx) {
         String sessionId = ctx.pathParam("sessionId");
-        JsonObject body = ctx.body().asJsonObject();
         String authId = ctx.get("authenticatedUserId");
-        String requesterId = authId != null ? authId : (body != null ? body.getString("requesterId") : null);
+        if (authId == null) {
+            ApiResponse.forbidden(ctx, "Unauthorized");
+            return;
+        }
         
-        sessionService.rejectSession(sessionId, requesterId)
+        sessionService.rejectSession(sessionId, authId)
             .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("message", "Session rejected")))
             .onFailure(err -> handleSessionFailure(ctx, err));
     }
 
     public void cancelSession(RoutingContext ctx) {
         String sessionId = ctx.pathParam("sessionId");
-        JsonObject body = ctx.body().asJsonObject();
         String authId = ctx.get("authenticatedUserId");
-        String requesterId = authId != null ? authId : (body != null ? body.getString("requesterId") : null);
+        if (authId == null) {
+            ApiResponse.forbidden(ctx, "Unauthorized");
+            return;
+        }
         
-        sessionService.cancelSession(sessionId, requesterId)
+        sessionService.cancelSession(sessionId, authId)
             .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("message", "Session cancelled")))
             .onFailure(err -> handleSessionFailure(ctx, err));
     }
 
     public void completeSession(RoutingContext ctx) {
         String sessionId = ctx.pathParam("sessionId");
-        JsonObject body = ctx.body().asJsonObject();
         String authId = ctx.get("authenticatedUserId");
-        String requesterId = authId != null ? authId : (body != null ? body.getString("requesterId") : null);
+        if (authId == null) {
+            ApiResponse.forbidden(ctx, "Unauthorized");
+            return;
+        }
         
-        sessionService.completeSession(sessionId, requesterId)
+        sessionService.completeSession(sessionId, authId)
             .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("message", "Session marked as COMPLETED by teacher")))
             .onFailure(err -> handleSessionFailure(ctx, err));
     }
 
     public void confirmSession(RoutingContext ctx) {
         String sessionId = ctx.pathParam("sessionId");
-        JsonObject body = ctx.body().asJsonObject();
         String authId = ctx.get("authenticatedUserId");
-        String requesterId = authId != null ? authId : (body != null ? body.getString("requesterId") : null);
+        if (authId == null) {
+            ApiResponse.forbidden(ctx, "Unauthorized");
+            return;
+        }
         
-        sessionService.confirmSession(sessionId, requesterId)
+        sessionService.confirmSession(sessionId, authId)
             .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("message", "Session confirmed by student")))
             .onFailure(err -> handleSessionFailure(ctx, err));
     }
 
     public void disputeSession(RoutingContext ctx) {
         String sessionId = ctx.pathParam("sessionId");
-        JsonObject body = ctx.body().asJsonObject();
         String authId = ctx.get("authenticatedUserId");
-        String requesterId = authId != null ? authId : (body != null ? body.getString("requesterId") : null);
+        if (authId == null) {
+            ApiResponse.forbidden(ctx, "Unauthorized");
+            return;
+        }
         
-        sessionService.disputeSession(sessionId, requesterId)
+        sessionService.disputeSession(sessionId, authId)
             .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("message", "Session DISPUTED")))
             .onFailure(err -> handleSessionFailure(ctx, err));
     }

@@ -18,9 +18,11 @@ public class MessageHandler {
         try {
             Message msg = ctx.body().asJsonObject().mapTo(Message.class);
             String authId = ctx.get("authenticatedUserId");
-            if (authId != null) {
-                msg.setSenderId(authId);
+            if (authId == null) {
+                ApiResponse.forbidden(ctx, "Unauthorized");
+                return;
             }
+            msg.setSenderId(authId);
             messageService.createMessage(msg)
                 .onSuccess(id -> ApiResponse.created(ctx, new JsonObject().put("id", id).put("message", "Message created successfully")))
                 .onFailure(err -> {

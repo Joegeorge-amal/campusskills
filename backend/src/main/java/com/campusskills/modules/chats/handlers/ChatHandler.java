@@ -17,6 +17,16 @@ public class ChatHandler {
     public void createChat(RoutingContext ctx) {
         try {
             Chat chat = ctx.body().asJsonObject().mapTo(Chat.class);
+            String authId = ctx.get("authenticatedUserId");
+            if (authId == null) {
+                ApiResponse.forbidden(ctx, "Unauthorized");
+                return;
+            }
+            if (chat.getParticipants() == null) {
+                chat.setParticipants(new java.util.ArrayList<>());
+            }
+            chat.getParticipants().add(authId);
+            
             chatService.createChat(chat)
                 .onSuccess(id -> ApiResponse.created(ctx, new JsonObject().put("id", id).put("message", "Chat created successfully")))
                 .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));

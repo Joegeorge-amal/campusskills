@@ -19,9 +19,11 @@ public class ExchangeHandler {
         try {
             Exchange exchange = ctx.body().asJsonObject().mapTo(Exchange.class);
             String authId = ctx.get("authenticatedUserId");
-            if (authId != null) {
-                exchange.setRequesterId(authId);
+            if (authId == null) {
+                ApiResponse.forbidden(ctx, "Unauthorized");
+                return;
             }
+            exchange.setRequesterId(authId);
             exchangeService.createRequest(exchange)
                 .onSuccess(id -> ApiResponse.created(ctx, new JsonObject().put("id", id).put("message", "Exchange request created")))
                 .onFailure(err -> {

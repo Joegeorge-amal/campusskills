@@ -3,6 +3,7 @@ package com.campusskills.modules.chats.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -11,8 +12,7 @@ public class Chat {
     @JsonProperty("_id")
     private String id;
     private String listingId;
-    private String user1Id;
-    private String user2Id;
+    private List<String> participants = new java.util.ArrayList<>();
     private String status; // "REQUEST", "ACTIVE", "BLOCKED", "CLOSED"
     private Long createdAt;
     private Long updatedAt;
@@ -35,20 +35,12 @@ public class Chat {
         this.listingId = listingId;
     }
 
-    public String getUser1Id() {
-        return user1Id;
+    public List<String> getParticipants() {
+        return participants;
     }
 
-    public void setUser1Id(String user1Id) {
-        this.user1Id = user1Id;
-    }
-
-    public String getUser2Id() {
-        return user2Id;
-    }
-
-    public void setUser2Id(String user2Id) {
-        this.user2Id = user2Id;
+    public void setParticipants(List<String> participants) {
+        this.participants = participants;
     }
 
     public String getStatus() {

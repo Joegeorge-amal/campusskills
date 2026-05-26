@@ -29,15 +29,18 @@ public class MessageService {
             if (chat == null) {
                 return Future.failedFuture("CHAT_NOT_FOUND");
             }
-            String user1Id = chat.getString("user1Id");
-            String user2Id = chat.getString("user2Id");
-            if (!message.getSenderId().equals(user1Id) && !message.getSenderId().equals(user2Id)) {
+            io.vertx.core.json.JsonArray participantsArray = chat.getJsonArray("participants");
+            if (participantsArray == null || !participantsArray.contains(message.getSenderId())) {
                 return Future.failedFuture("UNAUTHORIZED_SENDER");
             }
             
+            java.util.List<String> participantList = participantsArray.stream()
+                .map(Object::toString)
+                .collect(java.util.stream.Collectors.toList());
+            
             message.setMessage(content); // Store trimmed content
             return repository.createMessage(message).onSuccess(id -> {
-                com.campusskills.web.websockets.MessageBroadcaster.broadcastNewMessage(message, user1Id, user2Id);
+                com.campusskills.web.websockets.MessageBroadcaster.broadcastNewMessage(message, participantList);
             });
         });
     }

@@ -14,13 +14,33 @@ public class ChatService {
     }
 
     public Future<String> createChat(Chat chat) {
-        if (chat.getUser1Id() == null || chat.getUser2Id() == null) {
-            return Future.failedFuture("user1Id and user2Id are required");
+        if (chat.getParticipants() == null || chat.getParticipants().isEmpty()) {
+            return Future.failedFuture("participants list is required");
         }
+
+        // Deduplicate and sort
+        List<String> uniqueParticipants = chat.getParticipants().stream()
+                .filter(p -> p != null && !p.trim().isEmpty())
+                .distinct()
+                .sorted()
+                .collect(java.util.stream.Collectors.toList());
+
+        if (uniqueParticipants.size() != 2) {
+            return Future.failedFuture("Chat must have exactly 2 unique participants");
+        }
+        
+        chat.setParticipants(uniqueParticipants);
+
         if (chat.getStatus() == null) {
             chat.setStatus("REQUEST");
         }
-        return repository.createChat(chat);
+
+        return repository.findExistingChat(chat.getListingId(), uniqueParticipants).compose(existing -> {
+            if (existing != null) {
+                return Future.failedFuture("CHAT_ALREADY_EXISTS");
+            }
+            return repository.createChat(chat);
+        });
     }
 
     public Future<List<Chat>> getUserChats(String userId) {

@@ -34,13 +34,20 @@ public class ChatRepository {
     }
 
     public Future<List<Chat>> fetchUserChats(String userId) {
-        JsonObject query = new JsonObject().put("$or", new JsonArray()
-                .add(new JsonObject().put("user1Id", userId))
-                .add(new JsonObject().put("user2Id", userId)));
+        JsonObject query = new JsonObject().put("participants", userId);
         
         return client.find(COLLECTION, query)
                 .map(list -> list.stream()
                         .map(json -> json.mapTo(Chat.class))
                         .collect(Collectors.toList()));
+    }
+
+    public Future<Chat> findExistingChat(String listingId, List<String> participants) {
+        JsonObject query = new JsonObject()
+                .put("listingId", listingId)
+                .put("participants", new JsonObject().put("$size", participants.size()).put("$all", new JsonArray(participants)));
+        
+        return client.findOne(COLLECTION, query, null)
+                .map(doc -> doc == null ? null : doc.mapTo(Chat.class));
     }
 }

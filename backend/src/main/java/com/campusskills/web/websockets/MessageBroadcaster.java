@@ -6,26 +6,32 @@ import io.vertx.core.json.JsonObject;
 
 public class MessageBroadcaster {
 
-    public static void broadcastNewMessage(Message message, String user1Id, String user2Id) {
-        JsonObject payload = new JsonObject()
-                .put("type", "NEW_MESSAGE")
+    public static void broadcastNewMessage(Message message, java.util.List<String> participants) {
+        JsonObject eventPayload = new JsonObject()
                 .put("chatId", message.getChatId())
                 .put("senderId", message.getSenderId())
                 .put("message", message.getMessage())
-                .put("type", message.getType() != null ? message.getType() : "TEXT")
+                .put("messageType", message.getType() != null ? message.getType() : "TEXT")
                 .put("sessionId", message.getSessionId())
                 .put("createdAt", message.getCreatedAt());
 
-        ConnectionManager.sendMessage(user1Id, payload);
-        ConnectionManager.sendMessage(user2Id, payload);
+        JsonObject event = new JsonObject()
+                .put("type", "NEW_MESSAGE")
+                .put("timestamp", System.currentTimeMillis())
+                .put("payload", eventPayload);
+
+        for (String participant : participants) {
+            ConnectionManager.sendMessage(participant, event);
+        }
     }
 
     public static void broadcastSessionEvent(String eventType, Session session) {
-        JsonObject payload = new JsonObject()
+        JsonObject event = new JsonObject()
                 .put("type", eventType)
-                .put("session", JsonObject.mapFrom(session));
+                .put("timestamp", System.currentTimeMillis())
+                .put("payload", new JsonObject().put("session", JsonObject.mapFrom(session)));
 
-        ConnectionManager.sendMessage(session.getTeacherId(), payload);
-        ConnectionManager.sendMessage(session.getStudentId(), payload);
+        ConnectionManager.sendMessage(session.getTeacherId(), event);
+        ConnectionManager.sendMessage(session.getStudentId(), event);
     }
 }
