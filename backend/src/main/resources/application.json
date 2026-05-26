@@ -1,0 +1,13 @@
+{
+  "server": {
+    "port": 8080,
+    "host": "0.0.0.0"
+  },
+  "database": {
+    "connection_string": "mongodb://localhost:27017",
+    "db_name": "campusskills"
+  },
+  "jwt": {
+    "secret": "your-256-bit-secret-here-for-development"
+  }
+}

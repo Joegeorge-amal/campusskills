@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusSkills Dev Test UI</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="tabs">
+    <button class="tablink active" onclick="openTab(event, 'preview')">App Preview</button>
+    <button class="tablink" onclick="openTab(event, 'auth')">Authentication</button>
+    <button class="tablink" onclick="openTab(event, 'console')">Developer Console</button>
+  </div>
+
+  <!-- TAB 1: App Preview -->
+  <div id="preview" class="tabcontent" style="display: block;">
+    <div class="layout">
+      
+      <!-- Sidebar -->
+      <aside class="sidebar">
+        <h3>Chats</h3>
+        <ul id="chat-list" class="placeholder-list">
+          <li class="active-item">Alice (Design)</li>
+          <li>Bob (Math Tutor)</li>
+        </ul>
+      </aside>
+
+      <!-- Main Chat Area -->
+      <main class="chat-area">
+        <div class="chat-header">
+          <h3>Chat with Alice</h3>
+        </div>
+        <div id="messages" class="messages-container">
+           <div class="msg incoming">Hi, are you available for a skill exchange?</div>
+           <div class="msg outgoing">Yes! I'd love to learn design.</div>
+        </div>
+        <form id="send-msg-form" class="msg-form">
+          <input type="text" placeholder="Type a message..." required>
+          <button type="submit">Send</button>
+        </form>
+      </main>
+
+      <!-- Right Panel -->
+      <aside class="right-panel">
+        <div class="section">
+          <h3>Exchanges</h3>
+          <div class="card">
+            <strong>Listing: #123</strong>
+            <p>Status: <span class="badge pending">PENDING</span></p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Sessions</h3>
+          <div class="card">
+            <strong>Session: #456</strong>
+            <p>Status: <span class="badge scheduled">SCHEDULED</span></p>
+            <p class="meta">Teacher: Alice</p>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Notifications</h3>
+          <div class="card empty">
+            No new notifications
+          </div>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <!-- TAB 2: Authentication -->
+  <div id="auth" class="tabcontent">
+    <div class="auth-layout" style="display: flex; gap: 20px; padding: 20px;">
+      
+      <div class="panel" style="flex: 1;">
+        <h3>Signup</h3>
+        <form id="signup-form">
+          <input type="email" id="signup-email" placeholder="Email" required style="display:block; margin-bottom: 10px; width: 100%;">
+          <input type="password" id="signup-password" placeholder="Password" required style="display:block; margin-bottom: 10px; width: 100%;">
+          <input type="text" id="signup-name" placeholder="Display Name" required style="display:block; margin-bottom: 10px; width: 100%;">
+          <select id="signup-role" style="display:block; margin-bottom: 10px; width: 100%;">
+            <option value="STUDENT">STUDENT</option>
+            <option value="TEACHER">TEACHER</option>
+          </select>
+          <button type="button" onclick="handleSignup()" class="btn-primary">Signup</button>
+        </form>
+      </div>
+
+      <div class="panel" style="flex: 1;">
+        <h3>Login</h3>
+        <form id="login-form">
+          <input type="email" id="login-email" placeholder="Email" required style="display:block; margin-bottom: 10px; width: 100%;">
+          <input type="password" id="login-password" placeholder="Password" required style="display:block; margin-bottom: 10px; width: 100%;">
+          <button type="button" onclick="handleLogin()" class="btn-primary">Login</button>
+          <button type="button" onclick="handleLogout()" class="btn-danger" style="margin-left: 10px;">Logout</button>
+        </form>
+      </div>
+      
+    </div>
+    
+    <div class="panel" style="margin: 20px;">
+      <h3>Current Authentication Status</h3>
+      <div id="auth-status-display" style="padding: 10px; background: #e9ecef; border-radius: 4px;">Not logged in</div>
+    </div>
+  </div>
+
+  <!-- TAB 3: Developer Console -->
+  <div id="console" class="tabcontent">
+    <div class="console-layout">
+      
+      <!-- API Testing -->
+      <div class="api-testing panel">
+        <h3>Backend API Testing</h3>
+        <form id="api-form">
+          <div class="form-row">
+            <select id="api-method">
+              <option value="GET">GET</option>
+              <option value="POST">POST</option>
+              <option value="PATCH">PATCH</option>
+              <option value="DELETE">DELETE</option>
+            </select>
+            <input type="text" id="api-url" placeholder="/api/v1/messages" style="flex:1;">
+          </div>
+          <textarea id="api-body" placeholder='{ "key": "value" }'></textarea>
+          <button type="button" onclick="sendApiRequest()" class="btn-primary">Send Request</button>
+        </form>
+        
+        <div class="response-area">
+          <h4>Response <span id="res-status" class="status-code">-</span></h4>
+          <pre id="res-body">Response body will appear here...</pre>
+        </div>
+      </div>
+
+      <!-- WebSocket Testing -->
+      <div class="ws-testing panel">
+        <h3>WebSocket Event Console</h3>
+        <div class="ws-controls">
+          <button onclick="connectWS()" class="btn-success">Connect with JWT Token</button>
+          <button onclick="disconnectWS()" class="btn-danger">Disconnect</button>
+        </div>
+        <div class="ws-status-bar">
+          Status: <strong id="ws-status" class="offline">Disconnected</strong>
+        </div>
+        <div id="ws-events" class="event-log"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+package com.campusskills.web.router;
+
+import io.vertx.core.Vertx;
+import io.vertx.ext.web.Router;
+import io.vertx.ext.web.handler.BodyHandler;
+
+import com.campusskills.modules.chats.routes.ChatRouter;
+import com.campusskills.modules.messages.routes.MessageRouter;
+import com.campusskills.modules.exchanges.routes.ExchangeRouter;
+import com.campusskills.modules.sessions.routes.SessionRouter;
+import com.campusskills.modules.users.routes.AuthRouter;
+
+import com.campusskills.web.middleware.RequestIdMiddleware;
+import com.campusskills.web.middleware.GlobalErrorHandler;
+import com.campusskills.web.middleware.JwtAuthMiddleware;
+
+import io.vertx.core.http.HttpMethod;
+import io.vertx.ext.web.handler.CorsHandler;
+import io.vertx.ext.auth.jwt.JWTAuth;
+
+public class ApiRouter {
+    
+    public static Router create(Vertx vertx, JWTAuth jwtAuth, String frontendOrigin) {
+        Router router = Router.router(vertx);
+        
+        // 1. CORS Middleware MUST be absolute first to intercept preflights properly
+        router.route().handler(CorsHandler.create()
+            .addRelativeOrigin(frontendOrigin)
+            .allowedMethod(HttpMethod.GET)
+            .allowedMethod(HttpMethod.POST)
+            .allowedMethod(HttpMethod.PATCH)
+            .allowedMethod(HttpMethod.DELETE)
+            .allowedMethod(HttpMethod.OPTIONS)
+            .allowedHeader("Content-Type")
+            .allowedHeader("Authorization"));
+
+        // 2. Add global middleware
+        router.route().handler(RequestIdMiddleware.create());
+        
+        // 3. Body parsing
+        router.route().handler(BodyHandler.create());
+        
+        // 4. Public Routes
+        router.mountSubRouter("/auth", AuthRouter.create(vertx, jwtAuth));
+
+        // 5. Protected Routes Middleware
+        router.route("/chats/*").handler(JwtAuthMiddleware.create(jwtAuth));
+        router.route("/messages/*").handler(JwtAuthMiddleware.create(jwtAuth));
+        router.route("/exchanges/*").handler(JwtAuthMiddleware.create(jwtAuth));
+        router.route("/sessions/*").handler(JwtAuthMiddleware.create(jwtAuth));
+
+        // 6. Modules Routing
+        router.mountSubRouter("/chats", ChatRouter.create(vertx));
+        router.mountSubRouter("/messages", MessageRouter.create(vertx));
+        router.mountSubRouter("/exchanges", ExchangeRouter.create(vertx));
+        router.mountSubRouter("/sessions", SessionRouter.create(vertx));
+        
+        // Global Error Handling
+        router.route().failureHandler(GlobalErrorHandler.create());
+
+        return router;
+    }
+}
