@@ -50,4 +50,16 @@ public class ChatRepository {
         return client.findOne(COLLECTION, query, null)
                 .map(doc -> doc == null ? null : doc.mapTo(Chat.class));
     }
+
+    public Future<Boolean> updateChatStatusByExchangeId(String exchangeId, String chatStatus, String exchangeStatus) {
+        JsonObject query = new JsonObject().put("exchangeId", exchangeId);
+        JsonObject update = new JsonObject()
+            .put("$set", new JsonObject()
+                .put("status", chatStatus)
+                .put("exchangeStatus", exchangeStatus)
+                .put("updatedAt", System.currentTimeMillis()));
+
+        return client.updateCollection(COLLECTION, query, update)
+                .map(res -> res.getDocModified() > 0);
+    }
 }

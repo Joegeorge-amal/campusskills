@@ -26,6 +26,12 @@ C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusski
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\users\repositories\UserRepository.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\users\routes\AuthRouter.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\users\services\UserService.java
+C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\shared\constants\ChatStatus.java
+C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\shared\constants\ExchangeStatus.java
+C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\shared\constants\MessageType.java
+C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\shared\constants\NotificationType.java
+C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\shared\constants\SessionStatus.java
+C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\shared\constants\WebSocketEventType.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\web\middleware\GlobalErrorHandler.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\web\middleware\JwtAuthMiddleware.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\web\middleware\RequestIdMiddleware.java
@@ -33,6 +39,5 @@ C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusski
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\web\router\ApiRouter.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\web\websockets\ConnectionManager.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\web\websockets\MessageBroadcaster.java
-C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\web\websockets\WebSocketEventType.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\web\websockets\WebSocketHandler.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\web\websockets\WebSocketMessageBuilder.java

@@ -8,6 +8,7 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.MongoClient;
 
 import java.util.List;
+import com.campusskills.shared.constants.ExchangeStatus;
 import java.util.stream.Collectors;
 
 public class ExchangeRepository {
@@ -63,7 +64,7 @@ public class ExchangeRepository {
                 .put("requesterId", requesterId)
                 .put("receiverId", receiverId)
                 .put("listingId", listingId)
-                .put("status", new JsonObject().put("$in", new JsonArray().add("PENDING").add("ACCEPTED")));
+                .put("status", new JsonObject().put("$in", new JsonArray().add(ExchangeStatus.PENDING.name()).add(ExchangeStatus.ACCEPTED.name())));
 
         return client.find(COLLECTION, query).map(list -> !list.isEmpty());
     }

@@ -44,6 +44,35 @@ public class SessionHandler {
             .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
     }
 
+    public void getSessionsForAuthUser(RoutingContext ctx) {
+        String authId = ctx.get("authenticatedUserId");
+        if (authId == null) {
+            ApiResponse.forbidden(ctx, "Unauthorized");
+            return;
+        }
+        
+        sessionService.getUserSessions(authId)
+            .onSuccess(sessions -> {
+                JsonArray responseArray = new JsonArray();
+                sessions.forEach(sess -> responseArray.add(JsonObject.mapFrom(sess)));
+                ApiResponse.ok(ctx, responseArray);
+            })
+            .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
+    }
+
+    public void getSessionById(RoutingContext ctx) {
+        String sessionId = ctx.pathParam("sessionId");
+        String authId = ctx.get("authenticatedUserId");
+        if (authId == null) {
+            ApiResponse.forbidden(ctx, "Unauthorized");
+            return;
+        }
+
+        sessionService.getSessionByIdAuth(sessionId, authId)
+            .onSuccess(session -> ApiResponse.ok(ctx, JsonObject.mapFrom(session)))
+            .onFailure(err -> handleSessionFailure(ctx, err));
+    }
+
     public void acceptSession(RoutingContext ctx) {
         String sessionId = ctx.pathParam("sessionId");
         String authId = ctx.get("authenticatedUserId");

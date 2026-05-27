@@ -3,6 +3,7 @@ package com.campusskills.modules.messages.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.campusskills.shared.constants.MessageType;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -15,7 +16,7 @@ public class Message {
     private String message;
     private Boolean isRead;
     private Long createdAt;
-    private String type; // TEXT, SESSION_PROPOSED, SESSION_ACCEPTED, SESSION_REJECTED, SESSION_CONFIRMED, SESSION_CANCELLED, SYSTEM
+    private MessageType type;
     private String sessionId;
 
     public Message() {}
@@ -68,11 +69,11 @@ public class Message {
         this.createdAt = createdAt;
     }
 
-    public String getType() {
+    public MessageType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(MessageType type) {
         this.type = type;
     }
 

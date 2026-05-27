@@ -1,0 +1,13 @@
+package com.campusskills.shared.constants;
+
+public enum NotificationType {
+    NEW_EXCHANGE_REQUEST,
+    EXCHANGE_ACCEPTED,
+    EXCHANGE_REJECTED,
+    SESSION_PROPOSED,
+    SESSION_SCHEDULED,
+    SESSION_CANCELLED,
+    SESSION_COMPLETED,
+    SESSION_DISPUTED,
+    NEW_MESSAGE
+}

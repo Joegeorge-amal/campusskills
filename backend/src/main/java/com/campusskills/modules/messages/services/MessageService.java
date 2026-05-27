@@ -34,6 +34,11 @@ public class MessageService {
                 return Future.failedFuture("UNAUTHORIZED_SENDER");
             }
             
+            String status = chat.getString("status");
+            if (status == null || !status.equals(com.campusskills.shared.constants.ChatStatus.ACTIVE.name())) {
+                return Future.failedFuture("CHAT_NOT_ACTIVE");
+            }
+            
             java.util.List<String> participantList = participantsArray.stream()
                 .map(Object::toString)
                 .collect(java.util.stream.Collectors.toList());

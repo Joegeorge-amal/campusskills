@@ -1,4 +1,4 @@
-package com.campusskills.web.websockets;
+package com.campusskills.shared.constants;
 
 public enum WebSocketEventType {
     NEW_MESSAGE,
@@ -7,5 +7,7 @@ public enum WebSocketEventType {
     USER_ONLINE,
     USER_OFFLINE,
     NOTIFICATION,
-    SESSION_UPDATE
+    SESSION_UPDATE,
+    CHAT_UPDATE,
+    SESSION_ACCEPTED
 }

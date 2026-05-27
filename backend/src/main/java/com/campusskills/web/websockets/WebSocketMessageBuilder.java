@@ -1,6 +1,7 @@
 package com.campusskills.web.websockets;
 
 import io.vertx.core.json.JsonObject;
+import com.campusskills.shared.constants.WebSocketEventType;
 
 public class WebSocketMessageBuilder {
 

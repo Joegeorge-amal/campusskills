@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.jwt.JWTAuth;
+import com.campusskills.shared.constants.WebSocketEventType;
 
 public class WebSocketHandler implements Handler<ServerWebSocket> {
     

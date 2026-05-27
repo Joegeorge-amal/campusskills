@@ -17,28 +17,53 @@
 
   <!-- TAB 1: App Preview -->
   <div id="preview" class="tabcontent" style="display: block;">
+    <!-- Modals -->
+    <div id="new-chat-modal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <h3>Start New Chat</h3>
+        <input type="text" id="new-chat-target" placeholder="Target User ID" style="display:block; margin-bottom: 10px; width: 100%;">
+        <input type="text" id="new-chat-listing" placeholder="Listing ID" style="display:block; margin-bottom: 10px; width: 100%;">
+        <button class="btn-primary" onclick="submitNewChat()">Start Chat</button>
+        <button class="btn-danger" onclick="closeNewChatModal()">Cancel</button>
+      </div>
+    </div>
+
+    <div id="new-session-modal" class="modal" style="display:none;">
+      <div class="modal-content">
+        <h3>Propose Session</h3>
+        <input type="text" id="new-session-student" placeholder="Student ID" style="display:block; margin-bottom: 10px; width: 100%;">
+        <input type="text" id="new-session-listing" placeholder="Listing ID" style="display:block; margin-bottom: 10px; width: 100%;">
+        <input type="number" id="new-session-start" placeholder="Start Timestamp (ms)" style="display:block; margin-bottom: 10px; width: 100%;">
+        <input type="number" id="new-session-end" placeholder="End Timestamp (ms)" style="display:block; margin-bottom: 10px; width: 100%;">
+        <button class="btn-primary" onclick="submitNewSession()">Propose Session</button>
+        <button class="btn-danger" onclick="closeNewSessionModal()">Cancel</button>
+      </div>
+    </div>
+
     <div class="layout">
       
       <!-- Sidebar -->
       <aside class="sidebar">
-        <h3>Chats</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+            <h3 style="border:none; padding:0; margin:0;">Chats</h3>
+            <button onclick="openNewChatModal()" class="btn-success" style="padding: 4px 8px; font-size: 12px;">+ New</button>
+        </div>
         <ul id="chat-list" class="placeholder-list">
-          <li class="active-item">Alice (Design)</li>
-          <li>Bob (Math Tutor)</li>
+          <li class="empty-state">No chats found.</li>
         </ul>
       </aside>
 
       <!-- Main Chat Area -->
       <main class="chat-area">
         <div class="chat-header">
-          <h3>Chat with Alice</h3>
+          <h3 id="active-chat-title">Select a chat</h3>
         </div>
         <div id="messages" class="messages-container">
-           <div class="msg incoming">Hi, are you available for a skill exchange?</div>
-           <div class="msg outgoing">Yes! I'd love to learn design.</div>
+           <div class="empty-state" style="margin: auto;">Select a chat to view messages</div>
         </div>
-        <form id="send-msg-form" class="msg-form">
-          <input type="text" placeholder="Type a message..." required>
+        <div id="typing-indicator" class="typing-indicator" style="display:none;">Someone is typing...</div>
+        <form id="send-msg-form" class="msg-form" style="display:none;">
+          <input type="text" id="msg-input" placeholder="Type a message..." required>
           <button type="submit">Send</button>
         </form>
       </main>
@@ -46,25 +71,18 @@
       <!-- Right Panel -->
       <aside class="right-panel">
         <div class="section">
-          <h3>Exchanges</h3>
-          <div class="card">
-            <strong>Listing: #123</strong>
-            <p>Status: <span class="badge pending">PENDING</span></p>
+          <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+            <h3 style="border:none; padding:0; margin:0;">Sessions</h3>
+            <button onclick="openNewSessionModal()" class="btn-success" style="padding: 4px 8px; font-size: 12px;">+ Propose</button>
           </div>
-        </div>
-
-        <div class="section">
-          <h3>Sessions</h3>
-          <div class="card">
-            <strong>Session: #456</strong>
-            <p>Status: <span class="badge scheduled">SCHEDULED</span></p>
-            <p class="meta">Teacher: Alice</p>
+          <div id="session-list" style="margin-top: 10px;">
+            <div class="card empty">No active sessions</div>
           </div>
         </div>
 
         <div class="section">
           <h3>Notifications</h3>
-          <div class="card empty">
+          <div id="notification-list" class="card empty">
             No new notifications
           </div>
         </div>

@@ -3,6 +3,7 @@ package com.campusskills.modules.sessions.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.campusskills.shared.constants.SessionStatus;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -18,7 +19,7 @@ public class Session {
     private Long scheduledEnd;
     private String meetingPlatform;
     private String meetingLink;
-    private String status; // SCHEDULED, ONGOING, COMPLETED, DISPUTED, CANCELLED
+    private SessionStatus status; // SCHEDULED, ONGOING, COMPLETED, DISPUTED, CANCELLED
     private Boolean teacherConfirmed;
     private Boolean studentConfirmed;
     private Long createdAt;
@@ -98,11 +99,11 @@ public class Session {
         this.meetingLink = meetingLink;
     }
 
-    public String getStatus() {
+    public SessionStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(SessionStatus status) {
         this.status = status;
     }
 

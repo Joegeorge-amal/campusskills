@@ -3,6 +3,7 @@ package com.campusskills.modules.exchanges.models;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.campusskills.shared.constants.ExchangeStatus;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -14,7 +15,7 @@ public class Exchange {
     private String requesterId;
     private String receiverId;
     private String optionalMessage;
-    private String status; // PENDING, ACCEPTED, REJECTED, CANCELLED, EXPIRED
+    private ExchangeStatus status;
     private Long createdAt;
     private Long updatedAt;
 
@@ -60,11 +61,11 @@ public class Exchange {
         this.optionalMessage = optionalMessage;
     }
 
-    public String getStatus() {
+    public ExchangeStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(ExchangeStatus status) {
         this.status = status;
     }
 

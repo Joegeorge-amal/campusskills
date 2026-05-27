@@ -27,8 +27,8 @@ public class ChatHandler {
             }
             chat.getParticipants().add(authId);
             
-            chatService.createChat(chat)
-                .onSuccess(id -> ApiResponse.created(ctx, new JsonObject().put("id", id).put("message", "Chat created successfully")))
+            chatService.createChat(chat, authId)
+                .onSuccess(data -> ApiResponse.created(ctx, data))
                 .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
         } catch (Exception e) {
             ApiResponse.badRequest(ctx, "Invalid JSON format");

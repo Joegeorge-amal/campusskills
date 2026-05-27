@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
+import com.campusskills.shared.constants.ChatStatus;
+import com.campusskills.shared.constants.ExchangeStatus;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -13,7 +15,9 @@ public class Chat {
     private String id;
     private String listingId;
     private List<String> participants = new java.util.ArrayList<>();
-    private String status; // "REQUEST", "ACTIVE", "BLOCKED", "CLOSED"
+    private ChatStatus status; // "REQUEST", "ACTIVE", "BLOCKED", "CLOSED"
+    private String exchangeId;
+    private ExchangeStatus exchangeStatus;
     private Long createdAt;
     private Long updatedAt;
 
@@ -43,11 +47,11 @@ public class Chat {
         this.participants = participants;
     }
 
-    public String getStatus() {
+    public ChatStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(ChatStatus status) {
         this.status = status;
     }
 
@@ -65,5 +69,21 @@ public class Chat {
 
     public void setUpdatedAt(Long updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getExchangeId() {
+        return exchangeId;
+    }
+
+    public void setExchangeId(String exchangeId) {
+        this.exchangeId = exchangeId;
+    }
+
+    public ExchangeStatus getExchangeStatus() {
+        return exchangeStatus;
+    }
+
+    public void setExchangeStatus(ExchangeStatus exchangeStatus) {
+        this.exchangeStatus = exchangeStatus;
     }
 }

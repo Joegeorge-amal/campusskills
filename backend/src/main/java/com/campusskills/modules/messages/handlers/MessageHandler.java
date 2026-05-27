@@ -31,6 +31,8 @@ public class MessageHandler {
                         ApiResponse.notFound(ctx, "Chat not found");
                     } else if ("UNAUTHORIZED_SENDER".equals(errorMsg)) {
                         ApiResponse.forbidden(ctx, "Sender not authorized for this chat");
+                    } else if ("CHAT_NOT_ACTIVE".equals(errorMsg)) {
+                        ApiResponse.forbidden(ctx, "Messaging is locked until the exchange request is accepted");
                     } else {
                         ApiResponse.badRequest(ctx, errorMsg);
                     }
