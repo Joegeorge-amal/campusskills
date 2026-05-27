@@ -26,8 +26,7 @@ public class MessageBroadcaster {
                 ConnectionManager.sendMessage(participant, event);
             }
         } catch (Exception e) {
-            System.err.println("[BROADCAST ERROR] Failed to broadcast NEW_MESSAGE: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("[BROADCAST WARN] Failed to broadcast NEW_MESSAGE: " + e.getMessage());
         }
     }
 
@@ -37,7 +36,7 @@ public class MessageBroadcaster {
             try {
                 type = WebSocketEventType.valueOf(eventType);
             } catch (IllegalArgumentException e) {
-                System.err.println("[BROADCAST WARNING] Unrecognized WebSocketEventType: " + eventType + ". Defaulting to SESSION_UPDATE.");
+                System.err.println("[BROADCAST WARN] Unrecognized WebSocketEventType: " + eventType + ". Defaulting to SESSION_UPDATE.");
                 type = WebSocketEventType.SESSION_UPDATE;
             }
 
@@ -52,8 +51,7 @@ public class MessageBroadcaster {
                 }
             }
         } catch (Exception e) {
-            System.err.println("[BROADCAST ERROR] Failed to broadcast " + eventType + " for session " + session.getId() + ": " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("[BROADCAST WARN] Failed to broadcast " + eventType + " for session " + session.getId() + ": " + e.getMessage());
         }
     }
 
@@ -63,8 +61,8 @@ public class MessageBroadcaster {
             try {
                 type = WebSocketEventType.valueOf(eventType);
             } catch (IllegalArgumentException e) {
-                System.err.println("[BROADCAST WARNING] Unrecognized WebSocketEventType: " + eventType + ". Defaulting to CHAT_UPDATE.");
-                type = WebSocketEventType.CHAT_UPDATE;
+                System.err.println("[BROADCAST WARN] Unrecognized WebSocketEventType: " + eventType + ". Defaulting to EXCHANGE_UPDATE.");
+                type = WebSocketEventType.EXCHANGE_UPDATE;
             }
 
             JsonObject event = new WebSocketMessageBuilder()
@@ -75,8 +73,7 @@ public class MessageBroadcaster {
             ConnectionManager.sendMessage(exchange.getRequesterId(), event);
             ConnectionManager.sendMessage(exchange.getReceiverId(), event);
         } catch (Exception e) {
-            System.err.println("[BROADCAST ERROR] Failed to broadcast " + eventType + " for exchange " + exchange.getId() + ": " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("[BROADCAST WARN] Failed to broadcast " + eventType + " for exchange " + exchange.getId() + ": " + e.getMessage());
         }
     }
 }

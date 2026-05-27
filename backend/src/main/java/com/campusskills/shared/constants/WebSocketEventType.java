@@ -9,5 +9,5 @@ public enum WebSocketEventType {
     NOTIFICATION,
     SESSION_UPDATE,
     CHAT_UPDATE,
-    SESSION_ACCEPTED
+    EXCHANGE_UPDATE
 }

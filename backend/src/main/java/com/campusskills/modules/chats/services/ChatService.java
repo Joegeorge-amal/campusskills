@@ -73,6 +73,7 @@ public class ChatService {
                 chat.setExchangeStatus(ExchangeStatus.PENDING);
                 
                 return repository.createChat(chat).map(chatId -> {
+                    System.out.println(String.format("[LIFECYCLE] Chat CREATED | chatId=%s exchangeId=%s authenticatedUserId=%s", chatId, exchangeId, authId));
                     return new JsonObject()
                         .put("chatId", chatId)
                         .put("chatStatus", chat.getStatus().name())

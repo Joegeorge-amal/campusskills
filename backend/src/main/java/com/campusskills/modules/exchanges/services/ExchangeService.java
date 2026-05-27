@@ -95,50 +95,37 @@ public class ExchangeService {
                 return Future.failedFuture("INVALID_STATUS_TRANSITION");
             }
             
-            System.out.println("[DEBUG-LIFECYCLE] --- Exchange Acceptance ---");
-            System.out.println("[DEBUG-LIFECYCLE] exchangeId: " + exchangeId);
-            System.out.println("[DEBUG-LIFECYCLE] authenticatedUserId: " + authenticatedUserId);
-            System.out.println("[DEBUG-LIFECYCLE] previous exchange status: " + previousStatus);
-            System.out.println("[DEBUG-LIFECYCLE] new exchange status: " + ExchangeStatus.ACCEPTED);
+            System.out.println(String.format("[LIFECYCLE] Exchange PENDING -> ACCEPTED | exchangeId=%s authenticatedUserId=%s", exchangeId, authenticatedUserId));
             
             return repository.updateStatus(exchangeId, ExchangeStatus.ACCEPTED.name()).compose(updated -> {
                 if (!updated) return Future.failedFuture("EXCHANGE_NOT_FOUND");
-                System.out.println("[EXCHANGE LIFECYCLE] Exchange " + exchangeId + " updated to ACCEPTED");
                 
                 exchange.setStatus(ExchangeStatus.ACCEPTED);
                 
                 if (chatRepository != null) {
-                    System.out.println("[EXCHANGE LIFECYCLE] Triggering Chat update for exchangeId: " + exchangeId);
-                    
                     return chatRepository.getChatByExchangeId(exchangeId).compose(chat -> {
-                        System.out.println("[DEBUG-LIFECYCLE] --- Chat Synchronization ---");
-                        System.out.println("[DEBUG-LIFECYCLE] result of findByExchangeId: " + (chat != null ? "FOUND" : "NOT_FOUND"));
-                        if (chat != null) {
-                            System.out.println("[DEBUG-LIFECYCLE] located chatId: " + chat.getId());
-                            System.out.println("[DEBUG-LIFECYCLE] previous chat status: " + chat.getStatus());
+                        if (chat == null) {
+                            System.err.println(String.format("[LIFECYCLE] ERROR: Missing linked Chat | exchangeId=%s authenticatedUserId=%s", exchangeId, authenticatedUserId));
                         }
-                        System.out.println("[DEBUG-LIFECYCLE] attempted new chat status: " + ChatStatus.ACTIVE);
                         
                         return chatRepository.updateChatStatusByExchangeId(exchangeId, ChatStatus.ACTIVE.name(), ExchangeStatus.ACCEPTED.name())
                             .compose(chatUpdated -> {
-                                System.out.println("[DEBUG-LIFECYCLE] result of chat update/save operation: " + chatUpdated);
                                 if (chatUpdated) {
-                                    System.out.println("[EXCHANGE LIFECYCLE] Successfully linked Chat transitioned to ACTIVE");
+                                    System.out.println(String.format("[LIFECYCLE] Linked Chat PENDING -> ACTIVE | exchangeId=%s chatId=%s authenticatedUserId=%s", exchangeId, chat != null ? chat.getId() : "unknown", authenticatedUserId));
                                 } else {
-                                    System.err.println("[EXCHANGE LIFECYCLE] WARNING: No linked Chat found for exchangeId: " + exchangeId);
+                                    System.err.println(String.format("[LIFECYCLE] ERROR: Failed to synchronize linked Chat | exchangeId=%s authenticatedUserId=%s", exchangeId, authenticatedUserId));
                                 }
-                                com.campusskills.web.websockets.MessageBroadcaster.broadcastExchangeEvent("CHAT_UPDATE", exchange);
+                                com.campusskills.web.websockets.MessageBroadcaster.broadcastExchangeEvent("EXCHANGE_UPDATE", exchange);
                                 return Future.succeededFuture((Void) null);
                             })
                             .recover(err -> {
-                                System.out.println("[DEBUG-LIFECYCLE] result of chat update/save operation: FAILED (" + err.getMessage() + ")");
-                                System.err.println("[EXCHANGE LIFECYCLE] ERROR updating linked Chat for exchangeId " + exchangeId + ": " + err.getMessage());
-                                com.campusskills.web.websockets.MessageBroadcaster.broadcastExchangeEvent("CHAT_UPDATE", exchange);
+                                System.err.println(String.format("[LIFECYCLE] ERROR updating linked Chat | exchangeId=%s authenticatedUserId=%s error=%s", exchangeId, authenticatedUserId, err.getMessage()));
+                                com.campusskills.web.websockets.MessageBroadcaster.broadcastExchangeEvent("EXCHANGE_UPDATE", exchange);
                                 return Future.succeededFuture((Void) null);
                             });
                     });
                 } else {
-                    com.campusskills.web.websockets.MessageBroadcaster.broadcastExchangeEvent("CHAT_UPDATE", exchange);
+                    com.campusskills.web.websockets.MessageBroadcaster.broadcastExchangeEvent("EXCHANGE_UPDATE", exchange);
                     return Future.succeededFuture((Void) null);
                 }
             });
@@ -165,31 +152,36 @@ public class ExchangeService {
                 System.err.println("[EXCHANGE LIFECYCLE] Invalid transition for Exchange " + exchangeId + " (Current: " + exchange.getStatus() + ")");
                 return Future.failedFuture("INVALID_STATUS_TRANSITION");
             }
+            System.out.println(String.format("[LIFECYCLE] Exchange PENDING -> REJECTED | exchangeId=%s authenticatedUserId=%s", exchangeId, authenticatedUserId));
+
             return repository.updateStatus(exchangeId, ExchangeStatus.REJECTED.name()).compose(updated -> {
                 if (!updated) return Future.failedFuture("EXCHANGE_NOT_FOUND");
-                System.out.println("[EXCHANGE LIFECYCLE] Exchange " + exchangeId + " updated to REJECTED");
                 
                 exchange.setStatus(ExchangeStatus.REJECTED);
 
                 if (chatRepository != null) {
-                    System.out.println("[EXCHANGE LIFECYCLE] Triggering Chat update for exchangeId: " + exchangeId);
-                    return chatRepository.updateChatStatusByExchangeId(exchangeId, ChatStatus.CLOSED.name(), ExchangeStatus.REJECTED.name())
-                        .compose(chatUpdated -> {
-                            if (chatUpdated) {
-                                System.out.println("[EXCHANGE LIFECYCLE] Successfully linked Chat transitioned to CLOSED");
-                            } else {
-                                System.err.println("[EXCHANGE LIFECYCLE] WARNING: No linked Chat found for exchangeId: " + exchangeId);
-                            }
-                            com.campusskills.web.websockets.MessageBroadcaster.broadcastExchangeEvent("CHAT_UPDATE", exchange);
-                            return Future.succeededFuture((Void) null);
-                        })
-                        .recover(err -> {
-                            System.err.println("[EXCHANGE LIFECYCLE] ERROR updating linked Chat for exchangeId " + exchangeId + ": " + err.getMessage());
-                            com.campusskills.web.websockets.MessageBroadcaster.broadcastExchangeEvent("CHAT_UPDATE", exchange);
-                            return Future.succeededFuture((Void) null);
-                        });
+                    return chatRepository.getChatByExchangeId(exchangeId).compose(chat -> {
+                        if (chat == null) {
+                            System.err.println(String.format("[LIFECYCLE] ERROR: Missing linked Chat during rejection | exchangeId=%s authenticatedUserId=%s", exchangeId, authenticatedUserId));
+                        }
+                        return chatRepository.updateChatStatusByExchangeId(exchangeId, ChatStatus.CLOSED.name(), ExchangeStatus.REJECTED.name())
+                            .compose(chatUpdated -> {
+                                if (chatUpdated) {
+                                    System.out.println(String.format("[LIFECYCLE] Linked Chat -> CLOSED | exchangeId=%s chatId=%s authenticatedUserId=%s", exchangeId, chat != null ? chat.getId() : "unknown", authenticatedUserId));
+                                } else {
+                                    System.err.println(String.format("[LIFECYCLE] ERROR: Failed to synchronize linked Chat closure | exchangeId=%s authenticatedUserId=%s", exchangeId, authenticatedUserId));
+                                }
+                                com.campusskills.web.websockets.MessageBroadcaster.broadcastExchangeEvent("EXCHANGE_UPDATE", exchange);
+                                return Future.succeededFuture((Void) null);
+                            })
+                            .recover(err -> {
+                                System.err.println(String.format("[LIFECYCLE] ERROR closing linked Chat | exchangeId=%s authenticatedUserId=%s error=%s", exchangeId, authenticatedUserId, err.getMessage()));
+                                com.campusskills.web.websockets.MessageBroadcaster.broadcastExchangeEvent("EXCHANGE_UPDATE", exchange);
+                                return Future.succeededFuture((Void) null);
+                            });
+                    });
                 } else {
-                    com.campusskills.web.websockets.MessageBroadcaster.broadcastExchangeEvent("CHAT_UPDATE", exchange);
+                    com.campusskills.web.websockets.MessageBroadcaster.broadcastExchangeEvent("EXCHANGE_UPDATE", exchange);
                     return Future.succeededFuture((Void) null);
                 }
             });

@@ -94,7 +94,8 @@ public class SessionService {
                     if (session.getChatId() != null) {
                         publishSystemMessage(session.getChatId(), MessageType.SESSION_PROPOSED, id, "A session meeting time has been proposed.");
                     }
-                    com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent("SESSION_PROPOSED", session);
+                    System.out.println(String.format("[LIFECYCLE] Session CREATED -> PROPOSED | sessionId=%s exchangeId=%s chatId=%s authenticatedUserId=%s", id, session.getExchangeId(), session.getChatId(), requesterId));
+                    com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent("SESSION_UPDATE", session);
                 });
             });
         });
@@ -162,7 +163,8 @@ public class SessionService {
                     if (session.getChatId() != null) {
                         publishSystemMessage(session.getChatId(), MessageType.SESSION_ACCEPTED, sessionId, "Session proposal has been accepted.");
                     }
-                    com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent("SESSION_ACCEPTED", session);
+                    System.out.println(String.format("[LIFECYCLE] Session PROPOSED -> SCHEDULED | sessionId=%s chatId=%s authenticatedUserId=%s", sessionId, session.getChatId(), requesterId));
+                    com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent("SESSION_UPDATE", session);
                     return Future.succeededFuture();
                 } else {
                     return Future.failedFuture("SESSION_NOT_FOUND");
@@ -198,7 +200,8 @@ public class SessionService {
                     if (session.getChatId() != null) {
                         publishSystemMessage(session.getChatId(), MessageType.SESSION_REJECTED, sessionId, "Session proposal has been declined.");
                     }
-                    com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent("SESSION_REJECTED", session);
+                    System.out.println(String.format("[LIFECYCLE] Session PROPOSED -> REJECTED | sessionId=%s chatId=%s authenticatedUserId=%s", sessionId, session.getChatId(), requesterId));
+                    com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent("SESSION_UPDATE", session);
                     return Future.succeededFuture();
                 } else {
                     return Future.failedFuture("SESSION_NOT_FOUND");
@@ -231,7 +234,8 @@ public class SessionService {
                     if (session.getChatId() != null) {
                         publishSystemMessage(session.getChatId(), MessageType.SESSION_CANCELLED, sessionId, "Session has been cancelled.");
                     }
-                    com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent("SESSION_CANCELLED", session);
+                    System.out.println(String.format("[LIFECYCLE] Session -> CANCELLED | sessionId=%s chatId=%s authenticatedUserId=%s", sessionId, session.getChatId(), requesterId));
+                    com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent("SESSION_UPDATE", session);
                     return Future.succeededFuture();
                 } else {
                     return Future.failedFuture("SESSION_NOT_FOUND");
@@ -265,7 +269,8 @@ public class SessionService {
                     if (session.getChatId() != null) {
                         publishSystemMessage(session.getChatId(), MessageType.SYSTEM, sessionId, "Session marked as completed. Please confirm.");
                     }
-                    com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent("SESSION_UPDATED", session);
+                    System.out.println(String.format("[LIFECYCLE] Session SCHEDULED -> COMPLETED | sessionId=%s chatId=%s authenticatedUserId=%s", sessionId, session.getChatId(), requesterId));
+                    com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent("SESSION_UPDATE", session);
                     return Future.succeededFuture();
                 } else {
                     return Future.failedFuture("SESSION_NOT_FOUND");
@@ -312,12 +317,14 @@ public class SessionService {
                         if (session.getChatId() != null) {
                             publishSystemMessage(session.getChatId(), MessageType.SESSION_CONFIRMED, sessionId, "Session has been mutually confirmed by all participants.");
                         }
+                        System.out.println(String.format("[LIFECYCLE] Session COMPLETED -> CONFIRMED | sessionId=%s chatId=%s authenticatedUserId=%s", sessionId, session.getChatId(), requesterId));
                     } else {
                          if (session.getChatId() != null) {
                             publishSystemMessage(session.getChatId(), MessageType.SYSTEM, sessionId, "A participant has confirmed the session.");
                         }
+                        System.out.println(String.format("[LIFECYCLE] Session COMPLETED (Participant Confirmation) | sessionId=%s chatId=%s authenticatedUserId=%s", sessionId, session.getChatId(), requesterId));
                     }
-                    com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent("SESSION_CONFIRMED", session);
+                    com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent("SESSION_UPDATE", session);
                     return Future.succeededFuture();
                 } else {
                     return Future.failedFuture("SESSION_NOT_FOUND");
@@ -351,7 +358,8 @@ public class SessionService {
                     if (session.getChatId() != null) {
                         publishSystemMessage(session.getChatId(), MessageType.SYSTEM, sessionId, "Session has been DISPUTED. An admin will review.");
                     }
-                    com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent("SESSION_DISPUTED", session);
+                    System.out.println(String.format("[LIFECYCLE] Session -> DISPUTED | sessionId=%s chatId=%s authenticatedUserId=%s", sessionId, session.getChatId(), requesterId));
+                    com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent("SESSION_UPDATE", session);
                     return Future.succeededFuture();
                 } else {
                     return Future.failedFuture("SESSION_NOT_FOUND");
