@@ -44,20 +44,37 @@ public class MessageHandler {
 
     public void getChatMessages(RoutingContext ctx) {
         String chatId = ctx.pathParam("chatId");
-        
-        int limit = 50;
-        int skip = 0;
-        try {
-            if (ctx.queryParam("limit").size() > 0) limit = Integer.parseInt(ctx.queryParam("limit").get(0));
-            if (ctx.queryParam("skip").size() > 0) skip = Integer.parseInt(ctx.queryParam("skip").get(0));
-        } catch (NumberFormatException ignored) {}
+        String authId = ctx.get("authenticatedUserId");
+        if (authId == null) {
+            ApiResponse.forbidden(ctx, "Unauthorized");
+            return;
+        }
 
-        messageService.getChatMessages(chatId, limit, skip)
-            .onSuccess(messages -> {
-                JsonArray responseArray = new JsonArray();
-                messages.forEach(msg -> responseArray.add(JsonObject.mapFrom(msg)));
-                ApiResponse.ok(ctx, responseArray);
-            })
-            .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
+        int page = 1;
+        int limit = 50;
+        try {
+            if (ctx.queryParam("page") != null && !ctx.queryParam("page").isEmpty()) {
+                page = Integer.parseInt(ctx.queryParam("page").get(0));
+            }
+            if (ctx.queryParam("limit") != null && !ctx.queryParam("limit").isEmpty()) {
+                limit = Integer.parseInt(ctx.queryParam("limit").get(0));
+            }
+        } catch (NumberFormatException e) {
+            ApiResponse.badRequest(ctx, "Invalid pagination parameters");
+            return;
+        }
+
+        messageService.getChatMessages(chatId, authId, page, limit)
+            .onSuccess(result -> ApiResponse.paginatedOk(ctx, result.getJsonArray("items"), result.getInteger("page"), result.getInteger("limit"), result.getLong("total")))
+            .onFailure(err -> {
+                String errorMsg = err.getMessage();
+                if (errorMsg != null && errorMsg.startsWith("UNAUTHORIZED")) {
+                    ApiResponse.forbidden(ctx, errorMsg);
+                } else if ("CHAT_NOT_FOUND".equals(errorMsg)) {
+                    ApiResponse.notFound(ctx, "Chat not found");
+                } else {
+                    ApiResponse.internalError(ctx, errorMsg);
+                }
+            });
     }
 }

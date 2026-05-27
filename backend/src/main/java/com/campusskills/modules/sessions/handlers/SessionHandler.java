@@ -33,17 +33,6 @@ public class SessionHandler {
         }
     }
 
-    public void getUserSessions(RoutingContext ctx) {
-        String userId = ctx.pathParam("userId");
-        sessionService.getUserSessions(userId)
-            .onSuccess(sessions -> {
-                JsonArray responseArray = new JsonArray();
-                sessions.forEach(sess -> responseArray.add(JsonObject.mapFrom(sess)));
-                ApiResponse.ok(ctx, responseArray);
-            })
-            .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
-    }
-
     public void getSessionsForAuthUser(RoutingContext ctx) {
         String authId = ctx.get("authenticatedUserId");
         if (authId == null) {
@@ -51,12 +40,22 @@ public class SessionHandler {
             return;
         }
         
-        sessionService.getUserSessions(authId)
-            .onSuccess(sessions -> {
-                JsonArray responseArray = new JsonArray();
-                sessions.forEach(sess -> responseArray.add(JsonObject.mapFrom(sess)));
-                ApiResponse.ok(ctx, responseArray);
-            })
+        int page = 1;
+        int limit = 20;
+        try {
+            if (ctx.queryParam("page") != null && !ctx.queryParam("page").isEmpty()) {
+                page = Integer.parseInt(ctx.queryParam("page").get(0));
+            }
+            if (ctx.queryParam("limit") != null && !ctx.queryParam("limit").isEmpty()) {
+                limit = Integer.parseInt(ctx.queryParam("limit").get(0));
+            }
+        } catch (NumberFormatException e) {
+            ApiResponse.badRequest(ctx, "Invalid pagination parameters");
+            return;
+        }
+        
+        sessionService.getUserSessions(authId, page, limit)
+            .onSuccess(result -> ApiResponse.paginatedOk(ctx, result.getJsonArray("items"), result.getInteger("page"), result.getInteger("limit"), result.getLong("total")))
             .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
     }
 

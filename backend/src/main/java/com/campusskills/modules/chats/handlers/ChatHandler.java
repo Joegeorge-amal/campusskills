@@ -36,13 +36,28 @@ public class ChatHandler {
     }
 
     public void getUserChats(RoutingContext ctx) {
-        String userId = ctx.pathParam("userId");
-        chatService.getUserChats(userId)
-            .onSuccess(chats -> {
-                JsonArray responseArray = new JsonArray();
-                chats.forEach(chat -> responseArray.add(JsonObject.mapFrom(chat)));
-                ApiResponse.ok(ctx, responseArray);
-            })
+        String authId = ctx.get("authenticatedUserId");
+        if (authId == null) {
+            ApiResponse.forbidden(ctx, "Unauthorized");
+            return;
+        }
+
+        int page = 1;
+        int limit = 20;
+        try {
+            if (ctx.queryParam("page") != null && !ctx.queryParam("page").isEmpty()) {
+                page = Integer.parseInt(ctx.queryParam("page").get(0));
+            }
+            if (ctx.queryParam("limit") != null && !ctx.queryParam("limit").isEmpty()) {
+                limit = Integer.parseInt(ctx.queryParam("limit").get(0));
+            }
+        } catch (NumberFormatException e) {
+            ApiResponse.badRequest(ctx, "Invalid pagination parameters");
+            return;
+        }
+
+        chatService.getUserChats(authId, page, limit)
+            .onSuccess(result -> ApiResponse.paginatedOk(ctx, result.getJsonArray("items"), result.getInteger("page"), result.getInteger("limit"), result.getLong("total")))
             .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
     }
 }

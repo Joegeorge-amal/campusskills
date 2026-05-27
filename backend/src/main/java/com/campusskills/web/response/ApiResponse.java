@@ -48,6 +48,16 @@ public class ApiResponse {
         sendSuccess(ctx, 200, data);
     }
 
+    public static void paginatedOk(RoutingContext ctx, Object items, int page, int limit, long total) {
+        JsonObject data = new JsonObject()
+                .put("items", items)
+                .put("page", page)
+                .put("limit", limit)
+                .put("total", total)
+                .put("hasMore", (page * limit) < total);
+        sendSuccess(ctx, 200, data);
+    }
+
     public static void created(RoutingContext ctx, Object data) {
         sendSuccess(ctx, 201, data);
     }

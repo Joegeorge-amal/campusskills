@@ -32,13 +32,23 @@ public class SessionRepository {
         return client.save(COLLECTION, document);
     }
 
-    public Future<List<Session>> fetchUserSessions(String userId) {
+    public Future<List<Session>> fetchUserSessions(String userId, int skip, int limit) {
         JsonObject query = new JsonObject().put("participants", userId);
 
-        return client.find(COLLECTION, query)
+        io.vertx.ext.mongo.FindOptions options = new io.vertx.ext.mongo.FindOptions()
+                .setSort(new JsonObject().put("scheduledStart", 1))
+                .setSkip(skip)
+                .setLimit(limit);
+
+        return client.findWithOptions(COLLECTION, query, options)
                 .map(list -> list.stream()
                         .map(json -> json.mapTo(Session.class))
                         .collect(Collectors.toList()));
+    }
+
+    public Future<Long> countUserSessions(String userId) {
+        JsonObject query = new JsonObject().put("participants", userId);
+        return client.count(COLLECTION, query);
     }
 
     public Future<Session> getSessionById(String sessionId) {

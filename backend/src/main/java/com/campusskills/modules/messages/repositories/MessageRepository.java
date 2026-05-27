@@ -33,12 +33,11 @@ public class MessageRepository {
         return client.save(COLLECTION, document);
     }
 
-    public Future<List<Message>> fetchChatMessages(String chatId, int limit, int skip) {
+    public Future<List<Message>> fetchChatMessages(String chatId, int skip, int limit) {
         JsonObject query = new JsonObject().put("chatId", chatId);
         
-        // Sort by createdAt descending (newest first)
         FindOptions options = new FindOptions()
-                .setSort(new JsonObject().put("createdAt", -1))
+                .setSort(new JsonObject().put("createdAt", 1))
                 .setLimit(limit)
                 .setSkip(skip);
                 
@@ -46,6 +45,21 @@ public class MessageRepository {
                 .map(list -> list.stream()
                         .map(json -> json.mapTo(Message.class))
                         .collect(Collectors.toList()));
+    }
+
+    public Future<Long> countMessagesByChatId(String chatId) {
+        JsonObject query = new JsonObject().put("chatId", chatId);
+        return client.count(COLLECTION, query);
+    }
+
+    public Future<Message> findLastMessageByChatId(String chatId) {
+        JsonObject query = new JsonObject().put("chatId", chatId);
+        FindOptions options = new FindOptions()
+                .setSort(new JsonObject().put("createdAt", -1))
+                .setLimit(1);
+                
+        return client.findWithOptions(COLLECTION, query, options)
+                .map(list -> list.isEmpty() ? null : list.get(0).mapTo(Message.class));
     }
 
     public Future<JsonObject> getChatById(String chatId) {

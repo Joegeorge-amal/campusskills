@@ -15,7 +15,7 @@ public class MessageRouter {
         MessageHandler handler = new MessageHandler(service);
 
         router.post("/").handler(handler::createMessage);
-        router.get("/chat/:chatId").handler(handler::getChatMessages);
+        router.get("/:chatId").handler(handler::getChatMessages);
 
         // Internal EventBus Consumer for system messages
         vertx.eventBus().<io.vertx.core.json.JsonObject>consumer("internal.message.create", msg -> {

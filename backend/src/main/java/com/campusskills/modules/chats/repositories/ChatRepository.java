@@ -33,13 +33,23 @@ public class ChatRepository {
         return client.save(COLLECTION, document);
     }
 
-    public Future<List<Chat>> fetchUserChats(String userId) {
+    public Future<List<Chat>> fetchUserChats(String userId, int skip, int limit) {
         JsonObject query = new JsonObject().put("participants", userId);
         
-        return client.find(COLLECTION, query)
+        io.vertx.ext.mongo.FindOptions options = new io.vertx.ext.mongo.FindOptions()
+                .setSort(new JsonObject().put("updatedAt", -1))
+                .setSkip(skip)
+                .setLimit(limit);
+
+        return client.findWithOptions(COLLECTION, query, options)
                 .map(list -> list.stream()
                         .map(json -> json.mapTo(Chat.class))
                         .collect(Collectors.toList()));
+    }
+
+    public Future<Long> countUserChats(String userId) {
+        JsonObject query = new JsonObject().put("participants", userId);
+        return client.count(COLLECTION, query);
     }
 
     public Future<Chat> findExistingChat(String listingId, List<String> participants) {

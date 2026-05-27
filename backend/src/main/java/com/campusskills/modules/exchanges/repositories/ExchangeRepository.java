@@ -33,15 +33,27 @@ public class ExchangeRepository {
         return client.save(COLLECTION, document);
     }
 
-    public Future<List<Exchange>> fetchUserRequests(String userId) {
+    public Future<List<Exchange>> fetchUserRequests(String userId, int skip, int limit) {
         JsonObject query = new JsonObject().put("$or", new JsonArray()
                 .add(new JsonObject().put("requesterId", userId))
                 .add(new JsonObject().put("receiverId", userId)));
 
-        return client.find(COLLECTION, query)
+        io.vertx.ext.mongo.FindOptions options = new io.vertx.ext.mongo.FindOptions()
+                .setSort(new JsonObject().put("createdAt", -1))
+                .setSkip(skip)
+                .setLimit(limit);
+
+        return client.findWithOptions(COLLECTION, query, options)
                 .map(list -> list.stream()
                         .map(json -> json.mapTo(Exchange.class))
                         .collect(Collectors.toList()));
+    }
+
+    public Future<Long> countUserRequests(String userId) {
+        JsonObject query = new JsonObject().put("$or", new JsonArray()
+                .add(new JsonObject().put("requesterId", userId))
+                .add(new JsonObject().put("receiverId", userId)));
+        return client.count(COLLECTION, query);
     }
 
     public Future<Exchange> getExchangeById(String exchangeId) {

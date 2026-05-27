@@ -16,7 +16,7 @@ public class ExchangeRouter {
         ExchangeHandler handler = new ExchangeHandler(service);
 
         router.post("/").handler(handler::createRequest);
-        router.get("/user/:userId").handler(handler::getUserRequests);
+        router.get("/").handler(handler::getUserRequests);
         router.patch("/:exchangeId/accept").handler(handler::acceptRequest);
         router.patch("/:exchangeId/reject").handler(handler::rejectRequest);
 

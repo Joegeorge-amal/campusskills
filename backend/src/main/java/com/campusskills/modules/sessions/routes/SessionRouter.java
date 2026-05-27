@@ -19,7 +19,6 @@ public class SessionRouter {
         router.post("/").handler(handler::createSession);
         router.get("/").handler(handler::getSessionsForAuthUser);
         router.get("/:sessionId").handler(handler::getSessionById);
-        router.get("/user/:userId").handler(handler::getUserSessions);
         router.patch("/:sessionId/accept").handler(handler::acceptSession);
         router.patch("/:sessionId/reject").handler(handler::rejectSession);
         router.patch("/:sessionId/cancel").handler(handler::cancelSession);

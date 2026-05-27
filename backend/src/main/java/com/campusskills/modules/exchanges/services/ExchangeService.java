@@ -11,6 +11,7 @@ import java.util.List;
 
 import com.campusskills.modules.chats.repositories.ChatRepository;
 import com.campusskills.shared.constants.ChatStatus;
+import io.vertx.core.json.JsonObject;
 
 public class ExchangeService {
 
@@ -51,11 +52,24 @@ public class ExchangeService {
                 });
     }
 
-    public Future<List<Exchange>> getUserRequests(String userId) {
+    public Future<JsonObject> getUserRequests(String userId, int page, int limit) {
         if (userId == null || userId.trim().isEmpty()) {
             return Future.failedFuture("userId is required");
         }
-        return repository.fetchUserRequests(userId);
+        int skip = (page - 1) * limit;
+        System.out.println("[RETRIEVAL] User " + userId + " requested exchanges | page: " + page + " limit: " + limit);
+        
+        return repository.countUserRequests(userId).compose(total -> 
+            repository.fetchUserRequests(userId, skip, limit).map(list -> {
+                io.vertx.core.json.JsonArray items = new io.vertx.core.json.JsonArray();
+                list.forEach(req -> items.add(JsonObject.mapFrom(req)));
+                return new JsonObject()
+                    .put("items", items)
+                    .put("page", page)
+                    .put("limit", limit)
+                    .put("total", total);
+            })
+        );
     }
 
     public Future<Void> acceptRequest(String exchangeId, String authenticatedUserId) {

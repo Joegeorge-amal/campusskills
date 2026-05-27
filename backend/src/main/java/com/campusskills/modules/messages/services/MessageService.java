@@ -50,13 +50,38 @@ public class MessageService {
         });
     }
 
-    public Future<List<Message>> getChatMessages(String chatId, int limit, int skip) {
+    public Future<io.vertx.core.json.JsonObject> getChatMessages(String chatId, String authId, int page, int limit) {
         if (chatId == null || chatId.trim().isEmpty()) {
             return Future.failedFuture("chatId is required");
         }
-        if (limit <= 0 || limit > 100) limit = 50;
-        if (skip < 0) skip = 0;
-        
-        return repository.fetchChatMessages(chatId, limit, skip);
+        if (authId == null || authId.trim().isEmpty()) {
+            return Future.failedFuture("authId is required");
+        }
+        int skip = (page - 1) * limit;
+
+        return repository.getChatById(chatId).compose(chat -> {
+            if (chat == null) {
+                return Future.failedFuture("CHAT_NOT_FOUND");
+            }
+            io.vertx.core.json.JsonArray participantsArray = chat.getJsonArray("participants");
+            if (participantsArray == null || !participantsArray.contains(authId)) {
+                System.err.println("[RETRIEVAL] Unauthorized message access for chat " + chatId + " by User " + authId);
+                return Future.failedFuture("UNAUTHORIZED: User is not a participant of this chat");
+            }
+
+            System.out.println("[RETRIEVAL] User " + authId + " requested messages for chat " + chatId + " | page: " + page + " limit: " + limit);
+            
+            return repository.countMessagesByChatId(chatId).compose(total -> 
+                repository.fetchChatMessages(chatId, skip, limit).map(list -> {
+                    io.vertx.core.json.JsonArray items = new io.vertx.core.json.JsonArray();
+                    list.forEach(msg -> items.add(io.vertx.core.json.JsonObject.mapFrom(msg)));
+                    return new io.vertx.core.json.JsonObject()
+                        .put("items", items)
+                        .put("page", page)
+                        .put("limit", limit)
+                        .put("total", total);
+                })
+            );
+        });
     }
 }

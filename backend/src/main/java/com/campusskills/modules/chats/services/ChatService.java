@@ -8,17 +8,23 @@ import io.vertx.core.Future;
 import java.util.List;
 
 import com.campusskills.modules.exchanges.repositories.ExchangeRepository;
+import com.campusskills.modules.messages.repositories.MessageRepository;
 import com.campusskills.modules.exchanges.models.Exchange;
 import com.campusskills.shared.constants.ExchangeStatus;
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.json.JsonArray;
+import io.vertx.core.CompositeFuture;
+import java.util.ArrayList;
 
 public class ChatService {
     private final ChatRepository repository;
     private final ExchangeRepository exchangeRepository;
+    private final MessageRepository messageRepository;
 
-    public ChatService(ChatRepository repository, ExchangeRepository exchangeRepository) {
+    public ChatService(ChatRepository repository, ExchangeRepository exchangeRepository, MessageRepository messageRepository) {
         this.repository = repository;
         this.exchangeRepository = exchangeRepository;
+        this.messageRepository = messageRepository;
     }
 
     public Future<JsonObject> createChat(Chat chat, String authId) {
@@ -77,10 +83,46 @@ public class ChatService {
         });
     }
 
-    public Future<List<Chat>> getUserChats(String userId) {
+    public Future<JsonObject> getUserChats(String userId, int page, int limit) {
         if (userId == null || userId.trim().isEmpty()) {
             return Future.failedFuture("userId is required");
         }
-        return repository.fetchUserChats(userId);
+        int skip = (page - 1) * limit;
+
+        return repository.countUserChats(userId).compose(total -> 
+            repository.fetchUserChats(userId, skip, limit).compose(chats -> {
+                if (chats.isEmpty()) {
+                    return Future.succeededFuture(new JsonObject()
+                        .put("items", new JsonArray())
+                        .put("page", page)
+                        .put("limit", limit)
+                        .put("total", total));
+                }
+
+                List<Future> futures = new ArrayList<>();
+                JsonArray items = new JsonArray();
+
+                for (Chat chat : chats) {
+                    JsonObject chatJson = JsonObject.mapFrom(chat);
+                    items.add(chatJson);
+                    
+                    Future<Void> fut = messageRepository.findLastMessageByChatId(chat.getId()).map(lastMessage -> {
+                        if (lastMessage != null) {
+                            chatJson.put("lastMessagePreview", lastMessage.getMessage());
+                            chatJson.put("lastMessageAt", lastMessage.getCreatedAt());
+                        }
+                        return null;
+                    });
+                    futures.add(fut);
+                }
+
+                return CompositeFuture.all(futures).map(v -> new JsonObject()
+                    .put("items", items)
+                    .put("page", page)
+                    .put("limit", limit)
+                    .put("total", total)
+                );
+            })
+        );
     }
 }

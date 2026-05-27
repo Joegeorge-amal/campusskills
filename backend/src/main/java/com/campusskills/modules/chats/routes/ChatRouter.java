@@ -12,11 +12,12 @@ public class ChatRouter {
         
         ChatRepository repository = new ChatRepository();
         com.campusskills.modules.exchanges.repositories.ExchangeRepository exchangeRepository = new com.campusskills.modules.exchanges.repositories.ExchangeRepository();
-        ChatService service = new ChatService(repository, exchangeRepository);
+        com.campusskills.modules.messages.repositories.MessageRepository messageRepository = new com.campusskills.modules.messages.repositories.MessageRepository();
+        ChatService service = new ChatService(repository, exchangeRepository, messageRepository);
         ChatHandler handler = new ChatHandler(service);
 
         router.post("/").handler(handler::createChat);
-        router.get("/user/:userId").handler(handler::getUserChats);
+        router.get("/").handler(handler::getUserChats);
 
         return router;
     }
