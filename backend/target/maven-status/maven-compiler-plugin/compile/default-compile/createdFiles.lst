@@ -24,6 +24,7 @@ com\campusskills\modules\messages\routes\MessageRouter.class
 com\campusskills\modules\messages\models\Message.class
 com\campusskills\modules\exchanges\repositories\ExchangeRepository.class
 com\campusskills\web\websockets\MessageBroadcaster.class
+com\campusskills\core\database\DatabaseInitializer.class
 com\campusskills\modules\sessions\handlers\SessionHandler.class
 com\campusskills\web\middleware\JwtAuthMiddleware.class
 com\campusskills\modules\sessions\routes\SessionRouter.class

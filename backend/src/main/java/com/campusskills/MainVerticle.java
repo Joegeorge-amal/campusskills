@@ -35,6 +35,7 @@ public class MainVerticle extends AbstractVerticle {
 
         // 2. Initialize Database Connection
         MongoManager.init(vertx, dbConfig);
+        com.campusskills.core.database.DatabaseInitializer.initializeIndexes(MongoManager.getClient());
 
         // 3. Initialize JWT Auth
         JWTAuth jwtAuth = JWTAuth.create(vertx, new JWTAuthOptions()
