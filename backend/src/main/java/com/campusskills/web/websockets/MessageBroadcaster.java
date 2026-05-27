@@ -30,6 +30,27 @@ public class MessageBroadcaster {
         }
     }
 
+    public static void broadcastMessageRead(String messageId, String chatId, String readBy, Long readAt, java.util.List<String> participants) {
+        try {
+            JsonObject eventPayload = new JsonObject()
+                    .put("messageId", messageId)
+                    .put("chatId", chatId)
+                    .put("readBy", readBy)
+                    .put("readAt", readAt);
+
+            JsonObject event = new WebSocketMessageBuilder()
+                    .type(WebSocketEventType.MESSAGE_READ)
+                    .payload(eventPayload)
+                    .build();
+
+            for (String participant : participants) {
+                ConnectionManager.sendMessage(participant, event);
+            }
+        } catch (Exception e) {
+            System.err.println("[BROADCAST WARN] Failed to broadcast MESSAGE_READ: " + e.getMessage());
+        }
+    }
+
     public static void broadcastSessionEvent(String eventType, Session session) {
         try {
             WebSocketEventType type;

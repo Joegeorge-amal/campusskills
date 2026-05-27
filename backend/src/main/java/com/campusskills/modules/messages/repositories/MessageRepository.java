@@ -66,4 +66,28 @@ public class MessageRepository {
         JsonObject query = new JsonObject().put("_id", chatId);
         return client.findOne("chats", query, null);
     }
+
+    public Future<Message> getMessageById(String messageId) {
+        JsonObject query = new JsonObject().put("_id", messageId);
+        return client.findOne(COLLECTION, query, null)
+                .map(doc -> doc == null ? null : doc.mapTo(Message.class));
+    }
+
+    public Future<Boolean> markMessageAsRead(String messageId, Long readAt) {
+        JsonObject query = new JsonObject().put("_id", messageId);
+        JsonObject update = new JsonObject().put("$set", new JsonObject()
+                .put("isRead", true)
+                .put("readAt", readAt));
+        
+        return client.updateCollection(COLLECTION, query, update)
+                .map(res -> res.getDocModified() > 0);
+    }
+
+    public Future<Long> countUnreadMessagesForUser(String chatId, String userId) {
+        JsonObject query = new JsonObject()
+                .put("chatId", chatId)
+                .put("senderId", new JsonObject().put("$ne", userId))
+                .put("isRead", false);
+        return client.count(COLLECTION, query);
+    }
 }

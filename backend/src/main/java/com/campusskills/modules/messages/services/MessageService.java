@@ -84,4 +84,53 @@ public class MessageService {
             );
         });
     }
+
+    public Future<Void> markAsRead(String messageId, String authId) {
+        if (messageId == null || messageId.trim().isEmpty()) {
+            return Future.failedFuture("messageId is required");
+        }
+        if (authId == null || authId.trim().isEmpty()) {
+            return Future.failedFuture("authId is required");
+        }
+
+        return repository.getMessageById(messageId).compose(message -> {
+            if (message == null) {
+                return Future.failedFuture("MESSAGE_NOT_FOUND");
+            }
+            if (authId.equals(message.getSenderId())) {
+                return Future.failedFuture("UNAUTHORIZED: Cannot mark own message as read");
+            }
+
+            if (message.getIsRead() != null && message.getIsRead()) {
+                // Idempotent read behavior: already marked as read
+                return Future.succeededFuture();
+            }
+
+            return repository.getChatById(message.getChatId()).compose(chat -> {
+                if (chat == null) {
+                    return Future.failedFuture("CHAT_NOT_FOUND");
+                }
+
+                io.vertx.core.json.JsonArray participantsArray = chat.getJsonArray("participants");
+                if (participantsArray == null || !participantsArray.contains(authId)) {
+                    System.err.println("[RETRIEVAL ERROR] Unauthorized read receipt attempt for message " + messageId + " by User " + authId);
+                    return Future.failedFuture("UNAUTHORIZED: User is not a participant of this chat");
+                }
+                
+                java.util.List<String> participantList = participantsArray.stream()
+                    .map(Object::toString)
+                    .collect(java.util.stream.Collectors.toList());
+
+                Long readAt = System.currentTimeMillis();
+                
+                return repository.markMessageAsRead(messageId, readAt).compose(updated -> {
+                    if (updated) {
+                        System.out.println(String.format("[MESSAGE_READ] messageId=%s chatId=%s authenticatedUserId=%s readAt=%d", messageId, message.getChatId(), authId, readAt));
+                        com.campusskills.web.websockets.MessageBroadcaster.broadcastMessageRead(messageId, message.getChatId(), authId, readAt, participantList);
+                    }
+                    return Future.succeededFuture();
+                });
+            });
+        });
+    }
 }

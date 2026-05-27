@@ -77,4 +77,28 @@ public class MessageHandler {
                 }
             });
     }
+
+    public void markAsRead(RoutingContext ctx) {
+        String messageId = ctx.pathParam("messageId");
+        String authId = ctx.get("authenticatedUserId");
+        if (authId == null) {
+            ApiResponse.forbidden(ctx, "Unauthorized");
+            return;
+        }
+
+        messageService.markAsRead(messageId, authId)
+            .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("success", true).put("message", "Message marked as read")))
+            .onFailure(err -> {
+                String errorMsg = err.getMessage();
+                if (errorMsg != null && errorMsg.startsWith("UNAUTHORIZED")) {
+                    ApiResponse.forbidden(ctx, errorMsg);
+                } else if ("MESSAGE_NOT_FOUND".equals(errorMsg)) {
+                    ApiResponse.notFound(ctx, "Message not found");
+                } else if ("CHAT_NOT_FOUND".equals(errorMsg)) {
+                    ApiResponse.notFound(ctx, "Chat not found");
+                } else {
+                    ApiResponse.internalError(ctx, errorMsg);
+                }
+            });
+    }
 }

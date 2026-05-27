@@ -15,6 +15,7 @@ public class Message {
     private String senderId;
     private String message;
     private Boolean isRead;
+    private Long readAt;
     private Long createdAt;
     private MessageType type;
     private String sessionId;
@@ -59,6 +60,14 @@ public class Message {
 
     public void setIsRead(Boolean read) {
         isRead = read;
+    }
+
+    public Long getReadAt() {
+        return readAt;
+    }
+
+    public void setReadAt(Long readAt) {
+        this.readAt = readAt;
     }
 
     public Long getCreatedAt() {
