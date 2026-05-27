@@ -33,9 +33,7 @@ public class SessionRepository {
     }
 
     public Future<List<Session>> fetchUserSessions(String userId) {
-        JsonObject query = new JsonObject().put("$or", new JsonArray()
-                .add(new JsonObject().put("teacherId", userId))
-                .add(new JsonObject().put("studentId", userId)));
+        JsonObject query = new JsonObject().put("participants", userId);
 
         return client.find(COLLECTION, query)
                 .map(list -> list.stream()

@@ -46,8 +46,11 @@ public class MessageBroadcaster {
                     .payload(new JsonObject().put("session", JsonObject.mapFrom(session)))
                     .build();
 
-            ConnectionManager.sendMessage(session.getTeacherId(), event);
-            ConnectionManager.sendMessage(session.getStudentId(), event);
+            if (session.getParticipants() != null) {
+                for (String participantId : session.getParticipants()) {
+                    ConnectionManager.sendMessage(participantId, event);
+                }
+            }
         } catch (Exception e) {
             System.err.println("[BROADCAST ERROR] Failed to broadcast " + eventType + " for session " + session.getId() + ": " + e.getMessage());
             e.printStackTrace();

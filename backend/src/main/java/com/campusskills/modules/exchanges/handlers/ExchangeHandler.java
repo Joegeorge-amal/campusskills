@@ -54,7 +54,12 @@ public class ExchangeHandler {
 
     public void acceptRequest(RoutingContext ctx) {
         String exchangeId = ctx.pathParam("exchangeId");
-        exchangeService.acceptRequest(exchangeId)
+        String authId = ctx.get("authenticatedUserId");
+        if (authId == null) {
+            ApiResponse.forbidden(ctx, "Unauthorized");
+            return;
+        }
+        exchangeService.acceptRequest(exchangeId, authId)
             .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("message", "Request ACCEPTED")))
             .onFailure(err -> {
                 String msg = err.getMessage();
@@ -62,6 +67,8 @@ public class ExchangeHandler {
                     ApiResponse.notFound(ctx, "Exchange not found");
                 } else if ("INVALID_STATUS_TRANSITION".equals(msg)) {
                     ApiResponse.conflict(ctx, "Invalid exchange status transition");
+                } else if (msg != null && msg.startsWith("UNAUTHORIZED")) {
+                    ApiResponse.forbidden(ctx, msg);
                 } else {
                     ApiResponse.badRequest(ctx, msg);
                 }
@@ -70,7 +77,12 @@ public class ExchangeHandler {
 
     public void rejectRequest(RoutingContext ctx) {
         String exchangeId = ctx.pathParam("exchangeId");
-        exchangeService.rejectRequest(exchangeId)
+        String authId = ctx.get("authenticatedUserId");
+        if (authId == null) {
+            ApiResponse.forbidden(ctx, "Unauthorized");
+            return;
+        }
+        exchangeService.rejectRequest(exchangeId, authId)
             .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("message", "Request REJECTED")))
             .onFailure(err -> {
                 String msg = err.getMessage();
@@ -78,6 +90,8 @@ public class ExchangeHandler {
                     ApiResponse.notFound(ctx, "Exchange not found");
                 } else if ("INVALID_STATUS_TRANSITION".equals(msg)) {
                     ApiResponse.conflict(ctx, "Invalid exchange status transition");
+                } else if (msg != null && msg.startsWith("UNAUTHORIZED")) {
+                    ApiResponse.forbidden(ctx, msg);
                 } else {
                     ApiResponse.badRequest(ctx, msg);
                 }

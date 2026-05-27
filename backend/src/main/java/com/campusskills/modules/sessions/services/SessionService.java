@@ -2,12 +2,21 @@ package com.campusskills.modules.sessions.services;
 
 import com.campusskills.modules.sessions.models.Session;
 import com.campusskills.modules.sessions.repositories.SessionRepository;
+import com.campusskills.modules.exchanges.repositories.ExchangeRepository;
+import com.campusskills.modules.chats.repositories.ChatRepository;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import com.campusskills.shared.constants.SessionStatus;
 import com.campusskills.shared.constants.MessageType;
+import com.campusskills.shared.constants.ExchangeStatus;
 
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.stream.Collectors;
 
 import io.vertx.core.eventbus.EventBus;
 
@@ -15,10 +24,14 @@ public class SessionService {
 
     private final EventBus eventBus;
     private final SessionRepository repository;
+    private final ExchangeRepository exchangeRepository;
+    private final ChatRepository chatRepository;
 
-    public SessionService(EventBus eventBus, SessionRepository repository) {
+    public SessionService(EventBus eventBus, SessionRepository repository, ExchangeRepository exchangeRepository, ChatRepository chatRepository) {
         this.eventBus = eventBus;
         this.repository = repository;
+        this.exchangeRepository = exchangeRepository;
+        this.chatRepository = chatRepository;
     }
 
     private void publishSystemMessage(String chatId, MessageType type, String sessionId, String messageText) {
@@ -33,30 +46,57 @@ public class SessionService {
     }
 
     public Future<String> createSession(Session session, String requesterId) {
-        if (session.getExchangeId() == null || session.getTeacherId() == null || session.getStudentId() == null) {
-            return Future.failedFuture("exchangeId, teacherId, and studentId are required");
+        if (session.getExchangeId() == null) {
+            return Future.failedFuture("exchangeId is required");
         }
         if (requesterId == null || requesterId.trim().isEmpty()) {
             return Future.failedFuture("requesterId is required");
         }
-        if (!requesterId.equals(session.getStudentId())) {
-            return Future.failedFuture("UNAUTHORIZED: Only the student can propose a session");
-        }
-        
-        if (session.getTeacherId().equals(session.getStudentId())) {
-            return Future.failedFuture("teacherId and studentId cannot be the same");
-        }
 
-        session.setStatus(SessionStatus.PROPOSED);
-        session.setTeacherConfirmed(false);
-        session.setStudentConfirmed(false);
-        
-        return repository.createSession(session).onSuccess(id -> {
-            session.setId(id);
-            if (session.getChatId() != null) {
-                publishSystemMessage(session.getChatId(), MessageType.SESSION_PROPOSED, id, "A session meeting time has been proposed.");
+        return exchangeRepository.getExchangeById(session.getExchangeId()).compose(exchange -> {
+            if (exchange == null) {
+                return Future.failedFuture("EXCHANGE_NOT_FOUND");
             }
-            com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent("SESSION_PROPOSED", session);
+            if (!requesterId.equals(exchange.getRequesterId()) && !requesterId.equals(exchange.getReceiverId())) {
+                return Future.failedFuture("UNAUTHORIZED: User is not part of this exchange");
+            }
+            if (exchange.getStatus() != ExchangeStatus.ACCEPTED) {
+                return Future.failedFuture("FORBIDDEN: Exchange must be ACCEPTED before proposing a session");
+            }
+
+            return chatRepository.getChatByExchangeId(session.getExchangeId()).compose(chat -> {
+                System.out.println("[DEBUG-LIFECYCLE] --- Session Creation Validation ---");
+                if (chat == null) {
+                    System.out.println("[DEBUG-LIFECYCLE] linked chatId: NOT FOUND");
+                    return Future.failedFuture("CHAT_NOT_FOUND");
+                }
+                
+                System.out.println("[DEBUG-LIFECYCLE] linked chatId: " + chat.getId());
+                System.out.println("[DEBUG-LIFECYCLE] linked chat status detected during validation: " + chat.getStatus());
+
+                if (chat.getStatus() != com.campusskills.shared.constants.ChatStatus.ACTIVE) {
+                    return Future.failedFuture("FORBIDDEN: Linked chat is not ACTIVE");
+                }
+
+                // Derive backend state
+                session.setOrganizerId(requesterId);
+                List<String> participants = Arrays.asList(exchange.getRequesterId(), exchange.getReceiverId());
+                participants = participants.stream().distinct().collect(Collectors.toList());
+                session.setParticipants(participants);
+                session.setListingId(exchange.getListingId());
+                session.setChatId(chat.getId());
+                
+                session.setStatus(SessionStatus.PROPOSED);
+                session.setConfirmedBy(new HashSet<>());
+
+                return repository.createSession(session).onSuccess(id -> {
+                    session.setId(id);
+                    if (session.getChatId() != null) {
+                        publishSystemMessage(session.getChatId(), MessageType.SESSION_PROPOSED, id, "A session meeting time has been proposed.");
+                    }
+                    com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent("SESSION_PROPOSED", session);
+                });
+            });
         });
     }
 
@@ -75,7 +115,7 @@ public class SessionService {
             if (session == null) {
                 return Future.failedFuture("SESSION_NOT_FOUND");
             }
-            if (!requesterId.equals(session.getTeacherId()) && !requesterId.equals(session.getStudentId())) {
+            if (session.getParticipants() == null || !session.getParticipants().contains(requesterId)) {
                 return Future.failedFuture("UNAUTHORIZED: Only participants can view the session");
             }
             return Future.succeededFuture(session);
@@ -93,8 +133,11 @@ public class SessionService {
             if (session == null) {
                 return Future.failedFuture("SESSION_NOT_FOUND");
             }
-            if (!requesterId.equals(session.getTeacherId())) {
-                return Future.failedFuture("UNAUTHORIZED: Only the teacher can accept the session proposal");
+            if (session.getParticipants() == null || !session.getParticipants().contains(requesterId)) {
+                return Future.failedFuture("UNAUTHORIZED: Not a participant");
+            }
+            if (requesterId.equals(session.getOrganizerId())) {
+                return Future.failedFuture("UNAUTHORIZED: The organizer cannot accept their own proposal");
             }
             if (session.getStatus() != SessionStatus.PROPOSED) {
                 return Future.failedFuture("Session must be PROPOSED to be accepted");
@@ -126,8 +169,11 @@ public class SessionService {
             if (session == null) {
                 return Future.failedFuture("SESSION_NOT_FOUND");
             }
-            if (!requesterId.equals(session.getTeacherId())) {
-                return Future.failedFuture("UNAUTHORIZED: Only the teacher can reject the session proposal");
+            if (session.getParticipants() == null || !session.getParticipants().contains(requesterId)) {
+                return Future.failedFuture("UNAUTHORIZED: Not a participant");
+            }
+            if (requesterId.equals(session.getOrganizerId())) {
+                return Future.failedFuture("UNAUTHORIZED: The organizer cannot reject their own proposal");
             }
             if (session.getStatus() != SessionStatus.PROPOSED) {
                 return Future.failedFuture("Session must be PROPOSED to be rejected");
@@ -159,7 +205,7 @@ public class SessionService {
             if (session == null) {
                 return Future.failedFuture("SESSION_NOT_FOUND");
             }
-            if (!requesterId.equals(session.getTeacherId()) && !requesterId.equals(session.getStudentId())) {
+            if (session.getParticipants() == null || !session.getParticipants().contains(requesterId)) {
                 return Future.failedFuture("UNAUTHORIZED: Only participants can cancel the session");
             }
             if (session.getStatus() != SessionStatus.PROPOSED && session.getStatus() != SessionStatus.SCHEDULED) {
@@ -192,21 +238,19 @@ public class SessionService {
             if (session == null) {
                 return Future.failedFuture("SESSION_NOT_FOUND");
             }
-            if (!requesterId.equals(session.getTeacherId())) {
-                return Future.failedFuture("UNAUTHORIZED: Only the teacher can complete the session");
+            if (session.getParticipants() == null || !session.getParticipants().contains(requesterId)) {
+                return Future.failedFuture("UNAUTHORIZED: Only participants can complete the session");
             }
             if (session.getStatus() != SessionStatus.SCHEDULED) {
                 return Future.failedFuture("Session must be SCHEDULED to be completed");
             }
             JsonObject updates = new JsonObject()
-                    .put("teacherConfirmed", true)
                     .put("status", SessionStatus.COMPLETED.name());
             return repository.updateSessionFields(sessionId, updates).compose(updated -> {
                 if (updated) {
                     session.setStatus(SessionStatus.COMPLETED);
-                    session.setTeacherConfirmed(true);
                     if (session.getChatId() != null) {
-                        publishSystemMessage(session.getChatId(), MessageType.SYSTEM, sessionId, "Session completed by teacher. Waiting for student confirmation.");
+                        publishSystemMessage(session.getChatId(), MessageType.SYSTEM, sessionId, "Session marked as completed. Please confirm.");
                     }
                     com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent("SESSION_UPDATED", session);
                     return Future.succeededFuture();
@@ -228,19 +272,37 @@ public class SessionService {
             if (session == null) {
                 return Future.failedFuture("SESSION_NOT_FOUND");
             }
-            if (!requesterId.equals(session.getStudentId())) {
-                return Future.failedFuture("UNAUTHORIZED: Only the student can confirm the session");
+            if (session.getParticipants() == null || !session.getParticipants().contains(requesterId)) {
+                return Future.failedFuture("UNAUTHORIZED: Only participants can confirm the session");
             }
             if (session.getStatus() != SessionStatus.COMPLETED) {
-                return Future.failedFuture("Session must be COMPLETED to be confirmed by student");
+                return Future.failedFuture("Session must be COMPLETED to be confirmed");
             }
-            JsonObject updates = new JsonObject()
-                    .put("studentConfirmed", true);
+            
+            Set<String> confirmedBy = session.getConfirmedBy();
+            if (confirmedBy == null) {
+                confirmedBy = new HashSet<>();
+            }
+            confirmedBy.add(requesterId);
+            
+            io.vertx.core.json.JsonArray confirmedArray = new io.vertx.core.json.JsonArray();
+            confirmedBy.forEach(confirmedArray::add);
+
+            JsonObject updates = new JsonObject().put("confirmedBy", confirmedArray);
+            
+            final Set<String> finalConfirmedBy = confirmedBy;
+
             return repository.updateSessionFields(sessionId, updates).compose(updated -> {
                 if (updated) {
-                    session.setStudentConfirmed(true);
-                    if (session.getChatId() != null) {
-                        publishSystemMessage(session.getChatId(), MessageType.SESSION_CONFIRMED, sessionId, "Session has been mutually confirmed.");
+                    session.setConfirmedBy(finalConfirmedBy);
+                    if (finalConfirmedBy.size() == session.getParticipants().size()) {
+                        if (session.getChatId() != null) {
+                            publishSystemMessage(session.getChatId(), MessageType.SESSION_CONFIRMED, sessionId, "Session has been mutually confirmed by all participants.");
+                        }
+                    } else {
+                         if (session.getChatId() != null) {
+                            publishSystemMessage(session.getChatId(), MessageType.SYSTEM, sessionId, "A participant has confirmed the session.");
+                        }
                     }
                     com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent("SESSION_CONFIRMED", session);
                     return Future.succeededFuture();
@@ -262,7 +324,7 @@ public class SessionService {
             if (session == null) {
                 return Future.failedFuture("SESSION_NOT_FOUND");
             }
-            if (!requesterId.equals(session.getTeacherId()) && !requesterId.equals(session.getStudentId())) {
+            if (session.getParticipants() == null || !session.getParticipants().contains(requesterId)) {
                 return Future.failedFuture("UNAUTHORIZED: Only participants can dispute the session");
             }
             if (session.getStatus() != SessionStatus.SCHEDULED && session.getStatus() != SessionStatus.COMPLETED) {

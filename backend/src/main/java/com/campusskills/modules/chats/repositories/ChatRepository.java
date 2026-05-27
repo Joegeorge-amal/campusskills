@@ -62,4 +62,10 @@ public class ChatRepository {
         return client.updateCollection(COLLECTION, query, update)
                 .map(res -> res.getDocModified() > 0);
     }
+
+    public Future<Chat> getChatByExchangeId(String exchangeId) {
+        JsonObject query = new JsonObject().put("exchangeId", exchangeId);
+        return client.findOne(COLLECTION, query, null)
+                .map(doc -> doc == null ? null : doc.mapTo(Chat.class));
+    }
 }

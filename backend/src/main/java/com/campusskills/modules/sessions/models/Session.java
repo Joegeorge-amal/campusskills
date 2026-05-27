@@ -13,19 +13,22 @@ public class Session {
     private String id;
     private String exchangeId;
     private String chatId;
-    private String teacherId;
-    private String studentId;
+    private String listingId;
+    private String organizerId;
+    private java.util.List<String> participants;
     private Long scheduledStart;
     private Long scheduledEnd;
     private String meetingPlatform;
     private String meetingLink;
-    private SessionStatus status; // SCHEDULED, ONGOING, COMPLETED, DISPUTED, CANCELLED
-    private Boolean teacherConfirmed;
-    private Boolean studentConfirmed;
+    private SessionStatus status;
+    private java.util.Set<String> confirmedBy;
     private Long createdAt;
     private Long updatedAt;
 
-    public Session() {}
+    public Session() {
+        this.participants = new java.util.ArrayList<>();
+        this.confirmedBy = new java.util.HashSet<>();
+    }
 
     public String getId() {
         return id;
@@ -51,20 +54,28 @@ public class Session {
         this.chatId = chatId;
     }
 
-    public String getTeacherId() {
-        return teacherId;
+    public String getListingId() {
+        return listingId;
     }
 
-    public void setTeacherId(String teacherId) {
-        this.teacherId = teacherId;
+    public void setListingId(String listingId) {
+        this.listingId = listingId;
     }
 
-    public String getStudentId() {
-        return studentId;
+    public String getOrganizerId() {
+        return organizerId;
     }
 
-    public void setStudentId(String studentId) {
-        this.studentId = studentId;
+    public void setOrganizerId(String organizerId) {
+        this.organizerId = organizerId;
+    }
+
+    public java.util.List<String> getParticipants() {
+        return participants;
+    }
+
+    public void setParticipants(java.util.List<String> participants) {
+        this.participants = participants;
     }
 
     public Long getScheduledStart() {
@@ -107,20 +118,12 @@ public class Session {
         this.status = status;
     }
 
-    public Boolean getTeacherConfirmed() {
-        return teacherConfirmed;
+    public java.util.Set<String> getConfirmedBy() {
+        return confirmedBy;
     }
 
-    public void setTeacherConfirmed(Boolean teacherConfirmed) {
-        this.teacherConfirmed = teacherConfirmed;
-    }
-
-    public Boolean getStudentConfirmed() {
-        return studentConfirmed;
-    }
-
-    public void setStudentConfirmed(Boolean studentConfirmed) {
-        this.studentConfirmed = studentConfirmed;
+    public void setConfirmedBy(java.util.Set<String> confirmedBy) {
+        this.confirmedBy = confirmedBy;
     }
 
     public Long getCreatedAt() {

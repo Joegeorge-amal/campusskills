@@ -11,7 +11,9 @@ public class SessionRouter {
         Router router = Router.router(vertx);
         
         SessionRepository repository = new SessionRepository();
-        SessionService service = new SessionService(vertx.eventBus(), repository);
+        com.campusskills.modules.exchanges.repositories.ExchangeRepository exchangeRepository = new com.campusskills.modules.exchanges.repositories.ExchangeRepository();
+        com.campusskills.modules.chats.repositories.ChatRepository chatRepository = new com.campusskills.modules.chats.repositories.ChatRepository();
+        SessionService service = new SessionService(vertx.eventBus(), repository, exchangeRepository, chatRepository);
         SessionHandler handler = new SessionHandler(service);
 
         router.post("/").handler(handler::createSession);
