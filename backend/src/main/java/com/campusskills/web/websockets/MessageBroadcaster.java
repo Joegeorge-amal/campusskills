@@ -15,10 +15,10 @@ public class MessageBroadcaster {
                 .put("sessionId", message.getSessionId())
                 .put("createdAt", message.getCreatedAt());
 
-        JsonObject event = new JsonObject()
-                .put("type", "NEW_MESSAGE")
-                .put("timestamp", System.currentTimeMillis())
-                .put("payload", eventPayload);
+        JsonObject event = new WebSocketMessageBuilder()
+                .type(WebSocketEventType.NEW_MESSAGE)
+                .payload(eventPayload)
+                .build();
 
         for (String participant : participants) {
             ConnectionManager.sendMessage(participant, event);
@@ -26,10 +26,11 @@ public class MessageBroadcaster {
     }
 
     public static void broadcastSessionEvent(String eventType, Session session) {
-        JsonObject event = new JsonObject()
-                .put("type", eventType)
-                .put("timestamp", System.currentTimeMillis())
-                .put("payload", new JsonObject().put("session", JsonObject.mapFrom(session)));
+        WebSocketEventType type = WebSocketEventType.valueOf(eventType);
+        JsonObject event = new WebSocketMessageBuilder()
+                .type(type)
+                .payload(new JsonObject().put("session", JsonObject.mapFrom(session)))
+                .build();
 
         ConnectionManager.sendMessage(session.getTeacherId(), event);
         ConnectionManager.sendMessage(session.getStudentId(), event);

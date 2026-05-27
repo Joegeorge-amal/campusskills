@@ -50,7 +50,32 @@ public class WebSocketHandler implements Handler<ServerWebSocket> {
                 
                 ws.handler(buffer -> {
                     log.debug("Received message from {}: {}", userId, buffer.toString());
-                    // WebSockets used only for delivery, frontend broadcasts are ignored
+                    try {
+                        JsonObject data = buffer.toJsonObject();
+                        String typeStr = data.getString("type");
+                        JsonObject payload = data.getJsonObject("payload");
+                        
+                        if (typeStr != null && payload != null) {
+                            WebSocketEventType type = WebSocketEventType.valueOf(typeStr);
+                            
+                            if (type == WebSocketEventType.TYPING_STARTED || type == WebSocketEventType.TYPING_STOPPED) {
+                                String targetUserId = payload.getString("targetUserId");
+                                if (targetUserId != null && !targetUserId.equals(userId)) {
+                                    // Strip any spoofed senderId and enforce authenticated identity
+                                    payload.put("senderId", userId);
+                                    
+                                    JsonObject event = new WebSocketMessageBuilder()
+                                        .type(type)
+                                        .payload(payload)
+                                        .build();
+                                    
+                                    ConnectionManager.sendMessage(targetUserId, event);
+                                }
+                            }
+                        }
+                    } catch (Exception e) {
+                        log.warn("Invalid websocket message from {}: {}", userId, e.getMessage());
+                    }
                 });
                 
                 ws.closeHandler(v -> {

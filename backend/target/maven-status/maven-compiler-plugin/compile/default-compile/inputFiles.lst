@@ -33,4 +33,6 @@ C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusski
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\web\router\ApiRouter.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\web\websockets\ConnectionManager.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\web\websockets\MessageBroadcaster.java
+C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\web\websockets\WebSocketEventType.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\web\websockets\WebSocketHandler.java
+C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\web\websockets\WebSocketMessageBuilder.java

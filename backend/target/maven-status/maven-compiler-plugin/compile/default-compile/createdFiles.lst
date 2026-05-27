@@ -1,5 +1,6 @@
 com\campusskills\modules\chats\repositories\ChatRepository.class
 com\campusskills\web\websockets\WebSocketHandler.class
+com\campusskills\web\websockets\WebSocketEventType.class
 com\campusskills\web\response\ApiResponse.class
 com\campusskills\web\websockets\ConnectionManager.class
 com\campusskills\modules\chats\models\Chat.class
@@ -11,6 +12,7 @@ com\campusskills\modules\chats\services\ChatService.class
 com\campusskills\modules\users\routes\AuthRouter.class
 com\campusskills\modules\users\services\UserService.class
 com\campusskills\modules\messages\repositories\MessageRepository.class
+com\campusskills\web\websockets\WebSocketMessageBuilder.class
 com\campusskills\web\middleware\RequestIdMiddleware.class
 com\campusskills\core\database\MongoManager.class
 com\campusskills\modules\messages\services\MessageService.class
