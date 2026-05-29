@@ -19,9 +19,9 @@ public class AuthHandler {
             String email = body.getString("email");
             String password = body.getString("password");
             String displayName = body.getString("displayName");
-            String role = body.getString("role");
+            String erpid = body.getString("erpid");
 
-            userService.signup(email, password, displayName, role)
+            userService.signup(email, password, erpid, displayName)
                 .onSuccess(data -> ApiResponse.created(ctx, data))
                 .onFailure(err -> {
                     if ("EMAIL_EXISTS".equals(err.getMessage())) {

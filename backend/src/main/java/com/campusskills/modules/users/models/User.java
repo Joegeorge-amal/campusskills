@@ -8,8 +8,9 @@ public class User {
     private String id;
     private String email;
     private String passwordHash;
-    private String displayName;
-    private String role; // STUDENT, TEACHER, ADMIN
+    private String erpid;
+    private UserRole role;
+    private Boolean isActive;
     private Long createdAt;
     private Long updatedAt;
 
@@ -24,11 +25,14 @@ public class User {
     public String getPasswordHash() { return passwordHash; }
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
 
-    public String getDisplayName() { return displayName; }
-    public void setDisplayName(String displayName) { this.displayName = displayName; }
+    public String getErpid() { return erpid; }
+    public void setErpid(String erpid) { this.erpid = erpid; }
 
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
+    public UserRole getRole() { return role; }
+    public void setRole(UserRole role) { this.role = role; }
+    
+    public Boolean getIsActive() { return isActive; }
+    public void setIsActive(Boolean isActive) { this.isActive = isActive; }
 
     public Long getCreatedAt() { return createdAt; }
     public void setCreatedAt(Long createdAt) { this.createdAt = createdAt; }

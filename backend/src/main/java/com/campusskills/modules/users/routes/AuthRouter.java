@@ -12,8 +12,11 @@ public class AuthRouter {
     public static Router create(Vertx vertx, JWTAuth jwtAuth) {
         Router router = Router.router(vertx);
         
-        UserRepository repository = new UserRepository();
-        UserService service = new UserService(repository, jwtAuth);
+        com.campusskills.modules.users.repositories.UserRepository userRepository = new com.campusskills.modules.users.repositories.UserRepository();
+        com.campusskills.modules.users.repositories.UserProfileRepository profileRepository = new com.campusskills.modules.users.repositories.UserProfileRepository();
+        com.campusskills.modules.users.repositories.UserStatsRepository statsRepository = new com.campusskills.modules.users.repositories.UserStatsRepository();
+        com.campusskills.modules.users.repositories.UserWalletRepository walletRepository = new com.campusskills.modules.users.repositories.UserWalletRepository();
+        UserService service = new UserService(userRepository, profileRepository, statsRepository, walletRepository, jwtAuth);
         AuthHandler handler = new AuthHandler(service);
 
         router.post("/signup").handler(handler::signup);

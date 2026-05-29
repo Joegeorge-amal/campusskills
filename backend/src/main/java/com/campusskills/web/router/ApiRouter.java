@@ -9,6 +9,7 @@ import com.campusskills.modules.messages.routes.MessageRouter;
 import com.campusskills.modules.exchanges.routes.ExchangeRouter;
 import com.campusskills.modules.sessions.routes.SessionRouter;
 import com.campusskills.modules.users.routes.AuthRouter;
+import com.campusskills.modules.users.routes.UserRouter;
 
 import com.campusskills.web.middleware.RequestIdMiddleware;
 import com.campusskills.web.middleware.GlobalErrorHandler;
@@ -44,12 +45,14 @@ public class ApiRouter {
         router.mountSubRouter("/auth", AuthRouter.create(vertx, jwtAuth));
 
         // 5. Protected Routes Middleware
+        router.route("/users/*").handler(JwtAuthMiddleware.create(jwtAuth));
         router.route("/chats/*").handler(JwtAuthMiddleware.create(jwtAuth));
         router.route("/messages/*").handler(JwtAuthMiddleware.create(jwtAuth));
         router.route("/exchanges/*").handler(JwtAuthMiddleware.create(jwtAuth));
         router.route("/sessions/*").handler(JwtAuthMiddleware.create(jwtAuth));
 
         // 6. Modules Routing
+        router.mountSubRouter("/users", UserRouter.create(vertx, jwtAuth));
         router.mountSubRouter("/chats", ChatRouter.create(vertx));
         router.mountSubRouter("/messages", MessageRouter.create(vertx));
         router.mountSubRouter("/exchanges", ExchangeRouter.create(vertx));
