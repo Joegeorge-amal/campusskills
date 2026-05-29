@@ -60,17 +60,16 @@ public class WebSocketHandler implements Handler<ServerWebSocket> {
                             WebSocketEventType type = WebSocketEventType.valueOf(typeStr);
                             
                             if (type == WebSocketEventType.TYPING_STARTED || type == WebSocketEventType.TYPING_STOPPED) {
-                                String targetUserId = payload.getString("targetUserId");
-                                if (targetUserId != null && !targetUserId.equals(userId)) {
+                                String chatId = payload.getString("chatId");
+                                if (chatId != null && !chatId.trim().isEmpty()) {
                                     // Strip any spoofed senderId and enforce authenticated identity
-                                    payload.put("senderId", userId);
+                                    payload.put("userId", userId);
                                     
-                                    JsonObject event = new WebSocketMessageBuilder()
-                                        .type(type)
-                                        .payload(payload)
-                                        .build();
-                                    
-                                    ConnectionManager.sendMessage(targetUserId, event);
+                                    JsonObject event = new JsonObject()
+                                        .put("type", typeStr)
+                                        .put("payload", payload);
+                                        
+                                    vertx.eventBus().send("internal.typing.event", event);
                                 }
                             }
                         }

@@ -8,9 +8,11 @@ import java.util.List;
 
 public class MessageService {
     private final MessageRepository repository;
+    private final TypingIndicatorService typingService;
 
-    public MessageService(MessageRepository repository) {
+    public MessageService(MessageRepository repository, TypingIndicatorService typingService) {
         this.repository = repository;
+        this.typingService = typingService;
     }
 
     public Future<String> createMessage(Message message) {
@@ -46,6 +48,7 @@ public class MessageService {
             message.setMessage(content); // Store trimmed content
             return repository.createMessage(message).onSuccess(id -> {
                 com.campusskills.web.websockets.MessageBroadcaster.broadcastNewMessage(message, participantList);
+                typingService.clearTypingState(message.getChatId(), message.getSenderId(), participantList);
             });
         });
     }

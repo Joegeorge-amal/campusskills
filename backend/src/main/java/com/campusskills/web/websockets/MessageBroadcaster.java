@@ -51,6 +51,27 @@ public class MessageBroadcaster {
         }
     }
 
+    public static void broadcastTypingEvent(String typeStr, String chatId, String userId, java.util.List<String> participants) {
+        try {
+            JsonObject eventPayload = new JsonObject()
+                    .put("chatId", chatId)
+                    .put("userId", userId);
+
+            JsonObject event = new WebSocketMessageBuilder()
+                    .type(WebSocketEventType.valueOf(typeStr))
+                    .payload(eventPayload)
+                    .build();
+
+            for (String participant : participants) {
+                if (!participant.equals(userId)) {
+                    ConnectionManager.sendMessage(participant, event);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[BROADCAST WARN] Failed to broadcast " + typeStr + ": " + e.getMessage());
+        }
+    }
+
     public static void broadcastSessionEvent(String eventType, Session session) {
         try {
             WebSocketEventType type;

@@ -11,7 +11,9 @@ public class MessageRouter {
         Router router = Router.router(vertx);
         
         MessageRepository repository = new MessageRepository();
-        MessageService service = new MessageService(repository);
+        com.campusskills.modules.messages.services.TypingIndicatorService typingService = 
+            new com.campusskills.modules.messages.services.TypingIndicatorService(vertx, repository);
+        MessageService service = new MessageService(repository, typingService);
         MessageHandler handler = new MessageHandler(service);
 
         router.post("/").handler(handler::createMessage);
@@ -29,6 +31,13 @@ public class MessageRouter {
                     msg.fail(500, ar.cause().getMessage());
                 }
             });
+        });
+
+        vertx.eventBus().<io.vertx.core.json.JsonObject>consumer("internal.typing.event", msg -> {
+            io.vertx.core.json.JsonObject data = msg.body();
+            String typeStr = data.getString("type");
+            io.vertx.core.json.JsonObject payload = data.getJsonObject("payload");
+            typingService.handleTypingEvent(typeStr, payload);
         });
 
         return router;
