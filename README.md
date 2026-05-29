@@ -1,229 +1,160 @@
 # CampusSkills
 
-A peer-to-peer skill exchange platform designed for university students.
+CampusSkills is a peer-to-peer learning platform designed for university students.
 
-Students can teach skills, learn from peers, exchange knowledge through skill swaps, schedule sessions, communicate through real-time chat, and build reputation through ratings and reviews.
+The platform enables students to:
+
+* Teach skills to other students
+* Learn new skills from peers
+* Offer paid learning sessions
+* Exchange skills through skill swaps
+* Schedule and manage learning sessions
+* Communicate through real-time chat
+* Build trust through ratings and reviews
 
 ---
 
 ## Tech Stack
 
-![Java](https://img.shields.io/badge/Java-17-orange)
-![Vert.x](https://img.shields.io/badge/Vert.x-4.5-green)
-![MongoDB](https://img.shields.io/badge/MongoDB-Database-brightgreen)
-![JWT](https://img.shields.io/badge/JWT-Authentication-blue)
-![WebSocket](https://img.shields.io/badge/WebSocket-Realtime-purple)
-![Maven](https://img.shields.io/badge/Maven-Build-red)
-![Git](https://img.shields.io/badge/Git-Version%20Control-orange)
-![GitHub](https://img.shields.io/badge/GitHub-Repository-black)
+| Technology | Version    |
+| ---------- | ---------- |
+| Java       | 17         |
+| Vert.x     | 4.5.13     |
+| MongoDB    | 7          |
+| Maven      | Build Tool |
 
 ---
 
 ## Architecture
 
-The platform follows a modular backend architecture built using:
+The backend follows a modular architecture built using:
 
 * Router → Handler → Service → Repository pattern
-* JWT-based authentication
 * MongoDB document storage
+* JWT Authentication
 * WebSocket-based real-time communication
-* Role architecture (USER / ADMIN)
-* Normalized user domain (User, UserProfile, UserStats)
+* Role-based authorization (USER / ADMIN)
+* Normalized user domain architecture
 
 ---
 
-# Features
+## Core Features
 
-## User Onboarding & Personalization
-
-Allows users to complete and personalize their profile during first-time setup.
-
-* Profile picture upload
-* Roll number, department and academic details
-* Bio / About section
-* Skills offered
-* Preferred learning categories
-
----
-
-## User Profiles
+### User Profiles
 
 Students can create and manage profiles showcasing skills they can teach or skills they want to learn.
 
-Backed by a normalized user architecture consisting of:
-
-* User
-* UserProfile
-* UserStats
-
-Features:
-
-* Name and department
-* Bio/about section
-* Skills offered
-* Rating and review display
 * Profile picture
-* Session requests
-* Bank details (planned)
-* UPI QR code (planned)
+* Department and academic information
+* Bio/About section
+* Skills offered
+* Ratings and reviews
+* Session request support
 
 ---
 
-## User Dashboard
+### Skill Marketplace
 
-Provides users with a centralized overview of their activity and platform interactions.
+Students can create listings for:
 
-* Skill statistics
-* Session statistics
-* Trust/rating score
-* Search for sessions
-* Wallet balance overview
-* Upcoming sessions
-* Recent messages
-* Notifications and alerts
-* Create listings
-
----
-
-## Skill Marketplace
-
-Students can browse available skill offerings and exchange opportunities.
-
-* Create skill listings
-* Browse/search listings
-* Category filtering
-* Paid sessions
+* Paid learning sessions
 * Skill swap sessions
-* Online/offline modes
-* Detailed listing pages
-* View listing creator profiles
-* View ratings and reviews
+* Free mentoring sessions
+
+Features include:
+
+* Create listings
+* Browse and search listings
+* Category filtering
+* Online / Offline learning modes
+* Listing details pages
+* User profile integration
+* Ratings and review visibility
 
 ---
 
-## Exchange Requests
+### Exchange Requests
 
-Students can request sessions from other users.
+Students can request learning sessions from other users.
 
-* Send requests
-* Accept/reject requests
-* Notification integration
+* Request creation
+* Accept / Reject workflows
+* Exchange lifecycle tracking
+* Session creation from accepted requests
 * Request status tracking
-* Request lifecycle management
-* Backend-derived exchange ownership
-* Session creation from accepted exchanges
 
 ---
 
-## Scheduling System
-
-Allows users to schedule learning sessions.
+### Scheduling & Sessions
 
 * Session proposal workflow
-* Scheduled session lifecycle
-* Session status lifecycle tracking
-* Online/offline scheduling
-* Session date and time management
-* Upcoming/completed sessions
-* Online / Offline / Skill Swap session types
+* Session lifecycle management
+* Upcoming and completed sessions
+* Online / Offline sessions
+* Skill swap sessions
+* Session status tracking
 
 ---
 
-## Messaging System
+### Messaging System
 
 Real-time communication between students.
 
-* Real-time one-to-one conversations
+* One-to-one conversations
 * Exchange-linked chat lifecycle
 * Read receipts
-* Unread message counts
+* Unread message tracking
 * Typing indicators
 * Message history
-* Exchange acceptance gating
-* Pagination support
-* WebSocket-based messaging
+* WebSocket messaging
 
 ---
 
-## Session Management
+### Notifications
 
-Tracks learning session progress and completion.
+Real-time activity notifications.
 
-* Session status tracking
-* Participant completion confirmation
-* Session history
-* Attendance/completion logs
+* New message notifications
+* Request updates
+* Session reminders
+* Notification badge counts
+* Read / Unread tracking
 
 ---
 
-## Ratings & Review System
+### Ratings & Reviews
 
-Students can review completed sessions.
+Students can review completed learning sessions.
 
 * Star ratings
 * Written reviews
-* Rating averages
+* Rating aggregation
 
 ---
 
-## Wallet System (Mock Payment System)
-
-Internal credit-based transaction system.
-
-* Credit balance
-* Session payments
-* Transaction history
-* Withdrawal requests (mock implementation)
-
----
-
-## Video Call Integration
-
-Supports online learning sessions.
-
-* Google Meet integration (planned)
-* Session-linked meeting rooms
-
----
-
-## Notification System
-
-Provides real-time and activity-based notifications.
-
-* New message notifications
-* Session reminders
-* Request acceptance/rejection alerts
-* Upcoming session alerts
-* Wallet/payment updates
-* Notification badge counts
-* Read/unread notification tracking
-* Notification persistence
-
----
-
-## Authentication & Security
+### Authentication & Security
 
 * JWT Authentication
-* Role-based authorization (USER / ADMIN)
 * Protected API routes
 * BCrypt password hashing
+* Role-based authorization
 * Email verification (In Progress)
-* Refresh token support (Planned)
+* Refresh tokens (Planned)
 
 ---
 
-## Admin & Moderation
+### Wallet System (Mock Payment Layer)
 
-* USER / ADMIN role architecture
-* User flagging (Planned)
-* Content moderation tools (Planned)
-* Administrative controls (Planned)
+Internal transaction architecture for paid sessions.
+
+* Credit balance tracking
+* Session payments
+* Transaction history
+* Withdrawal requests (Mock)
 
 ---
 
 ## Documentation
-
-Project documentation can be found in:
 
 ```text
 docs/
@@ -234,29 +165,33 @@ docs/
 
 ---
 
-## Current Status
+## Project Status
 
 🚧 Active Development
 
-Completed major backend modules:
+### Completed
 
-* Chats
-* Messages
-* Read Receipts
-* Unread Message Tracking
-* Typing Indicators
+* Real-time Chat System
 * Exchange Requests
 * Session Scheduling
 * Notifications
+* Read Receipts
+* Typing Indicators
 * User Domain Normalization
+* JWT Authentication Foundation
 
-Currently Working On:
+### In Progress
 
-* Auth V2
+* Authentication V2
 
   * Email Verification
   * Refresh Tokens
-  * Improved Authentication Flow
+  * Improved Session Management
 
-```
-```
+### Planned
+
+* Video Call Integration
+* Wallet Enhancements
+* Google OAuth
+* Admin Moderation Tools
+* File Attachments
