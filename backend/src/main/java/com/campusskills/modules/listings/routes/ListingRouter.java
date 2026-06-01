@@ -20,7 +20,8 @@ public class ListingRouter {
         // POST /listings is protected
         router.post("/").handler(JwtAuthMiddleware.create(jwtAuth)).handler(handler::createListing);
 
-        // Future GET routes can be left unprotected or protected selectively here.
+        // GET /listings is public
+        router.get("/").handler(handler::getAllListings);
 
         return router;
     }

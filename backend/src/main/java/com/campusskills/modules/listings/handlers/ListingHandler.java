@@ -116,4 +116,19 @@ public class ListingHandler {
             ApiResponse.sendError(ctx, 400, "Invalid request payload");
         }
     }
+
+    public void getAllListings(RoutingContext ctx) {
+        listingService.findAllActive()
+            .onSuccess(listings -> {
+                io.vertx.core.json.JsonArray jsonArray = new io.vertx.core.json.JsonArray();
+                for (Listing l : listings) {
+                    jsonArray.add(JsonObject.mapFrom(l));
+                }
+                ApiResponse.ok(ctx, jsonArray);
+            })
+            .onFailure(err -> {
+                err.printStackTrace();
+                ApiResponse.internalError(ctx, "Failed to retrieve listings");
+            });
+    }
 }

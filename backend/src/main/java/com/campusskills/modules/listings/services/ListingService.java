@@ -23,4 +23,10 @@ public class ListingService {
     public Future<Listing> getListingById(String id) {
         return listingRepository.findById(id);
     }
+
+    public Future<java.util.List<Listing>> findAllActive() {
+        return listingRepository.findAllActive().onSuccess(listings -> {
+            System.out.println("[LISTING] Retrieved " + listings.size() + " active listings");
+        });
+    }
 }

@@ -47,4 +47,16 @@ public class ListingRepository {
             .put("updatedAt", System.currentTimeMillis()));
         return client.updateCollection(COLLECTION, query, update).mapEmpty();
     }
+
+    public Future<java.util.List<Listing>> findAllActive() {
+        JsonObject query = new JsonObject().put("active", true);
+        io.vertx.ext.mongo.FindOptions options = new io.vertx.ext.mongo.FindOptions()
+            .setSort(new JsonObject().put("createdAt", -1));
+            
+        return client.findWithOptions(COLLECTION, query, options).map(docs -> {
+            return docs.stream()
+                .map(doc -> doc.mapTo(Listing.class))
+                .collect(java.util.stream.Collectors.toList());
+        });
+    }
 }
