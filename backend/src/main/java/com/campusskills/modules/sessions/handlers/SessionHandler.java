@@ -120,20 +120,7 @@ public class SessionHandler {
         }
         
         sessionService.completeSession(sessionId, authId)
-            .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("message", "Session marked as COMPLETED by teacher")))
-            .onFailure(err -> handleSessionFailure(ctx, err));
-    }
-
-    public void confirmSession(RoutingContext ctx) {
-        String sessionId = ctx.pathParam("sessionId");
-        String authId = ctx.get("authenticatedUserId");
-        if (authId == null) {
-            ApiResponse.forbidden(ctx, "Unauthorized");
-            return;
-        }
-        
-        sessionService.confirmSession(sessionId, authId)
-            .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("message", "Session confirmed by student")))
+            .onSuccess(msg -> ApiResponse.ok(ctx, new JsonObject().put("message", msg)))
             .onFailure(err -> handleSessionFailure(ctx, err));
     }
 

@@ -244,7 +244,7 @@ public class SessionService {
         });
     }
 
-    public Future<Void> completeSession(String sessionId, String requesterId) {
+    public Future<String> completeSession(String sessionId, String requesterId) {
         if (sessionId == null || sessionId.trim().isEmpty()) {
             return Future.failedFuture("sessionId is required");
         }
@@ -258,74 +258,56 @@ public class SessionService {
             if (session.getParticipants() == null || !session.getParticipants().contains(requesterId)) {
                 return Future.failedFuture("UNAUTHORIZED: Only participants can complete the session");
             }
-            if (session.getStatus() != SessionStatus.SCHEDULED) {
-                return Future.failedFuture("Session must be SCHEDULED to be completed");
+            if (session.getStatus() != SessionStatus.SCHEDULED && session.getStatus() != SessionStatus.PENDING_COMPLETION) {
+                return Future.failedFuture("Session must be SCHEDULED or PENDING_COMPLETION to be completed");
             }
-            JsonObject updates = new JsonObject()
-                    .put("status", SessionStatus.COMPLETED.name());
-            return repository.updateSessionFields(sessionId, updates).compose(updated -> {
-                if (updated) {
-                    session.setStatus(SessionStatus.COMPLETED);
-                    if (session.getChatId() != null) {
-                        publishSystemMessage(session.getChatId(), MessageType.SYSTEM, sessionId, "Session marked as completed. Please confirm.");
-                    }
-                    System.out.println(String.format("[LIFECYCLE] Session SCHEDULED -> COMPLETED | sessionId=%s chatId=%s authenticatedUserId=%s", sessionId, session.getChatId(), requesterId));
-                    com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent("SESSION_UPDATE", session);
-                    return Future.succeededFuture();
-                } else {
-                    return Future.failedFuture("SESSION_NOT_FOUND");
-                }
-            });
-        });
-    }
 
-    public Future<Void> confirmSession(String sessionId, String requesterId) {
-        if (sessionId == null || sessionId.trim().isEmpty()) {
-            return Future.failedFuture("sessionId is required");
-        }
-        if (requesterId == null || requesterId.trim().isEmpty()) {
-            return Future.failedFuture("requesterId is required");
-        }
-        return repository.getSessionById(sessionId).compose(session -> {
-            if (session == null) {
-                return Future.failedFuture("SESSION_NOT_FOUND");
-            }
-            if (session.getParticipants() == null || !session.getParticipants().contains(requesterId)) {
-                return Future.failedFuture("UNAUTHORIZED: Only participants can confirm the session");
-            }
-            if (session.getStatus() != SessionStatus.COMPLETED) {
-                return Future.failedFuture("Session must be COMPLETED to be confirmed");
-            }
-            
             Set<String> confirmedBy = session.getConfirmedBy();
             if (confirmedBy == null) {
                 confirmedBy = new HashSet<>();
             }
+
+            if (confirmedBy.contains(requesterId)) {
+                // Idempotent: already marked complete by this user
+                return Future.succeededFuture("You have already marked this session as complete.");
+            }
+
             confirmedBy.add(requesterId);
-            
+
             io.vertx.core.json.JsonArray confirmedArray = new io.vertx.core.json.JsonArray();
             confirmedBy.forEach(confirmedArray::add);
 
-            JsonObject updates = new JsonObject().put("confirmedBy", confirmedArray);
+            boolean isFullyCompleted = confirmedBy.size() == session.getParticipants().size();
+            SessionStatus newStatus = isFullyCompleted ? SessionStatus.COMPLETED : SessionStatus.PENDING_COMPLETION;
+
+            JsonObject updates = new JsonObject()
+                    .put("status", newStatus.name())
+                    .put("confirmedBy", confirmedArray);
             
             final Set<String> finalConfirmedBy = confirmedBy;
 
             return repository.updateSessionFields(sessionId, updates).compose(updated -> {
                 if (updated) {
+                    session.setStatus(newStatus);
                     session.setConfirmedBy(finalConfirmedBy);
-                    if (finalConfirmedBy.size() == session.getParticipants().size()) {
+                    
+                    String resultMessage;
+                    if (isFullyCompleted) {
+                        resultMessage = "Session mutually completed.";
                         if (session.getChatId() != null) {
-                            publishSystemMessage(session.getChatId(), MessageType.SESSION_CONFIRMED, sessionId, "Session has been mutually confirmed by all participants.");
+                            publishSystemMessage(session.getChatId(), MessageType.SESSION_CONFIRMED, sessionId, "Session mutually completed.");
                         }
-                        System.out.println(String.format("[LIFECYCLE] Session COMPLETED -> CONFIRMED | sessionId=%s chatId=%s authenticatedUserId=%s", sessionId, session.getChatId(), requesterId));
+                        System.out.println(String.format("[LIFECYCLE] Session %s -> COMPLETED | sessionId=%s chatId=%s authenticatedUserId=%s", session.getStatus().name(), sessionId, session.getChatId(), requesterId));
                     } else {
-                         if (session.getChatId() != null) {
-                            publishSystemMessage(session.getChatId(), MessageType.SYSTEM, sessionId, "A participant has confirmed the session.");
+                        resultMessage = "Session completion recorded. Waiting for remaining participant.";
+                        if (session.getChatId() != null) {
+                            publishSystemMessage(session.getChatId(), MessageType.SYSTEM, sessionId, "Session completion recorded. Waiting for remaining participants.");
                         }
-                        System.out.println(String.format("[LIFECYCLE] Session COMPLETED (Participant Confirmation) | sessionId=%s chatId=%s authenticatedUserId=%s", sessionId, session.getChatId(), requesterId));
+                        System.out.println(String.format("[LIFECYCLE] Session SCHEDULED -> PENDING_COMPLETION | sessionId=%s chatId=%s authenticatedUserId=%s", sessionId, session.getChatId(), requesterId));
                     }
+
                     com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent("SESSION_UPDATE", session);
-                    return Future.succeededFuture();
+                    return Future.succeededFuture(resultMessage);
                 } else {
                     return Future.failedFuture("SESSION_NOT_FOUND");
                 }

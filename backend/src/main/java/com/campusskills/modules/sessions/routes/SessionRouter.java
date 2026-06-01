@@ -23,7 +23,6 @@ public class SessionRouter {
         router.patch("/:sessionId/reject").handler(handler::rejectSession);
         router.patch("/:sessionId/cancel").handler(handler::cancelSession);
         router.patch("/:sessionId/complete").handler(handler::completeSession);
-        router.patch("/:sessionId/confirm").handler(handler::confirmSession);
         router.patch("/:sessionId/dispute").handler(handler::disputeSession);
 
         return router;
