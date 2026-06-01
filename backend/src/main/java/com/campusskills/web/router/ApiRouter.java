@@ -10,6 +10,7 @@ import com.campusskills.modules.exchanges.routes.ExchangeRouter;
 import com.campusskills.modules.sessions.routes.SessionRouter;
 import com.campusskills.modules.users.routes.AuthRouter;
 import com.campusskills.modules.users.routes.UserRouter;
+import com.campusskills.modules.listings.routes.ListingRouter;
 
 import com.campusskills.web.middleware.RequestIdMiddleware;
 import com.campusskills.web.middleware.GlobalErrorHandler;
@@ -57,6 +58,7 @@ public class ApiRouter {
         router.mountSubRouter("/messages", MessageRouter.create(vertx));
         router.mountSubRouter("/exchanges", ExchangeRouter.create(vertx));
         router.mountSubRouter("/sessions", SessionRouter.create(vertx));
+        router.mountSubRouter("/listings", ListingRouter.create(vertx, jwtAuth));
         
         // Global Error Handling
         router.route().failureHandler(GlobalErrorHandler.create());
