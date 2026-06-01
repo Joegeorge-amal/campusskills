@@ -3,14 +3,12 @@ package com.campusskills.modules.chats.services;
 import com.campusskills.modules.chats.models.Chat;
 import com.campusskills.modules.chats.repositories.ChatRepository;
 import com.campusskills.shared.constants.ChatStatus;
+import com.campusskills.shared.constants.ChatSourceType;
 import io.vertx.core.Future;
 
 import java.util.List;
 
-import com.campusskills.modules.exchanges.repositories.ExchangeRepository;
 import com.campusskills.modules.messages.repositories.MessageRepository;
-import com.campusskills.modules.exchanges.models.Exchange;
-import com.campusskills.shared.constants.ExchangeStatus;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.CompositeFuture;
@@ -18,12 +16,10 @@ import java.util.ArrayList;
 
 public class ChatService {
     private final ChatRepository repository;
-    private final ExchangeRepository exchangeRepository;
     private final MessageRepository messageRepository;
 
-    public ChatService(ChatRepository repository, ExchangeRepository exchangeRepository, MessageRepository messageRepository) {
+    public ChatService(ChatRepository repository, MessageRepository messageRepository) {
         this.repository = repository;
-        this.exchangeRepository = exchangeRepository;
         this.messageRepository = messageRepository;
     }
 
@@ -45,53 +41,38 @@ public class ChatService {
         chat.setParticipants(uniqueParticipants);
 
         if (chat.getStatus() == null) {
-            chat.setStatus(ChatStatus.REQUEST);
+            chat.setStatus(ChatStatus.PENDING);
+        }
+        
+        if (chat.getSourceType() == null) {
+            chat.setSourceType(ChatSourceType.GENERAL);
         }
 
-        return repository.findExistingChat(chat.getListingId(), uniqueParticipants).compose(existing -> {
+        return repository.findExistingChat(chat.getSourceType().name(), chat.getSourceId(), uniqueParticipants).compose(existing -> {
             if (existing != null) {
                 return Future.failedFuture("CHAT_ALREADY_EXISTS");
             }
 
-            String receiverId = uniqueParticipants.stream()
-                .filter(id -> !id.equals(authId))
-                .findFirst().orElse(null);
-
-            if (receiverId == null) {
-                return Future.failedFuture("Could not determine receiverId");
-            }
-
-            Exchange exchange = new Exchange();
-            exchange.setRequesterId(authId);
-            exchange.setReceiverId(receiverId);
-            exchange.setListingId(chat.getListingId());
-            exchange.setStatus(ExchangeStatus.PENDING);
-            exchange.setOptionalMessage("Automatic exchange request generated from chat creation");
-
-            return exchangeRepository.createRequest(exchange).compose(exchangeId -> {
-                chat.setExchangeId(exchangeId);
-                chat.setExchangeStatus(ExchangeStatus.PENDING);
-                
-                return repository.createChat(chat).map(chatId -> {
-                    System.out.println(String.format("[LIFECYCLE] Chat CREATED | chatId=%s exchangeId=%s authenticatedUserId=%s", chatId, exchangeId, authId));
-                    return new JsonObject()
-                        .put("chatId", chatId)
-                        .put("chatStatus", chat.getStatus().name())
-                        .put("exchangeId", exchangeId)
-                        .put("exchangeStatus", exchange.getStatus().name());
-                });
+            return repository.createChat(chat).map(chatId -> {
+                System.out.println(String.format("[LIFECYCLE] Chat CREATED | chatId=%s sourceType=%s sourceId=%s authenticatedUserId=%s", 
+                    chatId, chat.getSourceType(), chat.getSourceId(), authId));
+                return new JsonObject()
+                    .put("chatId", chatId)
+                    .put("chatStatus", chat.getStatus().name())
+                    .put("sourceType", chat.getSourceType().name())
+                    .put("sourceId", chat.getSourceId());
             });
         });
     }
 
-    public Future<JsonObject> getUserChats(String userId, int page, int limit) {
+    public Future<JsonObject> getUserChats(String userId, String statusFilter, int page, int limit) {
         if (userId == null || userId.trim().isEmpty()) {
             return Future.failedFuture("userId is required");
         }
         int skip = (page - 1) * limit;
 
-        return repository.countUserChats(userId).compose(total -> 
-            repository.fetchUserChats(userId, skip, limit).compose(chats -> {
+        return repository.countUserChats(userId, statusFilter).compose(total -> 
+            repository.fetchUserChats(userId, statusFilter, skip, limit).compose(chats -> {
                 if (chats.isEmpty()) {
                     return Future.succeededFuture(new JsonObject()
                         .put("items", new JsonArray())

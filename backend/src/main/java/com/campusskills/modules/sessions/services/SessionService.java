@@ -2,13 +2,13 @@ package com.campusskills.modules.sessions.services;
 
 import com.campusskills.modules.sessions.models.Session;
 import com.campusskills.modules.sessions.repositories.SessionRepository;
-import com.campusskills.modules.exchanges.repositories.ExchangeRepository;
+import com.campusskills.modules.exchangerequests.repositories.ExchangeRequestRepository;
 import com.campusskills.modules.chats.repositories.ChatRepository;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import com.campusskills.shared.constants.SessionStatus;
 import com.campusskills.shared.constants.MessageType;
-import com.campusskills.shared.constants.ExchangeStatus;
+import com.campusskills.shared.constants.RequestStatus;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -24,10 +24,10 @@ public class SessionService {
 
     private final EventBus eventBus;
     private final SessionRepository repository;
-    private final ExchangeRepository exchangeRepository;
+    private final ExchangeRequestRepository exchangeRepository;
     private final ChatRepository chatRepository;
 
-    public SessionService(EventBus eventBus, SessionRepository repository, ExchangeRepository exchangeRepository, ChatRepository chatRepository) {
+    public SessionService(EventBus eventBus, SessionRepository repository, ExchangeRequestRepository exchangeRepository, ChatRepository chatRepository) {
         this.eventBus = eventBus;
         this.repository = repository;
         this.exchangeRepository = exchangeRepository;
@@ -53,18 +53,18 @@ public class SessionService {
             return Future.failedFuture("requesterId is required");
         }
 
-        return exchangeRepository.getExchangeById(session.getExchangeId()).compose(exchange -> {
+        return exchangeRepository.findById(session.getExchangeId()).compose(exchange -> {
             if (exchange == null) {
                 return Future.failedFuture("EXCHANGE_NOT_FOUND");
             }
-            if (!requesterId.equals(exchange.getRequesterId()) && !requesterId.equals(exchange.getReceiverId())) {
+            if (!requesterId.equals(exchange.getSenderId()) && !requesterId.equals(exchange.getReceiverId())) {
                 return Future.failedFuture("UNAUTHORIZED: User is not part of this exchange");
             }
-            if (exchange.getStatus() != ExchangeStatus.ACCEPTED) {
+            if (exchange.getStatus() != RequestStatus.ACCEPTED) {
                 return Future.failedFuture("FORBIDDEN: Exchange must be ACCEPTED before proposing a session");
             }
 
-            return chatRepository.getChatByExchangeId(session.getExchangeId()).compose(chat -> {
+            return chatRepository.findById(exchange.getChatId()).compose(chat -> {
                 System.out.println("[DEBUG-LIFECYCLE] --- Session Creation Validation ---");
                 if (chat == null) {
                     System.out.println("[DEBUG-LIFECYCLE] linked chatId: NOT FOUND");
@@ -80,7 +80,7 @@ public class SessionService {
 
                 // Derive backend state
                 session.setOrganizerId(requesterId);
-                List<String> participants = Arrays.asList(exchange.getRequesterId(), exchange.getReceiverId());
+                List<String> participants = Arrays.asList(exchange.getSenderId(), exchange.getReceiverId());
                 participants = participants.stream().distinct().collect(Collectors.toList());
                 session.setParticipants(participants);
                 session.setListingId(exchange.getListingId());

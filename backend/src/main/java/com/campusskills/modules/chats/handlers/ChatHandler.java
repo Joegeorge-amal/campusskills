@@ -55,8 +55,13 @@ public class ChatHandler {
             ApiResponse.badRequest(ctx, "Invalid pagination parameters");
             return;
         }
+        
+        String statusFilter = null;
+        if (ctx.queryParam("status") != null && !ctx.queryParam("status").isEmpty()) {
+            statusFilter = ctx.queryParam("status").get(0);
+        }
 
-        chatService.getUserChats(authId, page, limit)
+        chatService.getUserChats(authId, statusFilter, page, limit)
             .onSuccess(result -> ApiResponse.paginatedOk(ctx, result.getJsonArray("items"), result.getInteger("page"), result.getInteger("limit"), result.getLong("total")))
             .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
     }
