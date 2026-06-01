@@ -46,14 +46,14 @@ public class SessionService {
     }
 
     public Future<String> createSession(Session session, String requesterId) {
-        if (session.getExchangeId() == null) {
-            return Future.failedFuture("exchangeId is required");
+        if (session.getRequestId() == null) {
+            return Future.failedFuture("requestId is required");
         }
         if (requesterId == null || requesterId.trim().isEmpty()) {
             return Future.failedFuture("requesterId is required");
         }
 
-        return exchangeRepository.findById(session.getExchangeId()).compose(exchange -> {
+        return exchangeRepository.findById(session.getRequestId()).compose(exchange -> {
             if (exchange == null) {
                 return Future.failedFuture("EXCHANGE_NOT_FOUND");
             }
@@ -94,7 +94,7 @@ public class SessionService {
                     if (session.getChatId() != null) {
                         publishSystemMessage(session.getChatId(), MessageType.SESSION_PROPOSED, id, "A session meeting time has been proposed.");
                     }
-                    System.out.println(String.format("[LIFECYCLE] Session CREATED -> PROPOSED | sessionId=%s exchangeId=%s chatId=%s authenticatedUserId=%s", id, session.getExchangeId(), session.getChatId(), requesterId));
+                    System.out.println(String.format("[LIFECYCLE] Session CREATED -> PROPOSED | sessionId=%s requestId=%s chatId=%s authenticatedUserId=%s", id, session.getRequestId(), session.getChatId(), requesterId));
                     com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent("SESSION_UPDATE", session);
                 });
             });
