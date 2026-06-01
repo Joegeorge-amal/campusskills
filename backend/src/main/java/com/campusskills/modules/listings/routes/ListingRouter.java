@@ -22,6 +22,9 @@ public class ListingRouter {
 
         // GET /listings is public
         router.get("/").handler(handler::getAllListings);
+        
+        // GET /listings/:id is public
+        router.get("/:id").handler(handler::getListingById);
 
         return router;
     }

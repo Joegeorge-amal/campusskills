@@ -131,4 +131,23 @@ public class ListingHandler {
                 ApiResponse.internalError(ctx, "Failed to retrieve listings");
             });
     }
+
+    public void getListingById(RoutingContext ctx) {
+        String id = ctx.pathParam("id");
+        if (id == null || id.trim().isEmpty()) {
+            ApiResponse.badRequest(ctx, "Listing ID is required");
+            return;
+        }
+
+        listingService.getListingById(id)
+            .onSuccess(listing -> ApiResponse.ok(ctx, JsonObject.mapFrom(listing)))
+            .onFailure(err -> {
+                if ("NOT_FOUND".equals(err.getMessage())) {
+                    ApiResponse.notFound(ctx, "Listing not found");
+                } else {
+                    err.printStackTrace();
+                    ApiResponse.internalError(ctx, "Failed to retrieve listing");
+                }
+            });
+    }
 }

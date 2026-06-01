@@ -21,7 +21,16 @@ public class ListingService {
     }
 
     public Future<Listing> getListingById(String id) {
-        return listingRepository.findById(id);
+        return listingRepository.findById(id).compose(listing -> {
+            if (listing == null) {
+                return Future.failedFuture("NOT_FOUND");
+            }
+            if (Boolean.FALSE.equals(listing.getActive())) {
+                return Future.failedFuture("NOT_FOUND"); // Treat inactive as not found publicly
+            }
+            System.out.println("[LISTING] Retrieved listing | listingId=" + id);
+            return Future.succeededFuture(listing);
+        });
     }
 
     public Future<java.util.List<Listing>> findAllActive() {
