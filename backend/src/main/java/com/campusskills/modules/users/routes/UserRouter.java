@@ -6,6 +6,7 @@ import com.campusskills.modules.users.repositories.UserProfileRepository;
 import com.campusskills.modules.users.repositories.UserStatsRepository;
 import com.campusskills.modules.users.repositories.UserWalletRepository;
 import com.campusskills.modules.users.services.UserService;
+import com.campusskills.web.middleware.JwtAuthMiddleware;
 import io.vertx.core.Vertx;
 import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.web.Router;

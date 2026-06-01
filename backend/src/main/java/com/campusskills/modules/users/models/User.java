@@ -13,6 +13,7 @@ public class User {
     private String erpid;
     private UserRole role;
     private Boolean isActive;
+    private Boolean emailVerified;
     private Long createdAt;
     private Long updatedAt;
 
@@ -35,6 +36,9 @@ public class User {
     
     public Boolean getIsActive() { return isActive; }
     public void setIsActive(Boolean isActive) { this.isActive = isActive; }
+
+    public Boolean getEmailVerified() { return emailVerified; }
+    public void setEmailVerified(Boolean emailVerified) { this.emailVerified = emailVerified; }
 
     public Long getCreatedAt() { return createdAt; }
     public void setCreatedAt(Long createdAt) { this.createdAt = createdAt; }

@@ -56,9 +56,11 @@ public class UserService {
             user.setErpid(erpid);
             user.setRole(UserRole.USER); // Default to USER
             user.setIsActive(true);
+            user.setEmailVerified(false); // Default for all new signups
             user.setPasswordHash(BCrypt.hashpw(password, BCrypt.gensalt()));
 
             return userRepository.createUser(user).compose(userId -> {
+                System.out.println("[AUTH] Created new user: " + userId + " with email: " + email);
                 user.setId(userId);
                 
                 UserProfile profile = new UserProfile();
@@ -119,9 +121,11 @@ public class UserService {
             UserWallet wallet = cf.resultAt(3);
 
             if (user == null) {
+                System.out.println("[AUTH] Failed to fetch profile. User not found for ID: " + userId);
                 throw new RuntimeException("User not found");
             }
 
+            System.out.println("[AUTH] Successfully aggregated profile for user ID: " + userId);
             JsonObject response = new JsonObject();
             
             JsonObject userJson = JsonObject.mapFrom(user);
