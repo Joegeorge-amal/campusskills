@@ -75,4 +75,15 @@ public class ChatRequestRepository {
             .add(new JsonObject().put("receiverId", userId)));
         return client.count(COLLECTION, query);
     }
+
+    public Future<ChatRequest> findPendingRequestBetweenUsers(String userA, String userB) {
+        JsonObject query = new JsonObject()
+            .put("status", RequestStatus.PENDING.name())
+            .put("$or", new io.vertx.core.json.JsonArray()
+                .add(new JsonObject().put("senderId", userA).put("receiverId", userB))
+                .add(new JsonObject().put("senderId", userB).put("receiverId", userA))
+            );
+        return client.findOne(COLLECTION, query, null)
+                .map(doc -> doc == null ? null : doc.mapTo(ChatRequest.class));
+    }
 }
