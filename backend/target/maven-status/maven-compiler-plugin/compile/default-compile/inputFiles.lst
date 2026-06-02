@@ -37,6 +37,7 @@ C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusski
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\notifications\services\NotificationBroadcaster.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\notifications\services\NotificationService.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\sessions\handlers\SessionHandler.java
+C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\sessions\models\CreateSessionRequest.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\sessions\models\Session.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\sessions\repositories\SessionRepository.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\sessions\routes\SessionRouter.java

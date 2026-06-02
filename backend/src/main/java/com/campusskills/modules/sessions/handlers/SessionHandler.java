@@ -18,12 +18,51 @@ public class SessionHandler {
     public void createSession(RoutingContext ctx) {
         try {
             JsonObject body = ctx.body().asJsonObject();
-            Session session = body.mapTo(Session.class);
+            com.campusskills.modules.sessions.models.CreateSessionRequest req = body.mapTo(com.campusskills.modules.sessions.models.CreateSessionRequest.class);
+            
             String authId = ctx.get("authenticatedUserId");
             if (authId == null) {
                 ApiResponse.forbidden(ctx, "Unauthorized");
                 return;
             }
+
+            if (req.getRequestId() == null || req.getRequestId().trim().isEmpty()) {
+                ApiResponse.badRequest(ctx, "requestId is required");
+                return;
+            }
+            if (req.getMeetingPlatform() == null || req.getMeetingPlatform().trim().isEmpty()) {
+                ApiResponse.badRequest(ctx, "meetingPlatform is required");
+                return;
+            }
+            if (req.getMeetingLink() == null || req.getMeetingLink().trim().isEmpty()) {
+                ApiResponse.badRequest(ctx, "meetingLink is required");
+                return;
+            }
+
+            Long start = req.getScheduledAt() != null ? req.getScheduledAt() : req.getScheduledStart();
+            if (start == null) {
+                ApiResponse.badRequest(ctx, "scheduledAt (or scheduledStart) is required");
+                return;
+            }
+
+            Long end = null;
+            if (req.getDurationMinutes() != null && req.getDurationMinutes() > 0) {
+                end = start + (req.getDurationMinutes() * 60 * 1000L);
+            } else if (req.getScheduledEnd() != null) {
+                end = req.getScheduledEnd();
+            }
+
+            if (end == null || end <= start) {
+                ApiResponse.badRequest(ctx, "Valid durationMinutes (or scheduledEnd) is required");
+                return;
+            }
+
+            Session session = new Session();
+            session.setRequestId(req.getRequestId());
+            session.setScheduledStart(start);
+            session.setScheduledEnd(end);
+            session.setMeetingPlatform(req.getMeetingPlatform());
+            session.setMeetingLink(req.getMeetingLink());
             
             sessionService.createSession(session, authId)
                 .onSuccess(id -> ApiResponse.created(ctx, new JsonObject().put("id", id).put("message", "Session created")))
