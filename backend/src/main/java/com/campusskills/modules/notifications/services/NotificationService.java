@@ -84,12 +84,17 @@ public class NotificationService {
         return repository.fetchUserNotifications(userId, skip, limit);
     }
 
-    public Future<Long> getUnreadCount(String userId) {
-        return repository.countUnreadNotifications(userId);
+    public Future<List<Notification>> getUnreadNotifications(String userId, int skip, int limit) {
+        return repository.findUnreadUserNotifications(userId, skip, limit);
     }
 
-    public Future<Boolean> markAsRead(String notificationId, String userId) {
-        return repository.markAsRead(notificationId, userId);
+    public Future<Notification> markAsRead(String notificationId, String userId) {
+        return repository.markAsRead(notificationId, userId).compose(updated -> {
+            if (updated) {
+                return repository.findById(notificationId);
+            }
+            return Future.failedFuture("NOTIFICATION_NOT_FOUND");
+        });
     }
 
     public Future<Long> markAllAsRead(String userId) {

@@ -55,7 +55,9 @@ com\campusskills\modules\users\repositories\UserStatsRepository.class
 com\campusskills\modules\listings\models\SessionType.class
 com\campusskills\modules\users\handlers\AuthHandler.class
 com\campusskills\modules\chats\routes\ChatRouter.class
+com\campusskills\modules\notifications\routes\NotificationRouter.class
 com\campusskills\shared\models\SkillProfile.class
+com\campusskills\modules\notifications\handlers\NotificationHandler.class
 com\campusskills\modules\exchangerequests\repositories\ExchangeRequestRepository.class
 com\campusskills\modules\users\models\UserStats.class
 com\campusskills\modules\messages\services\TypingIndicatorService.class

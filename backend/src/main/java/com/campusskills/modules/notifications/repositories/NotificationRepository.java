@@ -117,6 +117,24 @@ public class NotificationRepository {
                 }).collect(Collectors.toList()));
     }
     
+    public Future<List<Notification>> findUnreadUserNotifications(String userId, int skip, int limit) {
+        JsonObject query = new JsonObject()
+            .put("userId", userId)
+            .put("isRead", false);
+            
+        io.vertx.ext.mongo.FindOptions options = new io.vertx.ext.mongo.FindOptions()
+                .setSort(new JsonObject().put("updatedAt", -1))
+                .setSkip(skip)
+                .setLimit(limit);
+
+        return client.findWithOptions(COLLECTION, query, options)
+                .map(list -> list.stream().map(doc -> {
+                    doc.put("id", doc.getString("_id"));
+                    doc.remove("_id");
+                    return doc.mapTo(Notification.class);
+                }).collect(Collectors.toList()));
+    }
+    
     public Future<Long> countUnreadNotifications(String userId) {
         JsonObject query = new JsonObject()
             .put("userId", userId)

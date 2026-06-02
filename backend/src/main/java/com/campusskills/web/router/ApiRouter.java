@@ -51,6 +51,7 @@ public class ApiRouter {
         router.route("/sessions/*").handler(JwtAuthMiddleware.create(jwtAuth));
         router.route("/chat-requests/*").handler(JwtAuthMiddleware.create(jwtAuth));
         router.route("/exchange-requests/*").handler(JwtAuthMiddleware.create(jwtAuth));
+        router.route("/notifications/*").handler(JwtAuthMiddleware.create(jwtAuth));
 
         // 6. Modules Routing
         router.mountSubRouter("/users", UserRouter.create(vertx, jwtAuth));
@@ -60,6 +61,7 @@ public class ApiRouter {
         router.mountSubRouter("/listings", ListingRouter.create(vertx, jwtAuth));
         router.mountSubRouter("/chat-requests", com.campusskills.modules.chatrequests.routes.ChatRequestRouter.create(vertx));
         router.mountSubRouter("/exchange-requests", com.campusskills.modules.exchangerequests.routes.ExchangeRequestRouter.create(vertx));
+        router.mountSubRouter("/notifications", com.campusskills.modules.notifications.routes.NotificationRouter.create(vertx));
         
         // Global Error Handling
         router.route().failureHandler(GlobalErrorHandler.create());
