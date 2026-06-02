@@ -1,8 +1,8 @@
 package com.campusskills.shared.constants;
 
 public enum ChatStatus {
-    REQUEST,
+    PENDING,
     ACTIVE,
-    BLOCKED,
+    REJECTED,
     CLOSED
 }

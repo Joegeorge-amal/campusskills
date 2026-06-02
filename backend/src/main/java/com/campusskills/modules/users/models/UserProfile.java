@@ -1,6 +1,7 @@
 package com.campusskills.modules.users.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.campusskills.shared.models.SkillProfile;
 import java.util.List;
 
 public class UserProfile {
@@ -13,8 +14,8 @@ public class UserProfile {
     private String year;
     private String bio;
     private String profilePicture;
-    private List<String> skillsOffered;
-    private List<String> skillsWanted;
+    private List<SkillProfile> skillsOffered;
+    private List<SkillProfile> skillsWanted;
     private Boolean profileCompleted;
     private Long createdAt;
     private Long updatedAt;
@@ -45,11 +46,11 @@ public class UserProfile {
     public String getProfilePicture() { return profilePicture; }
     public void setProfilePicture(String profilePicture) { this.profilePicture = profilePicture; }
 
-    public List<String> getSkillsOffered() { return skillsOffered; }
-    public void setSkillsOffered(List<String> skillsOffered) { this.skillsOffered = skillsOffered; }
+    public List<SkillProfile> getSkillsOffered() { return skillsOffered; }
+    public void setSkillsOffered(List<SkillProfile> skillsOffered) { this.skillsOffered = skillsOffered; }
 
-    public List<String> getSkillsWanted() { return skillsWanted; }
-    public void setSkillsWanted(List<String> skillsWanted) { this.skillsWanted = skillsWanted; }
+    public List<SkillProfile> getSkillsWanted() { return skillsWanted; }
+    public void setSkillsWanted(List<SkillProfile> skillsWanted) { this.skillsWanted = skillsWanted; }
 
     public Boolean getProfileCompleted() { return profileCompleted; }
     public void setProfileCompleted(Boolean profileCompleted) { this.profileCompleted = profileCompleted; }

@@ -11,7 +11,7 @@ public class Session {
 
     @JsonProperty("_id")
     private String id;
-    private String exchangeId;
+    private String requestId;
     private String chatId;
     private String listingId;
     private String organizerId;
@@ -38,12 +38,12 @@ public class Session {
         this.id = id;
     }
 
-    public String getExchangeId() {
-        return exchangeId;
+    public String getRequestId() {
+        return requestId;
     }
 
-    public void setExchangeId(String exchangeId) {
-        this.exchangeId = exchangeId;
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
     }
 
     public String getChatId() {
