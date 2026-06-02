@@ -5,6 +5,7 @@ import com.campusskills.modules.exchangerequests.repositories.ExchangeRequestRep
 import com.campusskills.modules.chats.models.Chat;
 import com.campusskills.modules.chats.repositories.ChatRepository;
 import com.campusskills.modules.chats.services.ChatService;
+import com.campusskills.modules.users.repositories.UserProfileRepository;
 import com.campusskills.shared.constants.ChatSourceType;
 import com.campusskills.shared.constants.ChatStatus;
 import com.campusskills.shared.constants.RequestStatus;
@@ -20,12 +21,14 @@ public class ExchangeRequestService {
     private final ExchangeRequestRepository repository;
     private final ChatService chatService;
     private final ChatRepository chatRepository;
+    private final UserProfileRepository userProfileRepository;
     private final EventBus eventBus;
 
-    public ExchangeRequestService(ExchangeRequestRepository repository, ChatService chatService, ChatRepository chatRepository, EventBus eventBus) {
+    public ExchangeRequestService(ExchangeRequestRepository repository, ChatService chatService, ChatRepository chatRepository, UserProfileRepository userProfileRepository, EventBus eventBus) {
         this.repository = repository;
         this.chatService = chatService;
         this.chatRepository = chatRepository;
+        this.userProfileRepository = userProfileRepository;
         this.eventBus = eventBus;
     }
 
@@ -37,6 +40,17 @@ public class ExchangeRequestService {
                 .put("message", messageText)
                 .put("type", MessageType.SYSTEM.name());
         eventBus.send("internal.message.create", msg);
+    }
+
+    private void publishNotification(String userId, String type, String title, String message, String sourceType, String sourceId) {
+        JsonObject notification = new JsonObject()
+                .put("userId", userId)
+                .put("type", type)
+                .put("title", title)
+                .put("message", message)
+                .put("sourceType", sourceType)
+                .put("sourceId", sourceId);
+        eventBus.send("internal.notification.create", notification);
     }
 
     public Future<JsonObject> createRequest(ExchangeRequest request, String authId) {
@@ -74,6 +88,19 @@ public class ExchangeRequestService {
                         );
                     });
                 }
+            }).compose(result -> {
+                return userProfileRepository.findByUserId(authId).map(sender -> {
+                    String senderName = (sender != null && sender.getDisplayName() != null) ? sender.getDisplayName() : "Someone";
+                    publishNotification(
+                        request.getReceiverId(),
+                        "EXCHANGE_REQUEST_RECEIVED",
+                        "New Exchange Request",
+                        senderName + " submitted a request for your listing.",
+                        "EXCHANGE_REQUEST",
+                        requestId
+                    );
+                    return result;
+                });
             });
         });
     }
@@ -86,8 +113,21 @@ public class ExchangeRequestService {
 
             return repository.updateStatus(requestId, RequestStatus.ACCEPTED).compose(v -> 
                 chatRepository.updateChatStatus(req.getChatId(), ChatStatus.ACTIVE.name())
-            ).onSuccess(v -> {
+            ).compose(v -> {
                 publishSystemMessage(req.getChatId(), "The exchange request has been accepted.");
+                
+                return userProfileRepository.findByUserId(authId).map(receiver -> {
+                    String ownerName = (receiver != null && receiver.getDisplayName() != null) ? receiver.getDisplayName() : "Someone";
+                    publishNotification(
+                        req.getSenderId(),
+                        "EXCHANGE_REQUEST_ACCEPTED",
+                        "Exchange Request Accepted",
+                        ownerName + " accepted your exchange request.",
+                        "EXCHANGE_REQUEST",
+                        requestId
+                    );
+                    return null;
+                });
             }).mapEmpty();
         });
     }
@@ -106,6 +146,19 @@ public class ExchangeRequestService {
                         publishSystemMessage(req.getChatId(), "The exchange request was rejected.");
                         return Future.succeededFuture(false);
                     }
+                });
+            }).compose(v -> {
+                return userProfileRepository.findByUserId(authId).map(receiver -> {
+                    String ownerName = (receiver != null && receiver.getDisplayName() != null) ? receiver.getDisplayName() : "Someone";
+                    publishNotification(
+                        req.getSenderId(),
+                        "EXCHANGE_REQUEST_REJECTED",
+                        "Exchange Request Rejected",
+                        ownerName + " rejected your exchange request.",
+                        "EXCHANGE_REQUEST",
+                        requestId
+                    );
+                    return null;
                 });
             }).mapEmpty();
         });

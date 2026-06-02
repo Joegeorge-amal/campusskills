@@ -18,7 +18,8 @@ public class ExchangeRequestRouter {
         ChatService chatService = new ChatService(chatRepository, messageRepository);
         
         ExchangeRequestRepository repository = new ExchangeRequestRepository();
-        ExchangeRequestService service = new ExchangeRequestService(repository, chatService, chatRepository, vertx.eventBus());
+        com.campusskills.modules.users.repositories.UserProfileRepository userProfileRepository = new com.campusskills.modules.users.repositories.UserProfileRepository();
+        ExchangeRequestService service = new ExchangeRequestService(repository, chatService, chatRepository, userProfileRepository, vertx.eventBus());
         ExchangeRequestHandler handler = new ExchangeRequestHandler(service);
 
         router.post("/").handler(handler::createRequest);
