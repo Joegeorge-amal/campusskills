@@ -29,6 +29,11 @@ C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusski
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\messages\routes\MessageRouter.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\messages\services\MessageService.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\messages\services\TypingIndicatorService.java
+C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\notifications\models\Notification.java
+C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\notifications\models\NotificationType.java
+C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\notifications\repositories\NotificationRepository.java
+C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\notifications\services\NotificationBroadcaster.java
+C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\notifications\services\NotificationService.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\sessions\handlers\SessionHandler.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\sessions\models\Session.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\sessions\repositories\SessionRepository.java

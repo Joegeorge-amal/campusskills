@@ -1,5 +1,7 @@
 com\campusskills\modules\exchangerequests\handlers\ExchangeRequestHandler.class
+com\campusskills\modules\notifications\repositories\NotificationRepository.class
 com\campusskills\shared\models\SkillLevel.class
+com\campusskills\modules\notifications\models\NotificationType.class
 com\campusskills\modules\chats\models\Chat.class
 com\campusskills\web\middleware\GlobalErrorHandler.class
 com\campusskills\web\router\ApiRouter.class
@@ -23,6 +25,7 @@ com\campusskills\modules\exchangerequests\models\ExchangeRequest.class
 com\campusskills\modules\exchangerequests\services\ExchangeRequestService.class
 com\campusskills\core\database\DatabaseInitializer.class
 com\campusskills\modules\chatrequests\repositories\ChatRequestRepository.class
+com\campusskills\modules\notifications\models\Notification.class
 com\campusskills\modules\sessions\handlers\SessionHandler.class
 com\campusskills\shared\constants\WebSocketEventType.class
 com\campusskills\web\middleware\JwtAuthMiddleware.class
@@ -33,6 +36,7 @@ com\campusskills\shared\constants\MessageType.class
 com\campusskills\modules\users\models\User.class
 com\campusskills\modules\chats\repositories\ChatRepository.class
 com\campusskills\modules\users\routes\UserRouter.class
+com\campusskills\modules\notifications\services\NotificationService.class
 com\campusskills\web\websockets\WebSocketHandler.class
 com\campusskills\modules\listings\routes\ListingRouter.class
 com\campusskills\web\response\ApiResponse.class
@@ -59,6 +63,7 @@ com\campusskills\modules\chatrequests\models\ChatRequest.class
 com\campusskills\web\websockets\MessageBroadcaster.class
 com\campusskills\modules\listings\repositories\ListingRepository.class
 com\campusskills\modules\users\repositories\UserProfileRepository.class
+com\campusskills\modules\notifications\services\NotificationBroadcaster.class
 com\campusskills\modules\users\handlers\UserHandler.class
 com\campusskills\modules\sessions\repositories\SessionRepository.class
 com\campusskills\modules\sessions\models\Session.class
