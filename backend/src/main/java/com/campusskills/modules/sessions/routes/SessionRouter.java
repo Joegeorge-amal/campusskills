@@ -13,7 +13,8 @@ public class SessionRouter {
         SessionRepository repository = new SessionRepository();
         com.campusskills.modules.exchangerequests.repositories.ExchangeRequestRepository exchangeRepository = new com.campusskills.modules.exchangerequests.repositories.ExchangeRequestRepository();
         com.campusskills.modules.chats.repositories.ChatRepository chatRepository = new com.campusskills.modules.chats.repositories.ChatRepository();
-        SessionService service = new SessionService(vertx.eventBus(), repository, exchangeRepository, chatRepository);
+        com.campusskills.modules.users.repositories.UserProfileRepository userProfileRepository = new com.campusskills.modules.users.repositories.UserProfileRepository();
+        SessionService service = new SessionService(vertx.eventBus(), repository, exchangeRepository, chatRepository, userProfileRepository);
         SessionHandler handler = new SessionHandler(service);
 
         router.post("/").handler(handler::createSession);

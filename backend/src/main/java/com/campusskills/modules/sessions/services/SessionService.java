@@ -4,6 +4,7 @@ import com.campusskills.modules.sessions.models.Session;
 import com.campusskills.modules.sessions.repositories.SessionRepository;
 import com.campusskills.modules.exchangerequests.repositories.ExchangeRequestRepository;
 import com.campusskills.modules.chats.repositories.ChatRepository;
+import com.campusskills.modules.users.repositories.UserProfileRepository;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import com.campusskills.shared.constants.SessionStatus;
@@ -26,12 +27,14 @@ public class SessionService {
     private final SessionRepository repository;
     private final ExchangeRequestRepository exchangeRepository;
     private final ChatRepository chatRepository;
+    private final UserProfileRepository userProfileRepository;
 
-    public SessionService(EventBus eventBus, SessionRepository repository, ExchangeRequestRepository exchangeRepository, ChatRepository chatRepository) {
+    public SessionService(EventBus eventBus, SessionRepository repository, ExchangeRequestRepository exchangeRepository, ChatRepository chatRepository, UserProfileRepository userProfileRepository) {
         this.eventBus = eventBus;
         this.repository = repository;
         this.exchangeRepository = exchangeRepository;
         this.chatRepository = chatRepository;
+        this.userProfileRepository = userProfileRepository;
     }
 
     private void publishSystemMessage(String chatId, MessageType type, String sessionId, String messageText) {
@@ -43,6 +46,17 @@ public class SessionService {
                 .put("type", type.name())
                 .put("sessionId", sessionId);
         eventBus.send("internal.message.create", msg);
+    }
+
+    private void publishNotification(String userId, String type, String title, String message, String sourceType, String sourceId) {
+        JsonObject notification = new JsonObject()
+                .put("userId", userId)
+                .put("type", type)
+                .put("title", title)
+                .put("message", message)
+                .put("sourceType", sourceType)
+                .put("sourceId", sourceId);
+        eventBus.send("internal.notification.create", notification);
     }
 
     public Future<String> createSession(Session session, String requesterId) {
@@ -89,13 +103,27 @@ public class SessionService {
                 session.setStatus(SessionStatus.PROPOSED);
                 session.setConfirmedBy(new HashSet<>());
 
-                return repository.createSession(session).onSuccess(id -> {
+                return repository.createSession(session).compose(id -> {
                     session.setId(id);
                     if (session.getChatId() != null) {
                         publishSystemMessage(session.getChatId(), MessageType.SESSION_PROPOSED, id, "A session meeting time has been proposed.");
                     }
                     System.out.println(String.format("[LIFECYCLE] Session CREATED -> PROPOSED | sessionId=%s requestId=%s chatId=%s authenticatedUserId=%s", id, session.getRequestId(), session.getChatId(), requesterId));
                     com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent("SESSION_UPDATE", session);
+
+                    return userProfileRepository.findByUserId(requesterId).map(sender -> {
+                        String userName = (sender != null && sender.getDisplayName() != null) ? sender.getDisplayName() : "Someone";
+                        String targetUserId = requesterId.equals(exchange.getSenderId()) ? exchange.getReceiverId() : exchange.getSenderId();
+                        publishNotification(
+                            targetUserId,
+                            "SESSION_PROPOSED",
+                            "Session Proposed",
+                            userName + " proposed a session.",
+                            "SESSION",
+                            id
+                        );
+                        return id;
+                    });
                 });
             });
         });
@@ -165,7 +193,19 @@ public class SessionService {
                     }
                     System.out.println(String.format("[LIFECYCLE] Session PROPOSED -> SCHEDULED | sessionId=%s chatId=%s authenticatedUserId=%s", sessionId, session.getChatId(), requesterId));
                     com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent("SESSION_UPDATE", session);
-                    return Future.succeededFuture();
+                    
+                    return userProfileRepository.findByUserId(requesterId).map(accepter -> {
+                        String userName = (accepter != null && accepter.getDisplayName() != null) ? accepter.getDisplayName() : "Someone";
+                        publishNotification(
+                            session.getOrganizerId(),
+                            "SESSION_ACCEPTED",
+                            "Session Accepted",
+                            userName + " accepted the session proposal.",
+                            "SESSION",
+                            sessionId
+                        );
+                        return null;
+                    });
                 } else {
                     return Future.failedFuture("SESSION_NOT_FOUND");
                 }
@@ -202,7 +242,19 @@ public class SessionService {
                     }
                     System.out.println(String.format("[LIFECYCLE] Session PROPOSED -> REJECTED | sessionId=%s chatId=%s authenticatedUserId=%s", sessionId, session.getChatId(), requesterId));
                     com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent("SESSION_UPDATE", session);
-                    return Future.succeededFuture();
+                    
+                    return userProfileRepository.findByUserId(requesterId).map(rejecter -> {
+                        String userName = (rejecter != null && rejecter.getDisplayName() != null) ? rejecter.getDisplayName() : "Someone";
+                        publishNotification(
+                            session.getOrganizerId(),
+                            "SESSION_REJECTED",
+                            "Session Rejected",
+                            userName + " rejected the session proposal.",
+                            "SESSION",
+                            sessionId
+                        );
+                        return null;
+                    });
                 } else {
                     return Future.failedFuture("SESSION_NOT_FOUND");
                 }
@@ -236,7 +288,23 @@ public class SessionService {
                     }
                     System.out.println(String.format("[LIFECYCLE] Session -> CANCELLED | sessionId=%s chatId=%s authenticatedUserId=%s", sessionId, session.getChatId(), requesterId));
                     com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent("SESSION_UPDATE", session);
-                    return Future.succeededFuture();
+                    
+                    return userProfileRepository.findByUserId(requesterId).map(canceller -> {
+                        String userName = (canceller != null && canceller.getDisplayName() != null) ? canceller.getDisplayName() : "Someone";
+                        for (String pId : session.getParticipants()) {
+                            if (!pId.equals(requesterId)) {
+                                publishNotification(
+                                    pId,
+                                    "SESSION_CANCELLED",
+                                    "Session Cancelled",
+                                    userName + " cancelled the session.",
+                                    "SESSION",
+                                    sessionId
+                                );
+                            }
+                        }
+                        return null;
+                    });
                 } else {
                     return Future.failedFuture("SESSION_NOT_FOUND");
                 }
@@ -307,7 +375,36 @@ public class SessionService {
                     }
 
                     com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent("SESSION_UPDATE", session);
-                    return Future.succeededFuture(resultMessage);
+                    
+                    return userProfileRepository.findByUserId(requesterId).map(completer -> {
+                        String userName = (completer != null && completer.getDisplayName() != null) ? completer.getDisplayName() : "Someone";
+                        if (isFullyCompleted) {
+                            for (String pId : session.getParticipants()) {
+                                publishNotification(
+                                    pId,
+                                    "SESSION_COMPLETED",
+                                    "Session Completed",
+                                    "The session has been successfully completed by all participants.",
+                                    "SESSION",
+                                    sessionId
+                                );
+                            }
+                        } else {
+                            for (String pId : session.getParticipants()) {
+                                if (!finalConfirmedBy.contains(pId)) {
+                                    publishNotification(
+                                        pId,
+                                        "SESSION_COMPLETION_PENDING",
+                                        "Session Completion Pending",
+                                        userName + " marked the session as complete. Please review and mark completion if the session has concluded.",
+                                        "SESSION",
+                                        sessionId
+                                    );
+                                }
+                            }
+                        }
+                        return resultMessage;
+                    });
                 } else {
                     return Future.failedFuture("SESSION_NOT_FOUND");
                 }
