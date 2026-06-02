@@ -17,6 +17,8 @@ public class UserProfile {
     private List<SkillProfile> skillsOffered;
     private List<SkillProfile> skillsWanted;
     private Boolean profileCompleted;
+    private Double averageRating;
+    private Integer reviewCount;
     private Long createdAt;
     private Long updatedAt;
 
@@ -60,4 +62,10 @@ public class UserProfile {
 
     public Long getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(Long updatedAt) { this.updatedAt = updatedAt; }
+
+    public Double getAverageRating() { return averageRating; }
+    public void setAverageRating(Double averageRating) { this.averageRating = averageRating; }
+
+    public Integer getReviewCount() { return reviewCount; }
+    public void setReviewCount(Integer reviewCount) { this.reviewCount = reviewCount; }
 }

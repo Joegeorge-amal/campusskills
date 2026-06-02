@@ -36,6 +36,12 @@ C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusski
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\notifications\routes\NotificationRouter.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\notifications\services\NotificationBroadcaster.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\notifications\services\NotificationService.java
+C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\reviews\handlers\ReviewHandler.java
+C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\reviews\models\CreateReviewRequest.java
+C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\reviews\models\Review.java
+C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\reviews\repositories\ReviewRepository.java
+C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\reviews\routes\ReviewRouter.java
+C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\reviews\services\ReviewService.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\sessions\handlers\SessionHandler.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\sessions\models\CreateSessionRequest.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\sessions\models\Session.java
@@ -43,6 +49,7 @@ C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusski
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\sessions\routes\SessionRouter.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\sessions\services\SessionService.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\users\handlers\AuthHandler.java
+C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\users\handlers\ProfileHandler.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\users\handlers\UserHandler.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\users\models\User.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\users\models\UserProfile.java
@@ -54,6 +61,7 @@ C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusski
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\users\repositories\UserStatsRepository.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\users\repositories\UserWalletRepository.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\users\routes\AuthRouter.java
+C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\users\routes\ProfileRouter.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\users\routes\UserRouter.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\modules\users\services\UserService.java
 C:\Users\amalj\OneDrive\Desktop\campusskills\backend\src\main\java\com\campusskills\shared\constants\ChatSourceType.java
