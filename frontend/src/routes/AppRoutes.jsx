@@ -55,12 +55,12 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Navigate to={user ? (role === 'admin' ? "/admin/dashboard" : "/app/dashboard") : "/login"} replace />} />
-      <Route path="/login" element={<LoginPage />} />
+      <Route path="/login" element={user ? <Navigate to={role === 'admin' ? "/admin/dashboard" : "/app/dashboard"} replace /> : <LoginPage />} />
       <Route path="/setup" element={<SetupPage />} />
       
       {/* Student Layout */}
       <Route path="/app" element={
-        <ProtectedRoute allowedRoles={['student']}>
+        <ProtectedRoute allowedRoles={['student', 'user']}>
           <AppLayout />
         </ProtectedRoute>
       }>

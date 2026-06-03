@@ -26,7 +26,10 @@ const LoginPage = () => {
 
       await login(email, password);
 
-      if (email.toLowerCase().includes('admin')) {
+      // We let AppRoutes handle the exact path redirect since context updates synchronously-ish, 
+      // but if we want a hard redirect:
+      const savedRole = localStorage.getItem('cs_role');
+      if (savedRole === 'admin') {
         navigate('/admin/dashboard');
       } else {
         navigate('/app/dashboard');

@@ -6,7 +6,7 @@ import { IconArrowLeft } from '@tabler/icons-react';
 const SetupPage = () => {
   const [step, setStep] = useState(1);
   const navigate = useNavigate();
-  const { completeSetup } = useAuth();
+  const { register, updateProfile } = useAuth();
 
   // Step 1 states
   const [email, setEmail] = useState('');
@@ -20,6 +20,7 @@ const SetupPage = () => {
   const [upi, setUpi] = useState('');
   const [avatarColor, setAvatarColor] = useState({ bg: '#EEEDFE', text: '#3C3489' });
   const [avatarImg, setAvatarImg] = useState(null);
+  const [error, setError] = useState('');
   const fileInputRef = useRef(null);
 
   // Step 2 states
@@ -52,14 +53,34 @@ const SetupPage = () => {
     if (step > 1) setStep(step - 1);
   };
 
-  const handleFinish = () => {
-    completeSetup({
-      email, fname: firstName, lname: lastName, year, branch, college, bio, upi,
-      skillsOffered: teachSkills, skillsWanted: learnSkills,
-      avatarImg: avatarImg
-    });
-    // Navigate to dashboard
-    navigate('/app/dashboard');
+  const handleFinish = async () => {
+    try {
+      setError('');
+      const displayName = `${firstName} ${lastName}`.trim();
+      
+      // Create user account via Auth V2
+      await register(email, password, displayName);
+      
+      // Update profile with onboarding data via Profile Phase 1
+      await updateProfile({
+        year, 
+        branch, 
+        college, 
+        bio, 
+        upi,
+        topicsOffered: teachSkills, 
+        topicsWanted: learnSkills,
+        avatarImg: avatarImg
+      });
+      
+      navigate('/app/dashboard');
+    } catch (err) {
+      setError(err.message || 'Setup failed');
+      // If setup fails, stay on page and show error
+      if (err.message.includes('Email already exists')) {
+        setStep(1); // Go back to step 1 to fix email
+      }
+    }
   };
 
   const addTeachSkill = (skill) => {
@@ -137,6 +158,7 @@ const SetupPage = () => {
         <div className="setup-hdr">
           <div className="setup-title">Set up your profile</div>
           <div className="setup-sub">Tell us about yourself to get matched with the right people</div>
+          {error && <div style={{ color: '#E24B4A', fontSize: '13px', marginTop: '12px', background: '#FBEAF0', padding: '10px 14px', borderRadius: '8px', fontWeight: 500 }}>{error}</div>}
         </div>
 
         {/* Step indicator */}

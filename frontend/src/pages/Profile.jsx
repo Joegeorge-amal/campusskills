@@ -29,8 +29,16 @@ const Profile = () => {
           <div style={{ fontSize: '15px', fontWeight: 500, color: '#222' }}>{user?.name || "Demo User"}</div>
           <div style={{ fontSize: '12px', color: '#888', marginTop: '2px' }}>{user ? `${user.year} · ${user.branch} · ${user.college}` : '3rd year · CSE · PESU Bengaluru'}</div>
           <div style={{ display: 'flex', gap: '5px', marginTop: '7px', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '20px', background: '#E1F5EE', color: '#0F6E56' }}>Teaching: DSA, C++</span>
-            <span style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '20px', background: '#EEEDFE', color: '#3C3489' }}>Learning: Figma, Japanese</span>
+            {(user?.topicsOffered?.length > 0) && (
+              <span style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '20px', background: '#E1F5EE', color: '#0F6E56' }}>
+                Teaching: {user.topicsOffered.join(', ')}
+              </span>
+            )}
+            {(user?.topicsWanted?.length > 0) && (
+              <span style={{ fontSize: '11px', padding: '3px 8px', borderRadius: '20px', background: '#EEEDFE', color: '#3C3489' }}>
+                Learning: {user.topicsWanted.join(', ')}
+              </span>
+            )}
           </div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '9px' }}>
@@ -119,28 +127,23 @@ const Profile = () => {
         {/* Skills */}
         <div className="card">
           <div className="ch"><span className="ct">Skills I'm offering</span><button className="clink" onClick={() => navigate('/app/edit-profile')}>+ Add</button></div>
-          <div className="skcard" style={{ marginBottom: '7px' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '5px' }}>
-              <span className="cpill c-code">Coding</span>
-              <span style={{ fontSize: '11px', fontWeight: 500, color: '#0F6E56' }}>₹300/hr</span>
-            </div>
-            <div style={{ fontSize: '12px', fontWeight: 500, color: '#222' }}>DSA</div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px' }}>
-              <span style={{ fontSize: '11px', color: '#BA7517' }}><IconStar /> 4.9</span>
-              <span style={{ fontSize: '10px', padding: '2px 6px', borderRadius: '20px', background: '#E1F5EE', color: '#085041' }}>Active</span>
-            </div>
-          </div>
-          <div className="skcard">
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '5px' }}>
-              <span className="cpill c-code">Coding</span>
-              <span style={{ fontSize: '11px', fontWeight: 500, color: '#534AB7' }}>Swap only</span>
-            </div>
-            <div style={{ fontSize: '12px', fontWeight: 500, color: '#222' }}>C++ basics</div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px' }}>
-              <span style={{ fontSize: '11px', color: '#BA7517' }}><IconStar /> 4.7</span>
-              <span style={{ fontSize: '10px', padding: '2px 6px', borderRadius: '20px', background: '#EEEDFE', color: '#3C3489' }}>Active</span>
-            </div>
-          </div>
+          {(!user?.topicsOffered || user.topicsOffered.length === 0) ? (
+             <div style={{ fontSize: '12px', color: '#888', padding: '10px 0' }}>No skills offered yet.</div>
+          ) : (
+            user.topicsOffered.map((topic, i) => (
+              <div className="skcard" key={i} style={{ marginBottom: i < user.topicsOffered.length - 1 ? '7px' : '0' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '5px' }}>
+                  <span className="cpill c-code">Topic</span>
+                  <span style={{ fontSize: '11px', fontWeight: 500, color: '#534AB7' }}>Available</span>
+                </div>
+                <div style={{ fontSize: '12px', fontWeight: 500, color: '#222' }}>{topic}</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px' }}>
+                  <span style={{ fontSize: '11px', color: '#BA7517' }}><IconStar /> New</span>
+                  <span style={{ fontSize: '10px', padding: '2px 6px', borderRadius: '20px', background: '#E1F5EE', color: '#085041' }}>Active</span>
+                </div>
+              </div>
+            ))
+          )}
         </div>
 
         {/* Earnings */}

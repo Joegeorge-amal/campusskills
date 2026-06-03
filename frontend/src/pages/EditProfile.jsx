@@ -20,8 +20,8 @@ const EditProfile = () => {
   const [avatarImg, setAvatarImg] = useState(user?.avatarImg || null);
   const fileInputRef = useRef(null);
   
-  const [teachSkills, setTeachSkills] = useState(['DSA', 'C++']);
-  const [learnSkills, setLearnSkills] = useState(['Figma', 'Japanese']);
+  const [teachSkills, setTeachSkills] = useState(user?.topicsOffered || []);
+  const [learnSkills, setLearnSkills] = useState(user?.topicsWanted || []);
   const [teachInp, setTeachInp] = useState('');
   const [learnInp, setLearnInp] = useState('');
 
@@ -44,20 +44,24 @@ const EditProfile = () => {
     return `${firstName.charAt(0) || ''}${lastName.charAt(0) || ''}`.toUpperCase();
   };
 
-  const handleSave = () => {
-    updateProfile({
-      name: `${firstName} ${lastName}`,
-      college,
-      year,
-      branch,
-      bio,
-      upi,
-      meta: `${year} · ${branch} · ${college}`,
-      avatar: getInitials(),
-      avatarImg
-    });
-    triggerToast('Profile updated successfully!');
-    navigate('/app/profile');
+  const handleSave = async () => {
+    try {
+      await updateProfile({
+        name: `${firstName} ${lastName}`,
+        college,
+        year,
+        branch,
+        bio,
+        upi,
+        topicsOffered: teachSkills,
+        topicsWanted: learnSkills,
+        avatarImg
+      });
+      triggerToast('Profile updated successfully!');
+      navigate('/app/profile');
+    } catch (err) {
+      triggerToast('Failed to update profile');
+    }
   };
 
   const handleImageChange = (e) => {

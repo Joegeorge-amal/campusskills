@@ -1,16 +1,20 @@
 import api from './api';
 
 export const authService = {
-  login: async (email, password, role) => {
-    return api.post('/auth/login', { email, password, role });
+  login: async (email, password) => {
+    return api.post('/auth/login', { email, password });
   },
 
-  register: async (studentData) => {
-    return api.post('/auth/register', studentData);
+  register: async (email, password, displayName) => {
+    return api.post('/auth/signup', { email, password, displayName });
   },
 
-  verifyToken: async () => {
-    return api.get('/auth/verify');
+  refresh: async (refreshToken) => {
+    return api.post('/auth/refresh', { refreshToken });
+  },
+
+  logout: async (refreshToken) => {
+    return api.post('/auth/logout', { refreshToken });
   },
 
   googleLogin: async (tokenId) => {
