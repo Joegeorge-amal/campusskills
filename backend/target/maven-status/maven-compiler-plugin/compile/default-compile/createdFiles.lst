@@ -66,7 +66,9 @@ com\campusskills\modules\notifications\handlers\NotificationHandler.class
 com\campusskills\modules\sessions\models\CreateSessionRequest.class
 com\campusskills\modules\exchangerequests\repositories\ExchangeRequestRepository.class
 com\campusskills\modules\users\models\UserStats.class
+com\campusskills\modules\users\models\RefreshToken.class
 com\campusskills\modules\messages\services\TypingIndicatorService.class
+com\campusskills\modules\users\repositories\RefreshTokenRepository.class
 com\campusskills\modules\chatrequests\models\ChatRequest.class
 com\campusskills\web\websockets\MessageBroadcaster.class
 com\campusskills\modules\reviews\handlers\ReviewHandler.class
