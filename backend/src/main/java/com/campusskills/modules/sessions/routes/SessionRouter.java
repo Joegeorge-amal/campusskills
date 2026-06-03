@@ -11,9 +11,10 @@ public class SessionRouter {
         Router router = Router.router(vertx);
         
         SessionRepository repository = new SessionRepository();
-        com.campusskills.modules.exchanges.repositories.ExchangeRepository exchangeRepository = new com.campusskills.modules.exchanges.repositories.ExchangeRepository();
+        com.campusskills.modules.exchangerequests.repositories.ExchangeRequestRepository exchangeRepository = new com.campusskills.modules.exchangerequests.repositories.ExchangeRequestRepository();
         com.campusskills.modules.chats.repositories.ChatRepository chatRepository = new com.campusskills.modules.chats.repositories.ChatRepository();
-        SessionService service = new SessionService(vertx.eventBus(), repository, exchangeRepository, chatRepository);
+        com.campusskills.modules.users.repositories.UserProfileRepository userProfileRepository = new com.campusskills.modules.users.repositories.UserProfileRepository();
+        SessionService service = new SessionService(vertx.eventBus(), repository, exchangeRepository, chatRepository, userProfileRepository);
         SessionHandler handler = new SessionHandler(service);
 
         router.post("/").handler(handler::createSession);
@@ -23,7 +24,6 @@ public class SessionRouter {
         router.patch("/:sessionId/reject").handler(handler::rejectSession);
         router.patch("/:sessionId/cancel").handler(handler::cancelSession);
         router.patch("/:sessionId/complete").handler(handler::completeSession);
-        router.patch("/:sessionId/confirm").handler(handler::confirmSession);
         router.patch("/:sessionId/dispute").handler(handler::disputeSession);
 
         return router;

@@ -1,6 +1,6 @@
 package com.campusskills.shared.constants;
 
-public enum ExchangeStatus {
+public enum RequestStatus {
     PENDING,
     ACCEPTED,
     REJECTED

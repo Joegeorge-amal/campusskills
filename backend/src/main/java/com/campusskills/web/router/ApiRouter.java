@@ -6,10 +6,10 @@ import io.vertx.ext.web.handler.BodyHandler;
 
 import com.campusskills.modules.chats.routes.ChatRouter;
 import com.campusskills.modules.messages.routes.MessageRouter;
-import com.campusskills.modules.exchanges.routes.ExchangeRouter;
 import com.campusskills.modules.sessions.routes.SessionRouter;
 import com.campusskills.modules.users.routes.AuthRouter;
 import com.campusskills.modules.users.routes.UserRouter;
+import com.campusskills.modules.listings.routes.ListingRouter;
 
 import com.campusskills.web.middleware.RequestIdMiddleware;
 import com.campusskills.web.middleware.GlobalErrorHandler;
@@ -48,15 +48,24 @@ public class ApiRouter {
         router.route("/users/*").handler(JwtAuthMiddleware.create(jwtAuth));
         router.route("/chats/*").handler(JwtAuthMiddleware.create(jwtAuth));
         router.route("/messages/*").handler(JwtAuthMiddleware.create(jwtAuth));
-        router.route("/exchanges/*").handler(JwtAuthMiddleware.create(jwtAuth));
         router.route("/sessions/*").handler(JwtAuthMiddleware.create(jwtAuth));
+        router.route("/chat-requests/*").handler(JwtAuthMiddleware.create(jwtAuth));
+        router.route("/exchange-requests/*").handler(JwtAuthMiddleware.create(jwtAuth));
+        router.route("/notifications/*").handler(JwtAuthMiddleware.create(jwtAuth));
+        router.route("/reviews/*").handler(JwtAuthMiddleware.create(jwtAuth));
+        router.route("/profiles/*").handler(JwtAuthMiddleware.create(jwtAuth));
 
         // 6. Modules Routing
         router.mountSubRouter("/users", UserRouter.create(vertx, jwtAuth));
+        router.mountSubRouter("/profiles", com.campusskills.modules.users.routes.ProfileRouter.create(vertx));
         router.mountSubRouter("/chats", ChatRouter.create(vertx));
         router.mountSubRouter("/messages", MessageRouter.create(vertx));
-        router.mountSubRouter("/exchanges", ExchangeRouter.create(vertx));
         router.mountSubRouter("/sessions", SessionRouter.create(vertx));
+        router.mountSubRouter("/listings", ListingRouter.create(vertx, jwtAuth));
+        router.mountSubRouter("/chat-requests", com.campusskills.modules.chatrequests.routes.ChatRequestRouter.create(vertx));
+        router.mountSubRouter("/exchange-requests", com.campusskills.modules.exchangerequests.routes.ExchangeRequestRouter.create(vertx));
+        router.mountSubRouter("/notifications", com.campusskills.modules.notifications.routes.NotificationRouter.create(vertx));
+        router.mountSubRouter("/reviews", com.campusskills.modules.reviews.routes.ReviewRouter.create(vertx));
         
         // Global Error Handling
         router.route().failureHandler(GlobalErrorHandler.create());

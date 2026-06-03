@@ -13,7 +13,7 @@ public class MessageBroadcaster {
                     .put("chatId", message.getChatId())
                     .put("senderId", message.getSenderId())
                     .put("message", message.getMessage())
-                    .put("messageType", message.getType() != null ? message.getType() : "TEXT")
+                    .put("messageType", message.getType() != null ? message.getType() : "USER")
                     .put("sessionId", message.getSessionId())
                     .put("createdAt", message.getCreatedAt());
 
@@ -97,25 +97,4 @@ public class MessageBroadcaster {
         }
     }
 
-    public static void broadcastExchangeEvent(String eventType, com.campusskills.modules.exchanges.models.Exchange exchange) {
-        try {
-            WebSocketEventType type;
-            try {
-                type = WebSocketEventType.valueOf(eventType);
-            } catch (IllegalArgumentException e) {
-                System.err.println("[BROADCAST WARN] Unrecognized WebSocketEventType: " + eventType + ". Defaulting to EXCHANGE_UPDATE.");
-                type = WebSocketEventType.EXCHANGE_UPDATE;
-            }
-
-            JsonObject event = new WebSocketMessageBuilder()
-                    .type(type)
-                    .payload(new JsonObject().put("exchange", JsonObject.mapFrom(exchange)))
-                    .build();
-
-            ConnectionManager.sendMessage(exchange.getRequesterId(), event);
-            ConnectionManager.sendMessage(exchange.getReceiverId(), event);
-        } catch (Exception e) {
-            System.err.println("[BROADCAST WARN] Failed to broadcast " + eventType + " for exchange " + exchange.getId() + ": " + e.getMessage());
-        }
-    }
 }

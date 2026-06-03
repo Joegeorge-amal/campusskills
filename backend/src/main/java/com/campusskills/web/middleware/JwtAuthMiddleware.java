@@ -4,10 +4,13 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.core.json.JsonObject;
 import com.campusskills.web.response.ApiResponse;
+import com.campusskills.modules.users.repositories.UserRepository;
 
 public class JwtAuthMiddleware {
 
     public static io.vertx.core.Handler<RoutingContext> create(JWTAuth jwtAuth) {
+        UserRepository userRepository = new UserRepository();
+        
         return ctx -> {
             String authHeader = ctx.request().getHeader("Authorization");
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -28,12 +31,24 @@ public class JwtAuthMiddleware {
                         return;
                     }
                     
-                    ctx.put("authenticatedUserId", userId);
-                    if (role != null) {
-                        ctx.put("authenticatedUserRole", role);
-                    }
-                    
-                    ctx.next();
+                    // Verify user still exists in DB
+                    userRepository.findById(userId)
+                        .onSuccess(foundUser -> {
+                            if (foundUser == null) {
+                                ApiResponse.forbidden(ctx, "User no longer exists");
+                                return;
+                            }
+                            
+                            ctx.put("authenticatedUserId", userId);
+                            if (role != null) {
+                                ctx.put("authenticatedUserRole", role);
+                            }
+                            
+                            ctx.next();
+                        })
+                        .onFailure(err -> {
+                            ApiResponse.internalError(ctx, "Failed to verify user identity");
+                        });
                 })
                 .onFailure(err -> {
                     ApiResponse.forbidden(ctx, "Invalid or expired token");
