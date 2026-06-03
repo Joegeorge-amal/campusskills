@@ -42,6 +42,7 @@ public class AuthRouter {
         router.post("/signup").handler(handler::signup);
         router.post("/login").handler(handler::login);
         router.post("/refresh").handler(handler::refresh);
+        router.post("/logout").handler(handler::logout);
 
         return router;
     }

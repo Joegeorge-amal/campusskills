@@ -39,4 +39,59 @@ public class ProfileHandler {
             })
             .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
     }
+    public void getMe(RoutingContext ctx) {
+        String userId = ctx.get("authenticatedUserId");
+
+        if (userId == null) {
+            ApiResponse.unauthorized(ctx, "Unauthorized");
+            return;
+        }
+
+        userProfileRepository.findByUserId(userId)
+            .onSuccess(profile -> {
+                if (profile == null) {
+                    ApiResponse.notFound(ctx, "Profile not found");
+                    return;
+                }
+
+                JsonObject json = JsonObject.mapFrom(profile);
+                json.remove("_id");
+
+                ApiResponse.ok(ctx, json);
+            })
+            .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
+    }
+
+    public void updateMe(RoutingContext ctx) {
+        String userId = ctx.get("authenticatedUserId");
+
+        if (userId == null) {
+            ApiResponse.unauthorized(ctx, "Unauthorized");
+            return;
+        }
+
+        JsonObject body = ctx.body().asJsonObject();
+        if (body == null || body.isEmpty()) {
+            ApiResponse.badRequest(ctx, "No data provided");
+            return;
+        }
+
+        // Filter out fields that shouldn't be updated directly via this endpoint
+        body.remove("_id");
+        body.remove("userId");
+        body.remove("averageRating");
+        body.remove("reviewCount");
+        body.remove("createdAt");
+        body.remove("updatedAt");
+
+        userProfileRepository.updateProfile(userId, body)
+            .onSuccess(updated -> {
+                if (!updated) {
+                    ApiResponse.notFound(ctx, "Profile not found");
+                    return;
+                }
+                ApiResponse.ok(ctx, new JsonObject().put("message", "Profile updated successfully"));
+            })
+            .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
+    }
 }

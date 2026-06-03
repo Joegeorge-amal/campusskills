@@ -66,6 +66,10 @@ public class ApiResponse {
         sendError(ctx, 400, message);
     }
 
+    public static void unauthorized(RoutingContext ctx, String message) {
+        sendError(ctx, 401, message);
+    }
+
     public static void forbidden(RoutingContext ctx, String message) {
         sendError(ctx, 403, message);
     }
