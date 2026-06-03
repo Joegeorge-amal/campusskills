@@ -89,17 +89,25 @@ export const AuthProvider = ({ children }) => {
     });
   };
 
-  const logout = () => {
-    // If backend implements token revocation later, it goes here
-    setUser(null);
-    setRole(null);
-    setIsAuthenticated(false);
-    localStorage.removeItem('cs_user');
-    localStorage.removeItem('cs_role');
-    localStorage.removeItem('cs_token');
-    localStorage.removeItem('cs_refresh_token');
-    localStorage.removeItem('cs_av_bg');
-    localStorage.removeItem('cs_av_col');
+  const logout = async () => {
+    try {
+      const refreshToken = localStorage.getItem('cs_refresh_token');
+      if (refreshToken) {
+        // Attempt backend revocation (fire-and-forget for client resilience)
+        await authService.logout(refreshToken).catch(err => console.error("Backend logout failed:", err));
+      }
+    } finally {
+      // Always clear local state regardless of backend success (idempotent local logout)
+      setUser(null);
+      setRole(null);
+      setIsAuthenticated(false);
+      localStorage.removeItem('cs_user');
+      localStorage.removeItem('cs_role');
+      localStorage.removeItem('cs_token');
+      localStorage.removeItem('cs_refresh_token');
+      localStorage.removeItem('cs_av_bg');
+      localStorage.removeItem('cs_av_col');
+    }
   };
 
   const changeAvColor = (bg, col) => {

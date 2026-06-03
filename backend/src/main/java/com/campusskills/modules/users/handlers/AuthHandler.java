@@ -76,4 +76,23 @@ public class AuthHandler {
             ApiResponse.badRequest(ctx, "Invalid JSON format");
         }
     }
+
+    public void logout(RoutingContext ctx) {
+        try {
+            JsonObject body = ctx.body().asJsonObject();
+            if (body == null) {
+                // If body is completely empty, fail safely
+                ApiResponse.ok(ctx, new JsonObject().put("message", "Logged out locally"));
+                return;
+            }
+            
+            String refreshToken = body.getString("refreshToken");
+
+            userService.logout(refreshToken)
+                .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("message", "Successfully logged out")))
+                .onFailure(err -> ApiResponse.internalError(ctx, "Failed to logout"));
+        } catch (Exception e) {
+            ApiResponse.badRequest(ctx, "Invalid JSON format");
+        }
+    }
 }

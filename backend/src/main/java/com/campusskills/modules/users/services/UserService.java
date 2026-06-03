@@ -177,6 +177,17 @@ public class UserService {
         });
     }
 
+    public Future<Void> logout(String rawRefreshToken) {
+        if (rawRefreshToken == null || rawRefreshToken.trim().isEmpty()) {
+            // Idempotent success if no token is provided to revoke
+            return Future.succeededFuture();
+        }
+        
+        String tokenHash = hashToken(rawRefreshToken);
+        // We delete the token if it exists. If it doesn't, no error is thrown (idempotent).
+        return refreshTokenRepository.deleteByTokenHash(tokenHash);
+    }
+
     public Future<JsonObject> getFullProfile(String userId) {
         Future<User> userFut = userRepository.findById(userId);
         Future<UserProfile> profileFut = profileRepository.findByUserId(userId);
