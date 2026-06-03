@@ -1,11 +1,14 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { profileService } from '../services/profileService';
 
 const SetupPage = () => {
   const [step, setStep] = useState(1);
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { completeSetup } = useAuth();
+  const { register } = useAuth();
 
   // Step 1 states
   const [email, setEmail] = useState('');
@@ -47,14 +50,34 @@ const SetupPage = () => {
     if (step > 1) setStep(step - 1);
   };
 
-  const handleFinish = () => {
-    completeSetup({
-      email, fname: firstName, lname: lastName, year, branch, college, bio, upi,
-      skillsOffered: teachSkills, skillsWanted: learnSkills,
-      avatarImg: avatarImg
-    });
-    // Navigate to dashboard
-    navigate('/app/dashboard');
+  const handleFinish = async () => {
+    setError('');
+    setIsLoading(true);
+    try {
+      const displayName = `${firstName} ${lastName}`.trim();
+      await register(email, password, displayName);
+      
+      // Map frontend fields to backend SkillProfile array format
+      const skillsOffered = teachSkills.map(s => ({ name: s, level: 'INTERMEDIATE', isSystemSkill: false }));
+      const skillsWanted = learnSkills.map(s => ({ name: s, level: 'BEGINNER', isSystemSkill: false }));
+
+      // Persist onboarding profile data
+      await profileService.updateMe({
+        bio,
+        year,
+        department: branch,
+        profilePicture: avatarImg || JSON.stringify(avatarColor),
+        skillsOffered,
+        skillsWanted
+      });
+
+      // Successfully authenticated and profile persisted
+      navigate('/app/dashboard');
+    } catch (err) {
+      setError(err.message || 'Registration failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const addTeachSkill = (skill) => {
@@ -364,11 +387,20 @@ const SetupPage = () => {
               </div>
 
               <div className="sbtn-row">
-                <button type="button" className="sbtn-back" onClick={handleBack}>Back</button>
-                <button type="submit" className="sbtn">Go to Dashboard</button>
+                <button type="button" className="sbtn-back" onClick={handleBack} disabled={isLoading}>Back</button>
+                <button type="submit" className="sbtn" disabled={isLoading}>
+                  {isLoading ? 'Creating Account...' : 'Go to Dashboard'}
+                </button>
               </div>
+              
+              {error && (
+                <div style={{ color: '#E24B4A', background: '#FCECEC', padding: '10px 14px', borderRadius: '8px', fontSize: '13px', marginTop: '16px', textAlign: 'center', border: '1px solid #F8D0D0' }}>
+                  {error}
+                </div>
+              )}
+
               <div style={{ textAlign: 'center', marginTop: '10px' }}>
-                <button type="button" onClick={handleFinish} style={{ background: 'none', border: 'none', fontSize: '12px', color: '#aaa', cursor: 'pointer', textDecoration: 'underline' }}>
+                <button type="button" onClick={handleFinish} disabled={isLoading} style={{ background: 'none', border: 'none', fontSize: '12px', color: '#aaa', cursor: 'pointer', textDecoration: 'underline' }}>
                   Skip for now
                 </button>
               </div>

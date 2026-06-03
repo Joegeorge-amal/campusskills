@@ -13,6 +13,8 @@ public class ProfileRouter {
         UserProfileRepository userProfileRepository = new UserProfileRepository();
         ProfileHandler profileHandler = new ProfileHandler(userProfileRepository);
 
+        router.get("/me").handler(profileHandler::getMe);
+        router.patch("/me").handler(profileHandler::updateMe);
         router.get("/:userId").handler(profileHandler::getPublicProfile);
         
         return router;

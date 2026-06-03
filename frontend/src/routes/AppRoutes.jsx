@@ -60,7 +60,7 @@ const AppRoutes = () => {
       
       {/* Student Layout */}
       <Route path="/app" element={
-        <ProtectedRoute allowedRoles={['student']}>
+        <ProtectedRoute allowedRoles={['student', 'user']}>
           <AppLayout />
         </ProtectedRoute>
       }>

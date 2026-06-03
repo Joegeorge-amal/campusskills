@@ -1,4 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { authService } from '../services/authService';
+import api from '../services/api';
 
 const AuthContext = createContext();
 
@@ -13,93 +15,70 @@ export const AuthProvider = ({ children }) => {
   const [avCol, setAvCol] = useState(() => localStorage.getItem('cs_av_col') || '#3C3489');
 
   const login = async (email, password) => {
-    // 1. Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-
-    // 2. Mock Validation (Any email/pass works, just ensure they exist)
     if (!email || !password) {
       throw new Error('Please enter both email and password.');
     }
 
-    // 3. Determine role based on email
-    const isMockAdmin = email.toLowerCase().includes('admin');
-    const assignedRole = isMockAdmin ? 'admin' : 'student';
+    try {
+      const response = await authService.login(email, password);
+      
+      // Axios interceptor returns response.data
+      const data = response.data || response;
+      const { token, refreshToken, user: userData } = data;
 
-    // 4. Setup mock data based on role
-    if (assignedRole === 'student') {
-      const mockStudent = {
-        id: "demo-student-user",
-        email: email,
-        fname: 'Arjun',
-        lname: 'Kumar',
-        name: 'Arjun Kumar',
-        year: '3rd year',
-        branch: 'CSE',
-        college: 'PESU Bengaluru',
-        upi: 'arjunkumar@upi',
-        bio: 'DSA enthusiast. Love helping juniors crack placements. Also learning Figma on the side.',
-        trustScore: '4.8',
-        skillsOffered: ['DSA', 'C++ basics'],
-        skillsWanted: ['Figma', 'Japanese'],
-        walletBalance: 840,
-        avatarImg: null,
-        role: 'student'
-      };
-      setUser(mockStudent);
-      setRole('student');
+      if (!token) {
+        throw new Error('Invalid response from server');
+      }
+
+      setUser(userData);
+      setRole(userData.role?.toLowerCase() || 'student');
       setIsAuthenticated(true);
       
-      localStorage.setItem('cs_user', JSON.stringify(mockStudent));
-      localStorage.setItem('cs_role', 'student');
-      localStorage.setItem('cs_token', 'mock-jwt-token-xyz');
+      localStorage.setItem('cs_user', JSON.stringify(userData));
+      localStorage.setItem('cs_role', userData.role?.toLowerCase() || 'student');
+      localStorage.setItem('cs_token', token);
+      if (refreshToken) {
+        localStorage.setItem('cs_refresh_token', refreshToken);
+      }
       localStorage.setItem('cs_av_bg', avBg);
       localStorage.setItem('cs_av_col', avCol);
-    } else {
-      const mockAdmin = {
-        id: "demo-admin-user",
-        email: email,
-        name: 'PESU Admin',
-        college: 'PESU Bengaluru',
-        role: 'admin'
-      };
-      setUser(mockAdmin);
-      setRole('admin');
-      setIsAuthenticated(true);
       
-      localStorage.setItem('cs_user', JSON.stringify(mockAdmin));
-      localStorage.setItem('cs_role', 'admin');
-      localStorage.setItem('cs_token', 'mock-jwt-admin-token-xyz');
+      return true;
+    } catch (error) {
+      // Re-throw standardized error message
+      const msg = error.response?.data?.error || error.response?.data?.message || error.message || 'Login failed';
+      throw new Error(msg);
     }
-
-    return true;
   };
 
-  const completeSetup = (setupData) => {
-    const name = `${setupData.fname} ${setupData.lname}`.trim() || 'Arjun Kumar';
-    const completeUser = {
-      email: setupData.email || 'yourname@college.edu',
-      fname: setupData.fname || 'Arjun',
-      lname: setupData.lname || 'Kumar',
-      name: name,
-      year: setupData.year || '3rd year',
-      branch: setupData.branch || 'CSE',
-      college: setupData.college || 'PESU Bengaluru',
-      upi: setupData.upi || 'yourname@upi',
-      bio: setupData.bio || 'Tell others what you\'re passionate about...',
-      trustScore: '4.8',
-      skillsOffered: setupData.skillsOffered || ['DSA', 'C++'],
-      skillsWanted: setupData.skillsWanted || ['Figma', 'Japanese'],
-      walletBalance: 840,
-      avatarImg: setupData.avatarImg || null
-    };
-    setUser(completeUser);
-    setRole('student');
-    setIsAuthenticated(true);
-    localStorage.setItem('cs_user', JSON.stringify(completeUser));
-    localStorage.setItem('cs_role', 'student');
-    localStorage.setItem('cs_token', 'mock-jwt-token-xyz');
-    localStorage.setItem('cs_av_bg', avBg);
-    localStorage.setItem('cs_av_col', avCol);
+  const register = async (email, password, displayName) => {
+    try {
+      const response = await authService.register(email, password, displayName);
+      const data = response.data || response;
+      const { token, refreshToken, user: userData } = data;
+
+      if (!token) {
+        throw new Error('Invalid response from server');
+      }
+
+      setUser(userData);
+      setRole(userData.role?.toLowerCase() || 'student');
+      setIsAuthenticated(true);
+      
+      localStorage.setItem('cs_user', JSON.stringify(userData));
+      localStorage.setItem('cs_role', userData.role?.toLowerCase() || 'student');
+      localStorage.setItem('cs_token', token);
+      if (refreshToken) {
+        localStorage.setItem('cs_refresh_token', refreshToken);
+      }
+      localStorage.setItem('cs_av_bg', avBg);
+      localStorage.setItem('cs_av_col', avCol);
+      
+      return true;
+    } catch (error) {
+      const msg = error.response?.data?.error || error.response?.data?.message || error.message || 'Registration failed';
+      throw new Error(msg);
+    }
   };
 
   const updateProfile = (updatedFields) => {
@@ -111,12 +90,14 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    // If backend implements token revocation later, it goes here
     setUser(null);
     setRole(null);
     setIsAuthenticated(false);
     localStorage.removeItem('cs_user');
     localStorage.removeItem('cs_role');
     localStorage.removeItem('cs_token');
+    localStorage.removeItem('cs_refresh_token');
     localStorage.removeItem('cs_av_bg');
     localStorage.removeItem('cs_av_col');
   };
@@ -137,7 +118,7 @@ export const AuthProvider = ({ children }) => {
         avBg,
         avCol,
         login,
-        completeSetup,
+        register,
         updateProfile,
         logout,
         changeAvColor
