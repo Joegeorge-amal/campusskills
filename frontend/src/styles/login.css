@@ -5,11 +5,17 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 24px;
-  overflow-y: auto;
-  overflow-x: hidden;
+  padding: 20px;
   position: relative;
   background: linear-gradient(135deg, #1e1b7a 0%, #4338ca 50%, #4f46e5 100%);
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .bg-circle {
@@ -47,6 +53,11 @@
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
   z-index: 2;
   margin: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-card form {
   display: flex;
   flex-direction: column;
 }
@@ -117,7 +128,7 @@
 }
 
 .lbl {
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 500;
   color: #333;
 }

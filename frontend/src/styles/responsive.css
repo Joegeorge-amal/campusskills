@@ -41,3 +41,42 @@
 .mobile-menu-btn {
   display: none !important;
 }
+
+/* ─── AUTH & SETUP SCREEN RESPONSIVENESS ─── */
+@media (max-width: 1024px) {
+  .setup-card {
+    padding: 32px;
+  }
+}
+
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .setup-card {
+    padding: 24px;
+    border-radius: 24px;
+  }
+  
+  .auth-card {
+    padding: 28px;
+    border-radius: 20px;
+  }
+
+  .step-prog-wrap {
+    margin: 24px 0 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-page {
+    padding: 16px;
+  }
+  
+  .setup-card, .auth-card {
+    padding: 20px;
+    border-radius: 20px;
+  }
+}

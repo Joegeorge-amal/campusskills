@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import ForgotPasswordModal from '../components/modals/ForgotPasswordModal';
 import { IconShieldCheck } from '@tabler/icons-react';
 
 const LoginPage = () => {
@@ -9,6 +10,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isForgotOpen, setIsForgotOpen] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -45,7 +47,8 @@ const LoginPage = () => {
       <div className="bg-circle bg-circle-1"></div>
       <div className="bg-circle bg-circle-2"></div>
       
-      <div className="auth-card fade-in">
+      <div className="auth-container">
+        <div className="auth-card fade-in">
         <div className="login-logo" style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
           <div className="login-mark">CS</div>
           <div className="login-brand" style={{ fontSize: '24px', fontWeight: 700, color: '#1a1560', letterSpacing: '-0.5px' }}>
@@ -97,6 +100,11 @@ const LoginPage = () => {
                   required
                 />
               </div>
+              <div style={{ textAlign: 'right', marginBottom: '16px', marginTop: '-4px' }}>
+                <a onClick={() => setIsForgotOpen(true)} style={{ fontSize: '12px', color: '#534AB7', cursor: 'pointer', fontWeight: 500, textDecoration: 'none' }}>
+                  Forgot Password?
+                </a>
+              </div>
               <button className="lbtn" type="submit" disabled={isLoading}>
                 {isLoading ? 'Logging in...' : 'Login as Student'}
               </button>
@@ -132,6 +140,11 @@ const LoginPage = () => {
                   required
                 />
               </div>
+              <div style={{ textAlign: 'right', marginBottom: '16px', marginTop: '-4px' }}>
+                <a onClick={() => setIsForgotOpen(true)} style={{ fontSize: '12px', color: '#534AB7', cursor: 'pointer', fontWeight: 500, textDecoration: 'none' }}>
+                  Forgot Password?
+                </a>
+              </div>
               <button className="lbtn" type="submit" disabled={isLoading}>
                 {isLoading ? 'Logging in...' : 'Login as Admin'}
               </button>
@@ -150,7 +163,13 @@ const LoginPage = () => {
             Don't have an account? <a onClick={handleGoogleLogin}>Create Account</a>
           </div>
         )}
+        </div>
       </div>
+
+      <ForgotPasswordModal 
+        isOpen={isForgotOpen} 
+        onClose={() => setIsForgotOpen(false)} 
+      />
     </div>
   );
 };

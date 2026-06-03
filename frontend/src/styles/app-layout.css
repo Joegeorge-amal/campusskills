@@ -87,7 +87,58 @@
   cursor: pointer;
   font-size: 12px;
   color: #666;
-  margin-bottom: 1px;
+  margin-right: 12px;
+}
+
+/* ─── FILTER CHIPS ─── */
+.filter-chip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: #F5F4FF;
+  border: 1px solid #E0DFF0;
+  color: #555;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.filter-chip:hover {
+  background: #E8E7F5;
+  transform: translateY(-1px);
+}
+
+.filter-chip.active {
+  background: linear-gradient(135deg, #1e1b7a 0%, #534AB7 100%);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 4px 10px rgba(83, 74, 183, 0.3);
+}
+
+.filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  background: #F5F4FF;
+  border: 1px solid #E0DFF0;
+  color: #222;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+  background: #E8E7F5;
+  transform: translateY(-1px);
+}
+
+.ni {
   border: none;
   background: none;
   width: 100%;

@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { IconArrowLeft } from '@tabler/icons-react';
 
 const SetupPage = () => {
   const [step, setStep] = useState(1);
@@ -26,9 +27,13 @@ const SetupPage = () => {
   const [learnSkills, setLearnSkills] = useState([]);
   const [teachInput, setTeachInput] = useState('');
   const [learnInput, setLearnInput] = useState('');
+  const [experience, setExperience] = useState('Intermediate');
+  const [interests, setInterests] = useState('');
+  const [category, setCategory] = useState('Technology');
 
   // Step 3 states
-  const [availability, setAvailability] = useState(['Mon–Fri evenings', 'Weekend mornings', 'Anytime flexible']);
+  const [availability, setAvailability] = useState(['Mon–Fri evenings', 'Weekend mornings']);
+  const [prefTime, setPrefTime] = useState('Evening (5PM - 9PM)');
   const [sessionPref, setSessionPref] = useState('Online (Google Meet)');
   const [exchangePref, setExchangePref] = useState('Skill swap');
 
@@ -113,8 +118,19 @@ const SetupPage = () => {
       <div className="bg-circle bg-circle-1"></div>
       <div className="bg-circle bg-circle-2"></div>
       
-      <div className="setup-card fade-in">
-          <div className="setup-logo">
+      <div className="auth-container">
+        <div className="setup-card fade-in" style={{ position: 'relative' }}>
+          {step === 1 && (
+            <button 
+              type="button"
+              onClick={() => navigate('/login')}
+              style={{ position: 'absolute', top: '24px', left: '24px', background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: '6px', color: '#666', fontSize: '13px', fontWeight: 500, cursor: 'pointer', zIndex: 10, padding: '8px' }}
+            >
+              <IconArrowLeft size={16} /> Back to Login
+            </button>
+          )}
+          
+          <div className="setup-logo" style={{ marginTop: '16px' }}>
             <div className="setup-mark">cs</div>
             <div className="setup-brand">campus<span>skills</span></div>
           </div>
@@ -258,15 +274,6 @@ const SetupPage = () => {
                   </select>
                 </div>
 
-                <div className="sfld">
-                  <label>Bio <span style={{ color: '#aaa', fontWeight: 400 }}>(optional)</span></label>
-                  <textarea placeholder="Tell others what you're passionate about..." value={bio} onChange={e => setBio(e.target.value)}></textarea>
-                </div>
-
-                <div className="sfld" style={{ marginBottom: 0 }}>
-                  <label>UPI ID <span style={{ color: '#aaa', fontWeight: 400 }}>(for payments)</span></label>
-                  <input type="text" placeholder="yourname@upi" value={upi} onChange={e => setUpi(e.target.value)} />
-                </div>
               </div>
               <button type="submit" className="sbtn">Continue</button>
             </div>
@@ -319,6 +326,33 @@ const SetupPage = () => {
                 </div>
               </div>
 
+              <div className="form-grid" style={{ marginBottom: '24px' }}>
+                <div className="sfld">
+                  <label>Experience Level *</label>
+                  <select value={experience} onChange={e => setExperience(e.target.value)} required>
+                    <option>Beginner</option>
+                    <option>Intermediate</option>
+                    <option>Advanced</option>
+                    <option>Expert</option>
+                  </select>
+                </div>
+                <div className="sfld">
+                  <label>Categories *</label>
+                  <select value={category} onChange={e => setCategory(e.target.value)} required>
+                    <option>Technology</option>
+                    <option>Design</option>
+                    <option>Business</option>
+                    <option>Languages</option>
+                    <option>Music & Arts</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div className="sfld" style={{ marginBottom: '32px' }}>
+                <label>Other Interests <span style={{ color: '#aaa', fontWeight: 400 }}>(optional)</span></label>
+                <input type="text" placeholder="e.g. Photography, Hiking..." value={interests} onChange={e => setInterests(e.target.value)} />
+              </div>
+
               <div className="sbtn-row">
                 <button type="button" className="sbtn-back" onClick={handleBack}>Back</button>
                 <button type="submit" className="sbtn">Continue</button>
@@ -340,19 +374,28 @@ const SetupPage = () => {
                   ))}
                 </div>
               </div>
-
-              <div style={{ marginBottom: '32px' }}>
-                <div className="ch"><span className="ct">Session preference</span></div>
-                <div className="avail-grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
-                  {['Online (Google Meet)', 'In-person on campus', 'Either works'].map(opt => (
-                    <div key={opt} className={`avail-opt ${sessionPref === opt ? 'on' : ''}`} onClick={() => setSessionPref(opt)}>
-                      {opt}
-                    </div>
-                  ))}
+              
+              <div className="form-grid" style={{ marginBottom: '24px' }}>
+                <div className="sfld" style={{ marginBottom: 0 }}>
+                  <label>Preferred Time *</label>
+                  <select value={prefTime} onChange={e => setPrefTime(e.target.value)} required>
+                    <option>Morning (8AM - 12PM)</option>
+                    <option>Afternoon (12PM - 5PM)</option>
+                    <option>Evening (5PM - 9PM)</option>
+                    <option>Night (9PM onwards)</option>
+                  </select>
+                </div>
+                <div className="sfld" style={{ marginBottom: 0 }}>
+                  <label>Session Mode *</label>
+                  <select value={sessionPref} onChange={e => setSessionPref(e.target.value)} required>
+                    <option>Online (Google Meet)</option>
+                    <option>In-person on campus</option>
+                    <option>Either works</option>
+                  </select>
                 </div>
               </div>
 
-              <div style={{ marginBottom: '32px' }}>
+              <div className="sfld" style={{ marginBottom: '20px' }}>
                 <div className="ch"><span className="ct">Exchange preference</span></div>
                 <div className="avail-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
                   {['Skill swap', 'Paid (₹/hr)', 'Both'].map(opt => (
@@ -361,6 +404,16 @@ const SetupPage = () => {
                     </div>
                   ))}
                 </div>
+              </div>
+
+              <div className="sfld" style={{ marginBottom: '24px' }}>
+                <label>Bio <span style={{ color: '#aaa', fontWeight: 400 }}>(optional)</span></label>
+                <textarea placeholder="Tell others what you're passionate about..." value={bio} onChange={e => setBio(e.target.value)}></textarea>
+              </div>
+
+              <div className="sfld" style={{ marginBottom: '32px' }}>
+                <label>UPI ID <span style={{ color: '#aaa', fontWeight: 400 }}>(for payments)</span></label>
+                <input type="text" placeholder="yourname@upi" value={upi} onChange={e => setUpi(e.target.value)} />
               </div>
 
               <div className="sbtn-row">
@@ -375,6 +428,7 @@ const SetupPage = () => {
             </div>
           )}
         </form>
+        </div>
       </div>
     </div>
   );
