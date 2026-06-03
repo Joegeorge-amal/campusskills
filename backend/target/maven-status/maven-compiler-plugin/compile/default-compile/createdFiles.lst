@@ -5,6 +5,8 @@ com\campusskills\modules\users\handlers\ProfileHandler.class
 com\campusskills\shared\models\SkillLevel.class
 com\campusskills\modules\notifications\models\NotificationType.class
 com\campusskills\modules\chats\models\Chat.class
+com\campusskills\modules\topics\models\Topic.class
+com\campusskills\modules\topics\routes\TopicRouter.class
 com\campusskills\web\middleware\GlobalErrorHandler.class
 com\campusskills\web\router\ApiRouter.class
 com\campusskills\modules\users\routes\AuthRouter.class
@@ -17,6 +19,8 @@ com\campusskills\web\websockets\WebSocketMessageBuilder.class
 com\campusskills\web\middleware\RequestIdMiddleware.class
 com\campusskills\core\database\MongoManager.class
 com\campusskills\modules\messages\services\MessageService.class
+com\campusskills\modules\topics\services\TopicService$TopicSeedData.class
+com\campusskills\modules\topics\repositories\TopicRepository.class
 com\campusskills\modules\users\repositories\UserRepository.class
 com\campusskills\modules\sessions\services\SessionService.class
 com\campusskills\shared\constants\RequestStatus.class
@@ -33,6 +37,7 @@ com\campusskills\modules\sessions\handlers\SessionHandler.class
 com\campusskills\shared\constants\WebSocketEventType.class
 com\campusskills\web\middleware\JwtAuthMiddleware.class
 com\campusskills\modules\sessions\routes\SessionRouter.class
+com\campusskills\modules\topics\handlers\TopicHandler.class
 com\campusskills\modules\chats\handlers\ChatHandler.class
 com\campusskills\modules\listings\models\Listing.class
 com\campusskills\shared\constants\MessageType.class
@@ -76,6 +81,7 @@ com\campusskills\modules\listings\repositories\ListingRepository.class
 com\campusskills\modules\reviews\routes\ReviewRouter.class
 com\campusskills\modules\users\repositories\UserProfileRepository.class
 com\campusskills\modules\notifications\services\NotificationBroadcaster.class
+com\campusskills\modules\topics\services\TopicService.class
 com\campusskills\modules\users\handlers\UserHandler.class
 com\campusskills\modules\users\routes\ProfileRouter.class
 com\campusskills\modules\sessions\repositories\SessionRepository.class

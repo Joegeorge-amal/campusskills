@@ -66,6 +66,7 @@ public class ApiRouter {
         router.mountSubRouter("/exchange-requests", com.campusskills.modules.exchangerequests.routes.ExchangeRequestRouter.create(vertx));
         router.mountSubRouter("/notifications", com.campusskills.modules.notifications.routes.NotificationRouter.create(vertx));
         router.mountSubRouter("/reviews", com.campusskills.modules.reviews.routes.ReviewRouter.create(vertx));
+        router.mountSubRouter("/topics", com.campusskills.modules.topics.routes.TopicRouter.create(vertx, jwtAuth));
         
         // Global Error Handling
         router.route().failureHandler(GlobalErrorHandler.create());
