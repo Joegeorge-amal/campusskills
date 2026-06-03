@@ -20,7 +20,19 @@ public class UserRouter {
         UserProfileRepository profileRepository = new UserProfileRepository();
         UserStatsRepository statsRepository = new UserStatsRepository();
         UserWalletRepository walletRepository = new UserWalletRepository();
-        UserService service = new UserService(userRepository, profileRepository, statsRepository, walletRepository, jwtAuth);
+        com.campusskills.modules.users.repositories.RefreshTokenRepository refreshTokenRepository = new com.campusskills.modules.users.repositories.RefreshTokenRepository();
+        
+        java.util.List<String> allowedDomains = java.util.Arrays.asList("kristujayanti.com");
+        
+        UserService service = new UserService(
+            userRepository, 
+            profileRepository, 
+            statsRepository, 
+            walletRepository, 
+            refreshTokenRepository,
+            jwtAuth,
+            allowedDomains
+        );
         
         UserHandler handler = new UserHandler(service);
 
