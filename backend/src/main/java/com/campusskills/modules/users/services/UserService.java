@@ -37,8 +37,7 @@ public class UserService {
         this.walletRepository = walletRepository;
         this.jwtAuth = jwtAuth;
     }
-
-    public Future<JsonObject> signup(String email, String password, String erpid, String displayName) {
+    public Future<JsonObject> signup(String email, String password, String displayName) {
         if (email == null || password == null) {
             return Future.failedFuture("email and password are required");
         }
@@ -53,7 +52,6 @@ public class UserService {
             
             User user = new User();
             user.setEmail(email);
-            user.setErpid(erpid);
             user.setRole(UserRole.USER); // Default to USER
             user.setIsActive(true);
             user.setEmailVerified(false); // Default for all new signups

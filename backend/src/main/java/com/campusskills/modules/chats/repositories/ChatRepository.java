@@ -33,8 +33,11 @@ public class ChatRepository {
         return client.save(COLLECTION, document);
     }
 
-    public Future<List<Chat>> fetchUserChats(String userId, int skip, int limit) {
+    public Future<List<Chat>> fetchUserChats(String userId, String statusFilter, int skip, int limit) {
         JsonObject query = new JsonObject().put("participants", userId);
+        if (statusFilter != null && !statusFilter.isEmpty()) {
+            query.put("status", statusFilter);
+        }
         
         io.vertx.ext.mongo.FindOptions options = new io.vertx.ext.mongo.FindOptions()
                 .setSort(new JsonObject().put("updatedAt", -1))
@@ -47,34 +50,51 @@ public class ChatRepository {
                         .collect(Collectors.toList()));
     }
 
-    public Future<Long> countUserChats(String userId) {
+    public Future<Long> countUserChats(String userId, String statusFilter) {
         JsonObject query = new JsonObject().put("participants", userId);
+        if (statusFilter != null && !statusFilter.isEmpty()) {
+            query.put("status", statusFilter);
+        }
         return client.count(COLLECTION, query);
     }
 
-    public Future<Chat> findExistingChat(String listingId, List<String> participants) {
+    public Future<Chat> findExistingChat(String sourceType, String sourceId, List<String> participants) {
         JsonObject query = new JsonObject()
-                .put("listingId", listingId)
+                .put("sourceType", sourceType)
                 .put("participants", new JsonObject().put("$size", participants.size()).put("$all", new JsonArray(participants)));
+        
+        if (sourceId != null) {
+            query.put("sourceId", sourceId);
+        }
         
         return client.findOne(COLLECTION, query, null)
                 .map(doc -> doc == null ? null : doc.mapTo(Chat.class));
     }
 
-    public Future<Boolean> updateChatStatusByExchangeId(String exchangeId, String chatStatus, String exchangeStatus) {
-        JsonObject query = new JsonObject().put("exchangeId", exchangeId);
+    public Future<Chat> findActiveChatBetweenUsers(String userA, String userB) {
+        JsonObject query = new JsonObject()
+                .put("status", com.campusskills.shared.constants.ChatStatus.ACTIVE.name())
+                .put("participants", new JsonObject()
+                        .put("$size", 2)
+                        .put("$all", new JsonArray().add(userA).add(userB)));
+        
+        return client.findOne(COLLECTION, query, null)
+                .map(doc -> doc == null ? null : doc.mapTo(Chat.class));
+    }
+
+    public Future<Boolean> updateChatStatus(String chatId, String chatStatus) {
+        JsonObject query = new JsonObject().put("_id", chatId);
         JsonObject update = new JsonObject()
             .put("$set", new JsonObject()
                 .put("status", chatStatus)
-                .put("exchangeStatus", exchangeStatus)
                 .put("updatedAt", System.currentTimeMillis()));
 
         return client.updateCollection(COLLECTION, query, update)
                 .map(res -> res.getDocModified() > 0);
     }
 
-    public Future<Chat> getChatByExchangeId(String exchangeId) {
-        JsonObject query = new JsonObject().put("exchangeId", exchangeId);
+    public Future<Chat> findById(String chatId) {
+        JsonObject query = new JsonObject().put("_id", chatId);
         return client.findOne(COLLECTION, query, null)
                 .map(doc -> doc == null ? null : doc.mapTo(Chat.class));
     }

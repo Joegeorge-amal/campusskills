@@ -10,7 +10,6 @@ public class User {
     private String id;
     private String email;
     private String passwordHash;
-    private String erpid;
     private UserRole role;
     private Boolean isActive;
     private Boolean emailVerified;
@@ -27,9 +26,6 @@ public class User {
 
     public String getPasswordHash() { return passwordHash; }
     public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
-
-    public String getErpid() { return erpid; }
-    public void setErpid(String erpid) { this.erpid = erpid; }
 
     public UserRole getRole() { return role; }
     public void setRole(UserRole role) { this.role = role; }
