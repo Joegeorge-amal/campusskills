@@ -15,13 +15,11 @@ public class UserHandler {
 
     public void getMyProfile(RoutingContext ctx) {
         try {
-            JsonObject authUser = ctx.get("user");
-            if (authUser == null || authUser.getString("userId") == null) {
+            String userId = ctx.get("authenticatedUserId");
+            if (userId == null) {
                 ApiResponse.sendError(ctx, 401, "Unauthorized");
                 return;
             }
-            
-            String userId = authUser.getString("userId");
 
             userService.getFullProfile(userId)
                 .onSuccess(data -> ApiResponse.ok(ctx, data))

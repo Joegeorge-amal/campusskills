@@ -1,7 +1,7 @@
 package com.campusskills.shared.constants;
 
 public enum MessageType {
-    TEXT,
+    USER,
     SYSTEM,
     ATTACHMENT,
     SESSION_PROPOSED,

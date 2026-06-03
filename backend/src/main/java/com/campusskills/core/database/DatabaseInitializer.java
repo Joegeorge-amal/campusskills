@@ -44,5 +44,21 @@ public class DatabaseInitializer {
         client.createIndexWithOptions("notifications", new JsonObject().put("userId", 1), options)
             .onSuccess(v -> log.info("Created index: notifications(userId)"))
             .onFailure(err -> log.error("Failed to create index on notifications", err));
+
+        // topics(normalizedName) -> unique constraint for topics catalog
+        IndexOptions uniqueOptions = new IndexOptions();
+        // Since setUnique is not available in this version, we will manually run the command if needed,
+        // but let's just try running createIndex with a manual command to be safe.
+        JsonObject command = new JsonObject()
+            .put("createIndexes", "topics")
+            .put("indexes", new io.vertx.core.json.JsonArray().add(
+                new JsonObject()
+                    .put("name", "normalizedName_1")
+                    .put("key", new JsonObject().put("normalizedName", 1))
+                    .put("unique", true)
+            ));
+        client.runCommand("createIndexes", command)
+            .onSuccess(v -> log.info("Created unique index: topics(normalizedName)"))
+            .onFailure(err -> log.error("Failed to create index on topics", err));
     }
 }

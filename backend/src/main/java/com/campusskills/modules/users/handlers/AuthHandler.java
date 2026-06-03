@@ -19,13 +19,14 @@ public class AuthHandler {
             String email = body.getString("email");
             String password = body.getString("password");
             String displayName = body.getString("displayName");
-            String erpid = body.getString("erpid");
 
-            userService.signup(email, password, erpid, displayName)
+            userService.signup(email, password, displayName)
                 .onSuccess(data -> ApiResponse.created(ctx, data))
                 .onFailure(err -> {
                     if ("EMAIL_EXISTS".equals(err.getMessage())) {
                         ApiResponse.conflict(ctx, "Email already exists");
+                    } else if ("DOMAIN_NOT_ALLOWED".equals(err.getMessage())) {
+                        ApiResponse.sendError(ctx, 403, "Email domain not allowed for registration");
                     } else {
                         ApiResponse.badRequest(ctx, err.getMessage());
                     }
@@ -50,6 +51,46 @@ public class AuthHandler {
                         ApiResponse.badRequest(ctx, err.getMessage());
                     }
                 });
+        } catch (Exception e) {
+            ApiResponse.badRequest(ctx, "Invalid JSON format");
+        }
+    }
+
+    public void refresh(RoutingContext ctx) {
+        try {
+            JsonObject body = ctx.body().asJsonObject();
+            String refreshToken = body.getString("refreshToken");
+
+            userService.refresh(refreshToken)
+                .onSuccess(data -> ApiResponse.ok(ctx, data))
+                .onFailure(err -> {
+                    if ("INVALID_REFRESH_TOKEN".equals(err.getMessage()) || 
+                        "EXPIRED_REFRESH_TOKEN".equals(err.getMessage()) ||
+                        "MISSING_REFRESH_TOKEN".equals(err.getMessage())) {
+                        ApiResponse.sendError(ctx, 401, err.getMessage());
+                    } else {
+                        ApiResponse.badRequest(ctx, err.getMessage());
+                    }
+                });
+        } catch (Exception e) {
+            ApiResponse.badRequest(ctx, "Invalid JSON format");
+        }
+    }
+
+    public void logout(RoutingContext ctx) {
+        try {
+            JsonObject body = ctx.body().asJsonObject();
+            if (body == null) {
+                // If body is completely empty, fail safely
+                ApiResponse.ok(ctx, new JsonObject().put("message", "Logged out locally"));
+                return;
+            }
+            
+            String refreshToken = body.getString("refreshToken");
+
+            userService.logout(refreshToken)
+                .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("message", "Successfully logged out")))
+                .onFailure(err -> ApiResponse.internalError(ctx, "Failed to logout"));
         } catch (Exception e) {
             ApiResponse.badRequest(ctx, "Invalid JSON format");
         }
