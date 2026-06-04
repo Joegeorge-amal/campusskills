@@ -42,21 +42,15 @@ public class ReviewService {
             if (session == null) {
                 return Future.failedFuture("SESSION_NOT_FOUND");
             }
+            if (!session.getTeacherId().equals(reviewerId) && !session.getStudentId().equals(reviewerId)) {
+                return Future.failedFuture("UNAUTHORIZED: You are not a participant in this session");
+            }
             if (session.getStatus() != SessionStatus.COMPLETED) {
                 return Future.failedFuture("FORBIDDEN: Reviews can only be submitted for COMPLETED sessions");
             }
-            if (session.getParticipants() == null || !session.getParticipants().contains(reviewerId)) {
-                return Future.failedFuture("UNAUTHORIZED: You are not a participant in this session");
-            }
 
             // Determine revieweeId (the other participant)
-            String revieweeId = null;
-            for (String pId : session.getParticipants()) {
-                if (!pId.equals(reviewerId)) {
-                    revieweeId = pId;
-                    break;
-                }
-            }
+            String revieweeId = session.getTeacherId().equals(reviewerId) ? session.getStudentId() : session.getTeacherId();
 
             if (revieweeId == null) {
                 return Future.failedFuture("UNAUTHORIZED: Could not determine reviewee");

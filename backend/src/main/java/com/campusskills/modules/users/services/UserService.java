@@ -71,36 +71,39 @@ public class UserService {
         if (email == null || password == null) {
             return Future.failedFuture("email and password are required");
         }
+        
+        final String normalizedEmail = email.toLowerCase().trim();
+        
         if (password.length() < 6) {
             return Future.failedFuture("Password must be at least 6 characters long");
         }
         
         if (!allowedDomains.isEmpty()) {
-            String[] parts = email.split("@");
+            String[] parts = normalizedEmail.split("@");
             if (parts.length != 2 || !allowedDomains.contains(parts[1].toLowerCase())) {
                 return Future.failedFuture("DOMAIN_NOT_ALLOWED");
             }
         }
 
-        return userRepository.findByEmail(email).compose(existing -> {
+        return userRepository.findByEmail(normalizedEmail).compose(existing -> {
             if (existing != null) {
                 return Future.failedFuture("EMAIL_EXISTS");
             }
             
             User user = new User();
-            user.setEmail(email);
+            user.setEmail(normalizedEmail);
             user.setRole(UserRole.USER); // Default to USER
             user.setIsActive(true);
             user.setEmailVerified(false); // Default for all new signups
             user.setPasswordHash(BCrypt.hashpw(password, BCrypt.gensalt()));
 
             return userRepository.createUser(user).compose(userId -> {
-                System.out.println("[AUTH] Created new user: " + userId + " with email: " + email);
+                System.out.println("[AUTH] Created new user: " + userId + " with email: " + normalizedEmail);
                 user.setId(userId);
                 
                 UserProfile profile = new UserProfile();
                 profile.setUserId(userId);
-                profile.setDisplayName(displayName != null ? displayName : email.split("@")[0]);
+                profile.setDisplayName(displayName != null ? displayName : normalizedEmail.split("@")[0]);
                 profile.setSkillsOffered(new ArrayList<>());
                 profile.setSkillsWanted(new ArrayList<>());
                 profile.setProfileCompleted(false);
@@ -131,7 +134,9 @@ public class UserService {
             return Future.failedFuture("email and password are required");
         }
 
-        return userRepository.findByEmail(email).compose(user -> {
+        final String normalizedEmail = email.toLowerCase().trim();
+
+        return userRepository.findByEmail(normalizedEmail).compose(user -> {
             if (user == null) {
                 return Future.failedFuture("INVALID_CREDENTIALS");
             }

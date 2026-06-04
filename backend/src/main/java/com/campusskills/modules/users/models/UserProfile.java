@@ -16,6 +16,9 @@ public class UserProfile {
     private String profilePicture;
     private List<SkillProfile> skillsOffered;
     private List<SkillProfile> skillsWanted;
+    private List<String> preferredTimes;
+    private String sessionPreference;
+    private String exchangePreference;
     private Boolean profileCompleted;
     private Double averageRating;
     private Integer reviewCount;
@@ -62,6 +65,15 @@ public class UserProfile {
 
     public Long getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(Long updatedAt) { this.updatedAt = updatedAt; }
+
+    public List<String> getPreferredTimes() { return preferredTimes; }
+    public void setPreferredTimes(List<String> preferredTimes) { this.preferredTimes = preferredTimes; }
+
+    public String getSessionPreference() { return sessionPreference; }
+    public void setSessionPreference(String sessionPreference) { this.sessionPreference = sessionPreference; }
+
+    public String getExchangePreference() { return exchangePreference; }
+    public void setExchangePreference(String exchangePreference) { this.exchangePreference = exchangePreference; }
 
     public Double getAverageRating() { return averageRating; }
     public void setAverageRating(Double averageRating) { this.averageRating = averageRating; }
