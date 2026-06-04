@@ -62,6 +62,9 @@ public class MainVerticle extends AbstractVerticle {
         // 5. Mount API Routes
         mainRouter.route("/api/v1/*").subRouter(ApiRouter.create(vertx, jwtAuth, frontendOrigin));
 
+        // Start Background Jobs
+        new com.campusskills.modules.sessions.jobs.AutoResolveJob().start(vertx);
+
         // 6. Start HTTP Server
         HttpServer server = vertx.createHttpServer();
 

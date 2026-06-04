@@ -1,12 +1,13 @@
 package com.campusskills.shared.constants;
 
 public enum SessionStatus {
-    PROPOSED,
+    UNSCHEDULED,
+    PENDING_CONFIRMATION,
     SCHEDULED,
     ONGOING,
-    PENDING_COMPLETION,
     COMPLETED,
-    DISPUTED,
     CANCELLED,
-    REJECTED
+    NO_SHOW,
+    CLOSED_UNCONFIRMED,
+    DISPUTED
 }
