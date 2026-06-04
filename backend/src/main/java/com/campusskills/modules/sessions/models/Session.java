@@ -11,134 +11,71 @@ public class Session {
 
     @JsonProperty("_id")
     private String id;
-    private String requestId;
+    private String exchangeId;
+    private String teacherId;
+    private String studentId;
+    private String topic;
     private String chatId;
     private String listingId;
-    private String organizerId;
-    private java.util.List<String> participants;
     private Long scheduledStart;
     private Long scheduledEnd;
     private String meetingPlatform;
     private String meetingLink;
     private SessionStatus status;
+    private Long confirmationDeadline;
     private java.util.Set<String> confirmedBy;
     private Long createdAt;
     private Long updatedAt;
 
     public Session() {
-        this.participants = new java.util.ArrayList<>();
         this.confirmedBy = new java.util.HashSet<>();
     }
 
-    public String getId() {
-        return id;
-    }
+    public String getId() { return id; }
+    public void setId(String id) { this.id = id; }
 
-    public void setId(String id) {
-        this.id = id;
-    }
+    public String getExchangeId() { return exchangeId; }
+    public void setExchangeId(String exchangeId) { this.exchangeId = exchangeId; }
 
-    public String getRequestId() {
-        return requestId;
-    }
+    public String getTeacherId() { return teacherId; }
+    public void setTeacherId(String teacherId) { this.teacherId = teacherId; }
 
-    public void setRequestId(String requestId) {
-        this.requestId = requestId;
-    }
+    public String getStudentId() { return studentId; }
+    public void setStudentId(String studentId) { this.studentId = studentId; }
 
-    public String getChatId() {
-        return chatId;
-    }
+    public String getTopic() { return topic; }
+    public void setTopic(String topic) { this.topic = topic; }
 
-    public void setChatId(String chatId) {
-        this.chatId = chatId;
-    }
+    public String getChatId() { return chatId; }
+    public void setChatId(String chatId) { this.chatId = chatId; }
 
-    public String getListingId() {
-        return listingId;
-    }
+    public String getListingId() { return listingId; }
+    public void setListingId(String listingId) { this.listingId = listingId; }
 
-    public void setListingId(String listingId) {
-        this.listingId = listingId;
-    }
+    public Long getScheduledStart() { return scheduledStart; }
+    public void setScheduledStart(Long scheduledStart) { this.scheduledStart = scheduledStart; }
 
-    public String getOrganizerId() {
-        return organizerId;
-    }
+    public Long getScheduledEnd() { return scheduledEnd; }
+    public void setScheduledEnd(Long scheduledEnd) { this.scheduledEnd = scheduledEnd; }
 
-    public void setOrganizerId(String organizerId) {
-        this.organizerId = organizerId;
-    }
+    public String getMeetingPlatform() { return meetingPlatform; }
+    public void setMeetingPlatform(String meetingPlatform) { this.meetingPlatform = meetingPlatform; }
 
-    public java.util.List<String> getParticipants() {
-        return participants;
-    }
+    public String getMeetingLink() { return meetingLink; }
+    public void setMeetingLink(String meetingLink) { this.meetingLink = meetingLink; }
 
-    public void setParticipants(java.util.List<String> participants) {
-        this.participants = participants;
-    }
+    public SessionStatus getStatus() { return status; }
+    public void setStatus(SessionStatus status) { this.status = status; }
 
-    public Long getScheduledStart() {
-        return scheduledStart;
-    }
+    public Long getConfirmationDeadline() { return confirmationDeadline; }
+    public void setConfirmationDeadline(Long confirmationDeadline) { this.confirmationDeadline = confirmationDeadline; }
 
-    public void setScheduledStart(Long scheduledStart) {
-        this.scheduledStart = scheduledStart;
-    }
+    public java.util.Set<String> getConfirmedBy() { return confirmedBy; }
+    public void setConfirmedBy(java.util.Set<String> confirmedBy) { this.confirmedBy = confirmedBy; }
 
-    public Long getScheduledEnd() {
-        return scheduledEnd;
-    }
+    public Long getCreatedAt() { return createdAt; }
+    public void setCreatedAt(Long createdAt) { this.createdAt = createdAt; }
 
-    public void setScheduledEnd(Long scheduledEnd) {
-        this.scheduledEnd = scheduledEnd;
-    }
-
-    public String getMeetingPlatform() {
-        return meetingPlatform;
-    }
-
-    public void setMeetingPlatform(String meetingPlatform) {
-        this.meetingPlatform = meetingPlatform;
-    }
-
-    public String getMeetingLink() {
-        return meetingLink;
-    }
-
-    public void setMeetingLink(String meetingLink) {
-        this.meetingLink = meetingLink;
-    }
-
-    public SessionStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(SessionStatus status) {
-        this.status = status;
-    }
-
-    public java.util.Set<String> getConfirmedBy() {
-        return confirmedBy;
-    }
-
-    public void setConfirmedBy(java.util.Set<String> confirmedBy) {
-        this.confirmedBy = confirmedBy;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(Long createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Long updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+    public Long getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(Long updatedAt) { this.updatedAt = updatedAt; }
 }

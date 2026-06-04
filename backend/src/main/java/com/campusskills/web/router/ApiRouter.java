@@ -50,10 +50,11 @@ public class ApiRouter {
         router.route("/messages/*").handler(JwtAuthMiddleware.create(jwtAuth));
         router.route("/sessions/*").handler(JwtAuthMiddleware.create(jwtAuth));
         router.route("/chat-requests/*").handler(JwtAuthMiddleware.create(jwtAuth));
-        router.route("/exchange-requests/*").handler(JwtAuthMiddleware.create(jwtAuth));
+        router.route("/exchanges/*").handler(JwtAuthMiddleware.create(jwtAuth));
         router.route("/notifications/*").handler(JwtAuthMiddleware.create(jwtAuth));
         router.route("/reviews/*").handler(JwtAuthMiddleware.create(jwtAuth));
         router.route("/profiles/*").handler(JwtAuthMiddleware.create(jwtAuth));
+        router.route("/availability/*").handler(JwtAuthMiddleware.create(jwtAuth));
 
         // 6. Modules Routing
         router.mountSubRouter("/users", UserRouter.create(vertx, jwtAuth));
@@ -63,10 +64,11 @@ public class ApiRouter {
         router.mountSubRouter("/sessions", SessionRouter.create(vertx));
         router.mountSubRouter("/listings", ListingRouter.create(vertx, jwtAuth));
         router.mountSubRouter("/chat-requests", com.campusskills.modules.chatrequests.routes.ChatRequestRouter.create(vertx));
-        router.mountSubRouter("/exchange-requests", com.campusskills.modules.exchangerequests.routes.ExchangeRequestRouter.create(vertx));
+        router.mountSubRouter("/exchanges", com.campusskills.modules.exchanges.routes.ExchangeRouter.create(vertx));
         router.mountSubRouter("/notifications", com.campusskills.modules.notifications.routes.NotificationRouter.create(vertx));
         router.mountSubRouter("/reviews", com.campusskills.modules.reviews.routes.ReviewRouter.create(vertx));
         router.mountSubRouter("/topics", com.campusskills.modules.topics.routes.TopicRouter.create(vertx, jwtAuth));
+        router.mountSubRouter("/availability", com.campusskills.modules.availability.routes.AvailabilityRouter.create(vertx));
         
         // Global Error Handling
         router.route().failureHandler(GlobalErrorHandler.create());

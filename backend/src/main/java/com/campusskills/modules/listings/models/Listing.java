@@ -24,8 +24,7 @@ public class Listing {
     
     private Availability availability;
     
-    private List<String> availableDays;
-    private String availableHours;
+    private List<ListingSlot> availableSlots;
     
     private Boolean active;
     
@@ -64,11 +63,8 @@ public class Listing {
     public Availability getAvailability() { return availability; }
     public void setAvailability(Availability availability) { this.availability = availability; }
 
-    public List<String> getAvailableDays() { return availableDays; }
-    public void setAvailableDays(List<String> availableDays) { this.availableDays = availableDays; }
-
-    public String getAvailableHours() { return availableHours; }
-    public void setAvailableHours(String availableHours) { this.availableHours = availableHours; }
+    public List<ListingSlot> getAvailableSlots() { return availableSlots; }
+    public void setAvailableSlots(List<ListingSlot> availableSlots) { this.availableSlots = availableSlots; }
 
     public Boolean getActive() { return active; }
     public void setActive(Boolean active) { this.active = active; }

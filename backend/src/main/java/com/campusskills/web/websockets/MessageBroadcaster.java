@@ -74,27 +74,19 @@ public class MessageBroadcaster {
 
     public static void broadcastSessionEvent(String eventType, Session session) {
         try {
-            WebSocketEventType type;
-            try {
-                type = WebSocketEventType.valueOf(eventType);
-            } catch (IllegalArgumentException e) {
-                System.err.println("[BROADCAST WARN] Unrecognized WebSocketEventType: " + eventType + ". Defaulting to SESSION_UPDATE.");
-                type = WebSocketEventType.SESSION_UPDATE;
+            JsonObject event = new JsonObject()
+                    .put("type", eventType)
+                    .put("payload", JsonObject.mapFrom(session));
+            
+            // Broadcast to teacher and student
+            if (session.getTeacherId() != null) {
+                ConnectionManager.sendMessage(session.getTeacherId(), event);
             }
-
-            JsonObject event = new WebSocketMessageBuilder()
-                    .type(type)
-                    .payload(new JsonObject().put("session", JsonObject.mapFrom(session)))
-                    .build();
-
-            if (session.getParticipants() != null) {
-                for (String participantId : session.getParticipants()) {
-                    ConnectionManager.sendMessage(participantId, event);
-                }
+            if (session.getStudentId() != null) {
+                ConnectionManager.sendMessage(session.getStudentId(), event);
             }
         } catch (Exception e) {
             System.err.println("[BROADCAST WARN] Failed to broadcast " + eventType + " for session " + session.getId() + ": " + e.getMessage());
         }
     }
-
 }
