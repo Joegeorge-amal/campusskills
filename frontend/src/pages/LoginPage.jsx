@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import ForgotPasswordModal from '../components/modals/ForgotPasswordModal';
-import { IconShieldCheck } from '@tabler/icons-react';
+import { IconArrowLeft, IconUser, IconShieldLock } from '@tabler/icons-react';
+import '../styles/login.css';
 
 const LoginPage = () => {
   const [tab, setTab] = useState('student'); // 'student' | 'admin'
@@ -26,8 +27,6 @@ const LoginPage = () => {
 
       await login(email, password);
 
-      // We let AppRoutes handle the exact path redirect since context updates synchronously-ish, 
-      // but if we want a hard redirect:
       const savedRole = localStorage.getItem('cs_role');
       if (savedRole === 'admin') {
         navigate('/admin/dashboard');
@@ -46,126 +45,105 @@ const LoginPage = () => {
   };
 
   return (
-    <div id="s-login" className="auth-page">
-      <div className="bg-circle bg-circle-1"></div>
-      <div className="bg-circle bg-circle-2"></div>
+    <div className="auth-page">
+      <Link to="/" className="auth-back-link">
+        <IconArrowLeft size={18} />
+        Back
+      </Link>
       
       <div className="auth-container">
         <div className="auth-card fade-in">
-        <div className="login-logo" style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-          <div className="login-mark">CS</div>
-          <div className="login-brand" style={{ fontSize: '24px', fontWeight: 700, color: '#1a1560', letterSpacing: '-0.5px' }}>
-            CAMPUS<span>SKILLS</span>
+          <div className="login-header">
+            <div className="login-logo-group">
+              <div className="login-mark">cs</div>
+              <div className="login-brand-text">
+                <div className="brand-title">Campus<span>Skills</span></div>
+                <div className="brand-subtitle">Kristu Jayanti University</div>
+              </div>
+            </div>
+            <h1 className="login-heading">Sign in to your account</h1>
           </div>
-        </div>
-        
-        <p className="login-sub" style={{ fontSize: '15px', color: '#666', marginTop: '-16px', marginBottom: '32px' }}>
-          Your college skill exchange platform
-        </p>
-        
-        <div className="ltabs">
-          <div 
-            className={`ltab ${tab === 'student' ? 'active' : ''}`}
-            onClick={() => setTab('student')}
-          >
-            Student
+          
+          <div className="login-type-label">Select Login Type</div>
+          
+          <div className="login-type-selector">
+            <div 
+              className={`type-card ${tab === 'student' ? 'active' : ''}`}
+              onClick={() => setTab('student')}
+            >
+              <div className="type-icon">
+                <IconUser size={24} />
+              </div>
+              <div className="type-title">Student</div>
+              <div className="type-desc">College account login</div>
+            </div>
+            <div 
+              className={`type-card ${tab === 'admin' ? 'active' : ''}`}
+              onClick={() => setTab('admin')}
+            >
+              <div className="type-icon">
+                <IconShieldLock size={24} />
+              </div>
+              <div className="type-title">Admin</div>
+              <div className="type-desc">Authorized access only</div>
+            </div>
           </div>
-          <div 
-            className={`ltab ${tab === 'admin' ? 'active' : ''}`}
-            onClick={() => setTab('admin')}
-          >
-            Admin
-          </div>
-        </div>
 
-        <form onSubmit={handleLogin}>
-          {tab === 'student' ? (
-            <div>
-              <div className="lfld">
-                <label className="lbl">College email address</label>
-                <input
-                  className="linp"
-                  type="email"
-                  placeholder="student@college.edu"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="lfld">
-                <label className="lbl">Password</label>
-                <input
-                  className="linp"
-                  type="password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-              <div style={{ textAlign: 'right', marginBottom: '16px', marginTop: '-4px' }}>
-                <a onClick={() => setIsForgotOpen(true)} style={{ fontSize: '12px', color: '#534AB7', cursor: 'pointer', fontWeight: 500, textDecoration: 'none' }}>
+          <form onSubmit={handleLogin} className="login-form">
+            <div className="lfld">
+              <label className="lbl">College Email Address</label>
+              <input
+                className="linp"
+                type="email"
+                placeholder={tab === 'student' ? "yourname@kristujayanti.com" : "admin@kristujayanti.com"}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="lfld">
+              <label className="lbl">Password</label>
+              <input
+                className="linp"
+                type="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <div className="forgot-pwd-container">
+                <a onClick={() => setIsForgotOpen(true)} className="forgot-pwd-link">
                   Forgot Password?
                 </a>
               </div>
-              <button className="lbtn" type="submit" disabled={isLoading}>
-                {isLoading ? 'Logging in...' : 'Login as Student'}
-              </button>
-              
-              <div className="ldiv">or continue with</div>
-              
-              <button type="button" className="gbtn" onClick={handleGoogleLogin}>
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="G" width="18" height="18" />
-                Login with Google
-              </button>
             </div>
-          ) : (
-            <div>
-              <div className="lfld">
-                <label className="lbl">Admin email</label>
-                <input
-                  className="linp"
-                  type="email"
-                  placeholder="admin@college.edu"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="lfld">
-                <label className="lbl">Admin password</label>
-                <input
-                  className="linp"
-                  type="password"
-                  placeholder="Enter admin password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-              <div style={{ textAlign: 'right', marginBottom: '16px', marginTop: '-4px' }}>
-                <a onClick={() => setIsForgotOpen(true)} style={{ fontSize: '12px', color: '#534AB7', cursor: 'pointer', fontWeight: 500, textDecoration: 'none' }}>
-                  Forgot Password?
-                </a>
-              </div>
-              <button className="lbtn" type="submit" disabled={isLoading}>
-                {isLoading ? 'Logging in...' : 'Login as Admin'}
-              </button>
-            </div>
-          )}
+            
+            <button className="lbtn" type="submit" disabled={isLoading}>
+              {isLoading ? 'Signing In...' : 'Sign In'}
+            </button>
+            
+            <div className="ldiv">or continue with</div>
+            
+            <button type="button" className="gbtn" onClick={handleGoogleLogin}>
+              <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="G" width="18" height="18" />
+              Sign in with Google
+            </button>
 
-          {error && (
-            <div className="login-err">
-              {error}
-            </div>
-          )}
-        </form>
+            {error && (
+              <div className="login-err">
+                {error}
+              </div>
+            )}
+          </form>
 
-        {tab === 'student' && (
-          <div className="lft">
-            Don't have an account? <a onClick={handleGoogleLogin}>Create Account</a>
+          <div className="auth-footer">
+            <div className="footer-divider">
+              <span>New to CampusSkills?</span>
+            </div>
+            <a className="create-account-link" onClick={handleGoogleLogin}>
+              {tab === 'student' ? 'Create an Account' : 'Create a student account'}
+            </a>
           </div>
-        )}
         </div>
       </div>
 

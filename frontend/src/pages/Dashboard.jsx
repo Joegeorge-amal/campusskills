@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useAppData } from '../context/AppDataContext';
-import Avatar from '../components/common/Avatar';
 import CreateSessionModal from '../components/modals/CreateSessionModal';
+import StatCard from '../components/common/StatCard';
+import SessionCard from '../components/common/SessionCard';
+import ChatListItem from '../components/common/ChatListItem';
 import { IconStar, IconSparkles, IconCheck, IconCurrencyRupee, IconArrowUpRight } from '@tabler/icons-react';
 
 const Dashboard = () => {
@@ -33,24 +35,24 @@ const Dashboard = () => {
   if (!user) return null;
 
   return (
-    <div id="home" className="pg on">
+    <div id="home" className="pg on" style={{ padding: '24px', background: 'var(--cs-bg-light)', minHeight: '100vh' }}>
       {/* Welcome Banner */}
-      <div style={{ background: 'linear-gradient(135deg,#534AB7,#3C3489)', borderRadius: '12px', padding: '14px 16px', marginBottom: '13px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ background: 'var(--cs-primary-gradient)', borderRadius: 'var(--cs-radius-lg)', padding: '24px', marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <div style={{ fontSize: '11px', color: '#AFA9EC', marginBottom: '3px' }}>Welcome back</div>
-          <div style={{ fontSize: '16px', fontWeight: 600, color: '#fff' }}>{user?.name || 'Demo User'}</div>
-          <div style={{ fontSize: '11px', color: '#AFA9EC', marginTop: '2px' }}>{user?.meta || 'Student'}</div>
+          <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.8)', marginBottom: '4px' }}>Welcome back</div>
+          <div style={{ fontSize: '24px', fontWeight: 600, color: '#fff' }}>{user?.name || 'Demo User'}</div>
+          <div style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.8)', marginTop: '4px' }}>{user?.meta || 'Student'}</div>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px' }}>
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: '22px', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', gap: '4px' }}>
-              {stats.trustScore} <IconStar size={14} color="#f0c040" fill="#f0c040" />
+            <div style={{ fontSize: '28px', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {stats.trustScore} <IconStar size={20} color="#F0C040" fill="#F0C040" />
             </div>
-            <div style={{ fontSize: '11px', color: '#AFA9EC' }}>Trust score · Top 10%</div>
+            <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.8)' }}>Trust score · Top 10%</div>
           </div>
           <button 
             onClick={() => setIsCreateSessionOpen(true)} 
-            style={{ fontSize: '12px', padding: '6px 14px', borderRadius: '8px', border: 'none', background: '#fff', color: '#3C3489', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', whiteSpace: 'nowrap' }}
+            style={{ fontSize: '14px', padding: '10px 20px', borderRadius: 'var(--cs-radius-md)', border: 'none', background: 'var(--cs-bg-white)', color: 'var(--cs-primary-dark)', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap' }}
           >
             Create Session
           </button>
@@ -58,104 +60,104 @@ const Dashboard = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="sgrid">
-        <div className="scard">
-          <div style={{ width: '27px', height: '27px', borderRadius: '7px', background: '#EEEDFE', color: '#534AB7', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '7px' }}>
-            <IconSparkles size={13} />
-          </div>
-          <div style={{ fontSize: '19px', fontWeight: 500, color: '#222' }}>{stats.skillsOffered}</div>
-          <div style={{ fontSize: '11px', color: '#888', marginTop: '1px' }}>Skills offered</div>
-          <div style={{ fontSize: '11px', color: '#0F6E56', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '2px' }}><IconArrowUpRight size={11} /> Active</div>
-        </div>
-        <div className="scard">
-          <div style={{ width: '27px', height: '27px', borderRadius: '7px', background: '#E1F5EE', color: '#0F6E56', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '7px' }}>
-            <IconCheck size={13} />
-          </div>
-          <div style={{ fontSize: '19px', fontWeight: 500, color: '#222' }}>{stats.sessionsDone}</div>
-          <div style={{ fontSize: '11px', color: '#888', marginTop: '1px' }}>Sessions done</div>
-          <div style={{ fontSize: '11px', color: '#0F6E56', marginTop: '4px', display: 'flex', alignItems: 'center', gap: '2px' }}><IconArrowUpRight size={11} /> +2 this week</div>
-        </div>
-        <div className="scard">
-          <div style={{ width: '27px', height: '27px', borderRadius: '7px', background: '#FAEEDA', color: '#854F0B', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '7px' }}>
-            <IconStar size={13} fill="#854F0B" />
-          </div>
-          <div style={{ fontSize: '19px', fontWeight: 500, color: '#222' }}>{stats.trustScore}</div>
-          <div style={{ fontSize: '11px', color: '#888', marginTop: '1px' }}>Trust score</div>
-          <div style={{ fontSize: '11px', color: '#0F6E56', marginTop: '4px' }}>Top 10%</div>
-        </div>
-        <div className="scard">
-          <div style={{ width: '27px', height: '27px', borderRadius: '7px', background: '#E1F5EE', color: '#0F6E56', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '7px' }}>
-            <IconCurrencyRupee size={13} />
-          </div>
-          <div style={{ fontSize: '19px', fontWeight: 500, color: '#222' }}>₹{walletBalance}</div>
-          <div style={{ fontSize: '11px', color: '#888', marginTop: '1px' }}>Wallet balance</div>
-          <div style={{ fontSize: '11px', color: '#534AB7', marginTop: '4px' }}>{stats.swapsDone} swaps done</div>
-        </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+        <StatCard 
+          icon={<IconSparkles size={16} />}
+          iconBg="var(--cs-primary-light)"
+          iconColor="var(--cs-primary)"
+          value={stats.skillsOffered}
+          label="Skills offered"
+          subText="Active"
+          subIcon={<IconArrowUpRight size={12} />}
+          subColor="#0F6E56"
+        />
+        <StatCard 
+          icon={<IconCheck size={16} />}
+          iconBg="#E1F5EE"
+          iconColor="#0F6E56"
+          value={stats.sessionsDone}
+          label="Sessions done"
+          subText="+2 this week"
+          subIcon={<IconArrowUpRight size={12} />}
+          subColor="#0F6E56"
+        />
+        <StatCard 
+          icon={<IconStar size={16} fill="#854F0B" />}
+          iconBg="#FAEEDA"
+          iconColor="#854F0B"
+          value={stats.trustScore}
+          label="Trust score"
+          subText="Top 10%"
+          subColor="#0F6E56"
+        />
+        <StatCard 
+          icon={<IconCurrencyRupee size={16} />}
+          iconBg="#E1F5EE"
+          iconColor="#0F6E56"
+          value={`₹${walletBalance}`}
+          label="Wallet balance"
+          subText={`${stats.swapsDone} swaps done`}
+          subColor="var(--cs-primary)"
+        />
       </div>
 
       {/* Two Column Layout: Sessions & Messages */}
-      <div className="r2">
-        <div className="card">
-          <div className="ch">
-            <span className="ct">Upcoming sessions</span>
-            <button className="clink" onClick={() => navigate('/app/sessions')}>See all</button>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
+        
+        {/* Upcoming Sessions Card */}
+        <div style={{ background: 'var(--cs-bg-white)', borderRadius: 'var(--cs-radius-lg)', padding: '20px', border: '0.5px solid var(--cs-border)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <span style={{ fontSize: '16px', fontWeight: 600, color: 'var(--cs-text-main)' }}>Upcoming sessions</span>
+            <button onClick={() => navigate('/app/sessions')} style={{ fontSize: '13px', color: 'var(--cs-primary)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 500 }}>See all</button>
           </div>
-          {upcomingSessions.length > 0 ? upcomingSessions.map((session, i) => (
-            <div className="sesscard" key={session.id || i}>
-              <div className="sddt">
-                <div className="sdd">{session.date || '--'}</div>
-                <div className="sdm">{(session.month || '').toUpperCase()}</div>
-              </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: '12px', fontWeight: 500, color: '#222' }}>{session.title || 'Unknown session'}</div>
-                <div style={{ fontSize: '11px', color: '#888' }}>{session.time || ''}</div>
-              </div>
-              {session.status === 'soon' ? (
-                <button style={{ fontSize: '11px', padding: '4px 9px', borderRadius: '7px', border: '0.5px solid rgba(0,0,0,.1)', background: 'none', color: '#aaa' }}>Soon</button>
-              ) : (
-                <button className="jbtn">Join</button>
-              )}
-            </div>
-          )) : (
-            <div style={{ fontSize: '12px', color: '#888', padding: '10px 0' }}>No upcoming sessions.</div>
-          )}
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {upcomingSessions.length > 0 ? upcomingSessions.map((session, i) => (
+              <SessionCard
+                key={session.id || i}
+                date={session.date || '--'}
+                month={session.month || ''}
+                title={session.title || 'Unknown session'}
+                subtitle={session.time || ''}
+                status={session.status === 'soon' ? 'soon' : 'upcoming'}
+                actions={
+                  session.status === 'soon' ? (
+                    <button style={{ fontSize: '11px', padding: '6px 12px', borderRadius: 'var(--cs-radius-sm)', border: '0.5px solid var(--cs-border)', background: 'var(--cs-bg-light)', color: 'var(--cs-text-inactive)', fontWeight: 500 }} disabled>Soon</button>
+                  ) : (
+                    <button style={{ fontSize: '12px', padding: '6px 14px', borderRadius: 'var(--cs-radius-sm)', border: 'none', background: 'var(--cs-primary)', color: 'var(--cs-bg-white)', cursor: 'pointer', fontWeight: 600 }} onClick={() => console.log('Join session', session.id)}>Join</button>
+                  )
+                }
+              />
+            )) : (
+              <div style={{ fontSize: '13px', color: 'var(--cs-text-inactive)', padding: '20px 0', textAlign: 'center' }}>No upcoming sessions.</div>
+            )}
+          </div>
         </div>
 
-        <div className="card">
-          <div className="ch">
-            <span className="ct">Recent messages</span>
-            <button className="clink" onClick={() => navigate('/app/messages')}>Open</button>
+        {/* Recent Messages Card */}
+        <div style={{ background: 'var(--cs-bg-white)', borderRadius: 'var(--cs-radius-lg)', padding: '20px', border: '0.5px solid var(--cs-border)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+            <span style={{ fontSize: '16px', fontWeight: 600, color: 'var(--cs-text-main)' }}>Recent messages</span>
+            <button onClick={() => navigate('/app/messages')} style={{ fontSize: '13px', color: 'var(--cs-primary)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 500 }}>Open</button>
           </div>
-          <div>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
             {recentChats.map(chat => (
-              <div 
-                key={chat.id} 
-                className="ci" 
-                style={{ padding: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '9px', borderBottom: '1px solid #f5f5f5' }}
+              <ChatListItem
+                key={chat.id}
+                avatarProps={{ initials: chat.init || 'U', bg: chat.bg, color: chat.col, size: '40px', fontSize: '14px' }}
+                isOnline={chat.online}
+                name={chat.name || 'Unknown User'}
+                preview={chat.preview || chat.lastMsg || 'No messages'}
+                time={chat.time || ''}
+                unreadCount={chat.unread}
                 onClick={() => navigate(`/app/messages?chatId=${chat.id}`)}
-              >
-                <div style={{ position: 'relative' }}>
-                  <Avatar letters={chat.init || 'U'} bgColor={chat.bg || '#eee'} textColor={chat.col || '#333'} size="33px" fontSize="11px" />
-                  {chat.online && <div className="dot-on"></div>}
-                </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: '12px', fontWeight: 500, color: '#222', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{chat.name || 'Unknown User'}</div>
-                  <div style={{ fontSize: '11px', color: '#888', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: '1px' }}>
-                    {chat.preview || chat.lastMsg || 'No messages'}
-                  </div>
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
-                  <div style={{ fontSize: '10px', color: '#aaa' }}>{chat.time || ''}</div>
-                  {chat.unread > 0 && (
-                    <div style={{ width: '16px', height: '16px', background: '#534AB7', color: '#EEEDFE', borderRadius: '50%', fontSize: '9px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 500 }}>
-                      {chat.unread}
-                    </div>
-                  )}
-                </div>
-              </div>
+              />
             ))}
+            {recentChats.length === 0 && (
+              <div style={{ fontSize: '13px', color: 'var(--cs-text-inactive)', padding: '20px 0', textAlign: 'center' }}>No recent messages.</div>
+            )}
           </div>
         </div>
+
       </div>
 
       <CreateSessionModal 

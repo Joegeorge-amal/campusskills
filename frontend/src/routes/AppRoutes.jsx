@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 
 import LoginPage from '../pages/LoginPage';
 import SetupPage from '../pages/SetupPage';
+import LandingPage from '../pages/LandingPage';
 import AppLayout from '../layouts/AppLayout';
 import AdminLayout from '../layouts/AdminLayout';
 
@@ -54,7 +55,7 @@ const AppRoutes = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<Navigate to={user ? (role === 'admin' ? "/admin/dashboard" : "/app/dashboard") : "/login"} replace />} />
+      <Route path="/" element={user ? <Navigate to={role === 'admin' ? "/admin/dashboard" : "/app/dashboard"} replace /> : <LandingPage />} />
       <Route path="/login" element={user ? <Navigate to={role === 'admin' ? "/admin/dashboard" : "/app/dashboard"} replace /> : <LoginPage />} />
       <Route path="/setup" element={<SetupPage />} />
       

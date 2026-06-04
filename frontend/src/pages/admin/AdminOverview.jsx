@@ -1,71 +1,78 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IconChevronRight, IconCode, IconPalette, IconLanguage } from '@tabler/icons-react';
+import StatCard from '../../components/common/StatCard';
+import StatusBadge from '../../components/common/StatusBadge';
 
 const AdminOverview = () => {
   const navigate = useNavigate();
 
   return (
     <div id="adm-overview" className="pg on">
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '11px', marginBottom: '11px' }}>
-        <div className="scard" style={{ background: '#534AB7', color: '#fff' }}>
-          <div style={{ fontSize: '12px', color: '#AFA9EC' }}>Total Platform Revenue</div>
-          <div style={{ fontSize: '24px', fontWeight: 600, marginTop: '3px' }}>₹42,500</div>
-          <div style={{ fontSize: '11px', color: '#AFA9EC', marginTop: '7px' }}>+12% this month</div>
-        </div>
-        <div className="scard" style={{ background: '#0F6E56', color: '#fff' }}>
-          <div style={{ fontSize: '12px', color: '#88D1B6' }}>Active Sessions Today</div>
-          <div style={{ fontSize: '24px', fontWeight: 600, marginTop: '3px' }}>128</div>
-          <div style={{ fontSize: '11px', color: '#88D1B6', marginTop: '7px' }}>45 paid · 83 swaps</div>
-        </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+        <StatCard 
+          title="Total Platform Revenue" 
+          value="₹42,500" 
+          subtitle="+12% this month" 
+        />
+        <StatCard 
+          title="Active Sessions Today" 
+          value="128" 
+          subtitle="45 paid · 83 swaps" 
+        />
       </div>
       
-      <div className="r2">
-        <div className="card">
-          <div className="ch"><span className="ct">Quick Actions</span></div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '7px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+        {/* Quick Actions Card */}
+        <div style={{ background: 'var(--cs-bg-white)', borderRadius: 'var(--cs-radius-lg)', padding: '24px', border: '1px solid var(--cs-border)' }}>
+          <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--cs-text-main)', marginBottom: '16px' }}>Quick Actions</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <button 
               onClick={() => navigate('/app/admin/reports')} 
-              style={{ padding: '12px', borderRadius: '9px', border: 'none', background: '#FAECE7', color: '#993C1D', fontSize: '12px', fontWeight: 500, cursor: 'pointer', display: 'flex', justifyContent: 'space-between' }}
+              style={{ padding: '16px', borderRadius: 'var(--cs-radius-md)', border: 'none', background: 'var(--cs-danger-light)', color: 'var(--cs-danger)', fontSize: '14px', fontWeight: 600, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
             >
               <span>Review 3 Open Reports</span>
-              <IconChevronRight />
+              <IconChevronRight size={18} />
             </button>
             <button 
               onClick={() => navigate('/app/admin/users')} 
-              style={{ padding: '12px', borderRadius: '9px', border: 'none', background: '#F5F4FF', color: '#534AB7', fontSize: '12px', fontWeight: 500, cursor: 'pointer', display: 'flex', justifyContent: 'space-between' }}
+              style={{ padding: '16px', borderRadius: 'var(--cs-radius-md)', border: 'none', background: 'var(--cs-primary-light)', color: 'var(--cs-primary)', fontSize: '14px', fontWeight: 600, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
             >
               <span>Verify 12 New Tutors</span>
-              <IconChevronRight />
+              <IconChevronRight size={18} />
             </button>
           </div>
         </div>
 
-        <div className="card">
-          <div className="ch"><span className="ct">Top Categories</span></div>
-          <div className="hrow">
-            <div className="hico" style={{ background: '#E6F1FB', color: '#0C447C' }}><IconCode /></div>
+        {/* Top Categories Card */}
+        <div style={{ background: 'var(--cs-bg-white)', borderRadius: 'var(--cs-radius-lg)', padding: '24px', border: '1px solid var(--cs-border)' }}>
+          <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--cs-text-main)', marginBottom: '16px' }}>Top Categories</div>
+          
+          <div style={{ display: 'flex', alignItems: 'center', padding: '12px 0', borderBottom: '0.5px solid var(--cs-border)' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: 'var(--cs-radius-sm)', background: '#E6F1FB', color: '#0C447C', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '16px' }}><IconCode size={20} /></div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '12px', fontWeight: 500, color: '#222' }}>React.js basics</div>
-              <div style={{ fontSize: '11px', color: '#888' }}>42 sessions</div>
+              <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--cs-text-main)' }}>React.js basics</div>
+              <div style={{ fontSize: '12px', color: 'var(--cs-text-inactive)', marginTop: '4px' }}>42 sessions</div>
             </div>
-            <span className="cpill c-code">Coding</span>
+            <StatusBadge status="Coding" />
           </div>
-          <div className="hrow">
-            <div className="hico" style={{ background: '#FBEAF0', color: '#72243E' }}><IconPalette /></div>
+          
+          <div style={{ display: 'flex', alignItems: 'center', padding: '12px 0', borderBottom: '0.5px solid var(--cs-border)' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: 'var(--cs-radius-sm)', background: '#FBEAF0', color: '#72243E', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '16px' }}><IconPalette size={20} /></div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '12px', fontWeight: 500, color: '#222' }}>Figma UI Design</div>
-              <div style={{ fontSize: '11px', color: '#888' }}>18 sessions</div>
+              <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--cs-text-main)' }}>Figma UI Design</div>
+              <div style={{ fontSize: '12px', color: 'var(--cs-text-inactive)', marginTop: '4px' }}>18 sessions</div>
             </div>
-            <span className="cpill c-des">Design</span>
+            <StatusBadge status="Design" />
           </div>
-          <div className="hrow">
-            <div className="hico" style={{ background: '#EAF3DE', color: '#27500A' }}><IconLanguage /></div>
+          
+          <div style={{ display: 'flex', alignItems: 'center', padding: '12px 0' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: 'var(--cs-radius-sm)', background: '#EAF3DE', color: '#27500A', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '16px' }}><IconLanguage size={20} /></div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '12px', fontWeight: 500, color: '#222' }}>Japanese N5</div>
-              <div style={{ fontSize: '11px', color: '#888' }}>11 sessions</div>
+              <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--cs-text-main)' }}>Japanese N5</div>
+              <div style={{ fontSize: '12px', color: 'var(--cs-text-inactive)', marginTop: '4px' }}>11 sessions</div>
             </div>
-            <span className="cpill c-lan">Language</span>
+            <StatusBadge status="Language" />
           </div>
         </div>
       </div>

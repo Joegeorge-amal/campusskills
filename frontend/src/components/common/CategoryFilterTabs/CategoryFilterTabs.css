@@ -1,0 +1,38 @@
+/* ─── CATEGORY FILTER TABS ─── */
+.cat-filter-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  scrollbar-width: none;
+  margin-bottom: 12px;
+}
+
+.cat-filter-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.cat-tab {
+  padding: 6px 14px;
+  border-radius: var(--cs-radius-lg);
+  background: var(--cs-bg-white);
+  border: 1px solid var(--cs-border);
+  color: var(--cs-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.cat-tab:hover {
+  background: var(--cs-bg-hover);
+}
+
+.cat-tab.active {
+  background: var(--cs-primary-light);
+  color: var(--cs-primary-dark);
+  border-color: var(--cs-primary-light);
+}

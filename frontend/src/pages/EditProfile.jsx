@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useAppData } from '../context/AppDataContext';
-import Avatar from '../components/common/Avatar';
 import { IconCheck } from '@tabler/icons-react';
 
 const EditProfile = () => {
@@ -107,25 +106,28 @@ const EditProfile = () => {
     }
   };
 
+  const inputStyle = { width: '100%', padding: '10px 14px', borderRadius: 'var(--cs-radius-md)', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-light)', fontSize: '14px', color: 'var(--cs-text-main)', outline: 'none', transition: 'border-color 0.2s' };
+  const labelStyle = { display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-inactive)', marginBottom: '6px' };
+
   return (
-    <div id="editprofile" className="pg on">
+    <div id="editprofile" className="pg on" style={{ padding: '24px', background: 'var(--cs-bg-light)', minHeight: '100vh', maxWidth: '800px', margin: '0 auto' }}>
       <button 
         onClick={() => navigate('/app/profile')} 
-        style={{ fontSize: '12px', color: '#888', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '14px' }}
+        style={{ fontSize: '13px', color: 'var(--cs-text-inactive)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '24px', fontWeight: 500 }}
       >
-        Back to profile
+        ← Back to profile
       </button>
 
       {/* Avatar section */}
-      <div style={{ background: '#fff', border: '0.5px solid rgba(0,0,0,.08)', borderRadius: '11px', padding: '16px', marginBottom: '11px' }}>
-        <div style={{ fontSize: '13px', fontWeight: 500, color: '#222', marginBottom: '12px', display: 'flex', justifyContent: 'space-between' }}>
+      <div style={{ background: 'var(--cs-bg-white)', border: '0.5px solid var(--cs-border)', borderRadius: 'var(--cs-radius-lg)', padding: '24px', marginBottom: '24px' }}>
+        <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--cs-text-main)', marginBottom: '20px', display: 'flex', justifyContent: 'space-between' }}>
           <span>Profile photo &amp; avatar</span>
           {avatarImg && (
-            <button onClick={handleRemovePhoto} style={{ background: 'none', border: 'none', color: '#E24B4A', fontSize: '11px', cursor: 'pointer' }}>Remove photo</button>
+            <button onClick={handleRemovePhoto} style={{ background: 'none', border: 'none', color: '#E24B4A', fontSize: '13px', cursor: 'pointer', fontWeight: 500 }}>Remove photo</button>
           )}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div className="ep-av-wrap" onClick={() => fileInputRef.current?.click()} style={{ cursor: 'pointer' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+          <div className="ep-av-wrap" onClick={() => fileInputRef.current?.click()} style={{ cursor: 'pointer', position: 'relative' }}>
             <input 
               type="file" 
               ref={fileInputRef} 
@@ -133,24 +135,24 @@ const EditProfile = () => {
               accept="image/*" 
               onChange={handleImageChange}
             />
-            <div className="avr" style={{ 
-              width: '64px', height: '64px', background: avatarColor.bg, color: avatarColor.text, fontSize: '22px', border: '3px solid #534AB7', flexShrink: 0,
+            <div style={{ 
+              width: '80px', height: '80px', borderRadius: '50%', background: avatarColor.bg, color: avatarColor.text, fontSize: '28px', border: '3px solid var(--cs-primary)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600,
               ...(avatarImg ? { backgroundImage: `url(${avatarImg})`, backgroundSize: 'cover', backgroundPosition: 'center', color: 'transparent' } : {})
             }}>
               {!avatarImg && getInitials()}
             </div>
-            <div className="ep-av-cam">
-              <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7zm7-13h-1.5l-1.7-2H8.2L6.5 2.5H5A3 3 0 0 0 2 5.5v13A3 3 0 0 0 5 21.5h14a3 3 0 0 0 3-3v-13A3 3 0 0 0 19 2.5z" fill="#fff"/></svg>
+            <div style={{ position: 'absolute', bottom: '0', right: '0', width: '24px', height: '24px', background: 'var(--cs-primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--cs-bg-white)' }}>
+              <svg viewBox="0 0 24 24" width="12" height="12" xmlns="http://www.w3.org/2000/svg"><path d="M12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7zm7-13h-1.5l-1.7-2H8.2L6.5 2.5H5A3 3 0 0 0 2 5.5v13A3 3 0 0 0 5 21.5h14a3 3 0 0 0 3-3v-13A3 3 0 0 0 19 2.5z" fill="#fff"/></svg>
             </div>
           </div>
           <div>
-            <div style={{ fontSize: '12px', color: '#555', marginBottom: '8px', fontWeight: 500 }}>Pick a colour</div>
-            <div style={{ display: 'flex', gap: '7px', flexWrap: 'wrap' }}>
+            <div style={{ fontSize: '13px', color: 'var(--cs-text-inactive)', marginBottom: '12px', fontWeight: 500 }}>Pick a colour</div>
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
               {colors.map((c, i) => (
                 <div 
                   key={i} 
                   onClick={() => setAvatarColor(c)}
-                  style={{ width: '26px', height: '26px', borderRadius: '50%', background: c.bg, border: `2px solid ${avatarColor.bg === c.bg ? '#222' : 'transparent'}`, cursor: 'pointer' }}
+                  style={{ width: '32px', height: '32px', borderRadius: '50%', background: c.bg, border: `2px solid ${avatarColor.bg === c.bg ? 'var(--cs-text-main)' : 'transparent'}`, cursor: 'pointer', transition: 'border-color 0.2s' }}
                 ></div>
               ))}
             </div>
@@ -159,94 +161,104 @@ const EditProfile = () => {
       </div>
 
       {/* Basic info */}
-      <div style={{ background: '#fff', border: '0.5px solid rgba(0,0,0,.08)', borderRadius: '11px', padding: '16px', marginBottom: '11px' }}>
-        <div style={{ fontSize: '13px', fontWeight: 500, color: '#222', marginBottom: '12px' }}>Basic information</div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '11px', marginBottom: '11px' }}>
-          <div className="fld"><label>First name</label><input type="text" value={firstName} onChange={e => setFirstName(e.target.value)} /></div>
-          <div className="fld"><label>Last name</label><input type="text" value={lastName} onChange={e => setLastName(e.target.value)} /></div>
+      <div style={{ background: 'var(--cs-bg-white)', border: '0.5px solid var(--cs-border)', borderRadius: 'var(--cs-radius-lg)', padding: '24px', marginBottom: '24px' }}>
+        <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--cs-text-main)', marginBottom: '20px' }}>Basic information</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+          <div><label style={labelStyle}>First name</label><input style={inputStyle} type="text" value={firstName} onChange={e => setFirstName(e.target.value)} /></div>
+          <div><label style={labelStyle}>Last name</label><input style={inputStyle} type="text" value={lastName} onChange={e => setLastName(e.target.value)} /></div>
         </div>
-        <div className="fld"><label>College / University</label><input type="text" value={college} onChange={e => setCollege(e.target.value)} /></div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '11px', marginBottom: '11px' }}>
-          <div className="fld">
-            <label>Year</label>
-            <select style={{ fontSize: '12px' }} value={year} onChange={e => setYear(e.target.value)}>
+        <div style={{ marginBottom: '16px' }}><label style={labelStyle}>College / University</label><input style={inputStyle} type="text" value={college} onChange={e => setCollege(e.target.value)} /></div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
+          <div>
+            <label style={labelStyle}>Year</label>
+            <select style={{ ...inputStyle, cursor: 'pointer' }} value={year} onChange={e => setYear(e.target.value)}>
               <option>1st year</option><option>2nd year</option><option>3rd year</option><option>4th year</option>
             </select>
           </div>
-          <div className="fld"><label>Branch / Department</label><input type="text" value={branch} onChange={e => setBranch(e.target.value)} /></div>
+          <div><label style={labelStyle}>Branch / Department</label><input style={inputStyle} type="text" value={branch} onChange={e => setBranch(e.target.value)} /></div>
         </div>
-        <div className="fld" style={{ marginBottom: 0 }}>
-          <label>Bio</label>
+        <div>
+          <label style={labelStyle}>Bio</label>
           <textarea 
-            style={{ width: '100%', padding: '9px 11px', borderRadius: '10px', border: '1.5px solid #E0DFF0', background: '#FAFAFA', fontSize: '12px', outline: 'none', fontFamily: 'inherit', resize: 'vertical', minHeight: '64px', color: '#222' }}
+            style={{ ...inputStyle, resize: 'vertical', minHeight: '80px', fontFamily: 'inherit' }}
             value={bio} onChange={e => setBio(e.target.value)}
           ></textarea>
         </div>
       </div>
 
       {/* Skills */}
-      <div style={{ background: '#fff', border: '0.5px solid rgba(0,0,0,.08)', borderRadius: '11px', padding: '16px', marginBottom: '11px' }}>
-        <div style={{ fontSize: '13px', fontWeight: 500, color: '#222', marginBottom: '12px' }}>Skills</div>
+      <div style={{ background: 'var(--cs-bg-white)', border: '0.5px solid var(--cs-border)', borderRadius: 'var(--cs-radius-lg)', padding: '24px', marginBottom: '24px' }}>
+        <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--cs-text-main)', marginBottom: '24px' }}>Skills</div>
         
-        <div style={{ fontSize: '11px', fontWeight: 500, color: '#555', marginBottom: '6px' }}>Skills I can teach</div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '7px' }}>
+        <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--cs-text-inactive)', marginBottom: '12px' }}>Skills I can teach</div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
           {teachSkills.map(s => (
-            <span key={s} style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '20px', background: '#EEEDFE', color: '#3C3489', border: '1px solid #AFA9EC', display: 'flex', alignItems: 'center', gap: '4px' }}>
-              {s} <button onClick={() => setTeachSkills(teachSkills.filter(ts => ts !== s))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#534AB7', fontSize: '13px', lineHeight: 1, padding: 0 }}>×</button>
+            <span key={s} style={{ fontSize: '13px', padding: '6px 12px', borderRadius: '20px', background: 'var(--cs-primary-light)', color: 'var(--cs-primary)', border: '1px solid var(--cs-primary-light)', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500 }}>
+              {s} <button onClick={() => setTeachSkills(teachSkills.filter(ts => ts !== s))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--cs-primary)', fontSize: '16px', lineHeight: 1, padding: 0 }}>&times;</button>
             </span>
           ))}
         </div>
-        <div style={{ display: 'flex', gap: '7px', marginBottom: '13px' }}>
-          <input type="text" placeholder="Add a skill you teach…" value={teachInp} onChange={e => setTeachInp(e.target.value)} onKeyPress={e => e.key === 'Enter' && addTeach()} style={{ flex: 1, padding: '8px 11px', borderRadius: '10px', border: '1.5px solid #E0DFF0', background: '#FAFAFA', fontSize: '12px', outline: 'none' }}/>
-          <button onClick={addTeach} style={{ padding: '8px 13px', borderRadius: '10px', border: 'none', background: '#534AB7', color: '#fff', fontSize: '12px', cursor: 'pointer', fontWeight: 500, whiteSpace: 'nowrap' }}>Add</button>
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
+          <input type="text" placeholder="Add a skill you teach…" value={teachInp} onChange={e => setTeachInp(e.target.value)} onKeyPress={e => e.key === 'Enter' && addTeach()} style={inputStyle}/>
+          <button onClick={addTeach} style={{ padding: '0 20px', borderRadius: 'var(--cs-radius-md)', border: 'none', background: 'var(--cs-primary)', color: '#fff', fontSize: '14px', cursor: 'pointer', fontWeight: 600, whiteSpace: 'nowrap' }}>Add</button>
         </div>
         
-        <div style={{ fontSize: '11px', fontWeight: 500, color: '#555', marginBottom: '6px' }}>Skills I want to learn</div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '7px' }}>
+        <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--cs-text-inactive)', marginBottom: '12px' }}>Skills I want to learn</div>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
           {learnSkills.map(s => (
-            <span key={s} style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '20px', background: '#EEEDFE', color: '#3C3489', border: '1px solid #AFA9EC', display: 'flex', alignItems: 'center', gap: '4px' }}>
-              {s} <button onClick={() => setLearnSkills(learnSkills.filter(ls => ls !== s))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#534AB7', fontSize: '13px', lineHeight: 1, padding: 0 }}>×</button>
+            <span key={s} style={{ fontSize: '13px', padding: '6px 12px', borderRadius: '20px', background: 'var(--cs-primary-light)', color: 'var(--cs-primary)', border: '1px solid var(--cs-primary-light)', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500 }}>
+              {s} <button onClick={() => setLearnSkills(learnSkills.filter(ls => ls !== s))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--cs-primary)', fontSize: '16px', lineHeight: 1, padding: 0 }}>&times;</button>
             </span>
           ))}
         </div>
-        <div style={{ display: 'flex', gap: '7px' }}>
-          <input type="text" placeholder="Add a skill you want to learn…" value={learnInp} onChange={e => setLearnInp(e.target.value)} onKeyPress={e => e.key === 'Enter' && addLearn()} style={{ flex: 1, padding: '8px 11px', borderRadius: '10px', border: '1.5px solid #E0DFF0', background: '#FAFAFA', fontSize: '12px', outline: 'none' }}/>
-          <button onClick={addLearn} style={{ padding: '8px 13px', borderRadius: '10px', border: 'none', background: '#534AB7', color: '#fff', fontSize: '12px', cursor: 'pointer', fontWeight: 500, whiteSpace: 'nowrap' }}>Add</button>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <input type="text" placeholder="Add a skill you want to learn…" value={learnInp} onChange={e => setLearnInp(e.target.value)} onKeyPress={e => e.key === 'Enter' && addLearn()} style={inputStyle}/>
+          <button onClick={addLearn} style={{ padding: '0 20px', borderRadius: 'var(--cs-radius-md)', border: 'none', background: 'var(--cs-primary)', color: '#fff', fontSize: '14px', cursor: 'pointer', fontWeight: 600, whiteSpace: 'nowrap' }}>Add</button>
         </div>
       </div>
 
       {/* Availability */}
-      <div style={{ background: '#fff', border: '0.5px solid rgba(0,0,0,.08)', borderRadius: '11px', padding: '16px', marginBottom: '11px' }}>
-        <div style={{ fontSize: '13px', fontWeight: 500, color: '#222', marginBottom: '12px' }}>Availability &amp; preferences</div>
-        <div style={{ fontSize: '11px', fontWeight: 500, color: '#555', marginBottom: '7px' }}>When are you free?</div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '6px', marginBottom: '13px' }}>
+      <div style={{ background: 'var(--cs-bg-white)', border: '0.5px solid var(--cs-border)', borderRadius: 'var(--cs-radius-lg)', padding: '24px', marginBottom: '24px' }}>
+        <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--cs-text-main)', marginBottom: '20px' }}>Availability &amp; preferences</div>
+        <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--cs-text-inactive)', marginBottom: '12px' }}>When are you free?</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '12px', marginBottom: '24px' }}>
           {['Weekday mornings', 'Weekday evenings', 'Weekend mornings', 'Weekend afternoons', 'Weekends anytime', 'Flexible / on-demand'].map(opt => (
-            <div key={opt} className={`avail-opt ${availability.includes(opt) ? 'on' : ''}`} onClick={() => toggleAvail(opt)}>{opt}</div>
+            <div key={opt} 
+                 onClick={() => toggleAvail(opt)}
+                 style={{ padding: '12px', borderRadius: 'var(--cs-radius-md)', border: `1px solid ${availability.includes(opt) ? 'var(--cs-primary)' : 'var(--cs-border)'}`, background: availability.includes(opt) ? 'var(--cs-primary-light)' : 'var(--cs-bg-light)', color: availability.includes(opt) ? 'var(--cs-primary)' : 'var(--cs-text-main)', fontSize: '13px', fontWeight: 500, textAlign: 'center', cursor: 'pointer', transition: 'all 0.2s' }}>
+              {opt}
+            </div>
           ))}
         </div>
-        <div style={{ fontSize: '11px', fontWeight: 500, color: '#555', marginBottom: '7px' }}>Session mode preference</div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '6px' }}>
+        <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--cs-text-inactive)', marginBottom: '12px' }}>Session mode preference</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '12px' }}>
           {['Online', 'In-person', 'Either'].map(opt => (
-            <div key={opt} className={`avail-opt ${mode === opt ? 'on' : ''}`} onClick={() => setMode(opt)}>{opt}</div>
+            <div key={opt} 
+                 onClick={() => setMode(opt)}
+                 style={{ padding: '12px', borderRadius: 'var(--cs-radius-md)', border: `1px solid ${mode === opt ? 'var(--cs-primary)' : 'var(--cs-border)'}`, background: mode === opt ? 'var(--cs-primary-light)' : 'var(--cs-bg-light)', color: mode === opt ? 'var(--cs-primary)' : 'var(--cs-text-main)', fontSize: '13px', fontWeight: 500, textAlign: 'center', cursor: 'pointer', transition: 'all 0.2s' }}>
+              {opt}
+            </div>
           ))}
         </div>
       </div>
 
       {/* UPI */}
-      <div style={{ background: '#fff', border: '0.5px solid rgba(0,0,0,.08)', borderRadius: '11px', padding: '16px', marginBottom: '11px' }}>
-        <div style={{ fontSize: '13px', fontWeight: 500, color: '#222', marginBottom: '12px' }}>UPI &amp; payment</div>
-        <div className="fld" style={{ marginBottom: 0 }}>
-          <label>UPI ID</label>
-          <input type="text" value={upi} onChange={e => setUpi(e.target.value)} placeholder="yourname@upi" />
+      <div style={{ background: 'var(--cs-bg-white)', border: '0.5px solid var(--cs-border)', borderRadius: 'var(--cs-radius-lg)', padding: '24px', marginBottom: '24px' }}>
+        <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--cs-text-main)', marginBottom: '20px' }}>UPI &amp; payment</div>
+        <div>
+          <label style={labelStyle}>UPI ID</label>
+          <input style={inputStyle} type="text" value={upi} onChange={e => setUpi(e.target.value)} placeholder="yourname@upi" />
         </div>
       </div>
 
       {/* Save / Cancel */}
-      <div style={{ display: 'flex', gap: '9px', marginBottom: '4px' }}>
-        <button onClick={handleSave} style={{ flex: 1, padding: '12px', borderRadius: '11px', border: 'none', background: '#534AB7', color: '#fff', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}>
-          <IconCheck style={{ fontSize: '13px', verticalAlign: '-1px' }} /> Save changes
+      <div style={{ display: 'flex', gap: '16px' }}>
+        <button onClick={handleSave} style={{ flex: 1, padding: '14px', borderRadius: 'var(--cs-radius-md)', border: 'none', background: 'var(--cs-primary)', color: '#fff', fontSize: '15px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+          <IconCheck size={18} /> Save changes
         </button>
-        <button onClick={() => navigate('/app/profile')} style={{ padding: '12px 20px', borderRadius: '11px', border: '1.5px solid #E0DFF0', background: '#fff', color: '#555', fontSize: '13px', cursor: 'pointer' }}>Cancel</button>
+        <button onClick={() => navigate('/app/profile')} style={{ padding: '14px 24px', borderRadius: 'var(--cs-radius-md)', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-white)', color: 'var(--cs-text-main)', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>
+          Cancel
+        </button>
       </div>
     </div>
   );

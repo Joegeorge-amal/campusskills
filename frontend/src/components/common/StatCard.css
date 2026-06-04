@@ -1,0 +1,39 @@
+.scard {
+  background: var(--cs-bg-white);
+  border: 0.5px solid var(--cs-border);
+  border-radius: var(--cs-radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.scard-icon-wrapper {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--cs-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.scard-value {
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--cs-text-main);
+  margin-bottom: 4px;
+}
+
+.scard-label {
+  font-size: 13px;
+  color: var(--cs-text-inactive);
+  margin-bottom: 8px;
+}
+
+.scard-sub {
+  font-size: 12px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}

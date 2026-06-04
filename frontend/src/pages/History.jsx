@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useAppData } from '../context/AppDataContext';
+import TransactionListItem from '../components/common/TransactionListItem';
+import CategoryFilterTabs from '../components/common/CategoryFilterTabs/CategoryFilterTabs';
 
 const History = () => {
   const { transactions } = useAppData();
@@ -17,58 +19,40 @@ const History = () => {
         return true;
       });
 
-  const getIconColor = (type) => {
-    switch (type) {
-      case 'received': return { bg: '#E1F5EE', color: '#0F6E56', icon: 'ti-currency-rupee', amtClass: 'cr' };
-      case 'withdrawn': return { bg: '#E6F1FB', color: '#185FA5', icon: 'ti-building-bank', amtClass: 'dr' };
-      case 'paid': return { bg: '#FAECE7', color: '#993C1D', icon: 'ti-credit-card', amtClass: 'dr' };
-      case 'swap': return { bg: '#EEEDFE', color: '#534AB7', icon: 'ti-arrows-exchange', amtClass: 'ex' };
-      default: return { bg: '#FAFAFA', color: '#888', icon: 'ti-receipt', amtClass: '' };
-    }
-  };
-
   return (
-    <div id="history" className="pg on">
-      <div className="chiprow" style={{ marginBottom: '11px' }}>
-        {filters.map(f => (
-          <span 
-            key={f} 
-            className={`chip ${filter === f ? 'on' : ''}`} 
-            onClick={() => setFilter(f)}
-          >
-            {f}
-          </span>
-        ))}
+    <div id="history" className="pg on" style={{ padding: '24px', background: 'var(--cs-bg-light)', minHeight: '100vh', maxWidth: '800px', margin: '0 auto' }}>
+      
+      <div style={{ marginBottom: '24px' }}>
+        <CategoryFilterTabs 
+          categories={filters}
+          activeCategory={filter}
+          onSelectCategory={setFilter}
+        />
       </div>
       
-      <div style={{ fontSize: '10px', fontWeight: 500, color: '#aaa', marginBottom: '6px', letterSpacing: '.05em', textTransform: 'uppercase' }}>
+      <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-inactive)', marginBottom: '16px', letterSpacing: '0.5px', textTransform: 'uppercase' }}>
         May 2025
       </div>
       
-      {filteredTx.map(tx => {
-        const style = getIconColor(tx.type);
-        return (
-          <div className="hrow" key={tx.id}>
-            <div className="hico" style={{ background: style.bg, color: style.color }}>
-              <i className={`ti ${style.icon}`}></i>
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '12px', fontWeight: 500, color: '#222' }}>{tx.title}</div>
-              <div style={{ fontSize: '11px', color: '#888' }}>{tx.desc}</div>
-            </div>
-            <div>
-              <div className={`hamt ${style.amtClass}`}>{tx.amount}</div>
-              <div style={{ fontSize: '10px', color: '#aaa', textAlign: 'right' }}>{tx.date}</div>
-            </div>
-          </div>
-        );
-      })}
+      <div style={{ background: 'var(--cs-bg-white)', borderRadius: 'var(--cs-radius-lg)', padding: '0 24px', border: '0.5px solid var(--cs-border)' }}>
+        {filteredTx.map(tx => (
+          <TransactionListItem
+            key={tx.id}
+            type={tx.type}
+            title={tx.title}
+            desc={tx.desc}
+            amount={tx.amount}
+            date={tx.date}
+          />
+        ))}
 
-      {filteredTx.length === 0 && (
-        <div style={{ fontSize: '12px', color: '#888', padding: '20px 0', textAlign: 'center', background: '#fff', borderRadius: '8px', border: '0.5px solid rgba(0,0,0,.08)' }}>
-          No transactions found.
-        </div>
-      )}
+        {filteredTx.length === 0 && (
+          <div style={{ fontSize: '13px', color: 'var(--cs-text-inactive)', padding: '48px 0', textAlign: 'center' }}>
+            No transactions found.
+          </div>
+        )}
+      </div>
+
     </div>
   );
 };

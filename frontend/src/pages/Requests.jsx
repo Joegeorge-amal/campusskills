@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAppData } from '../context/AppDataContext';
-import Avatar from '../components/common/Avatar';
+import RequestCard from '../components/common/RequestCard';
 
 const Requests = () => {
   const { requests, acceptRequest, declineRequest } = useAppData();
@@ -9,76 +9,62 @@ const Requests = () => {
   const outgoingRequests = requests.filter(r => r.direction === 'outgoing');
 
   return (
-    <div id="requests" className="pg on">
-      {/* Incoming Requests */}
-      <div style={{ fontSize: '12px', color: '#888', marginBottom: '9px' }}>
-        {incomingRequests.length} pending request{incomingRequests.length !== 1 ? 's' : ''}
-      </div>
+    <div id="requests" className="pg on" style={{ padding: '24px', background: 'var(--cs-bg-light)', minHeight: '100vh', maxWidth: '800px', margin: '0 auto' }}>
       
-      {incomingRequests.map(req => (
-        <div className="rcard" key={req.id}>
-          <Avatar letters={req.init} bgColor={req.bg} textColor={req.col} size="32px" fontSize="11px" />
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: '12px', fontWeight: 500, color: '#222' }}>{req.title}</div>
-            <div style={{ fontSize: '11px', color: '#888', marginTop: '2px' }}>{req.sub}</div>
-            <span style={{ fontSize: '10px', padding: '2px 7px', borderRadius: '20px', background: req.typeCls === 'c-code' ? '#E1F5EE' : '#EEEDFE', color: req.typeCls === 'c-code' ? '#085041' : '#3C3489', marginTop: '4px', display: 'inline-block' }}>
-              {req.type}
-            </span>
-          </div>
-          {req.status === 'pending' ? (
-            <div style={{ display: 'flex', gap: '5px' }}>
-              <button 
-                style={{ fontSize: '11px', padding: '5px 10px', borderRadius: '7px', border: 'none', background: '#E1F5EE', color: '#0F6E56', fontWeight: 500, cursor: 'pointer' }}
-                onClick={() => acceptRequest(req.id)}
-              >
-                Accept
-              </button>
-              <button 
-                style={{ fontSize: '11px', padding: '5px 10px', borderRadius: '7px', border: '0.5px solid rgba(0,0,0,.1)', background: 'none', color: '#888', cursor: 'pointer' }}
-                onClick={() => declineRequest(req.id)}
-              >
-                Decline
-              </button>
+      <div style={{ marginBottom: '32px' }}>
+        <div style={{ fontSize: '18px', fontWeight: 600, color: 'var(--cs-text-main)', marginBottom: '16px' }}>Incoming requests</div>
+        <div style={{ fontSize: '13px', color: 'var(--cs-text-secondary)', marginBottom: '16px' }}>
+          {incomingRequests.length} pending request{incomingRequests.length !== 1 ? 's' : ''}
+        </div>
+        
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          {incomingRequests.map(req => (
+            <RequestCard
+              key={req.id}
+              avatarProps={{ initials: req.init, bg: req.bg, color: req.col, size: '40px', fontSize: '14px' }}
+              title={req.title}
+              subtitle={req.sub}
+              tagText={req.type}
+              tagType={req.typeCls === 'c-code' ? 'success' : 'primary'}
+              status={req.status}
+              type="incoming"
+              onAccept={() => acceptRequest(req.id)}
+              onDecline={() => declineRequest(req.id)}
+            />
+          ))}
+          
+          {incomingRequests.length === 0 && (
+            <div style={{ fontSize: '13px', color: 'var(--cs-text-inactive)', padding: '32px 0', textAlign: 'center', background: 'var(--cs-bg-white)', borderRadius: 'var(--cs-radius-lg)', border: '0.5px dashed var(--cs-border)' }}>
+              No incoming requests right now.
             </div>
-          ) : (
-            <span style={{ fontSize: '11px', padding: '3px 9px', borderRadius: '20px', background: '#E1F5EE', color: '#0F6E56' }}>Accepted</span>
           )}
         </div>
-      ))}
-      
-      {incomingRequests.length === 0 && (
-        <div style={{ fontSize: '12px', color: '#888', padding: '20px 0', textAlign: 'center', background: '#fff', borderRadius: '8px', border: '0.5px solid rgba(0,0,0,.08)' }}>
-          No incoming requests right now.
-        </div>
-      )}
+      </div>
 
-      <div className="sep"></div>
+      <div style={{ height: '1px', background: 'var(--cs-border)', margin: '32px 0' }}></div>
 
-      {/* Outgoing Requests */}
-      <div style={{ fontSize: '12px', fontWeight: 500, color: '#222', marginBottom: '8px' }}>Sent requests</div>
-      
-      {outgoingRequests.map(req => (
-        <div className="rcard" key={req.id}>
-          <Avatar letters={req.init} bgColor={req.bg} textColor={req.col} size="32px" fontSize="11px" />
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: '12px', fontWeight: 500, color: '#222' }}>{req.title}</div>
-            <div style={{ fontSize: '11px', color: '#888' }}>{req.sub}</div>
-          </div>
-          <span style={{ 
-            fontSize: '11px', padding: '3px 9px', borderRadius: '20px', 
-            background: req.status === 'Confirmed' ? '#E1F5EE' : '#FAEEDA', 
-            color: req.status === 'Confirmed' ? '#0F6E56' : '#633806' 
-          }}>
-            {req.status}
-          </span>
-        </div>
-      ))}
+      <div>
+        <div style={{ fontSize: '18px', fontWeight: 600, color: 'var(--cs-text-main)', marginBottom: '16px' }}>Sent requests</div>
+        
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          {outgoingRequests.map(req => (
+            <RequestCard
+              key={req.id}
+              avatarProps={{ initials: req.init, bg: req.bg, color: req.col, size: '40px', fontSize: '14px' }}
+              title={req.title}
+              subtitle={req.sub}
+              status={req.status}
+              type="outgoing"
+            />
+          ))}
 
-      {outgoingRequests.length === 0 && (
-        <div style={{ fontSize: '12px', color: '#888', padding: '20px 0', textAlign: 'center', background: '#fff', borderRadius: '8px', border: '0.5px solid rgba(0,0,0,.08)' }}>
-          You haven't sent any requests yet.
+          {outgoingRequests.length === 0 && (
+            <div style={{ fontSize: '13px', color: 'var(--cs-text-inactive)', padding: '32px 0', textAlign: 'center', background: 'var(--cs-bg-white)', borderRadius: 'var(--cs-radius-lg)', border: '0.5px dashed var(--cs-border)' }}>
+              You haven't sent any requests yet.
+            </div>
+          )}
         </div>
-      )}
+      </div>
     </div>
   );
 };

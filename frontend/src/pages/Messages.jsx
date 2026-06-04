@@ -2,7 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAppData } from '../context/AppDataContext';
 import Avatar from '../components/common/Avatar';
-import { IconEdit, IconSearch, IconInfoCircle, IconPaperclip, IconSend } from '@tabler/icons-react';
+import ChatListItem from '../components/common/ChatListItem';
+import ChatMessageBubble from '../components/common/ChatMessageBubble';
+import ChatInput from '../components/common/ChatInput';
+import { IconEdit, IconSearch, IconInfoCircle } from '@tabler/icons-react';
 
 const Messages = () => {
   const { conversations, sendChatMessage, acceptRequest, declineRequest } = useAppData();
@@ -10,7 +13,6 @@ const Messages = () => {
   const initialChatId = searchParams.get('chatId') ? parseInt(searchParams.get('chatId')) : conversations[0]?.id;
   
   const [activeChatId, setActiveChatId] = useState(initialChatId);
-  const [inputMsg, setInputMsg] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const messagesEndRef = useRef(null);
 
@@ -29,143 +31,90 @@ const Messages = () => {
     scrollToBottom();
   }, [activeChat?.msgs]);
 
-  const handleSend = () => {
-    if (inputMsg.trim() && activeChat) {
-      sendChatMessage(activeChat.id, inputMsg);
-      setInputMsg('');
-    }
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSend();
+  const handleSend = (text) => {
+    if (text.trim() && activeChat) {
+      sendChatMessage(activeChat.id, text);
     }
   };
 
   return (
-    <div id="chat" className="pg on" style={{ padding: 0 }}>
-      <div className="chat-wrap">
+    <div id="chat" className="pg on" style={{ padding: 0, height: '100%', background: 'var(--cs-bg-light)', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', height: '100%', background: 'var(--cs-bg-white)', borderLeft: '0.5px solid var(--cs-border)' }}>
         {/* Left: Chat List */}
-        <div className="cl-list">
-          <div className="cl-hdr">
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <span style={{ fontSize: '13px', fontWeight: 500, color: '#222' }}>Messages</span>
-              <button style={{ width: '22px', height: '22px', borderRadius: '6px', border: '0.5px solid rgba(0,0,0,.1)', background: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#888', fontSize: '12px' }}>
-                <IconEdit />
+        <div style={{ width: '320px', display: 'flex', flexDirection: 'column', borderRight: '0.5px solid var(--cs-border)' }}>
+          <div style={{ padding: '20px 24px', borderBottom: '0.5px solid var(--cs-border)' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <span style={{ fontSize: '18px', fontWeight: 600, color: 'var(--cs-text-main)' }}>Messages</span>
+              <button style={{ width: '32px', height: '32px', borderRadius: 'var(--cs-radius-sm)', border: '0.5px solid var(--cs-border)', background: 'var(--cs-bg-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--cs-text-inactive)' }}>
+                <IconEdit size={18} />
               </button>
             </div>
-            <div className="cl-s">
-              <IconSearch style={{ fontSize: '11px', color: '#aaa' }} />
+            <div style={{ position: 'relative' }}>
+              <IconSearch style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--cs-text-inactive)' }} size={16} />
               <input 
                 type="text" 
                 placeholder="Search..." 
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
+                style={{ width: '100%', padding: '10px 12px 10px 36px', borderRadius: 'var(--cs-radius-md)', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-light)', fontSize: '13px', outline: 'none', color: 'var(--cs-text-main)' }}
               />
             </div>
           </div>
-          <div className="cl-items">
+          <div style={{ flex: 1, overflowY: 'auto', padding: '12px' }}>
             {filteredConversations.map(chat => (
-              <div 
-                key={chat.id} 
-                className={`ci ${activeChatId === chat.id ? 'on' : ''}`}
+              <ChatListItem 
+                key={chat.id}
+                avatarProps={{ letters: chat.init, bgColor: chat.bg, textColor: chat.col, size: '40px', fontSize: '14px' }}
+                isOnline={chat.online}
+                name={chat.name}
+                preview={chat.preview}
+                time={chat.time}
+                unreadCount={chat.unread}
+                isActive={activeChatId === chat.id}
                 onClick={() => setActiveChatId(chat.id)}
-              >
-                <div className="caw">
-                  <Avatar letters={chat.init} bgColor={chat.bg} textColor={chat.col} size="33px" fontSize="11px" />
-                  {chat.online ? <div className="dot-on"></div> : <div className="dot-on dot-off"></div>}
-                </div>
-                <div className="ci-inf">
-                  <div className="ci-nm">{chat.name}</div>
-                  <div className="ci-pv">{chat.preview}</div>
-                </div>
-                <div className="ci-mt">
-                  <div className="ci-tm">{chat.time}</div>
-                  {chat.unread > 0 && <div className="ci-un">{chat.unread}</div>}
-                </div>
-              </div>
+              />
             ))}
           </div>
         </div>
 
         {/* Right: Chat Main */}
-        <div className="chat-main">
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--cs-bg-light)' }}>
           {activeChat ? (
             <>
               {/* Header */}
-              <div className="chat-hdr">
-                <Avatar letters={activeChat.init} bgColor={activeChat.bg} textColor={activeChat.col} size="36px" fontSize="12px" />
+              <div style={{ padding: '20px 24px', background: 'var(--cs-bg-white)', borderBottom: '0.5px solid var(--cs-border)', display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <Avatar letters={activeChat.init} bgColor={activeChat.bg} textColor={activeChat.col} size="48px" fontSize="16px" />
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: '#222' }}>{activeChat.name}</div>
-                  <div style={{ fontSize: '11px', color: '#888' }}>
-                    {activeChat.online ? <span style={{ color: '#1D9E75' }}>● Online</span> : 'Offline'} · {activeChat.skill}
+                  <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--cs-text-main)' }}>{activeChat.name}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--cs-text-inactive)', marginTop: '4px' }}>
+                    {activeChat.online ? <span style={{ color: '#1D9E75', fontWeight: 500 }}>● Online</span> : 'Offline'} · {activeChat.skill}
                   </div>
                 </div>
-                <button style={{ width: '32px', height: '32px', borderRadius: '8px', border: '0.5px solid rgba(0,0,0,.1)', background: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#555', fontSize: '16px' }}>
-                  <IconInfoCircle />
+                <button style={{ width: '36px', height: '36px', borderRadius: 'var(--cs-radius-md)', border: '0.5px solid var(--cs-border)', background: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--cs-text-inactive)' }}>
+                  <IconInfoCircle size={20} />
                 </button>
               </div>
 
               {/* Messages Area */}
-              <div className="chat-msgs">
-                {activeChat.msgs.map((msg, i) => {
-                  const isMe = msg.f === 'me';
-                  
-                  if (msg.type === 'pay' || msg.type === 'swap') {
-                    // Custom rich bubble for requests
-                    return (
-                      <div key={i} className={`mrow ${isMe ? 'me' : ''}`} style={{ marginBottom: '4px' }}>
-                        {!isMe && (
-                          <div className="mav" style={{ background: activeChat.bg, color: activeChat.col }}>{activeChat.init}</div>
-                        )}
-                        <div className="rbbl">
-                          <div className="rbt">{msg.title}</div>
-                          <div className="rbs">{msg.sub}</div>
-                          {!isMe && (
-                            <div className="rbbtns">
-                              <button className="rbacc" onClick={() => acceptRequest(msg.reqId || Date.now())}>Accept</button>
-                              <button className="rbdec" onClick={() => declineRequest(msg.reqId || Date.now())}>Decline</button>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  }
-
-                  return (
-                    <div key={i} className={`mrow ${isMe ? 'me' : ''}`} style={{ marginBottom: '4px' }}>
-                      {!isMe && (
-                        <div className="mav" style={{ background: activeChat.bg, color: activeChat.col }}>{activeChat.init}</div>
-                      )}
-                      <div className={`bbl ${isMe ? 'me' : 'them'}`}>
-                        {msg.t}
-                      </div>
-                    </div>
-                  );
-                })}
+              <div style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column' }}>
+                {activeChat.msgs.map((msg, i) => (
+                  <ChatMessageBubble 
+                    key={msg.id || i}
+                    isMe={msg.f === 'me'}
+                    avatarProps={{ letters: activeChat.init, bgColor: activeChat.bg, textColor: activeChat.col }}
+                    payload={msg}
+                    onAccept={acceptRequest}
+                    onDecline={declineRequest}
+                  />
+                ))}
                 <div ref={messagesEndRef} />
               </div>
 
               {/* Input Bar */}
-              <div className="cin-bar">
-                <button style={{ width: '26px', height: '26px', borderRadius: '7px', border: '0.5px solid rgba(0,0,0,.1)', background: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#888', fontSize: '14px' }}>
-                  <IconPaperclip />
-                </button>
-                <input 
-                  className="cin" 
-                  type="text" 
-                  placeholder="Type a message..."
-                  value={inputMsg}
-                  onChange={e => setInputMsg(e.target.value)}
-                  onKeyPress={handleKeyPress}
-                />
-                <button className="csend" onClick={handleSend}>
-                  <IconSend />
-                </button>
-              </div>
+              <ChatInput onSend={handleSend} />
             </>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#888', fontSize: '13px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--cs-text-inactive)', fontSize: '14px', fontWeight: 500 }}>
               Select a conversation to start messaging
             </div>
           )}

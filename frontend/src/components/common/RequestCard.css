@@ -1,0 +1,129 @@
+.req-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--cs-bg-white);
+  border: 0.5px solid var(--cs-border);
+  border-radius: var(--cs-radius-md);
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.req-card:hover {
+  border-color: rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.req-card-avatar {
+  flex-shrink: 0;
+}
+
+.req-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.req-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--cs-text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.req-card-subtitle {
+  font-size: 12px;
+  color: var(--cs-text-inactive);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.req-card-tag-wrapper {
+  margin-top: 6px;
+}
+
+.req-card-tag {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 20px;
+  display: inline-block;
+  font-weight: 500;
+}
+
+.rc-tag-primary {
+  background: var(--cs-primary-light);
+  color: var(--cs-primary-dark);
+}
+
+.rc-tag-success {
+  background: #E1F5EE;
+  color: #0F6E56;
+}
+
+.rc-tag-warning {
+  background: #FAEEDA;
+  color: #854F0B;
+}
+
+.req-card-actions {
+  flex-shrink: 0;
+}
+
+.req-card-btn-group {
+  display: flex;
+  gap: 8px;
+}
+
+.req-card-btn-accept {
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: var(--cs-radius-sm);
+  border: none;
+  background: #E1F5EE;
+  color: #0F6E56;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.req-card-btn-accept:hover {
+  background: #cbf0e4;
+}
+
+.req-card-btn-decline {
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: var(--cs-radius-sm);
+  border: 0.5px solid var(--cs-border);
+  background: var(--cs-bg-white);
+  color: var(--cs-text-secondary);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.req-card-btn-decline:hover {
+  background: var(--cs-bg-hover);
+}
+
+.req-card-status-pill {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.req-card-status-pill.success {
+  background: #E1F5EE;
+  color: #0F6E56;
+}
+
+.req-card-status-pill.warning {
+  background: #FAEEDA;
+  color: #633806;
+}

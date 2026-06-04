@@ -1,9 +1,10 @@
 import React from 'react';
+import './StatCard.css';
 
 const StatCard = ({
   icon,
-  iconBg = '#EEEDFE',
-  iconColor = '#534AB7',
+  iconBg = 'var(--cs-primary-light)',
+  iconColor = 'var(--cs-primary)',
   value,
   label,
   subText = null,
@@ -13,26 +14,19 @@ const StatCard = ({
   return (
     <div className="scard">
       <div 
+        className="scard-icon-wrapper"
         style={{
-          width: '27px',
-          height: '27px',
-          borderRadius: '7px',
           background: iconBg,
-          color: iconColor,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '13px',
-          marginBottom: '7px'
+          color: iconColor
         }}
       >
-        <i className={icon}></i>
+        {typeof icon === 'string' ? <i className={icon}></i> : icon}
       </div>
-      <div style={{ fontSize: '19px', fontWeight: 500, color: '#222' }}>{value}</div>
-      <div style={{ fontSize: '11px', color: '#888', marginTop: '1px' }}>{label}</div>
+      <div className="scard-value">{value}</div>
+      <div className="scard-label">{label}</div>
       {subText && (
-        <div style={{ fontSize: '11px', color: subColor, marginTop: '4px' }}>
-          {subIcon && <i className={subIcon} style={{ marginRight: '2px' }}></i>}
+        <div className="scard-sub" style={{ color: subColor }}>
+          {subIcon && (typeof subIcon === 'string' ? <i className={subIcon}></i> : subIcon)}
           {subText}
         </div>
       )}

@@ -1,0 +1,169 @@
+/* ─── APP HEADER ─── */
+.topbar {
+  background: var(--cs-bg-white);
+  border-bottom: 0.5px solid var(--cs-border);
+  padding: 0 16px;
+  height: 49px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  position: sticky;
+  top: 0;
+  z-index: 90;
+}
+
+.mobile-menu-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  margin-right: 8px;
+  color: #555;
+  align-items: center;
+  justify-content: center;
+}
+
+.topbar-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--cs-text-main);
+}
+
+.topbar-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  overflow-x: auto;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+
+.topbar-actions::-webkit-scrollbar {
+  display: none;
+}
+
+.admin-badge {
+  font-size: 11px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  background: #FFF3CD;
+  color: #7A5800;
+  font-weight: 500;
+  border: 1px solid #F0C040;
+  white-space: nowrap;
+  margin-right: 4px;
+}
+
+/* FILTER CHIPS (extracted from app-layout.css) */
+.filter-chip {
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: var(--cs-bg-hover);
+  border: 1px solid #E0DFF0;
+  color: #555;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.filter-chip:hover {
+  background: #E8E7F5;
+  transform: translateY(-1px);
+}
+
+.filter-chip.active {
+  background: var(--cs-primary-gradient);
+  color: var(--cs-bg-white);
+  border-color: transparent;
+  box-shadow: 0 4px 10px rgba(83, 74, 183, 0.3);
+}
+
+.filter-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--cs-radius-sm);
+  background: var(--cs-bg-hover);
+  border: 1px solid #E0DFF0;
+  color: var(--cs-text-main);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+  background: #E8E7F5;
+  transform: translateY(-1px);
+}
+
+/* SEARCH FIELD */
+.search-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--cs-bg-hover);
+  border: 0.5px solid var(--cs-border);
+  border-radius: var(--cs-radius-sm);
+  padding: 5px 9px;
+  flex-shrink: 0;
+}
+
+.search-icon {
+  font-size: 12px;
+  color: var(--cs-text-muted);
+  width: 14px;
+  height: 14px;
+}
+
+.search-input {
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 12px;
+  color: var(--cs-text-main);
+  width: 100px;
+}
+
+.search-input::placeholder {
+  color: rgba(34, 34, 34, 0.5);
+}
+
+/* NOTIFICATION BELL */
+.notification-bell {
+  width: 29px;
+  height: 29px;
+  border-radius: var(--cs-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #888;
+  font-size: 15px;
+  border: 0.5px solid var(--cs-border);
+  background: var(--cs-bg-white);
+  position: relative;
+  margin-left: 6px;
+}
+
+.notification-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--cs-danger);
+  border-radius: 50%;
+  position: absolute;
+  top: 3px;
+  right: 3px;
+}
+
+@media (min-width: 769px) {
+  .mobile-menu-btn {
+    display: none;
+  }
+}
