@@ -88,3 +88,17 @@
   justify-content: center;
   font-weight: 600;
 }
+
+/* Card Variant (Dashboard) */
+.chat-li-card {
+  border: 1px solid #f3f4f6;
+  border-radius: 12px;
+  margin-bottom: 12px;
+  padding: 12px 16px;
+}
+
+.chat-li-card:last-child {
+  margin-bottom: 0;
+  border-bottom: 1px solid #f3f4f6; /* override default flat list last-child */
+}
+

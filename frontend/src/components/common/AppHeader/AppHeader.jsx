@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { IconMenu2, IconSearch, IconFilter, IconBell } from '@tabler/icons-react';
 import Avatar from '../Avatar';
+import NotificationPanel from './NotificationPanel';
 import './AppHeader.css';
 
 const AppHeader = ({
@@ -14,9 +15,13 @@ const AppHeader = ({
   setIsFilterModalOpen,
   avatarData,
   notificationCount,
+  notifications,
+  markAllAsRead,
   isAdminMode,
   onAvatarClick
 }) => {
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+
   return (
     <div className="topbar">
       <button 
@@ -63,10 +68,25 @@ const AppHeader = ({
           </div>
         )}
 
-        <div className="notification-bell">
+        <div 
+          className="notification-bell" 
+          onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+          style={{ cursor: 'pointer' }}
+        >
           <IconBell />
           {notificationCount > 0 && <div className="notification-dot"></div>}
         </div>
+
+        {isNotificationOpen && (
+          <NotificationPanel 
+            notifications={notifications || []} 
+            onClose={() => setIsNotificationOpen(false)}
+            onMarkAllRead={() => {
+              if (markAllAsRead) markAllAsRead();
+              setIsNotificationOpen(false);
+            }}
+          />
+        )}
 
         {avatarData && (
           <Avatar 

@@ -18,7 +18,7 @@ import {
 
 const AppLayout = () => {
   const { user, avBg, avCol, logout } = useAuth();
-  const { unreadMessagesCount, pendingRequestsCount } = useAppData();
+  const { unreadMessagesCount, pendingRequestsCount, notifications, markAllAsRead } = useAppData();
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
@@ -35,7 +35,7 @@ const AppLayout = () => {
     let config = { showSearch: true, chips: [], isAdvanced: false };
     
     if (path.includes('/app/dashboard')) {
-      config.showSearch = false;
+      config.showSearch = true;
     } else if (path.includes('/app/marketplace')) {
       config.isAdvanced = true;
     } else if (path.includes('/app/messages')) {
@@ -136,7 +136,9 @@ const AppLayout = () => {
           isAdvanced={isAdvanced}
           setIsFilterModalOpen={setIsFilterModalOpen}
           avatarData={profileData}
-          notificationCount={0}
+          notificationCount={notifications?.filter(n => n.unread).length || 0}
+          notifications={notifications}
+          markAllAsRead={markAllAsRead}
           isAdminMode={false}
           onAvatarClick={() => navigate('/app/profile')}
         />

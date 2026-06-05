@@ -13,6 +13,12 @@
   display: none;
 }
 
+.cat-filter-tabs.wrap {
+  flex-wrap: wrap;
+  overflow-x: visible;
+  padding-bottom: 0;
+}
+
 .cat-tab {
   padding: 6px 14px;
   border-radius: var(--cs-radius-lg);

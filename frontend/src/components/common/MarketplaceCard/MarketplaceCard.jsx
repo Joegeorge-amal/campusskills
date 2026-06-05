@@ -24,13 +24,15 @@ const MarketplaceCard = ({
     return 'c-mus'; // Default
   };
 
+  const isSwap = typeof price === 'string' && price.toLowerCase().includes('swap');
+
   return (
     <div className={`mc-card ${isSelected ? 'selected' : ''}`} onClick={onClick}>
       <div className="mc-header">
         <div className={`cpill ${getCategoryClass(category)}`}>
           {category}
         </div>
-        <div className="mc-price">
+        <div className="mc-price" style={{ color: isSwap ? '#534AB7' : '#0F6E56' }}>
           {price}
         </div>
       </div>
@@ -50,7 +52,7 @@ const MarketplaceCard = ({
           <span className="mc-sessions-text">&middot; {sessionsCount} sessions</span>
         </div>
         <div className="mc-mode">
-          <span className="mc-dot">&bull;</span> {mode}
+          <span className={`mc-dot ${mode.toLowerCase().includes('online') ? 'online' : 'offline'}`}></span> {mode}
         </div>
       </div>
     </div>

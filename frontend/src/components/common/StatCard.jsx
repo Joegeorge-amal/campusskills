@@ -9,10 +9,11 @@ const StatCard = ({
   label,
   subText = null,
   subColor = '#0F6E56',
-  subIcon = null
+  subIcon = null,
+  variant = 'default'
 }) => {
   return (
-    <div className="scard">
+    <div className={`scard scard-${variant}`}>
       <div 
         className="scard-icon-wrapper"
         style={{

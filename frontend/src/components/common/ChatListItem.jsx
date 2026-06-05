@@ -10,10 +10,12 @@ const ChatListItem = ({
   time,
   unreadCount,
   isActive,
+  variant = 'default',
   onClick
 }) => {
+  const className = `chat-li ${isActive ? 'active' : ''} chat-li-${variant}`;
   return (
-    <div className={`chat-li ${isActive ? 'active' : ''}`} onClick={onClick}>
+    <div className={className} onClick={onClick}>
       <div className="chat-li-avatar-wrapper">
         <Avatar {...avatarProps} />
         {isOnline && <div className="chat-li-dot-on"></div>}

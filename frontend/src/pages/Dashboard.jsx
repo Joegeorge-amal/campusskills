@@ -6,6 +6,7 @@ import CreateSessionModal from '../components/modals/CreateSessionModal';
 import StatCard from '../components/common/StatCard';
 import SessionCard from '../components/common/SessionCard';
 import ChatListItem from '../components/common/ChatListItem';
+import SessionRequestPopup from '../components/common/SessionRequestPopup';
 import { IconStar, IconSparkles, IconCheck, IconCurrencyRupee, IconArrowUpRight } from '@tabler/icons-react';
 
 const Dashboard = () => {
@@ -13,6 +14,9 @@ const Dashboard = () => {
   const { 
     bookedSessions, 
     conversations, 
+    requests,
+    acceptRequest,
+    declineRequest
   } = useAppData();
   const [isCreateSessionOpen, setIsCreateSessionOpen] = useState(false);
   const navigate = useNavigate();
@@ -21,8 +25,8 @@ const Dashboard = () => {
   const stats = {
     trustScore: user?.trustScore || '4.8',
     skillsOffered: user?.skillsOffered?.length || 2,
-    sessionsDone: 14,
-    swapsDone: 8
+    sessionsDone: 11,
+    swapsDone: 3
   };
   const walletBalance = user?.walletBalance || 840;
 
@@ -32,27 +36,41 @@ const Dashboard = () => {
   // Get recent chats (limit to 3)
   const recentChats = conversations.slice(0, 3);
 
+  // Filter for real incoming pending requests
+  const pendingRequests = requests.filter(r => r.direction === 'incoming' && r.status === 'pending');
+  const activeRequest = pendingRequests.length > 0 ? pendingRequests[0] : null;
+
   if (!user) return null;
 
   return (
-    <div id="home" className="pg on" style={{ padding: '24px', background: 'var(--cs-bg-light)', minHeight: '100vh' }}>
+    <div id="home" className="pg on" style={{ padding: '24px', background: '#f9fafb', minHeight: '100vh', position: 'relative' }}>
+      
+      {activeRequest && (
+        <SessionRequestPopup 
+          request={activeRequest}
+          remainingCount={pendingRequests.length - 1}
+          onAccept={() => acceptRequest(activeRequest.id)} 
+          onDecline={() => declineRequest(activeRequest.id)}
+        />
+      )}
+
       {/* Welcome Banner */}
-      <div style={{ background: 'var(--cs-primary-gradient)', borderRadius: 'var(--cs-radius-lg)', padding: '24px', marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ background: '#3b368c', borderRadius: '16px', padding: '32px', marginBottom: '24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div>
-          <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.8)', marginBottom: '4px' }}>Welcome back</div>
-          <div style={{ fontSize: '24px', fontWeight: 600, color: '#fff' }}>{user?.name || 'Demo User'}</div>
-          <div style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.8)', marginTop: '4px' }}>{user?.meta || 'Student'}</div>
+          <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.7)', marginBottom: '8px' }}>Welcome back</div>
+          <div style={{ fontSize: '28px', fontWeight: 600, color: '#fff', marginBottom: '8px', letterSpacing: '-0.5px' }}>{user?.name || 'Arjun Kumar'}</div>
+          <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.7)' }}>{user?.meta || '3rd year · CSE · PESU Bengaluru'}</div>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '16px' }}>
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: '28px', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ fontSize: '28px', fontWeight: 600, color: '#fff', display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'flex-end' }}>
               {stats.trustScore} <IconStar size={20} color="#F0C040" fill="#F0C040" />
             </div>
-            <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.8)' }}>Trust score · Top 10%</div>
+            <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.7)', marginTop: '4px' }}>Trust score · Top 10%</div>
           </div>
           <button 
             onClick={() => setIsCreateSessionOpen(true)} 
-            style={{ fontSize: '14px', padding: '10px 20px', borderRadius: 'var(--cs-radius-md)', border: 'none', background: 'var(--cs-bg-white)', color: 'var(--cs-primary-dark)', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap' }}
+            style={{ fontSize: '14px', padding: '10px 24px', borderRadius: '100px', border: 'none', background: '#ffffff', color: '#3b368c', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}
           >
             Create Session
           </button>
@@ -62,42 +80,47 @@ const Dashboard = () => {
       {/* Stats Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '16px', marginBottom: '24px' }}>
         <StatCard 
+          variant="dashboard"
           icon={<IconSparkles size={16} />}
-          iconBg="var(--cs-primary-light)"
-          iconColor="var(--cs-primary)"
+          iconBg="#f5f3ff"
+          iconColor="#6d28d9"
           value={stats.skillsOffered}
           label="Skills offered"
           subText="Active"
           subIcon={<IconArrowUpRight size={12} />}
-          subColor="#0F6E56"
+          subColor="#059669"
         />
         <StatCard 
+          variant="dashboard"
           icon={<IconCheck size={16} />}
-          iconBg="#E1F5EE"
-          iconColor="#0F6E56"
+          iconBg="#dcfce7"
+          iconColor="#16a34a"
           value={stats.sessionsDone}
           label="Sessions done"
           subText="+2 this week"
           subIcon={<IconArrowUpRight size={12} />}
-          subColor="#0F6E56"
+          subColor="#059669"
         />
         <StatCard 
-          icon={<IconStar size={16} fill="#854F0B" />}
-          iconBg="#FAEEDA"
-          iconColor="#854F0B"
+          variant="dashboard"
+          icon={<IconStar size={16} strokeWidth={2} />}
+          iconBg="#ffedd5"
+          iconColor="#ea580c"
           value={stats.trustScore}
           label="Trust score"
           subText="Top 10%"
-          subColor="#0F6E56"
+          subIcon={<IconArrowUpRight size={12} />}
+          subColor="#059669"
         />
         <StatCard 
+          variant="dashboard"
           icon={<IconCurrencyRupee size={16} />}
-          iconBg="#E1F5EE"
-          iconColor="#0F6E56"
+          iconBg="#d1fae5"
+          iconColor="#059669"
           value={`₹${walletBalance}`}
           label="Wallet balance"
           subText={`${stats.swapsDone} swaps done`}
-          subColor="var(--cs-primary)"
+          subColor="#4f46e5"
         />
       </div>
 
@@ -105,14 +128,15 @@ const Dashboard = () => {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
         
         {/* Upcoming Sessions Card */}
-        <div style={{ background: 'var(--cs-bg-white)', borderRadius: 'var(--cs-radius-lg)', padding: '20px', border: '0.5px solid var(--cs-border)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <span style={{ fontSize: '16px', fontWeight: 600, color: 'var(--cs-text-main)' }}>Upcoming sessions</span>
-            <button onClick={() => navigate('/app/sessions')} style={{ fontSize: '13px', color: 'var(--cs-primary)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 500 }}>See all</button>
+        <div style={{ background: '#ffffff', borderRadius: '16px', padding: '24px', border: '1px solid #f3f4f6' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <span style={{ fontSize: '18px', fontWeight: 600, color: '#111827' }}>Upcoming sessions</span>
+            <button onClick={() => navigate('/app/sessions')} style={{ fontSize: '14px', color: '#4f46e5', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>See all</button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {upcomingSessions.length > 0 ? upcomingSessions.map((session, i) => (
               <SessionCard
+                variant="dashboard"
                 key={session.id || i}
                 date={session.date || '--'}
                 month={session.month || ''}
@@ -121,27 +145,28 @@ const Dashboard = () => {
                 status={session.status === 'soon' ? 'soon' : 'upcoming'}
                 actions={
                   session.status === 'soon' ? (
-                    <button style={{ fontSize: '11px', padding: '6px 12px', borderRadius: 'var(--cs-radius-sm)', border: '0.5px solid var(--cs-border)', background: 'var(--cs-bg-light)', color: 'var(--cs-text-inactive)', fontWeight: 500 }} disabled>Soon</button>
+                    <button style={{ fontSize: '12px', padding: '8px 16px', borderRadius: '8px', border: '1px solid #e5e7eb', background: '#ffffff', color: '#6b7280', fontWeight: 600 }} disabled>Soon</button>
                   ) : (
-                    <button style={{ fontSize: '12px', padding: '6px 14px', borderRadius: 'var(--cs-radius-sm)', border: 'none', background: 'var(--cs-primary)', color: 'var(--cs-bg-white)', cursor: 'pointer', fontWeight: 600 }} onClick={() => console.log('Join session', session.id)}>Join</button>
+                    <button style={{ fontSize: '12px', padding: '8px 16px', borderRadius: '8px', border: 'none', background: '#4f46e5', color: '#ffffff', cursor: 'pointer', fontWeight: 600 }} onClick={() => console.log('Join session', session.id)}>Join</button>
                   )
                 }
               />
             )) : (
-              <div style={{ fontSize: '13px', color: 'var(--cs-text-inactive)', padding: '20px 0', textAlign: 'center' }}>No upcoming sessions.</div>
+              <div style={{ fontSize: '13px', color: '#9ca3af', padding: '20px 0', textAlign: 'center' }}>No upcoming sessions.</div>
             )}
           </div>
         </div>
 
         {/* Recent Messages Card */}
-        <div style={{ background: 'var(--cs-bg-white)', borderRadius: 'var(--cs-radius-lg)', padding: '20px', border: '0.5px solid var(--cs-border)' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <span style={{ fontSize: '16px', fontWeight: 600, color: 'var(--cs-text-main)' }}>Recent messages</span>
-            <button onClick={() => navigate('/app/messages')} style={{ fontSize: '13px', color: 'var(--cs-primary)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 500 }}>Open</button>
+        <div style={{ background: '#ffffff', borderRadius: '16px', padding: '24px', border: '1px solid #f3f4f6' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <span style={{ fontSize: '18px', fontWeight: 600, color: '#111827' }}>Recent messages</span>
+            <button onClick={() => navigate('/app/messages')} style={{ fontSize: '14px', color: '#4f46e5', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600 }}>Open</button>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {recentChats.map(chat => (
               <ChatListItem
+                variant="card"
                 key={chat.id}
                 avatarProps={{ initials: chat.init || 'U', bg: chat.bg, color: chat.col, size: '40px', fontSize: '14px' }}
                 isOnline={chat.online}
@@ -153,7 +178,7 @@ const Dashboard = () => {
               />
             ))}
             {recentChats.length === 0 && (
-              <div style={{ fontSize: '13px', color: 'var(--cs-text-inactive)', padding: '20px 0', textAlign: 'center' }}>No recent messages.</div>
+              <div style={{ fontSize: '13px', color: '#9ca3af', padding: '20px 0', textAlign: 'center' }}>No recent messages.</div>
             )}
           </div>
         </div>
