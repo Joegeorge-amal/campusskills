@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Avatar from '../Avatar';
+import logo from '../../../assets/kju_campus_logo.png';
 import './Sidebar.css';
 
 const Sidebar = ({ 
@@ -28,7 +29,7 @@ const Sidebar = ({
       {/* SIDEBAR NAVIGATION */}
       <div className={`sb ${isMobileMenuOpen ? 'open' : ''}`}>
         <div className="sb-logo">
-          <div className="mark">{brandIcon}</div>
+          <img src={logo} alt="Campus Logo" style={{ width: '28px', height: '28px', objectFit: 'contain', borderRadius: '4px' }} />
           <div className="wordmark">{brandText}<span>{brandSpan}</span></div>
         </div>
         

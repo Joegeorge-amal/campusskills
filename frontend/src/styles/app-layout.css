@@ -4,7 +4,8 @@
   display: flex;
   background: #F0EFF8;
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
   margin: 0;
 }
 
@@ -204,6 +205,8 @@
   min-width: 0;
   width: 100%;
   background: #fff;
+  height: 100vh;
+  overflow-y: auto;
 }
 
 /* ─── TOPBAR ─── */
