@@ -9,8 +9,8 @@ public class SessionHandler {
 
     private final SessionService sessionService;
 
-    public SessionHandler() {
-        this.sessionService = new SessionService();
+    public SessionHandler(io.vertx.core.eventbus.EventBus eventBus) {
+        this.sessionService = new SessionService(eventBus);
     }
 
     public void getSessionsForAuthUser(RoutingContext ctx) {

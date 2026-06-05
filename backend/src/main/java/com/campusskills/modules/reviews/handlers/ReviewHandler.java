@@ -65,4 +65,69 @@ public class ReviewHandler {
             .onSuccess(json -> ApiResponse.ok(ctx, json))
             .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
     }
+
+    public void updateReview(RoutingContext ctx) {
+        String reviewId = ctx.pathParam("id");
+        if (reviewId == null || reviewId.trim().isEmpty()) {
+            ApiResponse.badRequest(ctx, "id is required");
+            return;
+        }
+
+        String authId = ctx.get("authenticatedUserId");
+        if (authId == null) {
+            ApiResponse.forbidden(ctx, "Unauthorized");
+            return;
+        }
+
+        try {
+            JsonObject body = ctx.body().asJsonObject();
+            Double rating = body.getDouble("rating");
+            String comment = body.getString("comment");
+
+            reviewService.updateReview(reviewId, authId, rating, comment)
+                .onSuccess(success -> ApiResponse.ok(ctx, new JsonObject().put("message", "Review updated successfully")))
+                .onFailure(err -> {
+                    String msg = err.getMessage();
+                    if (msg.startsWith("FORBIDDEN") || msg.startsWith("UNAUTHORIZED")) {
+                        ApiResponse.forbidden(ctx, msg);
+                    } else if (msg.startsWith("NOT_FOUND")) {
+                        ApiResponse.notFound(ctx, msg);
+                    } else {
+                        ApiResponse.badRequest(ctx, msg);
+                    }
+                });
+        } catch (Exception e) {
+            ApiResponse.badRequest(ctx, "Invalid JSON format");
+        }
+    }
+
+    public void deleteReview(RoutingContext ctx) {
+        String reviewId = ctx.pathParam("id");
+        if (reviewId == null || reviewId.trim().isEmpty()) {
+            ApiResponse.badRequest(ctx, "id is required");
+            return;
+        }
+
+        String authId = ctx.get("authenticatedUserId");
+        if (authId == null) {
+            ApiResponse.forbidden(ctx, "Unauthorized");
+            return;
+        }
+
+        String role = ctx.get("authenticatedUserRole");
+        boolean isAdmin = "ADMIN".equals(role);
+
+        reviewService.deleteReview(reviewId, authId, isAdmin)
+            .onSuccess(success -> ApiResponse.ok(ctx, new JsonObject().put("message", "Review deleted successfully")))
+            .onFailure(err -> {
+                String msg = err.getMessage();
+                if (msg.startsWith("FORBIDDEN") || msg.startsWith("UNAUTHORIZED")) {
+                    ApiResponse.forbidden(ctx, msg);
+                } else if (msg.startsWith("NOT_FOUND")) {
+                    ApiResponse.notFound(ctx, msg);
+                } else {
+                    ApiResponse.badRequest(ctx, msg);
+                }
+            });
+    }
 }

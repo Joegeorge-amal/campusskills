@@ -16,6 +16,7 @@ public class Review {
     private Double rating;
     private String comment;
     private Long createdAt;
+    private Long editedAt;
 
     public Review() {}
 
@@ -39,4 +40,7 @@ public class Review {
 
     public Long getCreatedAt() { return createdAt; }
     public void setCreatedAt(Long createdAt) { this.createdAt = createdAt; }
+
+    public Long getEditedAt() { return editedAt; }
+    public void setEditedAt(Long editedAt) { this.editedAt = editedAt; }
 }

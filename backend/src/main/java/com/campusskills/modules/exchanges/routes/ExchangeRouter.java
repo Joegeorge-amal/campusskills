@@ -7,7 +7,7 @@ import io.vertx.ext.web.Router;
 public class ExchangeRouter {
 
     public static Router create(Vertx vertx) {
-        ExchangeHandler handler = new ExchangeHandler();
+        ExchangeHandler handler = new ExchangeHandler(vertx.eventBus());
         Router router = Router.router(vertx);
 
         router.post("/").handler(handler::createExchange);

@@ -71,4 +71,32 @@ public class ReviewRepository {
         return client.findWithOptions(COLLECTION, query, options)
                 .map(list -> list.stream().map(json -> json.mapTo(Review.class)).collect(Collectors.toList()));
     }
+
+    public Future<Review> findById(String id) {
+        return client.findOne(COLLECTION, new JsonObject().put("_id", id), null).map(doc -> {
+            if (doc == null) return null;
+            return doc.mapTo(Review.class);
+        });
+    }
+
+    public Future<Boolean> updateReview(String id, Double rating, String comment) {
+        JsonObject query = new JsonObject().put("_id", id);
+        JsonObject updateDoc = new JsonObject()
+            .put("rating", rating)
+            .put("editedAt", System.currentTimeMillis());
+            
+        if (comment != null && !comment.trim().isEmpty()) {
+            updateDoc.put("comment", comment.trim());
+        } else {
+            updateDoc.put("comment", ""); // allow clearing the comment
+        }
+            
+        JsonObject update = new JsonObject().put("$set", updateDoc);
+        return client.updateCollection(COLLECTION, query, update).map(res -> res.getDocModified() > 0);
+    }
+
+    public Future<Boolean> deleteReview(String id) {
+        JsonObject query = new JsonObject().put("_id", id);
+        return client.removeDocument(COLLECTION, query).map(res -> res.getRemovedCount() > 0);
+    }
 }

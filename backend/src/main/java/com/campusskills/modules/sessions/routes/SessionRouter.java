@@ -8,7 +8,7 @@ import io.vertx.ext.web.handler.BodyHandler;
 public class SessionRouter {
 
     public static Router create(Vertx vertx) {
-        SessionHandler handler = new SessionHandler();
+        SessionHandler handler = new SessionHandler(vertx.eventBus());
         Router router = Router.router(vertx);
 
         router.route().handler(BodyHandler.create());

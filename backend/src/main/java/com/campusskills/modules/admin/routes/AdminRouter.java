@@ -14,7 +14,8 @@ public class AdminRouter {
         Router router = Router.router(vertx);
         
         AdminRepository repository = new AdminRepository();
-        AdminService service = new AdminService(repository);
+        com.campusskills.modules.sessions.repositories.SessionRepository sessionRepository = new com.campusskills.modules.sessions.repositories.SessionRepository();
+        AdminService service = new AdminService(repository, sessionRepository, vertx.eventBus());
         AdminHandler handler = new AdminHandler(service);
 
         router.route().handler(JwtAuthMiddleware.create(jwtAuth));
