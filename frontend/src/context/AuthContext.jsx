@@ -38,34 +38,42 @@ export const AuthProvider = ({ children }) => {
     }
   }, [isAuthenticated]);
 
-  const login = async (email, password) => {
+  const login = async (email, password, requestedRole = 'student') => {
     try {
       if (!email || !password) {
         throw new Error('Please enter both email and password.');
       }
 
-      const response = await authService.login(email, password);
-      const data = response.data || response;
-      const { token, refreshToken, user: userData } = data;
+      // MOCK LOGIN FOR TESTING
+      console.log('Mocking login for testing. Bypassing backend.');
+      
+      const mockRole = requestedRole;
 
-      if (!token) throw new Error('Invalid response from server');
+      const userData = {
+        id: 'mock-id-123',
+        name: mockRole === 'admin' ? 'Admin User' : 'Student User',
+        email: email,
+        role: mockRole,
+        meta: mockRole === 'admin' ? 'Admin Access' : '3rd yr CSE'
+      };
+      
+      const token = 'mock-token-abc';
+      const refreshToken = 'mock-refresh-xyz';
 
       setUser(userData);
-      setRole(userData.role?.toLowerCase() || 'student');
+      setRole(mockRole);
       setIsAuthenticated(true);
       
       localStorage.setItem('cs_user', JSON.stringify(userData));
-      localStorage.setItem('cs_role', userData.role?.toLowerCase() || 'student');
+      localStorage.setItem('cs_role', mockRole);
       localStorage.setItem('cs_token', token);
-      if (refreshToken) {
-        localStorage.setItem('cs_refresh_token', refreshToken);
-      }
+      localStorage.setItem('cs_refresh_token', refreshToken);
       localStorage.setItem('cs_av_bg', avBg);
       localStorage.setItem('cs_av_col', avCol);
       
       return true;
     } catch (error) {
-      const msg = error.response?.data?.error || error.response?.data?.message || error.message || 'Login failed';
+      const msg = error.message || 'Login failed';
       throw new Error(msg);
     }
   };

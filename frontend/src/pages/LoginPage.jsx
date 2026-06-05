@@ -27,7 +27,7 @@ const LoginPage = () => {
         throw new Error('Please enter both email and password.');
       }
 
-      await login(email, password);
+      await login(email, password, tab);
 
       const savedRole = localStorage.getItem('cs_role');
       if (savedRole === 'admin') {
