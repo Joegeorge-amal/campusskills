@@ -7,6 +7,7 @@ import heroImage from '../../../docs/assets/kju_campus_hero_image.jpeg';
 import './LandingPage.css';
 
 const LandingPage = () => {
+
   const containerVariants = {
     hidden: { opacity: 0 },
     show: {
@@ -394,9 +395,6 @@ const LandingPage = () => {
         <motion.h2 variants={itemVariants}>Ready to learn<br/>from your campus?</motion.h2>
         <motion.p variants={itemVariants}>Your seniors know things you don't yet. Your juniors are<br/>hungry to learn what you have. CampusSkills brings<br/>them all together.</motion.p>
         <motion.div variants={itemVariants} style={{ marginTop: '2.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
-          <Link to="/login" className="btn-signin btn-bottom-cta" style={{ padding: '12px 32px', fontSize: '1.125rem' }}>
-            Join CampusSkills
-          </Link>
           <button 
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} 
             style={{ background: 'none', border: 'none', color: '#6b7280', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.5rem' }}

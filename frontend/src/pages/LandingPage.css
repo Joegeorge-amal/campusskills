@@ -1,8 +1,16 @@
+html {
+  scroll-behavior: smooth;
+}
+
 .landing-page {
   font-family: 'Inter', sans-serif;
   color: #1a1a1a;
   background-color: #fafafa;
   overflow-x: clip;
+}
+
+.section {
+  scroll-margin-top: 60px;
 }
 
 /* ==================

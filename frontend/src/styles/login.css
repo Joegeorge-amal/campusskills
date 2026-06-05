@@ -42,7 +42,7 @@
 .auth-card {
   width: 100%;
   border-radius: 16px;
-  padding: 36px 48px;
+  padding: 32px 40px;
   background: #ffffff;
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15), 0 12px 24px rgba(0, 0, 0, 0.1);
   z-index: 2;
@@ -56,14 +56,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
 }
 
 .login-logo-group {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
 }
 
 .login-mark {
@@ -125,7 +125,7 @@
 .login-type-selector {
   display: flex;
   gap: 16px;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 .type-card {
@@ -134,7 +134,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 16px 24px;
+  padding: 14px 20px;
   border-radius: 12px;
   border: 1px solid #e5e7eb;
   background: #ffffff;
@@ -197,7 +197,7 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .lbl {
@@ -240,7 +240,7 @@
 
 .linp {
   width: 100%;
-  padding: 14px 16px;
+  padding: 12px 16px;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   font-size: 0.95rem;
@@ -265,6 +265,12 @@
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
+/* Hide native Edge password reveal eye to prevent duplicate icons */
+.linp::-ms-reveal,
+.linp::-ms-clear {
+  display: none;
+}
+
 .forgot-pwd-container {
   display: flex;
   justify-content: flex-end;
@@ -286,7 +292,7 @@
 /* ─── BUTTONS ─── */
 .lbtn {
   width: 100%;
-  padding: 14px;
+  padding: 12px;
   background: #5b52c0;
   color: #fff;
   border: none;

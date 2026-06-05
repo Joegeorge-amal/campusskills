@@ -45,7 +45,7 @@ const LoginPage = () => {
 
 
   return (
-    <div className="auth-page" style={{ minHeight: '100vh', width: '100%' }}>
+    <div className="auth-page" style={{ height: '100vh', width: '100%', display: 'flex', flexDirection: 'column', position: 'relative', padding: '16px', boxSizing: 'border-box', overflow: 'hidden' }}>
       <Link to="/" className="auth-back-link" style={{ position: 'absolute', top: '32px', left: '32px' }}>
         <IconArrowLeft size={18} />
         Back
@@ -54,11 +54,7 @@ const LoginPage = () => {
       <div className="auth-container" style={{ 
         width: '100%', 
         maxWidth: '520px', 
-        position: 'absolute', 
-        top: '50%', 
-        left: '50%', 
-        transform: 'translate(-50%, -50%)',
-        padding: '16px',
+        margin: 'auto',
         boxSizing: 'border-box'
       }}>
         <div className="auth-card fade-in">
