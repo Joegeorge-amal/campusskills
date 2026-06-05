@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAppData } from '../context/AppDataContext';
-import RequestCard from '../components/common/RequestCard';
+import RequestsCardV2 from '../components/common/RequestsCardV2';
 
 const Requests = () => {
   const { requests, acceptRequest, declineRequest } = useAppData();
@@ -9,17 +9,37 @@ const Requests = () => {
   const outgoingRequests = requests.filter(r => r.direction === 'outgoing');
 
   return (
-    <div id="requests" className="pg on" style={{ padding: '24px', background: 'var(--cs-bg-light)', minHeight: '100vh', maxWidth: '800px', margin: '0 auto' }}>
+    <div id="requests" className="pg on" style={{ padding: '24px', background: '#f9fafb', minHeight: '100vh', maxWidth: '800px', margin: '0 auto' }}>
       
       <div style={{ marginBottom: '32px' }}>
-        <div style={{ fontSize: '18px', fontWeight: 600, color: 'var(--cs-text-main)', marginBottom: '16px' }}>Incoming requests</div>
-        <div style={{ fontSize: '13px', color: 'var(--cs-text-secondary)', marginBottom: '16px' }}>
-          {incomingRequests.length} pending request{incomingRequests.length !== 1 ? 's' : ''}
-        </div>
+        <div style={{ fontSize: '12px', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '16px' }}>Sent by you</div>
         
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {outgoingRequests.map(req => (
+            <RequestsCardV2
+              key={req.id}
+              avatarProps={{ initials: req.init, bg: req.bg, color: req.col, size: '40px', fontSize: '14px' }}
+              title={req.title}
+              subtitle={req.sub}
+              status={req.status}
+              type="outgoing"
+            />
+          ))}
+
+          {outgoingRequests.length === 0 && (
+            <div style={{ fontSize: '13px', color: '#9ca3af', padding: '32px 0', textAlign: 'center', background: '#ffffff', borderRadius: '12px', border: '1px dashed #e5e7eb' }}>
+              You haven't sent any requests yet.
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div>
+        <div style={{ fontSize: '12px', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '16px' }}>Incoming requests</div>
+        
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
           {incomingRequests.map(req => (
-            <RequestCard
+            <RequestsCardV2
               key={req.id}
               avatarProps={{ initials: req.init, bg: req.bg, color: req.col, size: '40px', fontSize: '14px' }}
               title={req.title}
@@ -34,37 +54,13 @@ const Requests = () => {
           ))}
           
           {incomingRequests.length === 0 && (
-            <div style={{ fontSize: '13px', color: 'var(--cs-text-inactive)', padding: '32px 0', textAlign: 'center', background: 'var(--cs-bg-white)', borderRadius: 'var(--cs-radius-lg)', border: '0.5px dashed var(--cs-border)' }}>
+            <div style={{ fontSize: '13px', color: '#9ca3af', padding: '32px 0', textAlign: 'center', background: '#ffffff', borderRadius: '12px', border: '1px dashed #e5e7eb' }}>
               No incoming requests right now.
             </div>
           )}
         </div>
       </div>
 
-      <div style={{ height: '1px', background: 'var(--cs-border)', margin: '32px 0' }}></div>
-
-      <div>
-        <div style={{ fontSize: '18px', fontWeight: 600, color: 'var(--cs-text-main)', marginBottom: '16px' }}>Sent requests</div>
-        
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-          {outgoingRequests.map(req => (
-            <RequestCard
-              key={req.id}
-              avatarProps={{ initials: req.init, bg: req.bg, color: req.col, size: '40px', fontSize: '14px' }}
-              title={req.title}
-              subtitle={req.sub}
-              status={req.status}
-              type="outgoing"
-            />
-          ))}
-
-          {outgoingRequests.length === 0 && (
-            <div style={{ fontSize: '13px', color: 'var(--cs-text-inactive)', padding: '32px 0', textAlign: 'center', background: 'var(--cs-bg-white)', borderRadius: 'var(--cs-radius-lg)', border: '0.5px dashed var(--cs-border)' }}>
-              You haven't sent any requests yet.
-            </div>
-          )}
-        </div>
-      </div>
     </div>
   );
 };

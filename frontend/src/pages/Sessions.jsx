@@ -1,7 +1,8 @@
 import React from 'react';
 import { useAppData } from '../context/AppDataContext';
-import SessionCard from '../components/common/SessionCard';
-
+import SessionCard from '../components/common/SessionCard'; // Kept just in case, but unused
+import SessionsCardV2 from '../components/common/SessionsCardV2';
+import ReportSessionModal from '../components/modals/ReportSessionModal';
 const Sessions = () => {
   const { bookedSessions, triggerToast } = useAppData();
 
@@ -24,15 +25,16 @@ const Sessions = () => {
   };
 
   // Pre-defined generic button styles
-  const btnJoin = { fontSize: '12px', padding: '6px 14px', borderRadius: 'var(--cs-radius-sm)', border: 'none', background: 'var(--cs-primary)', color: 'var(--cs-bg-white)', cursor: 'pointer', fontWeight: 600 };
-  const btnSoon = { fontSize: '11px', padding: '6px 12px', borderRadius: 'var(--cs-radius-sm)', border: '0.5px solid var(--cs-border)', background: 'var(--cs-bg-light)', color: 'var(--cs-text-inactive)', fontWeight: 500 };
-  const btnSwap = { fontSize: '12px', padding: '6px 14px', borderRadius: 'var(--cs-radius-sm)', border: 'none', background: 'var(--cs-primary-light)', color: 'var(--cs-primary-dark)', cursor: 'pointer', fontWeight: 600 };
-  const btnRate = { fontSize: '12px', padding: '6px 14px', borderRadius: 'var(--cs-radius-sm)', border: '0.5px solid var(--cs-border)', background: 'var(--cs-bg-white)', color: 'var(--cs-primary)', cursor: 'pointer', fontWeight: 500 };
-  const btnReviewed = { fontSize: '12px', padding: '6px 14px', borderRadius: 'var(--cs-radius-sm)', border: '0.5px solid var(--cs-border)', background: 'var(--cs-bg-light)', color: 'var(--cs-text-inactive)', fontWeight: 500 };
-  const btnReport = { fontSize: '12px', padding: '6px 14px', borderRadius: 'var(--cs-radius-sm)', border: '0.5px solid #FAECE7', background: '#FAECE7', color: '#993C1D', cursor: 'pointer', fontWeight: 500 };
+  const btnJoin = { fontSize: '13px', padding: '8px 16px', borderRadius: '24px', border: 'none', background: '#534AB7', color: '#ffffff', cursor: 'pointer', fontWeight: 600 };
+  const btnSoon = { fontSize: '13px', padding: '8px 16px', borderRadius: '24px', border: '1px solid #e5e7eb', background: '#f3f4f6', color: '#9ca3af', fontWeight: 500 };
+  const btnSwap = { fontSize: '13px', padding: '8px 16px', borderRadius: '24px', border: 'none', background: '#f5f4ff', color: '#534AB7', cursor: 'pointer', fontWeight: 600 };
+  const btnRate = { fontSize: '13px', padding: '8px 16px', borderRadius: '24px', border: '1px solid #e5e7eb', background: '#ffffff', color: '#534AB7', cursor: 'pointer', fontWeight: 500 };
+  const btnReviewed = { fontSize: '13px', padding: '8px 16px', borderRadius: '24px', border: '1px solid #e5e7eb', background: '#f9fafb', color: '#9ca3af', fontWeight: 500 };
+  const btnReport = { fontSize: '13px', padding: '8px 16px', borderRadius: '24px', border: 'none', background: '#ffedd5', color: '#ea580c', cursor: 'pointer', fontWeight: 500 };
 
   return (
     <div id="sessions" className="pg on" style={{ padding: 0, overflow: 'hidden' }}>
+      <ReportSessionModal />
       <div style={{ display: 'flex', height: '100%', minHeight: '560px' }}>
 
         {/* LEFT: All college sessions */}
@@ -49,35 +51,35 @@ const Sessions = () => {
           
           <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-inactive)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>Today · 26 May</div>
           
-          <SessionCard
+          <SessionsCardV2
             date="26" month="MAY"
             title="React.js · Priya S." subtitle="4:00 PM · Online · ₹300/hr"
             actions={<button style={btnJoin} onClick={() => handleBook('Priya S.')}>Book</button>}
           />
-          <SessionCard
+          <SessionsCardV2
             date="26" month="MAY"
             title="Guitar basics · Sneha K." subtitle="6:00 PM · In-person · ₹150/hr"
             actions={<button style={btnJoin} onClick={() => handleBook('Sneha K.')}>Book</button>}
           />
           
-          <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-inactive)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: '24px 0 12px' }}>Upcoming · 27–31 May</div>
+          <div style={{ fontSize: '12px', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', margin: '24px 0 12px' }}>Upcoming · 27–31 May</div>
           
-          <SessionCard
+          <SessionsCardV2
             date="27" month="MAY"
             title="Figma UI · Rohan M." subtitle="3:00 PM · Online · ₹250/hr"
             actions={<button style={btnJoin} onClick={() => handleBook('Rohan M.')}>Book</button>}
           />
-          <SessionCard
+          <SessionsCardV2
             date="28" month="MAY"
             title="Linear Algebra · Vikram N." subtitle="5:00 PM · Either · ₹200/hr"
             actions={<button style={btnJoin} onClick={() => handleBook('Vikram N.')}>Book</button>}
           />
-          <SessionCard
+          <SessionsCardV2
             date="29" month="MAY"
             title="Japanese N5 · Aisha T." subtitle="4:30 PM · Online · Swap only"
             actions={<button style={btnSwap} onClick={() => handleSwap('Aisha T.', 'Japanese N5')}>Swap</button>}
           />
-          <SessionCard
+          <SessionsCardV2
             date="30" month="MAY"
             title="Python & Data · Dev R." subtitle="2:00 PM · Online · Swap only"
             actions={<button style={btnSwap} onClick={() => handleSwap('Dev R.', 'Python & Data Analysis')}>Swap</button>}
@@ -85,12 +87,12 @@ const Sessions = () => {
         </div>
 
         {/* RIGHT: My upcoming sessions only */}
-        <div style={{ width: '340px', flexShrink: 0, padding: '24px', overflowY: 'auto', background: 'var(--cs-bg-light)' }}>
+        <div style={{ width: '340px', flexShrink: 0, padding: '24px', overflowY: 'auto', background: '#f9fafb' }}>
           <div style={{ fontSize: '18px', fontWeight: 600, color: 'var(--cs-text-main)', marginBottom: '24px' }}>My Upcoming Sessions</div>
           <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-inactive)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>Booked</div>
           
           {bookedSessions.filter(s => s.status !== 'completed').map(session => (
-            <SessionCard
+            <SessionsCardV2
               key={session.id}
               date={session.date}
               month={session.month}
@@ -107,12 +109,12 @@ const Sessions = () => {
             />
           ))}
 
-          <div style={{ height: '1px', background: 'var(--cs-border)', margin: '24px 0' }}></div>
+          <div style={{ height: '1px', background: '#e5e7eb', margin: '24px 0' }}></div>
           
-          <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-inactive)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>Past sessions</div>
+          <div style={{ fontSize: '12px', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>Past sessions</div>
           
           {bookedSessions.filter(s => s.status === 'completed').map(session => (
-            <SessionCard
+            <SessionsCardV2
               key={session.id}
               date={session.date}
               month={session.month}

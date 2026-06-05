@@ -2,9 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppData } from '../context/AppDataContext';
 import { useAuth } from '../context/AuthContext';
-import StatCard from '../components/common/StatCard';
-import TransactionListItem from '../components/common/TransactionListItem';
-import { IconArrowDownRight, IconArrowUpRight } from '@tabler/icons-react';
+import WalletTransactionItem from '../components/common/WalletTransactionItem';
 
 const Wallet = () => {
   const { transactions } = useAppData();
@@ -30,13 +28,13 @@ const Wallet = () => {
         <div style={{ display: 'flex', gap: '12px' }}>
           <button 
             onClick={() => navigate('/app/add-money')} 
-            style={{ fontSize: '14px', padding: '10px 20px', borderRadius: 'var(--cs-radius-md)', border: 'none', cursor: 'pointer', fontWeight: 600, background: 'var(--cs-bg-white)', color: 'var(--cs-primary-dark)' }}
+            style={{ fontSize: '14px', padding: '10px 20px', borderRadius: '24px', border: 'none', cursor: 'pointer', fontWeight: 600, background: '#ffffff', color: '#534AB7' }}
           >
             + Add money
           </button>
           <button 
             onClick={() => navigate('/app/withdraw')} 
-            style={{ fontSize: '14px', padding: '10px 20px', borderRadius: 'var(--cs-radius-md)', border: 'none', cursor: 'pointer', fontWeight: 600, background: 'rgba(255, 255, 255, 0.2)', color: '#fff' }}
+            style={{ fontSize: '14px', padding: '10px 20px', borderRadius: '24px', border: 'none', cursor: 'pointer', fontWeight: 600, background: '#7065C7', color: '#ffffff' }}
           >
             Withdraw to bank
           </button>
@@ -45,29 +43,23 @@ const Wallet = () => {
 
       {/* Stats row */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '32px' }}>
-        <StatCard 
-          icon={<IconArrowDownRight size={16} />}
-          iconBg="#E1F5EE"
-          iconColor="#0F6E56"
-          value="₹1,200"
-          label="Earned this month"
-        />
-        <StatCard 
-          icon={<IconArrowUpRight size={16} />}
-          iconBg="#FAECE7"
-          iconColor="#993C1D"
-          value="₹360"
-          label="Spent this month"
-        />
+        <div style={{ background: '#ffffff', borderRadius: '12px', padding: '24px', border: '1px solid #e5e7eb' }}>
+          <div style={{ fontSize: '13px', color: '#9ca3af', marginBottom: '8px' }}>Earned this month</div>
+          <div style={{ fontSize: '24px', fontWeight: 600, color: '#059669' }}>₹1,200</div>
+        </div>
+        <div style={{ background: '#ffffff', borderRadius: '12px', padding: '24px', border: '1px solid #e5e7eb' }}>
+          <div style={{ fontSize: '13px', color: '#9ca3af', marginBottom: '8px' }}>Spent this month</div>
+          <div style={{ fontSize: '24px', fontWeight: 600, color: '#dc2626' }}>₹360</div>
+        </div>
       </div>
 
       {/* Transactions List */}
-      <div style={{ background: 'var(--cs-bg-white)', borderRadius: 'var(--cs-radius-lg)', padding: '24px', border: '0.5px solid var(--cs-border)' }}>
+      <div style={{ background: 'var(--cs-bg-white)', borderRadius: '12px', padding: '24px', border: '1px solid #e5e7eb' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-          <span style={{ fontSize: '16px', fontWeight: 600, color: 'var(--cs-text-main)' }}>Recent transactions</span>
+          <span style={{ fontSize: '16px', fontWeight: 600, color: '#111827' }}>Recent transactions</span>
           <button 
             onClick={() => navigate('/app/history')}
-            style={{ fontSize: '13px', color: 'var(--cs-primary)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 500 }}
+            style={{ fontSize: '14px', color: '#534AB7', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 500 }}
           >
             Full history
           </button>
@@ -75,7 +67,7 @@ const Wallet = () => {
 
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {recentTx.map(tx => (
-            <TransactionListItem
+            <WalletTransactionItem
               key={tx.id}
               type={tx.type}
               title={tx.title}

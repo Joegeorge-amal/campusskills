@@ -23,6 +23,7 @@ import SwapRequest from '../pages/SwapRequest';
 import AddBank from '../pages/AddBank';
 import Profile from '../pages/Profile';
 import EditProfile from '../pages/EditProfile';
+import BookSessionRequest from '../pages/BookSessionRequest';
 
 // Admin Pages
 import AdminOverview from '../pages/admin/AdminOverview';
@@ -81,6 +82,7 @@ const AppRoutes = () => {
         <Route path="add-bank" element={<AddBank />} />
         <Route path="profile" element={<Profile />} />
         <Route path="edit-profile" element={<EditProfile />} />
+        <Route path="book-request" element={<BookSessionRequest />} />
       </Route>
 
       {/* Admin Layout */}

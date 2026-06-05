@@ -19,9 +19,7 @@ const EditProfile = () => {
   const [avatarImg, setAvatarImg] = useState(user?.avatarImg || null);
   const fileInputRef = useRef(null);
   
-  const [teachSkills, setTeachSkills] = useState(user?.topicsOffered || []);
   const [learnSkills, setLearnSkills] = useState(user?.topicsWanted || []);
-  const [teachInp, setTeachInp] = useState('');
   const [learnInp, setLearnInp] = useState('');
 
   const [availability, setAvailability] = useState(['Weekday mornings', 'Weekend mornings', 'Weekends anytime']);
@@ -52,7 +50,7 @@ const EditProfile = () => {
         branch,
         bio,
         upi,
-        topicsOffered: teachSkills,
+        topicsOffered: user?.topicsOffered || [],
         topicsWanted: learnSkills,
         avatarImg
       });
@@ -82,13 +80,6 @@ const EditProfile = () => {
   const handleRemovePhoto = (e) => {
     e.stopPropagation();
     setAvatarImg(null);
-  };
-
-  const addTeach = () => {
-    if (teachInp && !teachSkills.includes(teachInp)) {
-      setTeachSkills([...teachSkills, teachInp]);
-      setTeachInp('');
-    }
   };
 
   const addLearn = () => {
@@ -188,20 +179,8 @@ const EditProfile = () => {
 
       {/* Skills */}
       <div style={{ background: 'var(--cs-bg-white)', border: '0.5px solid var(--cs-border)', borderRadius: 'var(--cs-radius-lg)', padding: '24px', marginBottom: '24px' }}>
-        <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--cs-text-main)', marginBottom: '24px' }}>Skills</div>
-        
-        <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--cs-text-inactive)', marginBottom: '12px' }}>Skills I can teach</div>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>
-          {teachSkills.map(s => (
-            <span key={s} style={{ fontSize: '13px', padding: '6px 12px', borderRadius: '20px', background: 'var(--cs-primary-light)', color: 'var(--cs-primary)', border: '1px solid var(--cs-primary-light)', display: 'flex', alignItems: 'center', gap: '6px', fontWeight: 500 }}>
-              {s} <button onClick={() => setTeachSkills(teachSkills.filter(ts => ts !== s))} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--cs-primary)', fontSize: '16px', lineHeight: 1, padding: 0 }}>&times;</button>
-            </span>
-          ))}
-        </div>
-        <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
-          <input type="text" placeholder="Add a skill you teach…" value={teachInp} onChange={e => setTeachInp(e.target.value)} onKeyPress={e => e.key === 'Enter' && addTeach()} style={inputStyle}/>
-          <button onClick={addTeach} style={{ padding: '0 20px', borderRadius: 'var(--cs-radius-md)', border: 'none', background: 'var(--cs-primary)', color: '#fff', fontSize: '14px', cursor: 'pointer', fontWeight: 600, whiteSpace: 'nowrap' }}>Add</button>
-        </div>
+        <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--cs-text-main)', marginBottom: '24px' }}>Learning Interests</div>
+
         
         <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--cs-text-inactive)', marginBottom: '12px' }}>Skills I want to learn</div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '12px' }}>

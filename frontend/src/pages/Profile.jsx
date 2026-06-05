@@ -1,193 +1,246 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useAppData } from '../context/AppDataContext';
 import Avatar from '../components/common/Avatar';
-import StatCard from '../components/common/StatCard';
-import { IconStar, IconBuildingBank, IconQrcode, IconArrowDownRight, IconArrowUpRight, IconArrowsExchange } from '@tabler/icons-react';
+import { IconCircleCheckFilled, IconEdit, IconPlayerPlayFilled, IconRefresh } from '@tabler/icons-react';
+import SkillQuizModal from '../components/modals/SkillQuizModal';
 
 const Profile = () => {
-  const { user, avBg, avCol } = useAuth();
+  const { user, avBg, avCol, updateProfile } = useAuth();
   const { triggerToast } = useAppData();
   const navigate = useNavigate();
 
+  const [activeTab, setActiveTab] = useState('verified');
+  const [newSkill, setNewSkill] = useState('');
+  const [activeQuizSkill, setActiveQuizSkill] = useState(null);
+
   if (!user) return null;
 
-  // Mock stats since they are not in AppDataContext
-  const stats = {
-    trustScore: user?.trustScore || '4.8',
-    swapsDone: 8
-  };
+  // Local mapping to avoid dirtying global state. 
+  // We treat the first skill in user.topicsOffered as verified, rest as pending for demo purposes.
+  const [verifiedMap, setVerifiedMap] = useState({
+    'React.js': { confidence: 90, domain: 'Frontend' },
+    'Figma UI': { confidence: 85, domain: 'Design' }
+  });
+
+  const topicsOffered = user?.topicsOffered || [];
+  const verifiedSkills = topicsOffered.filter(skill => verifiedMap[skill]);
+  const pendingSkills = topicsOffered.filter(skill => !verifiedMap[skill]);
 
   const initials = user?.name ? user.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'AK';
 
+  const handleAddSkill = async () => {
+    if (!newSkill.trim()) return;
+    if (topicsOffered.includes(newSkill.trim())) {
+      triggerToast('Skill already added!');
+      return;
+    }
+    
+    try {
+      await updateProfile({
+        ...user,
+        topicsOffered: [...topicsOffered, newSkill.trim()]
+      });
+      setNewSkill('');
+      setActiveTab('pending');
+      triggerToast('Skill added to pending verification!');
+    } catch (err) {
+      triggerToast('Failed to add skill.');
+    }
+  };
+
+  const handleQuizStart = (skill) => {
+    setActiveQuizSkill(skill);
+  };
+
+  const handleQuizComplete = (skill, score, domain) => {
+    setVerifiedMap(prev => ({
+      ...prev,
+      [skill]: { confidence: score, domain: domain }
+    }));
+    setActiveQuizSkill(null);
+    setActiveTab('verified');
+    triggerToast(`${skill} has been verified successfully!`);
+  };
+
   return (
-    <div id="profile" className="pg on" style={{ padding: '24px', background: 'var(--cs-bg-light)', minHeight: '100vh', maxWidth: '800px', margin: '0 auto' }}>
+    <div id="profile" className="pg on" style={{ padding: '24px', background: '#f9fafb', minHeight: '100vh', maxWidth: '800px', margin: '0 auto' }}>
+      
+      <SkillQuizModal 
+        isOpen={!!activeQuizSkill}
+        skillName={activeQuizSkill}
+        onClose={() => setActiveQuizSkill(null)}
+        onComplete={handleQuizComplete}
+      />
       
       {/* Profile Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', background: 'var(--cs-bg-white)', border: '0.5px solid var(--cs-border)', borderRadius: 'var(--cs-radius-lg)', padding: '24px', marginBottom: '24px' }}>
-        <Avatar initials={initials} bg={avBg} color={avCol} backgroundImage={user?.avatarImg} size="64px" fontSize="20px" />
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: '18px', fontWeight: 600, color: 'var(--cs-text-main)' }}>{user?.name || "Demo User"}</div>
-          <div style={{ fontSize: '13px', color: 'var(--cs-text-inactive)', marginTop: '4px' }}>{user ? `${user.year} · ${user.branch} · ${user.college}` : '3rd year · CSE · PESU Bengaluru'}</div>
-          <div style={{ display: 'flex', gap: '8px', marginTop: '12px', flexWrap: 'wrap' }}>
-            {(user?.topicsOffered?.length > 0) && (
-              <span style={{ fontSize: '12px', padding: '4px 10px', borderRadius: '20px', background: '#E1F5EE', color: '#0F6E56', fontWeight: 500 }}>
-                Teaching: {user.topicsOffered.join(', ')}
-              </span>
-            )}
-            {(user?.topicsWanted?.length > 0) && (
-              <span style={{ fontSize: '12px', padding: '4px 10px', borderRadius: '20px', background: 'var(--cs-primary-light)', color: 'var(--cs-primary-dark)', fontWeight: 500 }}>
-                Learning: {user.topicsWanted.join(', ')}
-              </span>
-            )}
+      <div style={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '16px', padding: '24px', marginBottom: '24px' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+          
+          <div style={{ display: 'flex', gap: '20px' }}>
+            <Avatar initials={initials} bg={avBg} color={avCol} backgroundImage={user?.avatarImg} size="80px" fontSize="24px" />
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827' }}>{user?.name || "Demo User"}</div>
+                <IconCircleCheckFilled style={{ color: '#0ea5e9' }} size={24} />
+              </div>
+              <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '16px' }}>
+                {user ? `${user.year} · ${user.branch} · ${user.college}` : '3rd year · CSE · PESU Bengaluru'}
+              </div>
+              
+              <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 600, color: '#4b5563' }}>Verification Trust Score</span>
+                    <span style={{ fontSize: '12px', fontWeight: 700, color: '#059669' }}>Good 4.8/5</span>
+                  </div>
+                  <div style={{ width: '160px', height: '6px', background: '#f3f4f6', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{ width: '96%', height: '100%', background: '#10b981', borderRadius: '4px' }}></div>
+                  </div>
+                </div>
+
+                <div style={{ width: '1px', height: '32px', background: '#e5e7eb' }}></div>
+
+                <div>
+                  <div style={{ fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '4px' }}>Verified Score</div>
+                  <div style={{ fontSize: '18px', fontWeight: 700, color: '#111827' }}>{verifiedSkills.length}/{topicsOffered.length || 1}</div>
+                </div>
+              </div>
+
+            </div>
           </div>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px' }}>
-          <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: '24px', fontWeight: 600, color: 'var(--cs-primary)' }}>{stats.trustScore} <IconStar style={{ fontSize: '16px', color: '#BA7517' }} /></div>
-            <div style={{ fontSize: '12px', color: 'var(--cs-text-inactive)' }}>Trust score</div>
-          </div>
+
           <button 
             onClick={() => navigate('/app/edit-profile')} 
-            style={{ fontSize: '13px', padding: '8px 16px', borderRadius: 'var(--cs-radius-sm)', border: '1.5px solid var(--cs-primary-light)', background: 'var(--cs-bg-white)', color: 'var(--cs-primary)', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+            style={{ padding: '8px 16px', borderRadius: '24px', border: '1px solid #e5e7eb', background: '#ffffff', color: '#374151', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
           >
-            Edit profile
+            <IconEdit size={16} /> Edit Profile
           </button>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '24px' }}>
-        
-        {/* Linked Banks */}
-        <div style={{ background: 'var(--cs-bg-white)', border: '0.5px solid var(--cs-border)', borderRadius: 'var(--cs-radius-lg)', padding: '24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <span style={{ fontSize: '16px', fontWeight: 600, color: 'var(--cs-text-main)' }}>Linked bank accounts</span>
-            <button style={{ fontSize: '13px', color: 'var(--cs-primary)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 500 }} onClick={() => navigate('/app/add-bank')}>+ Add bank</button>
-          </div>
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 0', borderBottom: '0.5px solid var(--cs-border)' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: 'var(--cs-radius-sm)', background: 'var(--cs-bg-light)', color: 'var(--cs-text-inactive)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconBuildingBank size={20} /></div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--cs-text-main)' }}>HDFC Bank <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '20px', background: '#E1F5EE', color: '#0F6E56', marginLeft: '6px', fontWeight: 500 }}>Default</span></div>
-              <div style={{ fontSize: '12px', color: 'var(--cs-text-inactive)' }}>Savings · ••••1942 · IFSC HDFC0001234</div>
-            </div>
-            <button style={{ fontSize: '12px', padding: '4px 10px', borderRadius: 'var(--cs-radius-sm)', border: '0.5px solid var(--cs-border)', background: 'none', color: 'var(--cs-text-inactive)', cursor: 'pointer', fontWeight: 500 }}>Edit</button>
-          </div>
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 0' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: 'var(--cs-radius-sm)', background: '#EAF3DE', color: '#3B6D11', display: 'flex', alignItems: 'center', justifyContent: 'center' }}><IconBuildingBank size={20} /></div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--cs-text-main)' }}>State Bank of India</div>
-              <div style={{ fontSize: '12px', color: 'var(--cs-text-inactive)' }}>Savings · ••••3587 · IFSC SBIN0005678</div>
-            </div>
-            <button style={{ fontSize: '12px', padding: '4px 10px', borderRadius: 'var(--cs-radius-sm)', border: '0.5px solid var(--cs-border)', background: 'none', color: 'var(--cs-text-inactive)', cursor: 'pointer', fontWeight: 500 }}>Edit</button>
-          </div>
+      {/* Top Metric Cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '32px' }}>
+        <div style={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '16px' }}>
+          <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500, marginBottom: '8px' }}>Attended</div>
+          <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827' }}>12 <span style={{ fontSize: '14px', fontWeight: 500, color: '#9ca3af' }}>Sessions</span></div>
         </div>
-
-        {/* UPI QR */}
-        <div style={{ background: 'var(--cs-bg-white)', border: '0.5px solid var(--cs-border)', borderRadius: 'var(--cs-radius-lg)', padding: '24px' }}>
-          <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--cs-text-main)', marginBottom: '16px' }}>UPI & payment QR</div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: 'var(--cs-radius-sm)', background: '#FAEEDA', color: '#633806', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <IconQrcode size={20} />
-            </div>
-            <div>
-              <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--cs-text-main)' }}>{user.upi}</div>
-              <div style={{ fontSize: '12px', color: 'var(--cs-text-inactive)' }}>Linked to HDFC ••42</div>
-            </div>
-          </div>
-          <div style={{ border: '0.5px solid var(--cs-border)', borderRadius: 'var(--cs-radius-md)', padding: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
-            <svg width="100" height="100" viewBox="0 0 84 84" xmlns="http://www.w3.org/2000/svg">
-              <rect width="84" height="84" fill="#fff"/>
-              <g fill="#222">
-                <rect x="4" y="4" width="28" height="28" rx="3" fill="none" stroke="#222" strokeWidth="2.5"/>
-                <rect x="9" y="9" width="18" height="18" rx="1.5"/>
-                <rect x="52" y="4" width="28" height="28" rx="3" fill="none" stroke="#222" strokeWidth="2.5"/>
-                <rect x="57" y="9" width="18" height="18" rx="1.5"/>
-                <rect x="4" y="52" width="28" height="28" rx="3" fill="none" stroke="#222" strokeWidth="2.5"/>
-                <rect x="9" y="57" width="18" height="18" rx="1.5"/>
-                <rect x="39" y="4" width="5" height="5"/><rect x="39" y="12" width="5" height="5"/><rect x="39" y="20" width="5" height="5"/>
-                <rect x="4" y="39" width="5" height="5"/><rect x="12" y="39" width="5" height="5"/><rect x="20" y="39" width="5" height="5"/>
-                <rect x="39" y="39" width="5" height="5"/><rect x="47" y="39" width="5" height="5"/><rect x="55" y="39" width="5" height="5"/>
-                <rect x="63" y="39" width="5" height="5"/><rect x="71" y="39" width="5" height="5"/>
-                <rect x="39" y="47" width="5" height="5"/><rect x="55" y="47" width="5" height="5"/><rect x="71" y="47" width="5" height="5"/>
-                <rect x="47" y="55" width="5" height="5"/><rect x="63" y="55" width="5" height="5"/>
-                <rect x="39" y="63" width="5" height="5"/><rect x="47" y="63" width="5" height="5"/><rect x="55" y="63" width="5" height="5"/>
-                <rect x="63" y="71" width="5" height="5"/><rect x="71" y="63" width="5" height="5"/><rect x="71" y="71" width="5" height="5"/>
-              </g>
-            </svg>
-            <div style={{ fontSize: '12px', color: 'var(--cs-text-inactive)', textAlign: 'center' }}>Others scan this to pay you directly</div>
-            <button 
-              onClick={() => triggerToast('QR image saved!')} 
-              style={{ fontSize: '12px', padding: '6px 14px', borderRadius: 'var(--cs-radius-sm)', border: '0.5px solid var(--cs-border)', background: 'var(--cs-bg-light)', color: 'var(--cs-text-inactive)', cursor: 'pointer', fontWeight: 500 }}
-            >
-              Download QR
-            </button>
-          </div>
+        <div style={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '16px' }}>
+          <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500, marginBottom: '8px' }}>Average</div>
+          <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827' }}>4.9 <span style={{ fontSize: '14px', fontWeight: 500, color: '#9ca3af' }}>Rating</span></div>
+        </div>
+        <div style={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '16px' }}>
+          <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500, marginBottom: '8px' }}>Teaching</div>
+          <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827' }}>{topicsOffered.length} <span style={{ fontSize: '14px', fontWeight: 500, color: '#9ca3af' }}>Skills</span></div>
+        </div>
+        <div style={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '16px' }}>
+          <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500, marginBottom: '8px' }}>Verified</div>
+          <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827' }}>{verifiedSkills.length} <span style={{ fontSize: '14px', fontWeight: 500, color: '#9ca3af' }}>Skills</span></div>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-        
-        {/* Skills */}
-        <div style={{ background: 'var(--cs-bg-white)', border: '0.5px solid var(--cs-border)', borderRadius: 'var(--cs-radius-lg)', padding: '24px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-            <span style={{ fontSize: '16px', fontWeight: 600, color: 'var(--cs-text-main)' }}>Skills I'm offering</span>
-            <button style={{ fontSize: '13px', color: 'var(--cs-primary)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 500 }} onClick={() => navigate('/app/edit-profile')}>+ Add</button>
-          </div>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {(!user?.topicsOffered || user.topicsOffered.length === 0) ? (
-               <div style={{ fontSize: '13px', color: 'var(--cs-text-inactive)', padding: '16px 0' }}>No skills offered yet.</div>
-            ) : (
-              user.topicsOffered.map((topic, i) => (
-                <div key={i} style={{ border: '0.5px solid var(--cs-border)', borderRadius: 'var(--cs-radius-md)', padding: '16px', background: 'var(--cs-bg-light)' }}>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '8px' }}>
-                    <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', background: 'var(--cs-bg-white)', color: 'var(--cs-text-inactive)', border: '0.5px solid var(--cs-border)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Topic</span>
-                    <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--cs-primary)' }}>Available</span>
+      {/* My Skills Section */}
+      <div style={{ fontSize: '18px', fontWeight: 700, color: '#111827', marginBottom: '16px' }}>My Skills</div>
+      
+      {/* Tabs */}
+      <div style={{ display: 'flex', borderBottom: '1px solid #e5e7eb', marginBottom: '24px' }}>
+        <div 
+          onClick={() => setActiveTab('verified')}
+          style={{ padding: '0 16px 12px', cursor: 'pointer', borderBottom: activeTab === 'verified' ? '2px solid #534AB7' : '2px solid transparent', color: activeTab === 'verified' ? '#534AB7' : '#6b7280', fontWeight: 600, fontSize: '14px', transition: 'all 0.2s' }}
+        >
+          Verified Skills ({verifiedSkills.length})
+        </div>
+        <div 
+          onClick={() => setActiveTab('pending')}
+          style={{ padding: '0 16px 12px', cursor: 'pointer', borderBottom: activeTab === 'pending' ? '2px solid #534AB7' : '2px solid transparent', color: activeTab === 'pending' ? '#534AB7' : '#6b7280', fontWeight: 600, fontSize: '14px', transition: 'all 0.2s' }}
+        >
+          Pending Verification ({pendingSkills.length})
+        </div>
+      </div>
+
+      {/* Add Skill Flow */}
+      <div style={{ display: 'flex', gap: '12px', marginBottom: '24px' }}>
+        <input 
+          type="text" 
+          placeholder="Enter skill name..." 
+          value={newSkill} 
+          onChange={e => setNewSkill(e.target.value)}
+          onKeyPress={e => e.key === 'Enter' && handleAddSkill()}
+          style={{ flex: 1, padding: '12px 16px', borderRadius: '8px', border: '1px solid #e5e7eb', background: '#ffffff', fontSize: '14px', color: '#111827', outline: 'none' }}
+        />
+        <button 
+          onClick={handleAddSkill}
+          style={{ padding: '0 24px', borderRadius: '8px', border: 'none', background: '#534AB7', color: '#ffffff', fontSize: '14px', fontWeight: 600, cursor: 'pointer', whiteSpace: 'nowrap' }}
+        >
+          Add & Verify
+        </button>
+      </div>
+
+      {/* Tab Content */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {activeTab === 'verified' && (
+          verifiedSkills.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '48px 0', color: '#9ca3af', fontSize: '14px' }}>No verified skills yet.</div>
+          ) : (
+            verifiedSkills.map((skill, i) => {
+              const meta = verifiedMap[skill] || { confidence: 80, domain: 'General' };
+              return (
+                <div key={i} style={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                      <div style={{ fontSize: '16px', fontWeight: 600, color: '#111827' }}>{skill}</div>
+                      <span style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '20px', background: '#f3f4f6', color: '#4b5563', fontWeight: 600, letterSpacing: '0.5px', textTransform: 'uppercase' }}>
+                        {meta.domain}
+                      </span>
+                    </div>
+                    
+                    <div style={{ maxWidth: '300px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                        <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500 }}>Confidence Score</span>
+                        <span style={{ fontSize: '12px', color: '#059669', fontWeight: 700 }}>{meta.confidence}%</span>
+                      </div>
+                      <div style={{ width: '100%', height: '6px', background: '#f3f4f6', borderRadius: '4px', overflow: 'hidden' }}>
+                        <div style={{ width: `${meta.confidence}%`, height: '100%', background: '#10b981', borderRadius: '4px' }}></div>
+                      </div>
+                    </div>
                   </div>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--cs-text-main)' }}>{topic}</div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '12px' }}>
-                    <span style={{ fontSize: '12px', color: '#BA7517', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 500 }}><IconStar size={14} /> New</span>
-                    <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '20px', background: '#E1F5EE', color: '#0F6E56', fontWeight: 500 }}>Active</span>
-                  </div>
+
+                  <button 
+                    onClick={() => handleQuizStart(skill)}
+                    style={{ padding: '8px 16px', borderRadius: '24px', border: '1px solid #e5e7eb', background: '#ffffff', color: '#374151', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                  >
+                    <IconRefresh size={16} /> Retake Quiz
+                  </button>
                 </div>
-              ))
-            )}
-          </div>
-        </div>
+              );
+            })
+          )
+        )}
 
-        {/* Earnings */}
-        <div style={{ background: 'var(--cs-bg-white)', border: '0.5px solid var(--cs-border)', borderRadius: 'var(--cs-radius-lg)', padding: '24px' }}>
-          <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--cs-text-main)', marginBottom: '16px' }}>Earnings</div>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            <StatCard 
-              icon={<IconArrowDownRight size={16} />}
-              iconBg="#E1F5EE"
-              iconColor="#0F6E56"
-              value="₹1,200"
-              label="Total earned"
-            />
-            <StatCard 
-              icon={<IconArrowUpRight size={16} />}
-              iconBg="#E6F1FB"
-              iconColor="#185FA5"
-              value="₹500"
-              label="Withdrawn to bank"
-            />
-            <StatCard 
-              icon={<IconArrowsExchange size={16} />}
-              iconBg="var(--cs-primary-light)"
-              iconColor="var(--cs-primary)"
-              value={stats.swapsDone}
-              label="Swaps completed"
-            />
-          </div>
-        </div>
+        {activeTab === 'pending' && (
+          pendingSkills.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '48px 0', color: '#9ca3af', fontSize: '14px' }}>No pending skills.</div>
+          ) : (
+            pendingSkills.map((skill, i) => (
+              <div key={i} style={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#eab308' }}></div>
+                  <div style={{ fontSize: '16px', fontWeight: 600, color: '#111827' }}>{skill}</div>
+                </div>
 
+                <button 
+                  onClick={() => handleQuizStart(skill)}
+                  style={{ padding: '8px 16px', borderRadius: '24px', border: 'none', background: '#f5f4ff', color: '#534AB7', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <IconPlayerPlayFilled size={14} /> Start Verification Quiz
+                </button>
+              </div>
+            ))
+          )
+        )}
       </div>
+
     </div>
   );
 };

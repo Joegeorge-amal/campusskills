@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppData } from '../context/AppDataContext';
-import { IconBrandGoogle, IconDeviceMobile, IconQrcode } from '@tabler/icons-react';
+import { IconWallet, IconBuildingBank, IconQrcode } from '@tabler/icons-react';
 
 const Payment = () => {
   const navigate = useNavigate();
+  const [payMethod, setPayMethod] = useState('wallet');
   const { payForSession, walletBalance } = useAppData();
 
   // In a real app, you would pass these via state or search params
@@ -48,39 +49,88 @@ const Payment = () => {
             <span style={{ fontSize: '15px', fontWeight: 500, color: '#3C3489' }}>₹{amount}</span>
           </div>
           
-          <div style={{ background: '#F5F4FF', border: '1px solid #E0DFF0', borderRadius: '8px', padding: '10px 12px', marginTop: '14px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <span style={{ fontSize: '12px', fontWeight: 500, color: '#222' }}>CampusSkills Wallet</span>
-              <span style={{ fontSize: '12px', color: walletBalance >= amount ? '#0F6E56' : '#A32D2D', fontWeight: 500 }}>
-                Bal: ₹{walletBalance.toFixed(2)}
-              </span>
+          <div style={{ marginTop: '24px' }}>
+            <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '12px' }}>Pay from</div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginBottom: '24px' }}>
+              <div 
+                onClick={() => setPayMethod('wallet')}
+                style={{ 
+                  border: payMethod === 'wallet' ? '1.5px solid #534AB7' : '1px solid #e5e7eb',
+                  background: payMethod === 'wallet' ? '#f5f4ff' : '#ffffff',
+                  borderRadius: '12px',
+                  padding: '16px 8px',
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <IconWallet style={{ color: payMethod === 'wallet' ? '#534AB7' : '#9ca3af', marginBottom: '4px' }} />
+                <div style={{ fontSize: '13px', fontWeight: 600, color: payMethod === 'wallet' ? '#534AB7' : '#4b5563' }}>Wallet</div>
+                <div style={{ fontSize: '11px', color: payMethod === 'wallet' ? '#534AB7' : '#9ca3af' }}>₹{walletBalance.toFixed(0)}</div>
+              </div>
+
+              <div 
+                onClick={() => setPayMethod('bank')}
+                style={{ 
+                  border: payMethod === 'bank' ? '1.5px solid #534AB7' : '1px solid #e5e7eb',
+                  background: payMethod === 'bank' ? '#f5f4ff' : '#ffffff',
+                  borderRadius: '12px',
+                  padding: '16px 8px',
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <IconBuildingBank style={{ color: payMethod === 'bank' ? '#534AB7' : '#9ca3af', marginBottom: '4px' }} />
+                <div style={{ fontSize: '13px', fontWeight: 600, color: payMethod === 'bank' ? '#534AB7' : '#4b5563' }}>Bank</div>
+                <div style={{ fontSize: '11px', color: payMethod === 'bank' ? '#534AB7' : '#9ca3af' }}>HDFC &bull;&bull;42</div>
+              </div>
+
+              <div 
+                onClick={() => setPayMethod('upi')}
+                style={{ 
+                  border: payMethod === 'upi' ? '1.5px solid #534AB7' : '1px solid #e5e7eb',
+                  background: payMethod === 'upi' ? '#f5f4ff' : '#ffffff',
+                  borderRadius: '12px',
+                  padding: '16px 8px',
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                <IconQrcode style={{ color: payMethod === 'upi' ? '#534AB7' : '#9ca3af', marginBottom: '4px' }} />
+                <div style={{ fontSize: '13px', fontWeight: 600, color: payMethod === 'upi' ? '#534AB7' : '#4b5563' }}>UPI QR</div>
+                <div style={{ fontSize: '11px', color: payMethod === 'upi' ? '#534AB7' : '#9ca3af' }}>Scan</div>
+              </div>
             </div>
-            {walletBalance < amount && (
-              <div style={{ fontSize: '11px', color: '#A32D2D', marginBottom: '8px' }}>Insufficient balance. Please add money.</div>
+
+            {payMethod === 'wallet' && walletBalance < amount && (
+              <div style={{ fontSize: '12px', color: '#dc2626', marginBottom: '16px', textAlign: 'center' }}>
+                Insufficient wallet balance. Please add money or select another method.
+              </div>
             )}
             
-            <div style={{ fontSize: '11px', color: '#888', marginBottom: '5px' }}>Or pay directly via UPI:</div>
-            <div style={{ display: 'flex', gap: '5px' }}>
-              <div style={{ flex: 1, padding: '8px 4px', borderRadius: '8px', border: '0.5px solid rgba(0,0,0,.1)', textAlign: 'center', cursor: 'pointer', fontSize: '11px', color: '#888' }}>
-                <IconBrandGoogle style={{ fontSize: '14px', display: 'block', marginBottom: '2px' }} />GPay<br/><span style={{ fontSize: '10px' }}>App</span>
-              </div>
-              <div style={{ flex: 1, padding: '8px 4px', borderRadius: '8px', border: '0.5px solid rgba(0,0,0,.1)', textAlign: 'center', cursor: 'pointer', fontSize: '11px', color: '#888' }}>
-                <IconDeviceMobile style={{ fontSize: '14px', display: 'block', marginBottom: '2px' }} />PhonePe<br/><span style={{ fontSize: '10px' }}>App</span>
-              </div>
-              <div style={{ flex: 1, padding: '8px 4px', borderRadius: '8px', border: '0.5px solid rgba(0,0,0,.1)', textAlign: 'center', cursor: 'pointer', fontSize: '11px', color: '#888' }}>
-                <IconQrcode style={{ fontSize: '14px', display: 'block', marginBottom: '2px' }} />UPI QR<br/><span style={{ fontSize: '10px' }}>Scan</span>
-              </div>
-            </div>
+            <button 
+              onClick={handlePay}
+              disabled={payMethod === 'wallet' && walletBalance < amount}
+              style={{ 
+                width: '100%',
+                padding: '16px',
+                borderRadius: '12px',
+                border: 'none',
+                background: '#534AB7',
+                color: '#ffffff',
+                fontSize: '16px',
+                fontWeight: 600,
+                cursor: (payMethod === 'wallet' && walletBalance < amount) ? 'not-allowed' : 'pointer',
+                opacity: (payMethod === 'wallet' && walletBalance < amount) ? 0.6 : 1,
+                transition: 'background 0.2s'
+              }}
+            >
+              Confirm & pay ₹{amount}/hr
+            </button>
           </div>
-          
-          <button 
-            className="mgo" 
-            onClick={handlePay}
-            disabled={walletBalance < amount}
-            style={{ opacity: walletBalance < amount ? 0.6 : 1, cursor: walletBalance < amount ? 'not-allowed' : 'pointer' }}
-          >
-            Confirm & pay ₹{amount}
-          </button>
         </div>
       </div>
     </div>

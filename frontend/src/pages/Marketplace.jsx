@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAppData } from '../context/AppDataContext';
 import Avatar from '../components/common/Avatar';
 import MarketplaceCard from '../components/common/MarketplaceCard/MarketplaceCard';
@@ -7,6 +8,7 @@ import BookSessionModal from '../components/modals/BookSessionModal';
 import { IconStar, IconUser, IconMessageCircle } from '@tabler/icons-react';
 
 const Marketplace = () => {
+  const navigate = useNavigate();
   const { skills } = useAppData();
   const [filter, setFilter] = useState('All');
   const [selectedSkill, setSelectedSkill] = useState(skills[0]);
@@ -179,7 +181,14 @@ const Marketplace = () => {
           onClose={() => setIsBookModalOpen(false)}
           onContinue={(slot) => {
             setIsBookModalOpen(false);
-            window.alert('Payment flow coming soon');
+            navigate('/app/book-request', {
+              state: {
+                skillName: selectedSkill.name,
+                tutorName: selectedSkill.teacher.name,
+                price: selectedSkill.priceNum,
+                slot: `${slot.date} · ${slot.time}`
+              }
+            });
           }}
         />
       )}
