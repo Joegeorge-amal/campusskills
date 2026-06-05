@@ -14,7 +14,8 @@ public class TopicHandler {
 
     public void getAllTopics(RoutingContext ctx) {
         String category = ctx.request().getParam("category");
-        topicService.getAllTopics(category)
+        String q = ctx.request().getParam("q");
+        topicService.getAllTopics(category, q)
                 .onSuccess(data -> ApiResponse.ok(ctx, data))
                 .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
     }

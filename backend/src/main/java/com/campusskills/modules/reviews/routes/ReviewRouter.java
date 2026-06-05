@@ -15,12 +15,15 @@ public class ReviewRouter {
         ReviewRepository reviewRepository = new ReviewRepository();
         SessionRepository sessionRepository = new SessionRepository();
         UserProfileRepository userProfileRepository = new UserProfileRepository();
+        com.campusskills.modules.users.repositories.UserStatsRepository userStatsRepository = new com.campusskills.modules.users.repositories.UserStatsRepository();
         
-        ReviewService reviewService = new ReviewService(reviewRepository, sessionRepository, userProfileRepository);
+        ReviewService reviewService = new ReviewService(reviewRepository, sessionRepository, userProfileRepository, userStatsRepository, vertx.eventBus());
         ReviewHandler reviewHandler = new ReviewHandler(reviewService);
 
         router.post("/").handler(reviewHandler::createReview);
         router.get("/user/:userId").handler(reviewHandler::getUserReviews);
+        router.patch("/:id").handler(reviewHandler::updateReview);
+        router.delete("/:id").handler(reviewHandler::deleteReview);
         return router;
     }
 }

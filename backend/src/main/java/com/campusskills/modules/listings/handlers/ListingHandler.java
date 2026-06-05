@@ -122,13 +122,29 @@ public class ListingHandler {
     }
 
     public void getAllListings(RoutingContext ctx) {
-        listingService.findAllActive()
-            .onSuccess(listings -> {
-                io.vertx.core.json.JsonArray jsonArray = new io.vertx.core.json.JsonArray();
-                for (Listing l : listings) {
-                    jsonArray.add(JsonObject.mapFrom(l));
-                }
-                ApiResponse.ok(ctx, jsonArray);
+        String q = ctx.request().getParam("q");
+        List<String> topics = ctx.queryParam("topics");
+        List<String> paymentTypes = ctx.queryParam("payment_types");
+        List<String> modes = ctx.queryParam("modes");
+        String sort = ctx.request().getParam("sort");
+        
+        int page = 1;
+        int limit = 20;
+        try {
+            if (ctx.request().getParam("page") != null) page = Integer.parseInt(ctx.request().getParam("page"));
+            if (ctx.request().getParam("limit") != null) limit = Integer.parseInt(ctx.request().getParam("limit"));
+        } catch (NumberFormatException ignored) {}
+
+        JsonObject filters = new JsonObject();
+        if (q != null && !q.trim().isEmpty()) filters.put("q", q.trim());
+        if (topics != null && !topics.isEmpty()) filters.put("topics", new io.vertx.core.json.JsonArray(topics));
+        if (paymentTypes != null && !paymentTypes.isEmpty()) filters.put("payment_types", new io.vertx.core.json.JsonArray(paymentTypes));
+        if (modes != null && !modes.isEmpty()) filters.put("modes", new io.vertx.core.json.JsonArray(modes));
+        if (sort != null && !sort.trim().isEmpty()) filters.put("sort", sort.trim());
+
+        listingService.searchListings(filters, page, limit)
+            .onSuccess(result -> {
+                ApiResponse.ok(ctx, result);
             })
             .onFailure(err -> {
                 err.printStackTrace();

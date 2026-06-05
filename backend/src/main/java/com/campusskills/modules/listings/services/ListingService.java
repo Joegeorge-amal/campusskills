@@ -33,9 +33,25 @@ public class ListingService {
         });
     }
 
-    public Future<java.util.List<Listing>> findAllActive() {
-        return listingRepository.findAllActive().onSuccess(listings -> {
-            System.out.println("[LISTING] Retrieved " + listings.size() + " active listings");
+    public Future<io.vertx.core.json.JsonObject> searchListings(io.vertx.core.json.JsonObject filters, int page, int limit) {
+        return listingRepository.countSearch(filters).compose(total -> {
+            return listingRepository.search(filters, page, limit).map(listings -> {
+                int totalPages = (int) Math.ceil((double) total / limit);
+                
+                io.vertx.core.json.JsonArray data = new io.vertx.core.json.JsonArray();
+                for (Listing l : listings) {
+                    data.add(io.vertx.core.json.JsonObject.mapFrom(l));
+                }
+                
+                return new io.vertx.core.json.JsonObject()
+                    .put("data", data)
+                    .put("pagination", new io.vertx.core.json.JsonObject()
+                        .put("total", total)
+                        .put("page", page)
+                        .put("limit", limit)
+                        .put("totalPages", totalPages)
+                    );
+            });
         });
     }
 }

@@ -10,8 +10,8 @@ public class ExchangeHandler {
 
     private final ExchangeService service;
 
-    public ExchangeHandler() {
-        this.service = new ExchangeService();
+    public ExchangeHandler(io.vertx.core.eventbus.EventBus eventBus) {
+        this.service = new ExchangeService(eventBus);
     }
 
     public void createExchange(RoutingContext ctx) {

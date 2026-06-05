@@ -10,9 +10,28 @@ public class SessionService {
 
     private final SessionRepository repository;
 
-    public SessionService() {
+    private final io.vertx.core.eventbus.EventBus eventBus;
+
+    public SessionService(io.vertx.core.eventbus.EventBus eventBus) {
         this.repository = new SessionRepository();
+        this.eventBus = eventBus;
     }
+
+    private void sendNotification(String userId, com.campusskills.shared.constants.NotificationType type, String title, String message, String sourceType, String sourceId) {
+        if (eventBus == null) return;
+        JsonObject payload = new JsonObject()
+            .put("userId", userId)
+            .put("type", type.name())
+            .put("title", title)
+            .put("message", message)
+            .put("sourceType", sourceType)
+            .put("sourceId", sourceId);
+        eventBus.send("internal.notification.create", payload);
+    }
+
+    // TODO(Future): SESSION_REMINDER notifications can be integrated seamlessly here 
+    // without structural changes. We can dispatch a `SESSION_REMINDER` notification 
+    // payload to `internal.notification.create` via a background worker or chron job.
 
     public Future<JsonObject> getUserSessions(String userId, int page, int limit) {
         int skip = (page - 1) * limit;
@@ -56,7 +75,11 @@ public class SessionService {
                 if (session.getConfirmedBy().size() + 1 >= 2) {
                     // Both confirmed
                     JsonObject updates = new JsonObject().put("status", SessionStatus.COMPLETED.name());
-                    return repository.updateSessionFields(sessionId, updates).mapEmpty();
+                    return repository.updateSessionFields(sessionId, updates).onSuccess(v -> {
+                        // Notify both parties that it is COMPLETED
+                        sendNotification(session.getTeacherId(), com.campusskills.shared.constants.NotificationType.SESSION_COMPLETED, "Session Completed", "The session has been marked as completed.", "SESSION", sessionId);
+                        sendNotification(session.getStudentId(), com.campusskills.shared.constants.NotificationType.SESSION_COMPLETED, "Session Completed", "The session has been marked as completed.", "SESSION", sessionId);
+                    }).mapEmpty();
                 } else {
                     return Future.succeededFuture();
                 }
@@ -75,7 +98,10 @@ public class SessionService {
             }
 
             JsonObject updates = new JsonObject().put("status", SessionStatus.DISPUTED.name());
-            return repository.updateSessionFields(sessionId, updates).mapEmpty();
+            return repository.updateSessionFields(sessionId, updates).onSuccess(v -> {
+                sendNotification(session.getTeacherId(), com.campusskills.shared.constants.NotificationType.SESSION_DISPUTED, "Session Disputed", "The session has been marked as disputed.", "SESSION", sessionId);
+                sendNotification(session.getStudentId(), com.campusskills.shared.constants.NotificationType.SESSION_DISPUTED, "Session Disputed", "The session has been marked as disputed.", "SESSION", sessionId);
+            }).mapEmpty();
         });
     }
 }

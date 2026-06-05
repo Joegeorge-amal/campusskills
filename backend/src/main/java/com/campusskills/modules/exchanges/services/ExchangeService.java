@@ -17,14 +17,38 @@ public class ExchangeService {
     private final ExchangeRepository repository;
     private final SessionRepository sessionRepository;
 
-    public ExchangeService() {
+    private final io.vertx.core.eventbus.EventBus eventBus;
+
+    public ExchangeService(io.vertx.core.eventbus.EventBus eventBus) {
         this.repository = new ExchangeRepository();
         this.sessionRepository = new SessionRepository();
+        this.eventBus = eventBus;
+    }
+
+    private void sendNotification(String userId, com.campusskills.shared.constants.NotificationType type, String title, String message, String sourceType, String sourceId) {
+        if (eventBus == null) return;
+        JsonObject payload = new JsonObject()
+            .put("userId", userId)
+            .put("type", type.name())
+            .put("title", title)
+            .put("message", message)
+            .put("sourceType", sourceType)
+            .put("sourceId", sourceId);
+        eventBus.send("internal.notification.create", payload);
     }
 
     public Future<String> createExchange(Exchange request) {
         request.setStatus(ExchangeStatus.REQUESTED);
-        return repository.createRequest(request);
+        return repository.createRequest(request).onSuccess(id -> {
+            sendNotification(
+                request.getReceiverId(),
+                com.campusskills.shared.constants.NotificationType.NEW_EXCHANGE_REQUEST,
+                "New Exchange Request",
+                "You have received a new exchange request.",
+                "EXCHANGE",
+                id
+            );
+        });
     }
 
     public Future<Void> acceptExchange(String exchangeId) {
@@ -38,6 +62,15 @@ public class ExchangeService {
 
             // Update to ACCEPTED
             return repository.updateStatus(exchangeId, ExchangeStatus.ACCEPTED).compose(updated -> {
+                sendNotification(
+                    exchange.getInitiatorId(),
+                    com.campusskills.shared.constants.NotificationType.EXCHANGE_ACCEPTED,
+                    "Exchange Accepted",
+                    "Your exchange request was accepted.",
+                    "EXCHANGE",
+                    exchangeId
+                );
+
                 if (exchange.getProposedSessions() != null) {
                     List<Future<String>> sessionFutures = new ArrayList<>();
                     for (JsonObject proposed : exchange.getProposedSessions()) {
@@ -45,10 +78,10 @@ public class ExchangeService {
                         session.setExchangeId(exchangeId);
                         
                         // Parse proposed roles
-                        String teacherId = proposed.getString("teacherId");
-                        String studentId = proposed.getString("studentId");
-                        if (teacherId == null) teacherId = exchange.getReceiverId();
-                        if (studentId == null) studentId = exchange.getInitiatorId();
+                        String tempTeacherId = proposed.getString("teacherId");
+                        String tempStudentId = proposed.getString("studentId");
+                        final String teacherId = tempTeacherId == null ? exchange.getReceiverId() : tempTeacherId;
+                        final String studentId = tempStudentId == null ? exchange.getInitiatorId() : tempStudentId;
                         
                         session.setTeacherId(teacherId);
                         session.setStudentId(studentId);
@@ -57,7 +90,13 @@ public class ExchangeService {
                         session.setScheduledEnd(proposed.getLong("scheduledEnd"));
                         session.setTopic(proposed.getString("topic"));
                         
-                        sessionFutures.add(sessionRepository.createSession(session));
+                        sessionFutures.add(sessionRepository.createSession(session).onSuccess(sessId -> {
+                            // Notify both student and teacher
+                            sendNotification(teacherId, com.campusskills.shared.constants.NotificationType.SESSION_SCHEDULED, "Session Scheduled", "A new session has been scheduled.", "SESSION", sessId);
+                            if (!teacherId.equals(studentId)) {
+                                sendNotification(studentId, com.campusskills.shared.constants.NotificationType.SESSION_SCHEDULED, "Session Scheduled", "A new session has been scheduled.", "SESSION", sessId);
+                            }
+                        }));
                     }
                     return Future.all(sessionFutures).mapEmpty();
                 }

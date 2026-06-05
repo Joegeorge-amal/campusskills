@@ -60,5 +60,32 @@ public class DatabaseInitializer {
         client.runCommand("createIndexes", command)
             .onSuccess(v -> log.info("Created unique index: topics(normalizedName)"))
             .onFailure(err -> log.error("Failed to create index on topics", err));
+
+        // Text Indexes for Search
+        client.createIndexWithOptions("skill_listings", new JsonObject()
+            .put("title", "text")
+            .put("description", "text")
+            .put("skills.name", "text"), options)
+            .onSuccess(v -> log.info("Created text index on skill_listings"))
+            .onFailure(err -> log.error("Failed to create text index on skill_listings", err));
+
+        client.createIndexWithOptions("topics", new JsonObject()
+            .put("name", "text"), options)
+            .onSuccess(v -> log.info("Created text index on topics"))
+            .onFailure(err -> log.error("Failed to create text index on topics", err));
+
+        client.createIndexWithOptions("users", new JsonObject()
+            .put("firstName", "text")
+            .put("lastName", "text")
+            .put("university", "text")
+            .put("bio", "text"), options)
+            .onSuccess(v -> log.info("Created text index on users"))
+            .onFailure(err -> log.error("Failed to create text index on users", err));
+
+        client.createIndexWithOptions("sessions", new JsonObject()
+            .put("disputeReason", "text")
+            .put("status", "text"), options)
+            .onSuccess(v -> log.info("Created text index on sessions"))
+            .onFailure(err -> log.error("Failed to create text index on sessions", err));
     }
 }

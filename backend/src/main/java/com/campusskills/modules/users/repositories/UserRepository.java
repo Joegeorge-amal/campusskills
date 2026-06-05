@@ -38,4 +38,17 @@ public class UserRepository {
             return doc.mapTo(User.class);
         });
     }
+
+    public Future<java.util.List<String>> searchUserIdsByName(String q) {
+        if (q == null || q.trim().isEmpty()) {
+            return Future.succeededFuture(java.util.Collections.emptyList());
+        }
+        JsonObject query = new JsonObject().put("$or", new io.vertx.core.json.JsonArray()
+            .add(new JsonObject().put("firstName", new JsonObject().put("$regex", q.trim()).put("$options", "i")))
+            .add(new JsonObject().put("lastName", new JsonObject().put("$regex", q.trim()).put("$options", "i")))
+        );
+        return client.find(COLLECTION, query).map(docs -> 
+            docs.stream().map(doc -> doc.getString("_id")).collect(java.util.stream.Collectors.toList())
+        );
+    }
 }

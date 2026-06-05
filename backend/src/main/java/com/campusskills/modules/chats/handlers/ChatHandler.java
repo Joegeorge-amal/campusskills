@@ -61,7 +61,12 @@ public class ChatHandler {
             statusFilter = ctx.queryParam("status").get(0);
         }
 
-        chatService.getUserChats(authId, statusFilter, page, limit)
+        String q = null;
+        if (ctx.queryParam("q") != null && !ctx.queryParam("q").isEmpty()) {
+            q = ctx.queryParam("q").get(0);
+        }
+
+        chatService.getUserChats(authId, statusFilter, q, page, limit)
             .onSuccess(result -> ApiResponse.paginatedOk(ctx, result.getJsonArray("items"), result.getInteger("page"), result.getInteger("limit"), result.getLong("total")))
             .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
     }

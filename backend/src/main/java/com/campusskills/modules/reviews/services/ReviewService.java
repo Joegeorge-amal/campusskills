@@ -17,11 +17,27 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final SessionRepository sessionRepository;
     private final UserProfileRepository userProfileRepository;
+    private final com.campusskills.modules.users.repositories.UserStatsRepository userStatsRepository;
+    private final io.vertx.core.eventbus.EventBus eventBus;
 
-    public ReviewService(ReviewRepository reviewRepository, SessionRepository sessionRepository, UserProfileRepository userProfileRepository) {
+    public ReviewService(ReviewRepository reviewRepository, SessionRepository sessionRepository, UserProfileRepository userProfileRepository, com.campusskills.modules.users.repositories.UserStatsRepository userStatsRepository, io.vertx.core.eventbus.EventBus eventBus) {
         this.reviewRepository = reviewRepository;
         this.sessionRepository = sessionRepository;
         this.userProfileRepository = userProfileRepository;
+        this.userStatsRepository = userStatsRepository;
+        this.eventBus = eventBus;
+    }
+
+    private void sendNotification(String userId, com.campusskills.shared.constants.NotificationType type, String title, String message, String sourceType, String sourceId) {
+        if (eventBus == null) return;
+        JsonObject payload = new JsonObject()
+            .put("userId", userId)
+            .put("type", type.name())
+            .put("title", title)
+            .put("message", message)
+            .put("sourceType", sourceType)
+            .put("sourceId", sourceId);
+        eventBus.send("internal.notification.create", payload);
     }
 
     public Future<String> createReview(CreateReviewRequest req, String reviewerId) {
@@ -55,6 +71,9 @@ public class ReviewService {
             if (revieweeId == null) {
                 return Future.failedFuture("UNAUTHORIZED: Could not determine reviewee");
             }
+            if (revieweeId.equals(reviewerId)) {
+                return Future.failedFuture("CONFLICT: You cannot review yourself");
+            }
             
             final String finalRevieweeId = revieweeId;
 
@@ -73,13 +92,12 @@ public class ReviewService {
                 }
 
                 return reviewRepository.createReview(review).compose(id -> {
-                    // Trigger async recalculation and update Profile
-                    reviewRepository.calculateAggregates(finalRevieweeId).onSuccess(agg -> {
-                        Double avg = agg.getDouble("averageRating");
-                        Integer count = agg.getInteger("reviewCount");
-                        userProfileRepository.updateRatings(finalRevieweeId, avg, count);
-                    });
-
+                    // Trigger async recalculation and update Profile & Stats
+                    syncRatings(finalRevieweeId);
+                    
+                    // Send notification to reviewee
+                    sendNotification(finalRevieweeId, com.campusskills.shared.constants.NotificationType.REVIEW_RECEIVED, "New Review Received", "You have received a new review with a rating of " + req.getRating() + " stars.", "REVIEW", id);
+                    
                     return Future.succeededFuture(id);
                 });
             });
@@ -105,6 +123,56 @@ public class ReviewService {
                 .put("items", items)
                 .put("page", fPage)
                 .put("limit", fLimit);
+        });
+    }
+
+    public Future<Boolean> updateReview(String reviewId, String requesterId, Double rating, String comment) {
+        if (rating == null) return Future.failedFuture("rating is required");
+        if (rating < 1.0 || rating > 5.0) return Future.failedFuture("rating must be between 1.0 and 5.0");
+        if ((rating * 10) % 5 != 0) return Future.failedFuture("rating must be in 0.5 increments (e.g. 1.0, 1.5, 2.0)");
+
+        return reviewRepository.findById(reviewId).compose(review -> {
+            if (review == null) return Future.failedFuture("NOT_FOUND: Review not found");
+            if (!review.getReviewerId().equals(requesterId)) return Future.failedFuture("FORBIDDEN: You can only edit your own reviews");
+
+            long now = System.currentTimeMillis();
+            if (review.getCreatedAt() != null && (now - review.getCreatedAt() > 48L * 60L * 60L * 1000L)) {
+                return Future.failedFuture("FORBIDDEN: Reviews can only be edited within 48 hours of creation");
+            }
+
+            return reviewRepository.updateReview(reviewId, rating, comment).compose(success -> {
+                if (success) syncRatings(review.getRevieweeId());
+                return Future.succeededFuture(success);
+            });
+        });
+    }
+
+    public Future<Boolean> deleteReview(String reviewId, String requesterId, boolean isAdmin) {
+        return reviewRepository.findById(reviewId).compose(review -> {
+            if (review == null) return Future.failedFuture("NOT_FOUND: Review not found");
+            
+            if (!isAdmin && !review.getReviewerId().equals(requesterId)) {
+                return Future.failedFuture("FORBIDDEN: You can only delete your own reviews");
+            }
+
+            return reviewRepository.deleteReview(reviewId).compose(success -> {
+                if (success) syncRatings(review.getRevieweeId());
+                return Future.succeededFuture(success);
+            });
+        });
+    }
+
+    private void syncRatings(String revieweeId) {
+        reviewRepository.calculateAggregates(revieweeId).onSuccess(agg -> {
+            Double avg = agg.getDouble("averageRating");
+            Integer count = agg.getInteger("reviewCount");
+            
+            io.vertx.core.Future<Boolean> profileUpdate = userProfileRepository.updateRatings(revieweeId, avg, count);
+            io.vertx.core.Future<Boolean> statsUpdate = userStatsRepository.updateRatings(revieweeId, avg, count);
+            
+            io.vertx.core.Future.all(profileUpdate, statsUpdate).onFailure(err -> {
+                System.err.println("Failed to sync ratings for user " + revieweeId + ": " + err.getMessage());
+            });
         });
     }
 }
