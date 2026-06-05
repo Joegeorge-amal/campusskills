@@ -17,31 +17,35 @@ const RequestsCardV2 = ({
       background: '#ffffff',
       border: '1px solid #e5e7eb',
       borderRadius: '12px',
-      padding: '16px',
+      padding: '24px',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      marginBottom: '12px'
+      marginBottom: '12px',
+      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.02)'
     }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        <Avatar {...avatarProps} />
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+        <div style={{ marginTop: '2px' }}>
+          <Avatar {...avatarProps} />
+        </div>
         <div>
-          <div style={{ fontSize: '15px', fontWeight: 600, color: '#111827', marginBottom: '2px' }}>{title}</div>
-          <div style={{ fontSize: '13px', color: '#6b7280', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ fontSize: '16px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>{title}</div>
+          <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '8px' }}>
             {subtitle}
-            {tagText && (
-              <span style={{ 
-                fontSize: '11px', 
-                padding: '2px 8px', 
-                borderRadius: '12px', 
-                background: tagType === 'success' ? '#d1fae5' : '#e0e7ff', 
-                color: tagType === 'success' ? '#059669' : '#4f46e5',
-                fontWeight: 500
-              }}>
-                {tagText}
-              </span>
-            )}
           </div>
+          {tagText && (
+            <span style={{ 
+              fontSize: '12px', 
+              padding: '4px 10px', 
+              borderRadius: '16px', 
+              background: tagType === 'success' ? '#e6f4ea' : '#e8eaf6', 
+              color: tagType === 'success' ? '#1e8e3e' : '#5c6bc0',
+              fontWeight: 600,
+              display: 'inline-block'
+            }}>
+              {tagText}
+            </span>
+          )}
         </div>
       </div>
 
@@ -50,13 +54,17 @@ const RequestsCardV2 = ({
           <>
             <button 
               onClick={onAccept}
-              style={{ padding: '6px 16px', background: '#d1fae5', color: '#059669', border: 'none', borderRadius: '20px', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}
+              style={{ padding: '8px 20px', background: '#e6f4ea', color: '#1e8e3e', border: 'none', borderRadius: '8px', fontWeight: 600, fontSize: '14px', cursor: 'pointer', transition: 'background 0.2s' }}
+              onMouseOver={(e) => { e.currentTarget.style.background = '#d3ebd9' }}
+              onMouseOut={(e) => { e.currentTarget.style.background = '#e6f4ea' }}
             >
               Accept
             </button>
             <button 
               onClick={onDecline}
-              style={{ padding: '6px 16px', background: '#ffffff', color: '#4b5563', border: '1px solid #e5e7eb', borderRadius: '20px', fontWeight: 500, fontSize: '13px', cursor: 'pointer' }}
+              style={{ padding: '8px 20px', background: '#ffffff', color: '#5f6368', border: '1px solid #dadce0', borderRadius: '8px', fontWeight: 500, fontSize: '14px', cursor: 'pointer', transition: 'background 0.2s' }}
+              onMouseOver={(e) => { e.currentTarget.style.background = '#f8f9fa' }}
+              onMouseOut={(e) => { e.currentTarget.style.background = '#ffffff' }}
             >
               Decline
             </button>
@@ -64,7 +72,7 @@ const RequestsCardV2 = ({
         )}
         
         {type === 'incoming' && status !== 'pending' && (
-          <span style={{ padding: '4px 12px', background: '#d1fae5', color: '#059669', borderRadius: '20px', fontWeight: 500, fontSize: '12px' }}>
+          <span style={{ padding: '6px 16px', background: '#e6f4ea', color: '#1e8e3e', borderRadius: '8px', fontWeight: 600, fontSize: '14px' }}>
             {status.charAt(0).toUpperCase() + status.slice(1)}
           </span>
         )}
@@ -72,17 +80,25 @@ const RequestsCardV2 = ({
         {type === 'outgoing' && (
           <>
             <span style={{ 
-              padding: '4px 12px', 
-              background: status.toLowerCase() === 'confirmed' ? '#d1fae5' : '#fef08a', 
-              color: status.toLowerCase() === 'confirmed' ? '#059669' : '#854d0e', 
-              borderRadius: '20px', 
-              fontWeight: 500, 
-              fontSize: '12px' 
+              padding: '6px 16px', 
+              background: status.toLowerCase() === 'confirmed' ? '#e6f4ea' : '#fef08a', 
+              color: status.toLowerCase() === 'confirmed' ? '#1e8e3e' : '#854d0e', 
+              borderRadius: '16px', 
+              fontWeight: 600, 
+              fontSize: '13px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px'
             }}>
+              {status.toLowerCase() === 'pending' && '⏳'}
               {status.charAt(0).toUpperCase() + status.slice(1)}
             </span>
             {status.toLowerCase() === 'pending' && (
-              <button style={{ padding: '6px 16px', background: 'transparent', color: '#ef4444', border: '1px solid #fca5a5', borderRadius: '20px', fontWeight: 500, fontSize: '13px', cursor: 'pointer' }}>
+              <button 
+                style={{ padding: '8px 20px', background: '#ffffff', color: '#5f6368', border: '1px solid #dadce0', borderRadius: '8px', fontWeight: 500, fontSize: '14px', cursor: 'pointer', transition: 'background 0.2s' }}
+                onMouseOver={(e) => { e.currentTarget.style.background = '#f8f9fa' }}
+                onMouseOut={(e) => { e.currentTarget.style.background = '#ffffff' }}
+              >
                 Cancel
               </button>
             )}

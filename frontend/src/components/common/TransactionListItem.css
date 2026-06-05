@@ -1,13 +1,11 @@
 .tx-list-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 0.5px solid var(--cs-border);
-}
-
-.tx-list-item:last-child {
-  border-bottom: none;
+  gap: 16px;
+  padding: 16px;
+  background: #ffffff;
+  border: 1px solid #E5E7EB;
+  border-radius: 12px;
 }
 
 .tx-icon {
@@ -64,7 +62,7 @@
 }
 
 .tx-amount.tx-amt-dr {
-  color: #222;
+  color: #ef4444;
 }
 
 .tx-amount.tx-amt-dr::before {

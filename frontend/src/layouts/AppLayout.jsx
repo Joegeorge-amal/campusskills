@@ -39,9 +39,7 @@ const AppLayout = () => {
     } else if (path.includes('/app/marketplace')) {
       config.isAdvanced = true;
     } else if (path.includes('/app/messages')) {
-      config.chips = ['All', 'Unread', 'Active', 'Archived'];
-    } else if (path.includes('/app/requests')) {
-      config.chips = ['All', 'Pending', 'Accepted', 'Rejected', 'Cancelled'];
+      // no chips
     } else if (path.includes('/app/sessions')) {
       config.chips = ['All', 'Upcoming', 'Completed', 'Cancelled'];
     } else if (path.includes('/app/wallet')) {

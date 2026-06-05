@@ -9,10 +9,10 @@ const Requests = () => {
   const outgoingRequests = requests.filter(r => r.direction === 'outgoing');
 
   return (
-    <div id="requests" className="pg on" style={{ padding: '24px', background: '#f9fafb', minHeight: '100vh', maxWidth: '800px', margin: '0 auto' }}>
+    <div id="requests" className="pg on" style={{ padding: '32px 40px', background: '#F4F5F9', minHeight: '100vh', boxSizing: 'border-box' }}>
       
       <div style={{ marginBottom: '32px' }}>
-        <div style={{ fontSize: '12px', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '16px' }}>Sent by you</div>
+        <div style={{ fontSize: '12px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '16px' }}>Sent by you</div>
         
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {outgoingRequests.map(req => (
@@ -27,7 +27,7 @@ const Requests = () => {
           ))}
 
           {outgoingRequests.length === 0 && (
-            <div style={{ fontSize: '13px', color: '#9ca3af', padding: '32px 0', textAlign: 'center', background: '#ffffff', borderRadius: '12px', border: '1px dashed #e5e7eb' }}>
+            <div style={{ fontSize: '14px', color: '#6b7280', padding: '48px 0', textAlign: 'center', background: '#ffffff', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
               You haven't sent any requests yet.
             </div>
           )}
@@ -35,7 +35,7 @@ const Requests = () => {
       </div>
 
       <div>
-        <div style={{ fontSize: '12px', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '16px' }}>Incoming requests</div>
+        <div style={{ fontSize: '12px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '16px' }}>Incoming requests</div>
         
         <div style={{ display: 'flex', flexDirection: 'column' }}>
           {incomingRequests.map(req => (
@@ -54,7 +54,7 @@ const Requests = () => {
           ))}
           
           {incomingRequests.length === 0 && (
-            <div style={{ fontSize: '13px', color: '#9ca3af', padding: '32px 0', textAlign: 'center', background: '#ffffff', borderRadius: '12px', border: '1px dashed #e5e7eb' }}>
+            <div style={{ fontSize: '14px', color: '#6b7280', padding: '48px 0', textAlign: 'center', background: '#ffffff', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
               No incoming requests right now.
             </div>
           )}
