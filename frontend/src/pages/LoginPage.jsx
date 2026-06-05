@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import ForgotPasswordModal from '../components/modals/ForgotPasswordModal';
-import { IconArrowLeft, IconUser, IconShieldLock } from '@tabler/icons-react';
+import { IconArrowLeft, IconUser, IconShieldLock, IconLogin, IconMail, IconLock, IconEye, IconEyeClosed } from '@tabler/icons-react';
+import logo from '../assets/kju_campus_logo.png';
 import '../styles/login.css';
 
 const LoginPage = () => {
@@ -12,6 +13,7 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isForgotOpen, setIsForgotOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
 
@@ -40,22 +42,29 @@ const LoginPage = () => {
     }
   };
 
-  const handleGoogleLogin = () => {
-    navigate('/setup'); // For the demo, going to setup simulating new Google user
-  };
+
 
   return (
-    <div className="auth-page">
-      <Link to="/" className="auth-back-link">
+    <div className="auth-page" style={{ minHeight: '100vh', width: '100%' }}>
+      <Link to="/" className="auth-back-link" style={{ position: 'absolute', top: '32px', left: '32px' }}>
         <IconArrowLeft size={18} />
         Back
       </Link>
       
-      <div className="auth-container">
+      <div className="auth-container" style={{ 
+        width: '100%', 
+        maxWidth: '520px', 
+        position: 'absolute', 
+        top: '50%', 
+        left: '50%', 
+        transform: 'translate(-50%, -50%)',
+        padding: '16px',
+        boxSizing: 'border-box'
+      }}>
         <div className="auth-card fade-in">
           <div className="login-header">
             <div className="login-logo-group">
-              <div className="login-mark">cs</div>
+              <img src={logo} alt="CampusSkills Logo" style={{ width: '48px', height: '48px' }} />
               <div className="login-brand-text">
                 <div className="brand-title">Campus<span>Skills</span></div>
                 <div className="brand-subtitle">Kristu Jayanti University</div>
@@ -92,25 +101,39 @@ const LoginPage = () => {
           <form onSubmit={handleLogin} className="login-form">
             <div className="lfld">
               <label className="lbl">College Email Address</label>
-              <input
-                className="linp"
-                type="email"
-                placeholder={tab === 'student' ? "yourname@kristujayanti.com" : "admin@kristujayanti.com"}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+              <div className="input-wrapper">
+                <IconMail className="input-icon" size={20} strokeWidth={1.5} />
+                <input
+                  className="linp with-icon"
+                  type="email"
+                  placeholder={tab === 'student' ? "yourname@kristujayanti.com" : "admin@kristujayanti.com"}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
             </div>
             <div className="lfld">
               <label className="lbl">Password</label>
-              <input
-                className="linp"
-                type="password"
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+              <div className="input-wrapper">
+                <IconLock className="input-icon" size={20} strokeWidth={1.5} />
+                <input
+                  className="linp with-icon"
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <button 
+                  type="button" 
+                  className="password-toggle" 
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label="Toggle password visibility"
+                >
+                  {showPassword ? <IconEye size={18} strokeWidth={1.5} /> : <IconEyeClosed size={18} strokeWidth={1.5} />}
+                </button>
+              </div>
               <div className="forgot-pwd-container">
                 <a onClick={() => setIsForgotOpen(true)} className="forgot-pwd-link">
                   Forgot Password?
@@ -119,15 +142,11 @@ const LoginPage = () => {
             </div>
             
             <button className="lbtn" type="submit" disabled={isLoading}>
-              {isLoading ? 'Signing In...' : 'Sign In'}
+              <IconLogin size={20} style={{ transform: 'scaleX(-1)' }} />
+              {isLoading ? 'Signing In...' : `Sign In as ${tab === 'student' ? 'Student' : 'Admin'}`}
             </button>
             
-            <div className="ldiv">or continue with</div>
-            
-            <button type="button" className="gbtn" onClick={handleGoogleLogin}>
-              <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="G" width="18" height="18" />
-              Sign in with Google
-            </button>
+
 
             {error && (
               <div className="login-err">
@@ -140,7 +159,7 @@ const LoginPage = () => {
             <div className="footer-divider">
               <span>New to CampusSkills?</span>
             </div>
-            <a className="create-account-link" onClick={handleGoogleLogin}>
+            <a className="create-account-link" onClick={() => navigate('/setup')}>
               {tab === 'student' ? 'Create an Account' : 'Create a student account'}
             </a>
           </div>

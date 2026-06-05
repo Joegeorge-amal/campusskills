@@ -1,8 +1,8 @@
 .landing-page {
   font-family: 'Inter', sans-serif;
-  color: #111827;
-  background-color: #ffffff;
-  overflow-x: hidden;
+  color: #1a1a1a;
+  background-color: #fafafa;
+  overflow-x: clip;
 }
 
 /* ==================
@@ -13,10 +13,13 @@
   justify-content: space-between;
   align-items: center;
   padding: 0 4rem;
-  height: 80px;
-  background-color: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(10px);
-  position: sticky;
+  height: 60px;
+  background-color: rgba(255, 255, 255, 0.85); /* More opaque, still letting heavy hues through */
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  position: fixed;
+  width: 100%;
+  box-sizing: border-box;
   top: 0;
   z-index: 100;
   border-bottom: 1px solid #f3f4f6;
@@ -29,7 +32,7 @@
 }
 
 .university-logo {
-  height: 40px;
+  height: 48px; /* Adjusted to fit the new 60px navbar */
   width: auto;
 }
 
@@ -41,7 +44,11 @@
 .brand-name {
   font-weight: 700;
   font-size: 1.125rem;
-  color: #1e3a8a; /* Deep blue/purple */
+  color: #0a2472; /* Deep blue/purple */
+}
+
+.brand-accent {
+  color: #6366f1;
 }
 
 .brand-sub {
@@ -69,18 +76,37 @@
 
 .btn-signin {
   padding: 10px 28px;
-  background-color: #4f46e5; /* Primary */
-  color: white;
+  background-color: #5b52c0; /* Softer purple from reference */
+  color: #f8fafc;
   border: none;
   border-radius: 8px;
   font-weight: 600;
   font-size: 0.875rem;
   text-decoration: none;
   transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.btn-arrow {
+  display: inline-block;
+  transform: translateY(-1px); /* optically center with uppercase text */
+  font-size: 1.1em;
 }
 
 .btn-signin:hover {
-  background-color: #4338ca; 
+  background-color: #4c44a8; 
+}
+
+.btn-bottom-cta {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.2s;
+}
+
+.btn-bottom-cta:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(91, 82, 192, 0.35); /* Updated purple shadow to match new button color */
+  background-color: #4c44a8;
 }
 
 /* ==================
@@ -88,12 +114,13 @@
    ================== */
 .hero-section {
   position: relative;
-  min-height: 80vh;
+  min-height: 100vh; /* Fill entire viewport, underlaying the nav */
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 6rem 2rem;
+  padding: 0 2rem;
 }
 
 .hero-background {
@@ -103,6 +130,7 @@
   width: 100%;
   height: 100%;
   z-index: 1;
+  overflow: hidden; /* Clips the scaled up hero image so it doesn't bleed out */
 }
 
 .hero-img {
@@ -117,86 +145,153 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(67, 56, 202, 0.45) 0%, rgba(14, 165, 233, 0.3) 100%);
+  background: 
+    linear-gradient(to bottom, rgba(17, 24, 39, 0) 0%, rgba(17, 24, 39, 0.55) 100%),
+    linear-gradient(135deg, rgba(67, 56, 202, 0.5) 0%, rgba(16, 185, 129, 0.25) 35%, rgba(16, 185, 129, 0.25) 65%, rgba(67, 56, 202, 0.5) 100%);
 }
 
 .hero-content {
   position: relative;
   z-index: 2;
-  color: white;
+  color: #f8fafc;
   max-width: 900px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: 18vh;
 }
 
 .hero-title {
-  font-size: 4.5rem;
+  font-size: clamp(3rem, 6vw, 4.75rem);
   font-weight: 900;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
   margin: 0;
+  transform: scaleY(1.15); /* Stretches the characters vertically */
+  transform-origin: center;
+  margin-bottom: 0.75rem; /* Accounts for the visual height increase */
 }
 
 .hero-highlight {
   display: block;
   font-style: italic;
-  font-size: 4.5rem;
-  color: #ffffff;
+  font-size: clamp(2.5rem, 5vw, 3.75rem);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.6) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
   font-weight: 900;
+  letter-spacing: -0.03em;
   margin-top: 0;
 }
 
 .hero-subtitle {
-  font-size: 1.125rem;
-  font-weight: 400;
-  opacity: 0.95;
+  font-size: clamp(1.125rem, 1.5vw, 1.25rem); /* Increased size */
   line-height: 1.6;
-  margin-top: 1.5rem;
-  margin-bottom: 2.5rem;
-  max-width: 650px;
+  max-width: 600px;
+  margin: 1.5rem auto 3.5rem; /* Increased bottom spacing to push button down */
+  color: #f8fafc; /* More white */
+  font-weight: 300;
+  letter-spacing: 0.01em;
 }
 
 .btn-primary-inverted {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
   padding: 14px 32px;
-  background-color: white;
-  color: #4f46e5;
+  background-color: transparent;
+  color: #5b52c0;
   border-radius: 8px;
   font-size: 1rem;
   font-weight: 700;
   text-decoration: none;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: color 0.6s ease, transform 0.5s ease;
+  /* Fixes white border/aliasing bleed on WebKit when animating inside border-radius */
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+}
+
+/* Default white background */
+.btn-primary-inverted::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #fafafa;
+  z-index: -2;
+}
+
+/* Purple radial propagation */
+.btn-primary-inverted::after {
+  content: '';
+  position: absolute;
+  top: 100%; /* Anchor to the bottom edge */
+  left: 50%;
+  width: 300px; /* Large enough to comfortably cover the button */
+  height: 300px;
+  background-color: #5b52c0;
+  border-radius: 50%;
+  z-index: -1;
+  transform: translate(-50%, -50%) scale(0);
+  transition: transform 0.5s ease; /* Smoother, slower retreat */
+  transform-origin: center center;
 }
 
 .btn-primary-inverted:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-  background-color: #f9fafb;
+  color: #ffffff;
+  transform: translateY(-4px);
+}
+
+.btn-primary-inverted:hover::after {
+  transform: translate(-50%, -50%) scale(1.2);
+  transition: transform 0.6s ease; /* Smoother, less aggressive ease */
 }
 
 .hero-stats {
   display: flex;
+  justify-content: center;
   gap: 1.5rem;
-  margin-top: 4rem;
+  margin-top: 3rem; /* Compensated to keep pills in the same spot */
+  flex-wrap: wrap;
 }
 
 .stat-pill {
   display: flex;
-  flex-direction: row;
   align-items: center;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  border-radius: 99px;
-  padding: 10px 24px;
+  gap: 0.75rem;
+  padding: 0.875rem 1.5rem;
+  background: rgba(255, 255, 255, 0.12); /* Restored original opacity */
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-top-color: rgba(255, 255, 255, 0.45);
+  border-left-color: rgba(255, 255, 255, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  animation: blurFadeIn 0.5s ease-out forwards;
+  animation-delay: 1.6s; /* Wait for Framer Motion entrance to completely finish */
+}
+
+@keyframes blurFadeIn {
+  from {
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+  }
+  to {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
 }
 
 .stat-pill strong {
-  font-size: 1rem;
+  font-size: 1.125rem;
   font-weight: 800;
-  color: white;
+  color: #f8fafc;
 }
 
 .stat-pill span {
@@ -217,8 +312,9 @@
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #6366f1;
+  letter-spacing: 0.15em; /* Increased letter spacing */
+  word-spacing: 0.25em; /* Added word spacing */
+  color: #4338ca; /* Darker purple */
   margin-bottom: 1rem;
   display: block;
 }
@@ -239,11 +335,11 @@
 }
 
 .section-header h2 {
-  font-size: 2.75rem;
-  font-weight: 800;
+  font-size: 2.5rem;
+  font-weight: 700;
   margin: 0 0 1rem 0;
-  color: #111827;
-  letter-spacing: -0.02em;
+  color: #1a1a1a;
+  letter-spacing: -0.01em;
   line-height: 1.1;
 }
 
@@ -264,16 +360,16 @@
 }
 
 .about-text-content h2 {
-  font-size: 2.75rem;
-  font-weight: 800;
+  font-size: 2.25rem;
+  font-weight: 700;
   margin: 0 0 1.5rem 0;
-  color: #111827;
+  color: #1a1a1a;
   letter-spacing: -0.02em;
   line-height: 1.1;
 }
 
 .about-text-content p {
-  font-size: 1.125rem;
+  font-size: 1rem;
   color: #4b5563;
   line-height: 1.6;
   max-width: 450px;
@@ -286,19 +382,26 @@
 }
 
 .about-card {
-  background: white;
+  background: #fafafa;
   border: 1px solid #f3f4f6;
   padding: 1.5rem;
   border-radius: 16px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
   display: flex;
   gap: 1.25rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.about-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 32px -8px rgba(99, 102, 241, 0.25);
+  border-color: rgba(99, 102, 241, 0.15);
 }
 
 .about-card-icon {
   width: 48px;
   height: 48px;
-  border-radius: 50%;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -310,7 +413,7 @@
   margin: 0 0 0.5rem 0;
   font-size: 1rem;
   font-weight: 700;
-  color: #111827;
+  color: #172554; /* Navy blue */
 }
 
 .about-card-text p {
@@ -322,16 +425,25 @@
 
 /* Icon Tints */
 .icon-purple { background: rgba(99, 102, 241, 0.1); }
-.icon-yellow { background: rgba(250, 204, 21, 0.1); }
+.icon-yellow { background: rgba(45, 212, 191, 0.15); }
 .icon-orange { background: rgba(249, 115, 22, 0.1); }
 
 /* ==================
    How It Works
    ================== */
 .how-it-works {
-  background-color: #fafafa;
+  background-color: #f5f3fc; /* Just a touch more purple */
   max-width: 100%;
+  border-top: 1px solid #d1d5db; /* Thinner but crisp 1px line */
+  border-bottom: 1px solid #d1d5db;
+  padding: 8rem 4rem; /* Increased vertical padding */
 }
+
+.how-it-works .section-header {
+  margin-bottom: 3.5rem; /* Slightly larger margin */
+}
+
+
 
 .steps-container {
   display: grid;
@@ -344,11 +456,19 @@
 
 .step-line {
   position: absolute;
-  top: 40px;
-  left: 12.5%;
-  right: 12.5%;
+  top: 36px; /* Centered with 72px icon */
+  /* Exact grid center is 12.5% minus 3/8ths of the gap (2rem = 32px), which is -12px.
+     Adding the 36px radius gives an offset of +24px */
+  left: calc(12.5% + 24px);
+  right: calc(12.5% + 24px);
   height: 1px;
-  background-color: #e5e7eb;
+  background: linear-gradient(
+    to right,
+    rgba(156, 163, 175, 0.05) 0%,
+    rgba(156, 163, 175, 0.6) 35%,
+    rgba(156, 163, 175, 0.6) 65%,
+    rgba(156, 163, 175, 0.05) 100%
+  );
   z-index: 1;
 }
 
@@ -360,29 +480,31 @@
 }
 
 .step-icon {
-  width: 80px;
-  height: 80px;
-  background: white;
-  border: 1px solid #f3f4f6;
+  width: 72px;
+  height: 72px;
+  background: #ffffff; /* Solid white to perfectly mask the line behind it */
+  border: 1px solid rgba(99, 102, 241, 0.15); /* Very subtle purple border matching the image */
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 0 auto 1.5rem auto;
-  font-size: 2rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  margin: 0 auto 1.25rem auto;
+  font-size: 1.75rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); /* Soft, natural drop shadow */
 }
 
+
+
 .step-card h3 {
-  margin: 0 0 0.75rem 0;
-  font-size: 1.125rem;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.05rem; /* Slightly larger text */
   font-weight: 700;
-  color: #111827;
+  color: #172554; /* Slightly darker navy blue */
 }
 
 .step-card p {
   color: #6b7280;
-  font-size: 0.875rem;
+  font-size: 0.875rem; /* Restored to original size */
   line-height: 1.5;
   margin: 0;
 }
@@ -390,29 +512,44 @@
 /* ==================
    Features
    ================== */
+.features-section {
+  padding: 4rem 4rem 2rem 4rem; /* Scaled down section padding */
+}
+
+.features-section .section-header {
+  margin-bottom: 2rem; /* Scaled down from 4rem */
+}
+
 .features-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 2rem;
+  gap: 1.5rem; /* Scaled down from 2rem */
 }
 
 .feature-card {
-  background: white;
+  background: #fafafa;
   border: 1px solid #f3f4f6;
-  padding: 2rem;
-  border-radius: 16px;
+  padding: 1.5rem; /* Reduced from 2rem */
+  border-radius: 12px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 32px -8px rgba(99, 102, 241, 0.25);
+  border-color: rgba(99, 102, 241, 0.15);
 }
 
 .feature-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+  width: 40px; /* Reduced from 48px */
+  height: 40px;
+  border-radius: 10px; /* Reduced from 12px */
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
-  margin-bottom: 1.5rem;
+  font-size: 1.25rem; /* Reduced from 1.5rem */
+  margin-bottom: 1rem; /* Reduced from 1.5rem */
 }
 
 .bg-purple { background: rgba(99, 102, 241, 0.1); }
@@ -423,15 +560,15 @@
 .bg-indigo { background: rgba(79, 70, 229, 0.1); }
 
 .feature-card h3 {
-  margin: 0 0 0.75rem 0;
-  font-size: 1.125rem;
+  margin: 0 0 0.5rem 0; /* Reduced from 0.75rem */
+  font-size: 1rem; /* Reduced from 1.125rem */
   font-weight: 700;
-  color: #111827;
+  color: #172554; /* Navy blue */
 }
 
 .feature-card p {
   color: #6b7280;
-  font-size: 0.875rem;
+  font-size: 0.8125rem; /* Reduced from 0.875rem */
   line-height: 1.5;
   margin: 0;
 }
@@ -445,6 +582,7 @@
   padding: 6rem 2rem;
   text-align: center;
   background-color: #f8fafc;
+  border: 1px solid #e2e8f0; /* Added subtle border */
   overflow: hidden;
 }
 
@@ -454,9 +592,10 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at center, rgba(99, 102, 241, 0.1) 0%, transparent 60%);
+  background: radial-gradient(circle at center, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0.03) 40%, transparent 70%);
   pointer-events: none;
 }
+
 
 .access-content {
   position: relative;
@@ -466,11 +605,11 @@
 }
 
 .access-content h2 {
-  font-size: 2.75rem;
-  font-weight: 800;
+  font-size: 2.5rem;
+  font-weight: 700;
   margin: 0 0 1.5rem 0;
-  color: #111827;
-  letter-spacing: -0.02em;
+  color: #1a1a1a;
+  letter-spacing: -0.01em;
   line-height: 1.1;
 }
 
@@ -505,15 +644,24 @@
    Bottom CTA
    ================== */
 .bottom-cta {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   text-align: center;
-  padding: 8rem 2rem;
+  min-height: 100vh;
+  max-width: 100%;
+  margin-top: 6rem;
+  padding: 4rem;
+  background-color: #f5f3fc;
+  border-top: 1px solid #d1d5db;
 }
 
 .bottom-cta h2 {
   font-size: 3.5rem;
   font-weight: 900;
   margin: 0 0 1.5rem 0;
-  color: #111827;
+  color: #1a1a1a;
   letter-spacing: -0.02em;
   line-height: 1.1;
 }
