@@ -28,10 +28,14 @@ public class Listing {
     
     private Boolean active;
     
+    private String status;
+    
     private Long createdAt;
     private Long updatedAt;
 
-    public Listing() {}
+    public Listing() {
+        this.status = "ACTIVE";
+    }
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
@@ -74,4 +78,7 @@ public class Listing {
 
     public Long getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(Long updatedAt) { this.updatedAt = updatedAt; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

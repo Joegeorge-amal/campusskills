@@ -17,11 +17,8 @@ public class TopicService {
         this.topicRepository = topicRepository;
     }
 
-    public Future<List<Topic>> getAllTopics(String category) {
-        if (category != null && !category.trim().isEmpty()) {
-            return topicRepository.findByCategory(category);
-        }
-        return topicRepository.findAll();
+    public Future<List<Topic>> getAllTopics(String category, String q) {
+        return topicRepository.search(category, q);
     }
 
     public Future<Topic> getTopicById(String id) {

@@ -12,7 +12,8 @@ public class ChatRouter {
         
         ChatRepository repository = new ChatRepository();
         com.campusskills.modules.messages.repositories.MessageRepository messageRepository = new com.campusskills.modules.messages.repositories.MessageRepository();
-        ChatService service = new ChatService(repository, messageRepository);
+        com.campusskills.modules.users.repositories.UserRepository userRepository = new com.campusskills.modules.users.repositories.UserRepository();
+        ChatService service = new ChatService(repository, messageRepository, userRepository);
         ChatHandler handler = new ChatHandler(service);
 
         router.post("/").handler(handler::createChat);

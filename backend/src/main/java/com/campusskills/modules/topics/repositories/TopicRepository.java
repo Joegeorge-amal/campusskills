@@ -34,8 +34,15 @@ public class TopicRepository {
                 .map(list -> list.stream().map(json -> json.mapTo(Topic.class)).collect(Collectors.toList()));
     }
 
-    public Future<List<Topic>> findByCategory(String category) {
-        JsonObject query = new JsonObject().put("category", category);
+    public Future<List<Topic>> search(String category, String q) {
+        JsonObject query = new JsonObject();
+        if (category != null && !category.trim().isEmpty()) {
+            query.put("category", category);
+        }
+        if (q != null && !q.trim().isEmpty()) {
+            // Case-insensitive regex match on name
+            query.put("name", new JsonObject().put("$regex", q).put("$options", "i"));
+        }
         return mongoClient.find(COLLECTION, query)
                 .map(list -> list.stream().map(json -> json.mapTo(Topic.class)).collect(Collectors.toList()));
     }
