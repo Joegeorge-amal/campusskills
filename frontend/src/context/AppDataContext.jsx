@@ -6,6 +6,13 @@ const AppDataContext = createContext();
 export const AppDataProvider = ({ children }) => {
   const { user, updateProfile } = useAuth();
   const [toastMessage, setToastMessage] = useState(null);
+  
+  // 0. Notifications (future-ready empty state)
+  const [notifications, setNotifications] = useState([]);
+  
+  const markAllAsRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
+  };
 
   // 1. Marketplace skills list
   const [skills, setSkills] = useState([
@@ -814,7 +821,9 @@ export const AppDataProvider = ({ children }) => {
         adminWarnUser,
         adminIssueRefund,
         adminDismissReport,
-        createSession
+        createSession,
+        notifications,
+        markAllAsRead
       }}
     >
       {children}

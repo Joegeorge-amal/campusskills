@@ -1,9 +1,9 @@
 import React from 'react';
 import './CategoryFilterTabs.css';
 
-const CategoryFilterTabs = ({ categories, activeCategory, onSelectCategory }) => {
+const CategoryFilterTabs = ({ categories, activeCategory, onSelectCategory, variant }) => {
   return (
-    <div className="cat-filter-tabs">
+    <div className={`cat-filter-tabs ${variant === 'marketplace' ? 'wrap' : ''}`}>
       {categories.map(cat => (
         <button
           key={cat}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { IconChevronLeft, IconSearch, IconAdjustmentsHorizontal } from '@tabler/icons-react';
 import { useAppData } from '../../context/AppDataContext';
@@ -6,6 +6,32 @@ import '../../styles/admin.css';
 
 const AdminReports = () => {
   const { adminReports, adminDismissReport } = useAppData();
+  
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState('All');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+
+  // Composite Filter & Search Logic
+  const filteredReports = adminReports.filter(report => {
+    // Filter State
+    if (activeFilter !== 'All' && report.status.toLowerCase() !== activeFilter.toLowerCase()) return false;
+
+    // Search Query (id, reporter, target, title, desc)
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const reportIdStr = `d-${String(report.id).padStart(3, '0')}`;
+      if (
+        !reportIdStr.includes(q) &&
+        !(report.reporter && report.reporter.toLowerCase().includes(q)) &&
+        !(report.target && report.target.toLowerCase().includes(q)) &&
+        !(report.title && report.title.toLowerCase().includes(q)) &&
+        !(report.desc && report.desc.toLowerCase().includes(q))
+      ) {
+        return false;
+      }
+    }
+    return true;
+  });
 
   // For the UI, we'll map the status strings to match the design aesthetics
   const getBadgeStyle = (status) => {
@@ -29,27 +55,76 @@ const AdminReports = () => {
         </h1>
       </div>
 
-      <div className="admin-search-bar">
+      <div className="admin-search-bar" style={{ position: 'relative' }}>
         <div className="admin-search-input-wrapper">
           <IconSearch className="admin-search-icon" size={20} />
           <input 
             type="text" 
             className="admin-search-input" 
             placeholder="Search by student, tutor or reason..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-        <button className="admin-filter-btn">
-          <IconAdjustmentsHorizontal size={20} /> Filters
-        </button>
+        
+        <div style={{ position: 'relative' }}>
+          <button 
+            className="admin-filter-btn" 
+            onClick={() => setIsFilterOpen(!isFilterOpen)}
+            style={{ position: 'relative', zIndex: 10 }}
+          >
+            <IconAdjustmentsHorizontal size={20} /> 
+            {activeFilter === 'All' ? 'Filters' : `Filter: ${activeFilter}`}
+          </button>
+          
+          {isFilterOpen && (
+            <div style={{
+              position: 'absolute',
+              top: '110%',
+              right: '0',
+              width: '180px',
+              background: '#ffffff',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+              zIndex: 50,
+              padding: '8px 0',
+              overflow: 'hidden'
+            }}>
+              {['All', 'Open', 'Reviewing', 'Resolved'].map(filterOption => (
+                <div 
+                  key={filterOption}
+                  onClick={() => { setActiveFilter(filterOption); setIsFilterOpen(false); }}
+                  style={{
+                    padding: '10px 16px',
+                    fontSize: '0.9rem',
+                    fontWeight: activeFilter === filterOption ? 600 : 500,
+                    color: activeFilter === filterOption ? '#4f46e5' : '#374151',
+                    background: activeFilter === filterOption ? '#f9fafb' : 'transparent',
+                    cursor: 'pointer'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (activeFilter !== filterOption) e.target.style.background = '#f3f4f6';
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeFilter !== filterOption) e.target.style.background = 'transparent';
+                  }}
+                >
+                  {filterOption}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-        {adminReports.length === 0 ? (
+        {filteredReports.length === 0 ? (
           <div className="admin-card" style={{ textAlign: 'center', padding: '48px', color: '#6b7280' }}>
-            No disputes or reports found.
+            No disputes or reports found matching the criteria.
           </div>
         ) : (
-          adminReports.map((report) => (
+          filteredReports.map((report) => (
             <div key={report.id} className="admin-card">
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
                 <span style={{ fontSize: '0.95rem', fontWeight: 700, color: '#111827' }}>
@@ -68,11 +143,13 @@ const AdminReports = () => {
               </div>
               
               <div style={{ fontSize: '1.1rem', fontWeight: 600, color: '#111827', marginBottom: '4px' }}>
-                {report.student} vs {report.tutor}
+                {report.reporter} vs {report.target}
               </div>
               
-              <div style={{ fontSize: '0.85rem', color: '#6b7280', marginBottom: '24px' }}>
-                {report.reason} · Amount: ₹{report.amount || 200}
+              <div style={{ fontSize: '0.85rem', color: '#6b7280', marginBottom: '24px', lineHeight: 1.5 }}>
+                <span style={{ fontWeight: 600, color: '#374151' }}>{report.title}</span><br/>
+                {report.desc} <br/>
+                <span style={{ display: 'inline-block', marginTop: '6px' }}>Amount: ₹{report.amount || 200}</span>
               </div>
 
               <div style={{ display: 'flex', gap: '16px' }}>
