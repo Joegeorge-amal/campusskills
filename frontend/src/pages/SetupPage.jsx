@@ -1,10 +1,11 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { IconArrowLeft } from '@tabler/icons-react';
+import { IconArrowLeft, IconSchool } from '@tabler/icons-react';
 
 const SetupPage = () => {
   const [step, setStep] = useState(1);
+  const [highestStep, setHighestStep] = useState(1);
   const navigate = useNavigate();
   const { register, updateProfile } = useAuth();
 
@@ -45,8 +46,27 @@ const SetupPage = () => {
 
   const handleNext = (e) => {
     if (e) e.preventDefault();
-    if (step < 3) setStep(step + 1);
-    else handleFinish();
+    setError('');
+
+    // Validate Step 1 before proceeding
+    if (step === 1) {
+      if (!email.trim().toLowerCase().endsWith('@kristujayanti.com')) {
+        setError('Only University emal adresses are allowed.');
+        return;
+      }
+      if (password.length < 8) {
+        setError('Password must be at least 8 characters long.');
+        return;
+      }
+    }
+
+    if (step < 3) {
+      setStep(step + 1);
+      setHighestStep(h => Math.max(h, step + 1));
+      window.scrollTo(0,0);
+    } else {
+      handleFinish();
+    }
   };
 
   const handleBack = () => {
@@ -135,35 +155,37 @@ const SetupPage = () => {
   ];
 
   return (
-    <div id="setup" className="auth-page">
+    <div id="setup" className="auth-page" style={{ flexDirection: 'column', padding: '48px 16px', justifyContent: 'flex-start', backgroundColor: '#f5f3ff' }}>
       <div className="bg-circle bg-circle-1"></div>
       <div className="bg-circle bg-circle-2"></div>
       
-      <div className="auth-container">
-        <div className="setup-card fade-in" style={{ position: 'relative' }}>
-          {step === 1 && (
-            <button 
-              type="button"
-              onClick={() => navigate('/login')}
-              style={{ position: 'absolute', top: '24px', left: '24px', background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: '6px', color: '#666', fontSize: '13px', fontWeight: 500, cursor: 'pointer', zIndex: 10, padding: '8px' }}
-            >
-              <IconArrowLeft size={16} /> Back to Login
-            </button>
-          )}
-          
-          <div className="setup-logo" style={{ marginTop: '16px' }}>
-            <div className="setup-mark">cs</div>
-            <div className="setup-brand">campus<span>skills</span></div>
+      {step === 1 && (
+        <button 
+          type="button"
+          onClick={() => navigate('/login')}
+          style={{ position: 'absolute', top: '32px', left: '32px', background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: '6px', color: '#4b5563', fontSize: '14px', fontWeight: 500, cursor: 'pointer', zIndex: 10 }}
+        >
+          <IconArrowLeft size={18} /> Back to Login
+        </button>
+      )}
+
+      {/* HEADER & STEPS OUTSIDE CARD */}
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: '850px', margin: '0 auto 24px', zIndex: 2 }}>
+        <div className="setup-logo" style={{ marginBottom: '16px' }}>
+          <div className="setup-mark" style={{ borderRadius: '50%', background: 'transparent', width: '36px', height: '36px', padding: 0 }}>
+            <img src="/src/assets/kju_campus_logo.png" alt="logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }} />
+            <IconSchool size={28} color="#534AB7" style={{ display: 'none', margin: 'auto' }} />
           </div>
+          <div className="setup-brand" style={{ fontSize: '18px' }}>campus<span>skills</span></div>
+        </div>
         <div className="setup-hdr">
-          <div className="setup-title">Set up your profile</div>
-          <div className="setup-sub">Tell us about yourself to get matched with the right people</div>
-          {error && <div style={{ color: '#E24B4A', fontSize: '13px', marginTop: '12px', background: '#FBEAF0', padding: '10px 14px', borderRadius: '8px', fontWeight: 500 }}>{error}</div>}
+          <div className="setup-title" style={{ color: '#1e1b4b', fontSize: '24px' }}>Set up your profile</div>
+          <div className="setup-sub" style={{ color: '#6b7280' }}>Tell us about yourself to get matched with the right people</div>
         </div>
 
         {/* Step indicator */}
-        <div className="step-prog-wrap" id="step-prog">
-          <div className="spw-item">
+        <div className="step-prog-wrap" id="step-prog" style={{ width: '100%', maxWidth: '850px', margin: '32px 0 16px' }}>
+          <div className="spw-item" onClick={() => highestStep >= 1 && setStep(1)} style={{ cursor: highestStep >= 1 ? 'pointer' : 'default' }}>
             <div className="spw-top">
               <div className="spw-line hidden"></div>
               <div className={`sp-dot ${step === 1 ? 'active' : 'done'}`}>1</div>
@@ -171,7 +193,7 @@ const SetupPage = () => {
             </div>
             <div className="sp-lbl">About you</div>
           </div>
-          <div className="spw-item">
+          <div className="spw-item" onClick={() => highestStep >= 2 && setStep(2)} style={{ cursor: highestStep >= 2 ? 'pointer' : 'default' }}>
             <div className="spw-top">
               <div className={`spw-line ${step > 1 ? 'done' : ''}`}></div>
               <div className={`sp-dot ${step === 2 ? 'active' : (step > 2 ? 'done' : 'idle')}`}>2</div>
@@ -179,7 +201,7 @@ const SetupPage = () => {
             </div>
             <div className="sp-lbl">Your skills</div>
           </div>
-          <div className="spw-item">
+          <div className="spw-item" onClick={() => highestStep >= 3 && setStep(3)} style={{ cursor: highestStep >= 3 ? 'pointer' : 'default' }}>
             <div className="spw-top">
               <div className={`spw-line ${step > 2 ? 'done' : ''}`}></div>
               <div className={`sp-dot ${step === 3 ? 'active' : 'idle'}`}>3</div>
@@ -188,14 +210,19 @@ const SetupPage = () => {
             <div className="sp-lbl">Availability</div>
           </div>
         </div>
+      </div>
 
+      <div className="setup-card fade-in" style={{ width: '100%', maxWidth: '600px', margin: '0 auto', zIndex: 2, padding: '40px 48px' }}>
         <form onSubmit={handleNext}>
           {/* Step 1: Basic info */}
           {step === 1 && (
             <div className="setup-step on">
               <div>
-                <div className="ch"><span className="ct">Create your account</span></div>
-                <div className="form-grid">
+                <div className="ch" style={{ marginBottom: '24px' }}>
+                  <span className="ct" style={{ fontSize: '16px', color: '#111827', fontWeight: 700 }}>Create your account</span>
+                </div>
+
+                <div className="form-grid" style={{ marginBottom: '24px' }}>
                   <div className="sfld">
                     <label>Email *</label>
                     <input type="email" placeholder="yourname@college.edu" value={email} onChange={e => setEmail(e.target.value)} required />
@@ -205,11 +232,15 @@ const SetupPage = () => {
                     <input type="password" placeholder="Min. 8 characters" value={password} onChange={e => setPassword(e.target.value)} required />
                   </div>
                 </div>
-                <div style={{ height: '1px', background: '#E8E7F5', margin: '4px 0 16px' }}></div>
-                <div className="ch"><span className="ct">Basic information</span></div>
+
+                <div style={{ height: '1px', background: '#e5e7eb', margin: '32px 0' }}></div>
+
+                <div className="ch" style={{ marginBottom: '24px' }}>
+                  <span className="ct" style={{ fontSize: '16px', color: '#111827', fontWeight: 700 }}>Basic information</span>
+                </div>
                 
-                <div className="avatar-pick">
-                  <div className="av-wrap" onClick={() => fileInputRef.current?.click()} style={{ cursor: 'pointer' }}>
+                <div className="avatar-pick" style={{ marginBottom: '32px' }}>
+                  <div className="av-wrap" onClick={() => fileInputRef.current?.click()} style={{ cursor: 'pointer', width: '64px', height: '64px' }}>
                     <input 
                       type="file" 
                       ref={fileInputRef} 
@@ -218,20 +249,25 @@ const SetupPage = () => {
                       onChange={handleImageChange}
                     />
                     <div className="av-big" style={{ 
+                      width: '64px', height: '64px', fontSize: '24px',
                       background: avatarColor.bg, color: avatarColor.text,
                       ...(avatarImg ? { backgroundImage: `url(${avatarImg})`, backgroundSize: 'cover', backgroundPosition: 'center', color: 'transparent' } : {})
                     }}>
                       {!avatarImg && getInitials()}
                     </div>
-                    <div className="av-cam">
-                      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7zm7-13h-1.5l-1.7-2H8.2L6.5 2.5H5A3 3 0 0 0 2 5.5v13A3 3 0 0 0 5 21.5h14a3 3 0 0 0 3-3v-13A3 3 0 0 0 19 2.5z" fill="#fff"/></svg>
+                    <div className="av-cam" style={{ width: '24px', height: '24px', bottom: '-4px', right: '-4px' }}>
+                      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style={{ width: '12px', height: '12px' }}><path d="M12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7zm7-13h-1.5l-1.7-2H8.2L6.5 2.5H5A3 3 0 0 0 2 5.5v13A3 3 0 0 0 5 21.5h14a3 3 0 0 0 3-3v-13A3 3 0 0 0 19 2.5z" fill="#fff"/></svg>
                     </div>
                   </div>
-                  <div>
-                    <div style={{ fontSize: '12px', color: '#555', marginBottom: '8px', fontWeight: 500, display: 'flex', justifyContent: 'space-between' }}>
+                  <div style={{ marginLeft: '12px' }}>
+                    <div style={{ fontSize: '13px', color: '#4b5563', marginBottom: '8px', fontWeight: 500, display: 'flex', justifyContent: 'space-between' }}>
                       <span>Choose avatar colour</span>
                       {avatarImg && (
-                        <button type="button" onClick={(e) => { e.stopPropagation(); setAvatarImg(null); }} style={{ background: 'none', border: 'none', color: '#E24B4A', fontSize: '11px', cursor: 'pointer', padding: 0 }}>Remove</button>
+                        <button type="button" onClick={(e) => { 
+                          e.stopPropagation(); 
+                          setAvatarImg(null); 
+                          if (fileInputRef.current) fileInputRef.current.value = '';
+                        }} style={{ background: 'none', border: 'none', color: '#E24B4A', fontSize: '12px', cursor: 'pointer', padding: 0 }}>Remove</button>
                       )}
                     </div>
                     <div className="av-colors">
@@ -239,7 +275,7 @@ const SetupPage = () => {
                         <div 
                           key={i}
                           className={`av-col ${avatarColor.bg === c.bg ? 'on' : ''}`} 
-                          style={{ background: c.bg, borderColor: avatarColor.bg === c.bg ? '#534AB7' : 'transparent' }} 
+                          style={{ background: c.bg, borderColor: avatarColor.bg === c.bg ? '#534AB7' : 'transparent', width: '28px', height: '28px' }} 
                           onClick={() => setAvatarColor(c)}
                         ></div>
                       ))}
@@ -247,7 +283,7 @@ const SetupPage = () => {
                   </div>
                 </div>
 
-                <div className="form-grid">
+                <div className="form-grid" style={{ marginBottom: '20px' }}>
                   <div className="sfld">
                     <label>First name *</label>
                     <input type="text" placeholder="Arjun" value={firstName} onChange={e => setFirstName(e.target.value)} required />
@@ -258,7 +294,7 @@ const SetupPage = () => {
                   </div>
                 </div>
 
-                <div className="form-grid">
+                <div className="form-grid" style={{ marginBottom: '20px' }}>
                   <div className="sfld">
                     <label>Year *</label>
                     <select value={year} onChange={e => setYear(e.target.value)} required>
@@ -283,7 +319,7 @@ const SetupPage = () => {
                   </div>
                 </div>
 
-                <div className="sfld">
+                <div className="sfld" style={{ marginBottom: '20px' }}>
                   <label>College *</label>
                   <select value={college} onChange={e => setCollege(e.target.value)} required>
                     <option value="">Select your college</option>
@@ -296,8 +332,14 @@ const SetupPage = () => {
                   </select>
                 </div>
 
+                <div className="sfld" style={{ marginBottom: '32px' }}>
+                  <label>Bio (optional)</label>
+                  <textarea placeholder="Tell others what you're passionate about..." value={bio} onChange={e => setBio(e.target.value)}></textarea>
+                </div>
+
               </div>
-              <button type="submit" className="sbtn">Continue</button>
+              {error && <div style={{ color: '#E24B4A', fontSize: '13px', marginBottom: '16px', background: '#FBEAF0', padding: '10px 14px', borderRadius: '8px', fontWeight: 500 }}>{error}</div>}
+              <button type="submit" className="sbtn" style={{ padding: '16px', borderRadius: '12px', fontSize: '16px' }}>Continue</button>
             </div>
           )}
 
@@ -375,6 +417,7 @@ const SetupPage = () => {
                 <input type="text" placeholder="e.g. Photography, Hiking..." value={interests} onChange={e => setInterests(e.target.value)} />
               </div>
 
+              {error && <div style={{ color: '#E24B4A', fontSize: '13px', marginBottom: '16px', background: '#FBEAF0', padding: '10px 14px', borderRadius: '8px', fontWeight: 500 }}>{error}</div>}
               <div className="sbtn-row">
                 <button type="button" className="sbtn-back" onClick={handleBack}>Back</button>
                 <button type="submit" className="sbtn">Continue</button>
@@ -438,6 +481,7 @@ const SetupPage = () => {
                 <input type="text" placeholder="yourname@upi" value={upi} onChange={e => setUpi(e.target.value)} />
               </div>
 
+              {error && <div style={{ color: '#E24B4A', fontSize: '13px', marginBottom: '16px', background: '#FBEAF0', padding: '10px 14px', borderRadius: '8px', fontWeight: 500 }}>{error}</div>}
               <div className="sbtn-row">
                 <button type="button" className="sbtn-back" onClick={handleBack}>Back</button>
                 <button type="submit" className="sbtn">Go to Dashboard</button>
@@ -450,7 +494,6 @@ const SetupPage = () => {
             </div>
           )}
         </form>
-        </div>
       </div>
     </div>
   );

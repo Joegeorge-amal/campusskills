@@ -150,10 +150,10 @@ button, input, select, textarea {
   white-space: nowrap;
   z-index: 999;
   pointer-events: none;
-  animation: fadeIn 0.2s ease-out;
+  animation: toastFadeIn 0.2s ease-out;
 }
 
-@keyframes fadeIn {
+@keyframes toastFadeIn {
   from {
     opacity: 0;
     transform: translate(-50%, 10px);
