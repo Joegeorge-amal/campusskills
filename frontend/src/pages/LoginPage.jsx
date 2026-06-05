@@ -45,16 +45,18 @@ const LoginPage = () => {
 
 
   return (
-    <div className="auth-page" style={{ height: '100vh', width: '100%', display: 'flex', flexDirection: 'column', position: 'relative', padding: '16px', boxSizing: 'border-box', overflow: 'hidden' }}>
+    <div className="auth-page" style={{ minHeight: '100vh', width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', padding: '16px', boxSizing: 'border-box' }}>
       <Link to="/" className="auth-back-link" style={{ position: 'absolute', top: '32px', left: '32px' }}>
         <IconArrowLeft size={18} />
         Back
       </Link>
       
+      {/* Top flex spacer for vertical centering without top-cropping */}
+      <div style={{ flex: 1, minHeight: '32px' }} />
+
       <div className="auth-container" style={{ 
         width: '100%', 
-        maxWidth: '520px', 
-        margin: 'auto',
+        maxWidth: '520px',
         boxSizing: 'border-box'
       }}>
         <div className="auth-card fade-in">
@@ -161,7 +163,10 @@ const LoginPage = () => {
           </div>
         </div>
       </div>
-
+      
+      {/* Bottom flex spacer */}
+      <div style={{ flex: 1, minHeight: '32px' }} />
+      
       <ForgotPasswordModal 
         isOpen={isForgotOpen} 
         onClose={() => setIsForgotOpen(false)} 
