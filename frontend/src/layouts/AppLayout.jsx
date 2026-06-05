@@ -47,8 +47,6 @@ const AppLayout = () => {
     } else if (path.includes('/app/wallet')) {
       config.showSearch = false;
       config.chips = ['All', 'Credits', 'Debits'];
-    } else if (path.includes('/app/history')) {
-      config.chips = ['Sessions', 'Wallet', 'Exchanges'];
     } else if (path.includes('/app/profile') || path.includes('/app/edit-profile') || path.includes('/app/add-bank') || path.includes('/app/add-money') || path.includes('/app/withdraw') || path.includes('/app/payment') || path.includes('/app/swap-request')) {
       config.showSearch = false;
     }
@@ -119,8 +117,8 @@ const AppLayout = () => {
         navItems={navItems}
         sections={sections}
         brandIcon="cs"
-        brandText="campus"
-        brandSpan="skills"
+        brandText="Campus"
+        brandSpan="Skills"
         profileData={profileData}
         onLogout={handleSignOut}
       />

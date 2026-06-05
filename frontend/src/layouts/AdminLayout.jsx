@@ -3,6 +3,7 @@ import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { IconX } from '@tabler/icons-react';
 import Toast from '../components/common/Toast';
+import logo from '../assets/kju_campus_logo.png';
 import '../styles/admin.css';
 
 const AdminLayout = () => {
@@ -27,7 +28,7 @@ const AdminLayout = () => {
       {/* Top Header */}
       <header className="admin-header">
         <div className="admin-header-left">
-          <div className="admin-logo-mark">cs</div>
+          <img src={logo} alt="Campus Logo" style={{ width: '28px', height: '28px', objectFit: 'contain', borderRadius: '4px', marginRight: '8px' }} />
           <div className="admin-brand-text">
             Campus<span>Skills</span>
           </div>

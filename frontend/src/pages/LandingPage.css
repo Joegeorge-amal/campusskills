@@ -51,8 +51,9 @@ html {
 
 .brand-name {
   font-weight: 700;
-  font-size: 1.125rem;
-  color: #0a2472; /* Deep blue/purple */
+  font-size: 1.25rem;
+  color: #213B8A; /* Deep blue to match image */
+  letter-spacing: -0.5px;
 }
 
 .brand-accent {
