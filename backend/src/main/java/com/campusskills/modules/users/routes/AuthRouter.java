@@ -24,6 +24,8 @@ public class AuthRouter {
         UserStatsRepository statsRepository = new UserStatsRepository();
         UserWalletRepository walletRepository = new UserWalletRepository();
         RefreshTokenRepository refreshTokenRepository = new RefreshTokenRepository();
+        com.campusskills.modules.users.repositories.OtpVerificationRepository otpRepository = new com.campusskills.modules.users.repositories.OtpVerificationRepository();
+        com.campusskills.shared.services.EmailService emailService = new com.campusskills.shared.services.EmailService();
         
         // Load allowed domains (configurable, hardcoded here for testing setup as requested)
         List<String> allowedDomains = Arrays.asList("kristujayanti.com");
@@ -34,6 +36,8 @@ public class AuthRouter {
             statsRepository, 
             walletRepository, 
             refreshTokenRepository,
+            otpRepository,
+            emailService,
             jwtAuth,
             allowedDomains
         );

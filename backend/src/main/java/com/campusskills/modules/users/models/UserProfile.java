@@ -17,6 +17,7 @@ public class UserProfile {
     private String profilePicture;
     private List<SkillProfile> skillsOffered;
     private List<SkillProfile> skillsWanted;
+    private List<String> verifiedSkills;
     private List<String> preferredTimes;
     private String sessionPreference;
     private String exchangePreference;
@@ -60,6 +61,9 @@ public class UserProfile {
 
     public List<SkillProfile> getSkillsWanted() { return skillsWanted; }
     public void setSkillsWanted(List<SkillProfile> skillsWanted) { this.skillsWanted = skillsWanted; }
+
+    public List<String> getVerifiedSkills() { return verifiedSkills; }
+    public void setVerifiedSkills(List<String> verifiedSkills) { this.verifiedSkills = verifiedSkills; }
 
     public Boolean getProfileCompleted() { return profileCompleted; }
     public void setProfileCompleted(Boolean profileCompleted) { this.profileCompleted = profileCompleted; }

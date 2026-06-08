@@ -32,6 +32,7 @@ public class ListingRepository {
     }
 
     public Future<Void> update(Listing listing) {
+        listing.prepareForSave(); // Trigger dual-write sync
         listing.setUpdatedAt(System.currentTimeMillis());
         JsonObject query = new JsonObject().put("_id", listing.getId());
         JsonObject doc = JsonObject.mapFrom(listing);
@@ -61,19 +62,56 @@ public class ListingRepository {
             query.put("$text", new JsonObject().put("$search", q));
         }
 
-        // Topics (topics or skills.name)
+        // Search Mode (FIND_TUTORS, FIND_STUDENTS, FIND_SWAPS)
+        String searchMode = filters.getString("searchMode");
         io.vertx.core.json.JsonArray topics = filters.getJsonArray("topics");
-        if (topics != null && !topics.isEmpty()) {
-            query.put("$or", new io.vertx.core.json.JsonArray()
-                .add(new JsonObject().put("category", new JsonObject().put("$in", topics)))
-                .add(new JsonObject().put("skills.name", new JsonObject().put("$in", topics)))
-            );
+
+        if ("FIND_TUTORS".equals(searchMode)) {
+            query.put("listingType", "TEACH");
+            if (topics != null && !topics.isEmpty()) {
+                query.put("$or", new io.vertx.core.json.JsonArray()
+                    .add(new JsonObject().put("category", new JsonObject().put("$in", topics)))
+                    .add(new JsonObject().put("offeredSkills.name", new JsonObject().put("$in", topics)))
+                    .add(new JsonObject().put("skills.name", new JsonObject().put("$in", topics))) // Legacy fallback
+                );
+            }
+        } else if ("FIND_STUDENTS".equals(searchMode)) {
+            query.put("listingType", "LEARN");
+            if (topics != null && !topics.isEmpty()) {
+                query.put("$or", new io.vertx.core.json.JsonArray()
+                    .add(new JsonObject().put("category", new JsonObject().put("$in", topics)))
+                    .add(new JsonObject().put("requestedSkills.name", new JsonObject().put("$in", topics)))
+                    .add(new JsonObject().put("preferredSkills.name", new JsonObject().put("$in", topics))) // Legacy fallback
+                );
+            }
+        } else if ("FIND_SWAPS".equals(searchMode)) {
+            query.put("listingType", "SWAP");
+            if (topics != null && !topics.isEmpty()) {
+                query.put("$or", new io.vertx.core.json.JsonArray()
+                    .add(new JsonObject().put("category", new JsonObject().put("$in", topics)))
+                    .add(new JsonObject().put("offeredSkills.name", new JsonObject().put("$in", topics)))
+                    .add(new JsonObject().put("requestedSkills.name", new JsonObject().put("$in", topics)))
+                );
+            }
+        } else {
+            // Legacy / Default Fallback
+            if (topics != null && !topics.isEmpty()) {
+                query.put("$or", new io.vertx.core.json.JsonArray()
+                    .add(new JsonObject().put("category", new JsonObject().put("$in", topics)))
+                    .add(new JsonObject().put("skills.name", new JsonObject().put("$in", topics)))
+                    .add(new JsonObject().put("offeredSkills.name", new JsonObject().put("$in", topics)))
+                    .add(new JsonObject().put("requestedSkills.name", new JsonObject().put("$in", topics)))
+                );
+            }
         }
 
-        // Payment Types
+        // Payment Types / Session Types
         io.vertx.core.json.JsonArray paymentTypes = filters.getJsonArray("payment_types");
         if (paymentTypes != null && !paymentTypes.isEmpty()) {
-            query.put("sessionType", new JsonObject().put("$in", paymentTypes));
+            query.put("$or", new io.vertx.core.json.JsonArray()
+                .add(new JsonObject().put("listingType", new JsonObject().put("$in", paymentTypes)))
+                .add(new JsonObject().put("sessionType", new JsonObject().put("$in", paymentTypes)))
+            );
         }
 
         // Modes (availability)

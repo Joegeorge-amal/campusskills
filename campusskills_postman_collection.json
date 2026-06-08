@@ -81,6 +81,79 @@
               ]
             }
           }
+        },
+        {
+          "name": "Verify Email",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users/me/verify-email",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "me",
+                "verify-email"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Resend OTP",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:8080/api/v1/users/me/resend-otp",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "users",
+                "me",
+                "resend-otp"
+              ]
+            }
+          }
         }
       ]
     },
@@ -724,6 +797,220 @@
                   "key": "sessionId",
                   "value": "the-session-id"
                 }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Listings",
+      "item": [
+        {
+          "name": "Get All Listings (Search)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/api/v1/listings?searchMode=FIND_STUDENTS&topics=Data Structures&page=1&limit=20",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "listings"
+              ],
+              "query": [
+                {
+                  "key": "searchMode",
+                  "value": "FIND_STUDENTS"
+                },
+                {
+                  "key": "topics",
+                  "value": "Data Structures"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Listing By ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/api/v1/listings/:id",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "listings",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "the-listing-id"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Listing",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"listingType\": \"LEARN\",\n    \"title\": \"Need help with Advanced Data Structures\",\n    \"description\": \"Looking for a mentor to teach me graphs and DP.\",\n    \"category\": \"Computer Science\",\n    \"budget\": 300,\n    \"requestedSkills\": [\n        { \"name\": \"Data Structures\", \"proficiencyLevel\": \"BEGINNER\" }\n    ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/listings",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "listings"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Listings",
+      "item": [
+        {
+          "name": "Get All Listings (Search)",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/api/v1/listings?searchMode=FIND_STUDENTS&topics=Data Structures&page=1&limit=20",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "listings"
+              ],
+              "query": [
+                {
+                  "key": "searchMode",
+                  "value": "FIND_STUDENTS"
+                },
+                {
+                  "key": "topics",
+                  "value": "Data Structures"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Listing By ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://localhost:8080/api/v1/listings/:id",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "listings",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "the-listing-id"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Listing",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{jwt_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"listingType\": \"LEARN\",\n    \"title\": \"Need help with Advanced Data Structures\",\n    \"description\": \"Looking for a mentor to teach me graphs and DP.\",\n    \"category\": \"Computer Science\",\n    \"budget\": 300,\n    \"requestedSkills\": [\n        { \"name\": \"Data Structures\", \"proficiencyLevel\": \"BEGINNER\" }\n    ]\n}"
+            },
+            "url": {
+              "raw": "http://localhost:8080/api/v1/listings",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "8080",
+              "path": [
+                "api",
+                "v1",
+                "listings"
               ]
             }
           }

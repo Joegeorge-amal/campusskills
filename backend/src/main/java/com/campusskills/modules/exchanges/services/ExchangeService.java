@@ -16,12 +16,14 @@ public class ExchangeService {
 
     private final ExchangeRepository repository;
     private final SessionRepository sessionRepository;
+    private final com.campusskills.modules.listings.repositories.ListingRepository listingRepository;
 
     private final io.vertx.core.eventbus.EventBus eventBus;
 
     public ExchangeService(io.vertx.core.eventbus.EventBus eventBus) {
         this.repository = new ExchangeRepository();
         this.sessionRepository = new SessionRepository();
+        this.listingRepository = new com.campusskills.modules.listings.repositories.ListingRepository();
         this.eventBus = eventBus;
     }
 
@@ -72,33 +74,45 @@ public class ExchangeService {
                 );
 
                 if (exchange.getProposedSessions() != null) {
-                    List<Future<String>> sessionFutures = new ArrayList<>();
-                    for (JsonObject proposed : exchange.getProposedSessions()) {
-                        Session session = new Session();
-                        session.setExchangeId(exchangeId);
-                        
-                        // Parse proposed roles
-                        String tempTeacherId = proposed.getString("teacherId");
-                        String tempStudentId = proposed.getString("studentId");
-                        final String teacherId = tempTeacherId == null ? exchange.getReceiverId() : tempTeacherId;
-                        final String studentId = tempStudentId == null ? exchange.getInitiatorId() : tempStudentId;
-                        
-                        session.setTeacherId(teacherId);
-                        session.setStudentId(studentId);
-                        session.setStatus(SessionStatus.SCHEDULED);
-                        session.setScheduledStart(proposed.getLong("scheduledStart"));
-                        session.setScheduledEnd(proposed.getLong("scheduledEnd"));
-                        session.setTopic(proposed.getString("topic"));
-                        
-                        sessionFutures.add(sessionRepository.createSession(session).onSuccess(sessId -> {
-                            // Notify both student and teacher
-                            sendNotification(teacherId, com.campusskills.shared.constants.NotificationType.SESSION_SCHEDULED, "Session Scheduled", "A new session has been scheduled.", "SESSION", sessId);
-                            if (!teacherId.equals(studentId)) {
-                                sendNotification(studentId, com.campusskills.shared.constants.NotificationType.SESSION_SCHEDULED, "Session Scheduled", "A new session has been scheduled.", "SESSION", sessId);
+                    return listingRepository.findById(exchange.getListingId()).compose(listing -> {
+                        List<Future<String>> sessionFutures = new ArrayList<>();
+                        for (JsonObject proposed : exchange.getProposedSessions()) {
+                            Session session = new Session();
+                            session.setExchangeId(exchangeId);
+                            
+                            // Determine roles based on listing type
+                            String defaultTeacherId = exchange.getReceiverId();
+                            String defaultStudentId = exchange.getInitiatorId();
+                            
+                            if (listing != null && listing.getListingType() == com.campusskills.modules.listings.models.ListingType.LEARN) {
+                                // Invert roles for LEARN listings: Initiator is the Teacher, Receiver (Owner) is the Student
+                                defaultTeacherId = exchange.getInitiatorId();
+                                defaultStudentId = exchange.getReceiverId();
                             }
-                        }));
-                    }
-                    return Future.all(sessionFutures).mapEmpty();
+                            
+                            // Parse proposed roles (override if explicitly provided in proposal)
+                            String tempTeacherId = proposed.getString("teacherId");
+                            String tempStudentId = proposed.getString("studentId");
+                            final String teacherId = tempTeacherId == null ? defaultTeacherId : tempTeacherId;
+                            final String studentId = tempStudentId == null ? defaultStudentId : tempStudentId;
+                            
+                            session.setTeacherId(teacherId);
+                            session.setStudentId(studentId);
+                            session.setStatus(SessionStatus.SCHEDULED);
+                            session.setScheduledStart(proposed.getLong("scheduledStart"));
+                            session.setScheduledEnd(proposed.getLong("scheduledEnd"));
+                            session.setTopic(proposed.getString("topic"));
+                            
+                            sessionFutures.add(sessionRepository.createSession(session).onSuccess(sessId -> {
+                                // Notify both student and teacher
+                                sendNotification(teacherId, com.campusskills.shared.constants.NotificationType.SESSION_SCHEDULED, "Session Scheduled", "A new session has been scheduled.", "SESSION", sessId);
+                                if (!teacherId.equals(studentId)) {
+                                    sendNotification(studentId, com.campusskills.shared.constants.NotificationType.SESSION_SCHEDULED, "Session Scheduled", "A new session has been scheduled.", "SESSION", sessId);
+                                }
+                            }));
+                        }
+                        return Future.all(sessionFutures).mapEmpty();
+                    });
                 }
                 return Future.succeededFuture();
             });

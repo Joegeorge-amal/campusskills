@@ -45,6 +45,19 @@ public class DatabaseInitializer {
             .onSuccess(v -> log.info("Created index: notifications(userId)"))
             .onFailure(err -> log.error("Failed to create index on notifications", err));
 
+        // otp_verifications(expiresAt) -> TTL index (expireAfterSeconds = 0 means expire at the exact date)
+        JsonObject ttlCommand = new JsonObject()
+            .put("createIndexes", "otp_verifications")
+            .put("indexes", new io.vertx.core.json.JsonArray().add(
+                new JsonObject()
+                    .put("name", "expiresAt_ttl")
+                    .put("key", new JsonObject().put("expiresAt", 1))
+                    .put("expireAfterSeconds", 0)
+            ));
+        client.runCommand("createIndexes", ttlCommand)
+            .onSuccess(v -> log.info("Created TTL index: otp_verifications(expiresAt)"))
+            .onFailure(err -> log.error("Failed to create TTL index on otp_verifications", err));
+
         // topics(normalizedName) -> unique constraint for topics catalog
         IndexOptions uniqueOptions = new IndexOptions();
         // Since setUnique is not available in this version, we will manually run the command if needed,

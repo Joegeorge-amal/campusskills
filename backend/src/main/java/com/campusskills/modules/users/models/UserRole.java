@@ -4,7 +4,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 
 public enum UserRole {
     USER,
-    ADMIN;
+    EVALUATOR,
+    ADMIN,
+    SUPER_ADMIN;
 
     @JsonCreator
     public static UserRole fromString(String key) {

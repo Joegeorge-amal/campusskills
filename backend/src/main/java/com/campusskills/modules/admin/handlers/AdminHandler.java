@@ -81,6 +81,40 @@ public class AdminHandler {
             .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
     }
 
+    public void updateUserRole(RoutingContext ctx) {
+        String id = ctx.request().getParam("id");
+        JsonObject body = ctx.body().asJsonObject();
+        if (body == null || !body.containsKey("role")) {
+            ApiResponse.badRequest(ctx, "Missing role in body");
+            return;
+        }
+        
+        String roleStr = body.getString("role");
+        com.campusskills.modules.users.models.UserRole role;
+        try {
+            role = com.campusskills.modules.users.models.UserRole.valueOf(roleStr);
+        } catch (IllegalArgumentException e) {
+            ApiResponse.badRequest(ctx, "Invalid role. Allowed: USER, EVALUATOR, ADMIN");
+            return;
+        }
+        
+        adminService.updateUserRole(id, role)
+            .onSuccess(updated -> {
+                if (updated) {
+                    ApiResponse.ok(ctx, new JsonObject().put("message", "User role updated to " + role.name()));
+                } else {
+                    ApiResponse.notFound(ctx, "User not found");
+                }
+            })
+            .onFailure(err -> {
+                if (err.getMessage().startsWith("Cannot")) {
+                    ApiResponse.sendError(ctx, 403, err.getMessage());
+                } else {
+                    ApiResponse.internalError(ctx, err.getMessage());
+                }
+            });
+    }
+
     public void updateDisputeStatus(RoutingContext ctx) {
         String id = ctx.request().getParam("id");
         JsonObject body = ctx.body().asJsonObject();
@@ -166,6 +200,70 @@ public class AdminHandler {
             })
             .onFailure(err -> {
                 ctx.response().setStatusCode(500).end(new JsonObject().put("error", "Internal server error").encode());
+            });
+    }
+
+    public void getPendingVerifications(RoutingContext ctx) {
+        adminService.getPendingVerifications()
+            .onSuccess(list -> {
+                io.vertx.core.json.JsonArray arr = new io.vertx.core.json.JsonArray();
+                list.forEach(v -> arr.add(JsonObject.mapFrom(v)));
+                ApiResponse.ok(ctx, arr);
+            })
+            .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
+    }
+
+    public void assignVerification(RoutingContext ctx) {
+        String id = ctx.request().getParam("id");
+        JsonObject user = ctx.get("user");
+        String evaluatorId = user.getString("userId");
+
+        adminService.assignVerification(id, evaluatorId)
+            .onSuccess(assigned -> {
+                if (assigned) {
+                    ApiResponse.ok(ctx, new JsonObject().put("message", "Assigned successfully"));
+                } else {
+                    ApiResponse.badRequest(ctx, "Request is no longer pending or not found");
+                }
+            })
+            .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
+    }
+
+    public void evaluateVerification(RoutingContext ctx) {
+        String id = ctx.request().getParam("id");
+        JsonObject user = ctx.get("user");
+        String evaluatorId = user.getString("userId");
+        JsonObject body = ctx.body().asJsonObject();
+        
+        if (body == null || !body.containsKey("status")) {
+            ApiResponse.badRequest(ctx, "Missing status in body");
+            return;
+        }
+
+        com.campusskills.modules.users.models.VerificationStatus status;
+        try {
+            status = com.campusskills.modules.users.models.VerificationStatus.valueOf(body.getString("status"));
+        } catch (Exception e) {
+            ApiResponse.badRequest(ctx, "Invalid status");
+            return;
+        }
+
+        String notes = body.getString("notes", "");
+
+        adminService.evaluateVerification(id, evaluatorId, status, notes)
+            .onSuccess(evaluated -> {
+                if (evaluated) {
+                    ApiResponse.ok(ctx, new JsonObject().put("message", "Evaluation saved"));
+                } else {
+                    ApiResponse.badRequest(ctx, "Could not evaluate request");
+                }
+            })
+            .onFailure(err -> {
+                if (err.getMessage().startsWith("Only the assigned") || err.getMessage().startsWith("Verification request must")) {
+                    ApiResponse.sendError(ctx, 403, err.getMessage());
+                } else {
+                    ApiResponse.internalError(ctx, err.getMessage());
+                }
             });
     }
 }

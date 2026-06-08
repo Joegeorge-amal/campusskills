@@ -32,6 +32,8 @@ public class UserService {
     private final UserStatsRepository statsRepository;
     private final UserWalletRepository walletRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final com.campusskills.modules.users.repositories.OtpVerificationRepository otpRepository;
+    private final com.campusskills.shared.services.EmailService emailService;
     private final JWTAuth jwtAuth;
     private final List<String> allowedDomains;
 
@@ -40,6 +42,8 @@ public class UserService {
                        UserStatsRepository statsRepository,
                        UserWalletRepository walletRepository,
                        RefreshTokenRepository refreshTokenRepository,
+                       com.campusskills.modules.users.repositories.OtpVerificationRepository otpRepository,
+                       com.campusskills.shared.services.EmailService emailService,
                        JWTAuth jwtAuth,
                        List<String> allowedDomains) {
         this.userRepository = userRepository;
@@ -47,6 +51,8 @@ public class UserService {
         this.statsRepository = statsRepository;
         this.walletRepository = walletRepository;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.otpRepository = otpRepository;
+        this.emailService = emailService;
         this.jwtAuth = jwtAuth;
         this.allowedDomains = allowedDomains != null ? allowedDomains : new ArrayList<>();
     }
@@ -67,6 +73,25 @@ public class UserService {
         }
     }
 
+    private String generateOtp() {
+        SecureRandom random = new SecureRandom();
+        int otp = 100000 + random.nextInt(900000); // 6 digits
+        return String.valueOf(otp);
+    }
+
+    public static boolean isSuperAdmin(String email) {
+        if (email == null) return false;
+        String env = System.getenv("SUPER_ADMIN_EMAILS");
+        if (env == null || env.trim().isEmpty()) {
+            env = "amaljogeorge@gmail.com";
+        }
+        String[] admins = env.split(",");
+        for (String admin : admins) {
+            if (admin.trim().equalsIgnoreCase(email.trim())) return true;
+        }
+        return false;
+    }
+
     public Future<JsonObject> signup(String email, String password, String displayName) {
         if (email == null || password == null) {
             return Future.failedFuture("email and password are required");
@@ -78,7 +103,7 @@ public class UserService {
             return Future.failedFuture("Password must be at least 6 characters long");
         }
         
-        if (!allowedDomains.isEmpty()) {
+        if (!allowedDomains.isEmpty() && !isSuperAdmin(normalizedEmail)) {
             String[] parts = normalizedEmail.split("@");
             if (parts.length != 2 || !allowedDomains.contains(parts[1].toLowerCase())) {
                 return Future.failedFuture("DOMAIN_NOT_ALLOWED");
@@ -92,9 +117,9 @@ public class UserService {
             
             User user = new User();
             user.setEmail(normalizedEmail);
-            user.setRole(UserRole.USER); // Default to USER
+            user.setRole(isSuperAdmin(normalizedEmail) ? UserRole.SUPER_ADMIN : UserRole.USER);
             user.setIsActive(true);
-            user.setEmailVerified(false); // Default for all new signups
+            user.setEmailVerified(false);
             user.setPasswordHash(BCrypt.hashpw(password, BCrypt.gensalt()));
 
             return userRepository.createUser(user).compose(userId -> {
@@ -123,7 +148,22 @@ public class UserService {
                 Future<String> statsFut = statsRepository.createStats(stats);
                 Future<String> walletFut = walletRepository.createWallet(wallet);
 
-                return CompositeFuture.all(profileFut, statsFut, walletFut)
+                // OTP Generation
+                String otp = generateOtp();
+                String hashedOtp = BCrypt.hashpw(otp, BCrypt.gensalt());
+                com.campusskills.modules.users.models.OtpVerification otpVerification = new com.campusskills.modules.users.models.OtpVerification();
+                otpVerification.setUserId(userId);
+                otpVerification.setEmail(normalizedEmail);
+                otpVerification.setOtpHash(hashedOtp);
+                otpVerification.setAttempts(0);
+                otpVerification.setExpiresAt(new java.util.Date(System.currentTimeMillis() + 15 * 60 * 1000)); // 15 mins
+                otpVerification.setLastResentAt(System.currentTimeMillis());
+
+                Future<String> otpFut = otpRepository.create(otpVerification)
+                    .compose(v -> emailService.sendOtpEmail(normalizedEmail, otp))
+                    .map("otp-sent");
+
+                return CompositeFuture.all(profileFut, statsFut, walletFut, otpFut)
                     .compose(cf -> generateAuthResponse(user));
             });
         });
@@ -143,6 +183,12 @@ public class UserService {
 
             if (!BCrypt.checkpw(password, user.getPasswordHash())) {
                 return Future.failedFuture("INVALID_CREDENTIALS");
+            }
+
+            if (isSuperAdmin(user.getEmail()) && user.getRole() != UserRole.SUPER_ADMIN) {
+                user.setRole(UserRole.SUPER_ADMIN);
+                return userRepository.updateUserRole(user.getId(), UserRole.SUPER_ADMIN)
+                    .compose(v -> generateAuthResponse(user));
             }
 
             return generateAuthResponse(user);
@@ -173,7 +219,8 @@ public class UserService {
                 String accessToken = jwtAuth.generateToken(
                     new JsonObject()
                         .put("userId", user.getId())
-                        .put("role", user.getRole().name()),
+                        .put("role", user.getRole().name())
+                        .put("emailVerified", user.getEmailVerified()),
                     new JWTOptions().setExpiresInMinutes(15) // 15 mins
                 );
                 
@@ -225,11 +272,86 @@ public class UserService {
         });
     }
 
+    public Future<JsonObject> verifyEmail(String userId, String otp) {
+        if (otp == null || otp.trim().isEmpty()) {
+            return Future.failedFuture("OTP is required");
+        }
+
+        return otpRepository.findByUserId(userId).compose(verification -> {
+            if (verification == null) {
+                return Future.failedFuture("No pending verification found or OTP has expired");
+            }
+
+            if (verification.getAttempts() >= 5) {
+                return otpRepository.deleteByUserId(userId)
+                    .compose(v -> Future.failedFuture("Too many incorrect attempts. Please request a new OTP."));
+            }
+
+            if (!BCrypt.checkpw(otp.trim(), verification.getOtpHash())) {
+                return otpRepository.incrementAttempts(verification.getId())
+                    .compose(v -> Future.failedFuture("Invalid OTP"));
+            }
+
+            // OTP is valid
+            return userRepository.findById(userId).compose(user -> {
+                if (user == null) {
+                    return Future.failedFuture("User not found");
+                }
+                user.setEmailVerified(true);
+                return userRepository.updateUser(user).compose(v -> {
+                    return otpRepository.deleteByUserId(userId).compose(v2 -> {
+                        return generateAuthResponse(user);
+                    });
+                });
+            });
+        });
+    }
+
+    public Future<Void> resendOtp(String userId) {
+        return userRepository.findById(userId).compose(user -> {
+            if (user == null) {
+                return Future.failedFuture("User not found");
+            }
+            if (user.getEmailVerified()) {
+                return Future.failedFuture("Email is already verified");
+            }
+
+            return otpRepository.findByUserId(userId).compose(verification -> {
+                long now = System.currentTimeMillis();
+                String newOtp = generateOtp();
+                String newHash = BCrypt.hashpw(newOtp, BCrypt.gensalt());
+                java.util.Date newExpiry = new java.util.Date(now + 15 * 60 * 1000);
+
+                if (verification != null) {
+                    // Check cooldown (1 minute)
+                    if (now - verification.getLastResentAt() < 60000) {
+                        return Future.failedFuture("Please wait at least 1 minute before requesting a new OTP.");
+                    }
+                    return otpRepository.updateOtp(verification.getId(), newHash, newExpiry, now)
+                        .compose(v -> emailService.sendOtpEmail(user.getEmail(), newOtp));
+                } else {
+                    // Create new
+                    com.campusskills.modules.users.models.OtpVerification newVerification = new com.campusskills.modules.users.models.OtpVerification();
+                    newVerification.setUserId(userId);
+                    newVerification.setEmail(user.getEmail());
+                    newVerification.setOtpHash(newHash);
+                    newVerification.setAttempts(0);
+                    newVerification.setExpiresAt(newExpiry);
+                    newVerification.setLastResentAt(now);
+
+                    return otpRepository.create(newVerification)
+                        .compose(v -> emailService.sendOtpEmail(user.getEmail(), newOtp));
+                }
+            });
+        });
+    }
+
     private Future<JsonObject> generateAuthResponse(User user) {
         String accessToken = jwtAuth.generateToken(
             new JsonObject()
                 .put("userId", user.getId())
-                .put("role", user.getRole().name()),
+                .put("role", user.getRole().name())
+                .put("emailVerified", user.getEmailVerified()),
             new JWTOptions().setExpiresInMinutes(15) // 15 minutes access token
         );
         

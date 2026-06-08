@@ -55,8 +55,18 @@ public class ApiRouter {
         router.route("/reviews/*").handler(JwtAuthMiddleware.create(jwtAuth));
         router.route("/profiles/*").handler(JwtAuthMiddleware.create(jwtAuth));
         router.route("/availability/*").handler(JwtAuthMiddleware.create(jwtAuth));
+        router.route("/verifications/*").handler(JwtAuthMiddleware.create(jwtAuth));
 
-        // 6. Modules Routing
+        // 6. Restrict Marketplace Actions for Unverified Users
+        io.vertx.core.Handler<io.vertx.ext.web.RoutingContext> verifiedHandler = com.campusskills.web.middleware.EmailVerifiedMiddleware.create();
+        router.post("/sessions/*").handler(verifiedHandler);
+        router.post("/chat-requests/*").handler(verifiedHandler);
+        router.post("/exchanges/*").handler(verifiedHandler);
+        router.patch("/exchanges/*").handler(verifiedHandler);
+        router.post("/reviews/*").handler(verifiedHandler);
+        router.post("/verifications/*").handler(verifiedHandler);
+
+        // 7. Modules Routing
         router.mountSubRouter("/users", UserRouter.create(vertx, jwtAuth));
         router.mountSubRouter("/profiles", com.campusskills.modules.users.routes.ProfileRouter.create(vertx));
         router.mountSubRouter("/chats", ChatRouter.create(vertx));
@@ -70,6 +80,7 @@ public class ApiRouter {
         router.mountSubRouter("/topics", com.campusskills.modules.topics.routes.TopicRouter.create(vertx, jwtAuth));
         router.mountSubRouter("/availability", com.campusskills.modules.availability.routes.AvailabilityRouter.create(vertx));
         router.mountSubRouter("/admin", com.campusskills.modules.admin.routes.AdminRouter.create(vertx, jwtAuth));
+        router.mountSubRouter("/verifications", com.campusskills.modules.users.routes.VerificationRouter.create(vertx, jwtAuth));
         
         // Global Error Handling
         router.route().failureHandler(GlobalErrorHandler.create());

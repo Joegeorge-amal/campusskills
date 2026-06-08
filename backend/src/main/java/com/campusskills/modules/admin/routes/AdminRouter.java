@@ -15,10 +15,19 @@ public class AdminRouter {
         
         AdminRepository repository = new AdminRepository();
         com.campusskills.modules.sessions.repositories.SessionRepository sessionRepository = new com.campusskills.modules.sessions.repositories.SessionRepository();
-        AdminService service = new AdminService(repository, sessionRepository, vertx.eventBus());
+        com.campusskills.modules.users.repositories.UserRepository userRepository = new com.campusskills.modules.users.repositories.UserRepository();
+        com.campusskills.modules.users.repositories.SkillVerificationRepository verificationRepository = new com.campusskills.modules.users.repositories.SkillVerificationRepository();
+        com.campusskills.modules.users.repositories.UserProfileRepository userProfileRepository = new com.campusskills.modules.users.repositories.UserProfileRepository();
+        
+        AdminService service = new AdminService(repository, sessionRepository, userRepository, verificationRepository, userProfileRepository, vertx.eventBus());
         AdminHandler handler = new AdminHandler(service);
 
         router.route().handler(JwtAuthMiddleware.create(jwtAuth));
+        
+        // Super Admin only routes
+        router.patch("/users/:id/role").handler(com.campusskills.web.middleware.RequireSuperAdminMiddleware.create()).handler(handler::updateUserRole);
+
+        // Admin and Super Admin routes
         router.route().handler(com.campusskills.web.middleware.RequireAdminMiddleware.create());
         
         router.get("/users").handler(handler::getUsers);
@@ -32,6 +41,10 @@ public class AdminRouter {
 
         router.get("/listings").handler(handler::getListings);
         router.patch("/listings/:id/status").handler(handler::updateListingStatus);
+
+        router.get("/verifications/pending").handler(handler::getPendingVerifications);
+        router.patch("/verifications/:id/assign").handler(handler::assignVerification);
+        router.patch("/verifications/:id/evaluate").handler(handler::evaluateVerification);
 
         return router;
     }

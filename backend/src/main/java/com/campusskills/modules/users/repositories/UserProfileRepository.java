@@ -45,4 +45,12 @@ public class UserProfileRepository {
         JsonObject updateDoc = new JsonObject().put("$set", updates);
         return client.updateCollection(COLLECTION, query, updateDoc).map(res -> res.getDocModified() > 0);
     }
+
+    public Future<Boolean> addVerifiedSkill(String userId, String skillName) {
+        JsonObject query = new JsonObject().put("userId", userId);
+        JsonObject updateDoc = new JsonObject()
+            .put("$addToSet", new JsonObject().put("verifiedSkills", skillName))
+            .put("$set", new JsonObject().put("updatedAt", System.currentTimeMillis()));
+        return client.updateCollection(COLLECTION, query, updateDoc).map(res -> res.getDocModified() > 0);
+    }
 }
