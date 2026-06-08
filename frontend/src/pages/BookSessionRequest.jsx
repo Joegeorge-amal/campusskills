@@ -21,18 +21,19 @@ const BookSessionRequest = () => {
       {/* Scoped styles to exactly match the PNG */}
       <style>{`
         .bsr-container {
-          max-width: 800px;
+          width: 100%;
+          user-select: none;
         }
         .bsr-back-btn {
-          font-size: 13px;
+          font-size: 12px;
           color: #6b7280;
           background: none;
           border: none;
           cursor: pointer;
           display: inline-flex;
           align-items: center;
-          gap: 6px;
-          margin-bottom: 24px;
+          gap: 4px;
+          margin-bottom: 20px;
           font-weight: 500;
         }
         .bsr-back-btn:hover {
@@ -42,19 +43,18 @@ const BookSessionRequest = () => {
           background: #ffffff;
           border: 1px solid #e5e7eb;
           border-radius: 12px;
-          padding: 32px;
-          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+          padding: 20px;
         }
         .bsr-header-row {
           display: flex;
           align-items: center;
-          gap: 16px;
-          margin-bottom: 32px;
+          gap: 12px;
+          margin-bottom: 20px;
         }
         .bsr-icon-box {
-          width: 48px;
-          height: 48px;
-          border-radius: 12px;
+          width: 40px;
+          height: 40px;
+          border-radius: 8px;
           background: #f5f4ff;
           color: #534AB7;
           display: flex;
@@ -62,37 +62,37 @@ const BookSessionRequest = () => {
           justify-content: center;
         }
         .bsr-title {
-          font-size: 18px;
+          font-size: 15px;
           font-weight: 600;
           color: #111827;
-          margin-bottom: 4px;
+          margin-bottom: 2px;
         }
         .bsr-subtitle {
-          font-size: 14px;
+          font-size: 12px;
           color: #6b7280;
         }
         .bsr-divider {
           height: 1px;
           background: #f3f4f6;
-          margin: 0 -32px 32px -32px;
+          margin: 0 -20px 20px -20px;
         }
         .bsr-section-title {
-          font-size: 16px;
+          font-size: 14px;
           font-weight: 600;
           color: #111827;
-          margin-bottom: 6px;
+          margin-bottom: 4px;
         }
         .bsr-section-desc {
-          font-size: 14px;
+          font-size: 12px;
           color: #6b7280;
-          margin-bottom: 24px;
+          margin-bottom: 20px;
         }
         .bsr-field-label {
           display: block;
-          font-size: 14px;
+          font-size: 12px;
           font-weight: 600;
           color: #374151;
-          margin-bottom: 8px;
+          margin-bottom: 6px;
         }
         .bsr-field-label span {
           color: #9ca3af;
@@ -102,11 +102,12 @@ const BookSessionRequest = () => {
           width: 100%;
           border: 1px solid #d1d5db;
           border-radius: 8px;
-          padding: 12px 16px;
-          font-size: 14px;
+          padding: 10px 14px;
+          font-size: 13px;
           color: #111827;
           background: #f9fafb;
           transition: border-color 0.2s;
+          user-select: auto;
         }
         .bsr-input:focus, .bsr-textarea:focus {
           outline: none;
@@ -114,40 +115,39 @@ const BookSessionRequest = () => {
           background: #ffffff;
         }
         .bsr-textarea {
-          min-height: 100px;
+          min-height: 70px;
           resize: vertical;
-          margin-bottom: 32px;
+          margin-bottom: 20px;
         }
         .bsr-footer {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          padding: 16px 24px;
-          background: #ffffff;
-          border: 1px solid #e5e7eb;
-          border-radius: 8px;
-          margin-bottom: 32px;
+          padding: 16px 20px;
+          background: transparent;
+          border-top: 1px solid #f3f4f6;
+          margin: 0 -20px -20px -20px;
         }
         .bsr-footer-text {
-          font-size: 13px;
-          color: #6b7280;
+          font-size: 12px;
+          color: #9ca3af;
         }
         .bsr-secure {
           display: flex;
           align-items: center;
           gap: 6px;
-          font-size: 13px;
+          font-size: 12px;
           font-weight: 600;
           color: #059669;
         }
         .bsr-submit-btn {
           width: 100%;
-          padding: 16px;
+          padding: 14px;
           border-radius: 12px;
           border: none;
-          background: #534AB7;
+          background: linear-gradient(to right, #1e3a8a, #3b82f6);
           color: #ffffff;
-          font-size: 16px;
+          font-size: 15px;
           font-weight: 600;
           cursor: pointer;
           transition: background 0.2s;
@@ -165,7 +165,7 @@ const BookSessionRequest = () => {
         <div className="bsr-card">
           <div className="bsr-header-row">
             <div className="bsr-icon-box">
-              <IconCalendarEvent size={24} stroke={2} />
+              <IconCalendarEvent size={18} stroke={2} />
             </div>
             <div>
               <div className="bsr-title">{skillName}</div>
@@ -180,13 +180,14 @@ const BookSessionRequest = () => {
             Your request will be sent to the tutor. Payment is only required after they accept.
           </div>
 
-          <div style={{ marginBottom: '24px' }}>
+          <div style={{ marginBottom: '20px' }}>
             <label className="bsr-field-label">Preferred schedule</label>
             <input 
               type="text" 
               className="bsr-input" 
               value={slot}
               readOnly
+              style={{ caretColor: 'transparent', cursor: 'default' }}
             />
           </div>
 
@@ -203,15 +204,15 @@ const BookSessionRequest = () => {
           <div className="bsr-footer">
             <span className="bsr-footer-text">No payment until request is accepted</span>
             <div className="bsr-secure">
-              <IconShieldCheck size={16} stroke={2.5} />
+              <IconShieldCheck size={14} stroke={2.5} />
               Secure
             </div>
           </div>
-
-          <button className="bsr-submit-btn" onClick={handleSendRequest}>
-            Send Request
-          </button>
         </div>
+
+        <button className="bsr-submit-btn" style={{ marginTop: '12px' }} onClick={handleSendRequest}>
+          Send Request
+        </button>
       </div>
     </div>
   );

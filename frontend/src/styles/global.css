@@ -1,13 +1,13 @@
 :root {
   /* Colors */
-  --cs-primary: #534AB7;
-  --cs-primary-light: #EEEDFE;
-  --cs-primary-dark: #3C3489;
-  --cs-primary-gradient: linear-gradient(135deg, #1e1b7a 0%, #534AB7 100%);
+  --cs-primary: #1d4ed8;
+  --cs-primary-light: #eff6ff;
+  --cs-primary-dark: #1e40af;
+  --cs-primary-gradient: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
   
-  --cs-bg-light: #F0EFF8;
+  --cs-bg-light: #F4F5F9;
   --cs-bg-white: #ffffff;
-  --cs-bg-hover: #F5F4FF;
+  --cs-bg-hover: #eff6ff;
   
   --cs-text-main: #222222;
   --cs-text-secondary: #666666;
@@ -55,6 +55,19 @@ body {
   color: #222;
   display: block;
   overflow-x: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+input, textarea, [contenteditable="true"] {
+  user-select: auto;
+  -webkit-user-select: auto;
+}
+
+.selectable-text {
+  user-select: text;
+  -webkit-user-select: text;
+  cursor: text;
 }
 
 #root {
@@ -132,31 +145,34 @@ button, input, select, textarea {
 }
 
 .c-mus {
-  background: #EEEDFE;
-  color: #3C3489;
+  background: #eff6ff;
+  color: #1e40af;
 }
 
 /* ─── TOAST AESTHETICS ─── */
 .toast-el {
   position: fixed;
-  bottom: 20px;
+  top: 32px;
   left: 50%;
   transform: translateX(-50%);
-  background: #2C2C2A;
-  color: #F1EFE8;
-  font-size: 12px;
-  padding: 7px 18px;
-  border-radius: 20px;
+  background: #111827;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px 24px;
+  border-radius: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.05);
   white-space: nowrap;
-  z-index: 999;
+  z-index: 9999;
   pointer-events: none;
-  animation: toastFadeIn 0.2s ease-out;
+  animation: toastFadeInTop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-@keyframes toastFadeIn {
+@keyframes toastFadeInTop {
   from {
     opacity: 0;
-    transform: translate(-50%, 10px);
+    transform: translate(-50%, -20px);
   }
   to {
     opacity: 1;
@@ -180,4 +196,41 @@ button, input, select, textarea {
   width: min(500px, 92vw);
   border-radius: 24px;
   background: white;
+  animation: modalDropIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalDropIn {
+  from { opacity: 0; transform: translateY(-40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── GLOSSY CARD EFFECT ─── */
+.glossy-card {
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.3s ease !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.glossy-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 16px 32px -8px rgba(37, 99, 235, 0.2), 0 4px 12px -2px rgba(37, 99, 235, 0.1) !important;
+  border-color: rgba(37, 99, 235, 0.3) !important;
+}
+
+.glossy-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+  transform: skewX(-25deg);
+  transition: all 0.7s ease;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.glossy-card:hover::after {
+  left: 200%;
 }

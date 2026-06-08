@@ -1,13 +1,19 @@
 import React from 'react';
 import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { IconX } from '@tabler/icons-react';
+import { 
+  IconLayoutDashboard, 
+  IconUsers, 
+  IconAlertTriangle, 
+  IconCalendarEvent, 
+  IconBook,
+  IconLogout
+} from '@tabler/icons-react';
 import Toast from '../components/common/Toast';
-import logo from '../assets/kju_campus_logo.png';
 import '../styles/admin.css';
 
 const AdminLayout = () => {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -17,46 +23,74 @@ const AdminLayout = () => {
   };
 
   const navItems = [
-    { label: 'Overview', path: '/admin/dashboard' },
-    { label: 'Users', path: '/admin/users' },
-    { label: 'Disputes', path: '/admin/reports' }, // Map "Reports" to "Disputes"
-    { label: 'Sessions', path: '/admin/sessions' }
+    { label: 'Overview', path: '/admin/dashboard', icon: <IconLayoutDashboard size={20} /> },
+    { label: 'Users', path: '/admin/users', icon: <IconUsers size={20} /> },
+    { label: 'Disputes', path: '/admin/reports', icon: <IconAlertTriangle size={20} /> },
+    { label: 'Sessions', path: '/admin/sessions', icon: <IconCalendarEvent size={20} /> },
+    { label: 'Skills', path: '/admin/skills', icon: <IconBook size={20} /> }
   ];
+
+  const currentNav = navItems.find(item => location.pathname.includes(item.path)) || navItems[0];
 
   return (
     <div className="admin-layout">
-      {/* Top Header */}
-      <header className="admin-header">
-        <div className="admin-header-left">
-          <img src={logo} alt="Campus Logo" style={{ width: '28px', height: '28px', objectFit: 'contain', borderRadius: '4px', marginRight: '8px' }} />
+      {/* Sidebar */}
+      <aside className="admin-sidebar">
+        <div className="admin-brand">
+          <div className="admin-logo-mark">CS</div>
           <div className="admin-brand-text">
-            Campus<span>Skills</span>
+            Campus<span>Admin</span>
           </div>
-          <div className="admin-badge">Admin</div>
         </div>
-        <button className="admin-logout-btn" onClick={handleSignOut}>
-          <IconX size={16} />
-          Log Out
-        </button>
-      </header>
+        
+        <nav className="admin-nav">
+          {navItems.map((item) => (
+            <Link 
+              key={item.path}
+              to={item.path}
+              className={`admin-nav-item ${location.pathname.includes(item.path) ? 'active' : ''}`}
+            >
+              {item.icon}
+              {item.label}
+            </Link>
+          ))}
+        </nav>
 
-      {/* Sub Navigation */}
-      <nav className="admin-subnav">
-        {navItems.map((item) => (
-          <Link 
-            key={item.path}
-            to={item.path}
-            className={`admin-nav-link ${location.pathname.includes(item.path) ? 'active' : ''}`}
-          >
-            {item.label}
-          </Link>
-        ))}
-      </nav>
+        <div className="admin-sidebar-footer">
+          <button className="admin-logout-btn" onClick={handleSignOut}>
+            <IconLogout size={20} />
+            Sign out
+          </button>
+        </div>
+      </aside>
 
-      {/* Main Content Area */}
-      <main className="admin-main">
-        <Outlet />
-      </main>
+      {/* Content Wrapper */}
+      <div className="admin-content-wrapper">
+        
+        {/* Top Header */}
+        <header className="admin-topbar">
+          <div className="admin-topbar-left">
+            <span className="admin-breadcrumb">{currentNav.label}</span>
+          </div>
+          
+          <div className="admin-topbar-right">
+            <div className="admin-profile">
+              <div className="admin-profile-text" style={{ textAlign: 'right' }}>
+                <span className="admin-profile-name">{user?.name || 'Administrator'}</span>
+                <span className="admin-profile-role">Super Admin</span>
+              </div>
+              <div style={{ width: '36px', height: '36px', background: '#3b82f6', color: '#fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '0.9rem' }}>
+                {user?.name ? user.name[0].toUpperCase() : 'A'}
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Main View */}
+        <main className="admin-main">
+          <Outlet />
+        </main>
+      </div>
 
       <Toast />
     </div>

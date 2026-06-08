@@ -135,31 +135,43 @@
   color: rgba(34, 34, 34, 0.5);
 }
 
-/* NOTIFICATION BELL */
-.notification-bell {
-  width: 29px;
-  height: 29px;
-  border-radius: var(--cs-radius-sm);
+.header-icon-box {
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  border: 1px solid #dbeafe;
+  background: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  color: #888;
-  font-size: 15px;
-  border: 0.5px solid var(--cs-border);
-  background: var(--cs-bg-white);
   position: relative;
-  margin-left: 6px;
+  cursor: pointer;
+  margin-left: 8px;
+  transition: all 0.2s ease;
 }
 
-.notification-dot {
-  width: 6px;
-  height: 6px;
-  background: var(--cs-danger);
-  border-radius: 50%;
+.header-icon-box:hover {
+  background: #f8fafc;
+  border-color: #bfdbfe;
+}
+
+.notification-badge {
   position: absolute;
-  top: 3px;
-  right: 3px;
+  top: -6px;
+  right: -6px;
+  background: #fb7185;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  height: 20px;
+  min-width: 20px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 5px;
+  box-shadow: 0 2px 4px rgba(251, 113, 133, 0.3);
+  box-sizing: border-box;
 }
 
 @media (min-width: 769px) {

@@ -7,15 +7,15 @@ const getIconForType = (type) => {
   switch (type) {
     case 'accepted':
     case 'swap_accepted':
-      return { icon: <IconCheck size={18} stroke={2.5} />, bg: '#dcfce7', color: '#166534' }; // Green
+      return { icon: <IconCheck size={18} stroke={2.5} />, bg: '#ecfdf5', color: '#10b981' }; // Green
     case 'payment':
-      return { icon: <IconCurrencyRupee size={18} stroke={2.5} />, bg: '#e0f2fe', color: '#075985' }; // Blue
+      return { icon: <IconCurrencyRupee size={18} stroke={2.5} />, bg: '#f1f5f9', color: '#1d4ed8' }; // Light grey with blue icon
     case 'declined':
-      return { icon: <IconX size={18} stroke={2.5} />, bg: '#fee2e2', color: '#991b1b' }; // Red
+      return { icon: <IconX size={18} stroke={2.5} />, bg: '#fef2f2', color: '#ef4444' }; // Red
     case 'booked':
-      return { icon: <IconCalendarEvent size={18} stroke={2.5} />, bg: '#f3e8ff', color: '#6b21a8' }; // Purple
+      return { icon: <IconCalendarEvent size={18} stroke={2.5} />, bg: '#eff6ff', color: '#1d4ed8' }; // Light blue with blue icon
     case 'report':
-      return { icon: <IconFlag size={18} stroke={2.5} />, bg: '#fef08a', color: '#854d0e' }; // Yellow
+      return { icon: <IconFlag size={18} stroke={2.5} />, bg: '#fef9c3', color: '#eab308' }; // Yellow
     default:
       return { icon: <IconCheck size={18} stroke={2.5} />, bg: '#f3f4f6', color: '#374151' }; // Grey
   }

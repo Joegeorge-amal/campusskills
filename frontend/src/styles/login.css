@@ -18,14 +18,14 @@
   align-items: center;
   gap: 8px;
   text-decoration: none;
-  color: #4f46e5;
+  color: #213b8a;
   font-weight: 500;
   font-size: 0.95rem;
   transition: color 0.2s;
 }
 
 .auth-back-link:hover {
-  color: #3730a3;
+  color: #1e337a;
 }
 
 .auth-container {
@@ -88,18 +88,18 @@
 .brand-title {
   font-size: 24px;
   font-weight: 700;
-  color: #213B8A;
+  color: #111827;
   letter-spacing: -0.5px;
   line-height: 1.1;
 }
 
 .brand-title span {
-  color: #6366f1;
+  color: #2563eb;
 }
 
 .brand-subtitle {
   font-size: 0.84rem;
-  color: #6366f1;
+  color: #2563eb;
   font-weight: 400;
   line-height: 1;
   margin-top: 4px;
@@ -175,14 +175,14 @@
 
 /* Active State */
 .type-card.active {
-  border-color: #5b52c0;
-  background: #f5f3fc; /* Stronger, premium purple hue */
-  transform: translateY(-6px); /* Raise it up */
-  box-shadow: 0 0 0 1px #5b52c0, 0 14px 28px -6px rgba(91, 82, 192, 0.25); /* Purple shadow + 2px border trick */
+  border-color: #213b8a;
+  background: #f8fafc; 
+  transform: translateY(-6px); 
+  box-shadow: 0 0 0 1px #213b8a, 0 14px 28px -6px rgba(33, 59, 138, 0.25); 
 }
 
 .type-card.active .type-icon {
-  background: #5b52c0;
+  background: #213b8a;
   color: #ffffff;
   transform: scale(1.05); /* Subtle icon pop */
 }
@@ -279,7 +279,7 @@
 
 .forgot-pwd-link {
   font-size: 0.8rem;
-  color: #4f46e5;
+  color: #213b8a;
   font-weight: 600;
   cursor: pointer;
   text-decoration: none;
@@ -293,7 +293,7 @@
 .lbtn {
   width: 100%;
   padding: 12px;
-  background: #5b52c0;
+  background: #213b8a;
   color: #fff;
   border: none;
   border-radius: 12px;
@@ -301,7 +301,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
-  box-shadow: 0 4px 14px rgba(91, 82, 192, 0.25);
+  box-shadow: 0 4px 14px rgba(33, 59, 138, 0.25);
   margin-top: 8px;
   display: flex;
   align-items: center;
@@ -310,9 +310,9 @@
 }
 
 .lbtn:hover {
-  background: #4338ca;
+  background: #1e337a;
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 6px 20px rgba(33, 59, 138, 0.35);
 }
 
 .ldiv {
@@ -385,7 +385,7 @@
 }
 
 .create-account-link {
-  color: #4f46e5;
+  color: #213b8a;
   font-weight: 700;
   font-size: 1rem;
   text-decoration: none;

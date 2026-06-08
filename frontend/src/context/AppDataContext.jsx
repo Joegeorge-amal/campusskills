@@ -341,12 +341,12 @@ export const AppDataProvider = ({ children }) => {
     {
       id: 3,
       direction: 'outgoing',
-      name: 'Aisha T.',
-      init: 'AT',
-      bg: '#EEEDFE',
-      col: '#3C3489',
-      title: 'Aisha T. · Japanese N5',
-      sub: 'Swap: you teach DSA · awaiting reply',
+      name: 'Priya S.',
+      init: 'PS',
+      bg: '#E6F1FB',
+      col: '#0C447C',
+      title: 'React.js basics',
+      sub: 'Priya S. · ₹300/hr · Online\n📅 26 May · 4:00 PM',
       status: 'Pending'
     },
     {
@@ -380,7 +380,7 @@ export const AppDataProvider = ({ children }) => {
       date: '25',
       month: 'MAY',
       info: 'Teaching C++ · Sai M. · Skill swap',
-      status: 'soon'
+      status: 'join'
     },
     {
       id: 12,
@@ -642,7 +642,7 @@ export const AppDataProvider = ({ children }) => {
     triggerToast(`Swap request sent to ${tutorName}! Offering: ${offerSkill}`);
   };
 
-  const acceptRequest = (reqId) => {
+  const acceptRequest = (reqId, options = {}) => {
     setRequests((prev) =>
       prev.map((r) => {
         if (r.id === reqId) return { ...r, status: 'accepted' };
@@ -677,7 +677,9 @@ export const AppDataProvider = ({ children }) => {
           status: 'soon'
         };
         setBookedSessions((prev) => [newSess, ...prev]);
-        triggerToast(`Swap accepted! Exchange confirmed with ${matchedReq.name}`);
+        if (!options.hideToast) {
+          triggerToast(`Swap accepted! Exchange confirmed with ${matchedReq.name}`);
+        }
       }
     }
   };

@@ -6,14 +6,13 @@ import Toast from '../components/common/Toast';
 import Sidebar from '../components/common/Sidebar/Sidebar';
 import AppHeader from '../components/common/AppHeader/AppHeader';
 import {
-  IconLayoutDashboard,
-  IconShoppingBag,
+  IconHome,
+  IconLayoutGrid,
   IconMessageCircle,
-  IconClipboardList,
+  IconArrowsRightLeft,
   IconCalendarEvent,
-  IconWallet,
   IconHistory,
-  IconUser
+  IconUserCircle
 } from "@tabler/icons-react";
 
 const AppLayout = () => {
@@ -32,21 +31,14 @@ const AppLayout = () => {
 
   const getPageConfig = () => {
     const path = location.pathname;
-    let config = { showSearch: true, chips: [], isAdvanced: false };
+    let config = { showSearch: false, chips: [], isAdvanced: false };
     
     if (path.includes('/app/dashboard')) {
-      config.showSearch = true;
+      // No search needed on Dashboard
     } else if (path.includes('/app/marketplace')) {
-      config.isAdvanced = true;
-    } else if (path.includes('/app/messages')) {
-      // no chips
+      config.showSearch = true;
     } else if (path.includes('/app/sessions')) {
       config.chips = ['All', 'Upcoming', 'Completed', 'Cancelled'];
-    } else if (path.includes('/app/wallet')) {
-      config.showSearch = false;
-      config.chips = ['All', 'Credits', 'Debits'];
-    } else if (path.includes('/app/profile') || path.includes('/app/edit-profile') || path.includes('/app/add-bank') || path.includes('/app/add-money') || path.includes('/app/withdraw') || path.includes('/app/payment') || path.includes('/app/swap-request')) {
-      config.showSearch = false;
     }
     
     // Set default active chip
@@ -71,7 +63,6 @@ const AppLayout = () => {
     if (path.includes('/app/messages')) return 'Messages';
     if (path.includes('/app/requests')) return 'Requests';
     if (path.includes('/app/sessions')) return 'Sessions';
-    if (path.includes('/app/wallet')) return 'Wallet';
     if (path.includes('/app/history')) return 'History';
     if (path.includes('/app/profile')) return 'My profile';
     if (path.includes('/app/edit-profile')) return 'Edit profile';
@@ -84,17 +75,15 @@ const AppLayout = () => {
   };
 
   const navItems = [
-    { label: 'Dashboard', path: '/app/dashboard', icon: <IconLayoutDashboard />, section: 'Main' },
-    { label: 'Marketplace', path: '/app/marketplace', icon: <IconShoppingBag /> },
-    { label: 'Messages', path: '/app/messages', icon: <IconMessageCircle />, badge: unreadMessagesCount },
-    { label: 'Requests', path: '/app/requests', icon: <IconClipboardList />, badge: pendingRequestsCount },
-    { label: 'Sessions', path: '/app/sessions', icon: <IconCalendarEvent /> },
-    { label: 'Wallet', path: '/app/wallet', icon: <IconWallet />, section: 'Finance' },
-    { label: 'History', path: '/app/history', icon: <IconHistory /> },
-    { label: 'My profile', path: '/app/profile', icon: <IconUser />, section: 'Me' }
+    { label: 'Dashboard', path: '/app/dashboard', icon: <IconHome stroke={1.5} />, section: 'Main' },
+    { label: 'Marketplace', path: '/app/marketplace', icon: <IconLayoutGrid stroke={1.5} /> },
+    { label: 'Messages', path: '/app/messages', icon: <IconMessageCircle stroke={1.5} />, badge: unreadMessagesCount },
+    { label: 'Requests', path: '/app/requests', icon: <IconArrowsRightLeft stroke={1.5} />, badge: pendingRequestsCount },
+    { label: 'Sessions', path: '/app/sessions', icon: <IconCalendarEvent stroke={1.5} /> },
+    { label: 'My profile', path: '/app/profile', icon: <IconUserCircle stroke={1.5} />, section: 'Me' }
   ];
 
-  const sections = ['Main', 'Finance', 'Me'];
+  const sections = ['Main', 'Me'];
   const initials = user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'AK';
 
   const profileData = {

@@ -57,12 +57,12 @@ html {
 }
 
 .brand-accent {
-  color: #6366f1;
+  color: #2563eb;
 }
 
 .brand-sub {
   font-size: 0.7rem;
-  color: #6366f1; /* Soft purple */
+  color: #2563eb; /* Soft purple */
   font-weight: 500;
 }
 
@@ -74,18 +74,18 @@ html {
 
 .nav-links a {
   text-decoration: none;
-  color: #6366f1;
+  color: #2563eb;
   font-weight: 500;
   transition: color 0.2s;
 }
 
 .nav-links a:hover {
-  color: #4f46e5;
+  color: #1d4ed8;
 }
 
 .btn-signin {
   padding: 10px 28px;
-  background-color: #5b52c0; /* Softer purple from reference */
+  background-color: #213b8a; /* Softer purple from reference */
   color: #f8fafc;
   border: none;
   border-radius: 8px;
@@ -105,7 +105,7 @@ html {
 }
 
 .btn-signin:hover {
-  background-color: #4c44a8; 
+  background-color: #1e337a; 
 }
 
 .btn-bottom-cta {
@@ -114,8 +114,8 @@ html {
 
 .btn-bottom-cta:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(91, 82, 192, 0.35); /* Updated purple shadow to match new button color */
-  background-color: #4c44a8;
+  box-shadow: 0 12px 24px rgba(33, 59, 138, 0.35); /* Updated purple shadow to match new button color */
+  background-color: #1e337a;
 }
 
 /* ==================
@@ -156,7 +156,7 @@ html {
   height: 100%;
   background: 
     linear-gradient(to bottom, rgba(17, 24, 39, 0) 0%, rgba(17, 24, 39, 0.55) 100%),
-    linear-gradient(135deg, rgba(67, 56, 202, 0.5) 0%, rgba(16, 185, 129, 0.25) 35%, rgba(16, 185, 129, 0.25) 65%, rgba(67, 56, 202, 0.5) 100%);
+    linear-gradient(135deg, rgba(33, 59, 138, 0.5) 0%, rgba(16, 185, 129, 0.25) 35%, rgba(16, 185, 129, 0.25) 65%, rgba(33, 59, 138, 0.5) 100%);
 }
 
 .hero-content {
@@ -213,7 +213,7 @@ html {
   z-index: 1;
   padding: 14px 32px;
   background-color: transparent;
-  color: #5b52c0;
+  color: #213b8a;
   border-radius: 8px;
   font-size: 1rem;
   font-weight: 700;
@@ -243,7 +243,7 @@ html {
   left: 50%;
   width: 300px; /* Large enough to comfortably cover the button */
   height: 300px;
-  background-color: #5b52c0;
+  background-color: #213b8a;
   border-radius: 50%;
   z-index: -1;
   transform: translate(-50%, -50%) scale(0);
@@ -323,7 +323,7 @@ html {
   text-transform: uppercase;
   letter-spacing: 0.15em; /* Increased letter spacing */
   word-spacing: 0.25em; /* Added word spacing */
-  color: #4338ca; /* Darker purple */
+  color: #1e3a8a; /* Darker purple */
   margin-bottom: 1rem;
   display: block;
 }
@@ -403,8 +403,8 @@ html {
 
 .about-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 12px 32px -8px rgba(99, 102, 241, 0.25);
-  border-color: rgba(99, 102, 241, 0.15);
+  box-shadow: 0 12px 32px -8px rgba(37, 99, 235, 0.25);
+  border-color: rgba(37, 99, 235, 0.15);
 }
 
 .about-card-icon {
@@ -433,7 +433,7 @@ html {
 }
 
 /* Icon Tints */
-.icon-purple { background: rgba(99, 102, 241, 0.1); }
+.icon-purple { background: rgba(37, 99, 235, 0.1); }
 .icon-yellow { background: rgba(45, 212, 191, 0.15); }
 .icon-orange { background: rgba(249, 115, 22, 0.1); }
 
@@ -441,7 +441,7 @@ html {
    How It Works
    ================== */
 .how-it-works {
-  background-color: #f5f3fc; /* Just a touch more purple */
+  background-color: #eff6ff; /* Just a touch more purple */
   max-width: 100%;
   border-top: 1px solid #d1d5db; /* Thinner but crisp 1px line */
   border-bottom: 1px solid #d1d5db;
@@ -492,7 +492,7 @@ html {
   width: 72px;
   height: 72px;
   background: #ffffff; /* Solid white to perfectly mask the line behind it */
-  border: 1px solid rgba(99, 102, 241, 0.15); /* Very subtle purple border matching the image */
+  border: 1px solid rgba(37, 99, 235, 0.15); /* Very subtle purple border matching the image */
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -546,8 +546,8 @@ html {
 
 .feature-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 12px 32px -8px rgba(99, 102, 241, 0.25);
-  border-color: rgba(99, 102, 241, 0.15);
+  box-shadow: 0 12px 32px -8px rgba(37, 99, 235, 0.25);
+  border-color: rgba(37, 99, 235, 0.15);
 }
 
 .feature-icon {
@@ -561,7 +561,7 @@ html {
   margin-bottom: 1rem; /* Reduced from 1.5rem */
 }
 
-.bg-purple { background: rgba(99, 102, 241, 0.1); }
+.bg-purple { background: rgba(37, 99, 235, 0.1); }
 .bg-green { background: rgba(34, 197, 94, 0.1); }
 .bg-yellow { background: rgba(250, 204, 21, 0.1); }
 .bg-blue { background: rgba(59, 130, 246, 0.1); }
@@ -601,7 +601,7 @@ html {
   left: 0;
   right: 0;
   bottom: 0;
-  background: radial-gradient(circle at center, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0.03) 40%, transparent 70%);
+  background: radial-gradient(circle at center, rgba(37, 99, 235, 0.15) 0%, rgba(37, 99, 235, 0.03) 40%, transparent 70%);
   pointer-events: none;
 }
 
@@ -639,8 +639,8 @@ html {
 }
 
 .check-pill {
-  background: rgba(99, 102, 241, 0.1);
-  color: #4f46e5;
+  background: rgba(37, 99, 235, 0.1);
+  color: #1d4ed8;
   font-weight: 600;
   font-size: 0.875rem;
   padding: 8px 20px;
@@ -662,7 +662,7 @@ html {
   max-width: 100%;
   margin-top: 6rem;
   padding: 4rem;
-  background-color: #f5f3fc;
+  background-color: #eff6ff;
   border-top: 1px solid #d1d5db;
 }
 

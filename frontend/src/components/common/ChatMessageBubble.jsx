@@ -62,7 +62,7 @@ const ChatMessageBubble = ({
           {avatarProps.letters}
         </div>
       )}
-      <div className={`msg-bubble ${isMe ? 'msg-bubble-me' : 'msg-bubble-them'}`}>
+      <div className={`msg-bubble ${isMe ? 'msg-bubble-me' : 'msg-bubble-them'} selectable-text`}>
         {payload.t}
       </div>
     </div>

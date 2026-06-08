@@ -20,7 +20,7 @@ const AddMoney = () => {
     if (numAmount < 100) return; // Min 100
     
     depositMoney(numAmount);
-    navigate('/app/wallet');
+    navigate('/app/dashboard');
   };
 
   if (!user) return null;
@@ -28,12 +28,12 @@ const AddMoney = () => {
   return (
     <div id="addmoney" className="pg on" style={{ display: 'none' }}>
       {ReactDOM.createPortal(
-        <div className="modal-overlay" onClick={() => navigate('/app/wallet')}>
+        <div className="modal-overlay" onClick={() => navigate('/app/dashboard')}>
           <div className="modal-content" onClick={e => e.stopPropagation()} style={{ padding: '24px', border: '0.5px solid rgba(0, 0, 0, 0.08)' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
               <div style={{ fontSize: '14px', fontWeight: 500, color: '#222' }}>Add money to wallet</div>
               <button 
-                onClick={() => navigate('/app/wallet')} 
+                onClick={() => navigate('/app/dashboard')} 
                 style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#888', lineHeight: 1 }}
               >
                 ×

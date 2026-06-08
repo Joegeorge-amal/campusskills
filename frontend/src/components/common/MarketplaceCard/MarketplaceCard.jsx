@@ -27,12 +27,12 @@ const MarketplaceCard = ({
   const isSwap = typeof price === 'string' && price.toLowerCase().includes('swap');
 
   return (
-    <div className={`mc-card ${isSelected ? 'selected' : ''}`} onClick={onClick}>
+    <div className={`mc-card ${isSelected ? 'selected' : ''} glossy-card`} onClick={onClick}>
       <div className="mc-header">
         <div className={`cpill ${getCategoryClass(category)}`}>
           {category}
         </div>
-        <div className="mc-price" style={{ color: isSwap ? '#534AB7' : '#0F6E56' }}>
+        <div className="mc-price" style={{ color: isSwap ? '#1d4ed8' : '#0F6E56' }}>
           {price}
         </div>
       </div>

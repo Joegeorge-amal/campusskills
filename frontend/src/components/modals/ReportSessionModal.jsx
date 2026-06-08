@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import { IconCircleCheckFilled } from '@tabler/icons-react';
+import { IconCheck } from '@tabler/icons-react';
 
 const ReportSessionModal = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -37,39 +37,45 @@ const ReportSessionModal = () => {
     <div style={{
       position: 'fixed',
       top: 0, left: 0, right: 0, bottom: 0,
-      background: 'rgba(0, 0, 0, 0.5)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000
+      background: 'rgba(0,0,0,0.5)', zIndex: 1000,
+      display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '16px', paddingTop: '80px'
     }} onClick={handleClose}>
+      <style>{`
+        .rsm-wrapper {
+          background: #ffffff;
+          border-radius: 16px;
+          width: 100%;
+          max-width: 440px;
+          padding: 0;
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+          animation: modalDropIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes modalDropIn {
+          from { opacity: 0; transform: translateY(-40px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
       <div 
-        style={{
-          background: '#ffffff',
-          borderRadius: '16px',
-          width: '100%',
-          maxWidth: '400px',
-          padding: '24px',
-          boxShadow: '0 10px 25px rgba(0,0,0,0.1)'
-        }}
+        className="rsm-wrapper"
         onClick={(e) => e.stopPropagation()}
       >
-        {step === 'form' ? (
-          <>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <div style={{ fontSize: '18px', fontWeight: '600', color: '#111827' }}>Report session</div>
-              <button 
-                onClick={handleClose} 
-                style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: '#9ca3af', lineHeight: 1 }}
-              >
-                ×
-              </button>
-            </div>
-            
-            <div style={{ fontSize: '13px', color: '#6b7280', marginBottom: '24px' }}>
-              {context} · {target}
-            </div>
-
+        <div style={{ padding: '20px 24px', borderBottom: '1px solid #f3f4f6' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+            <div style={{ fontSize: '16px', fontWeight: 600, color: '#111827' }}>Report Session</div>
+            <button 
+              onClick={handleClose} 
+              style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#9ca3af', lineHeight: 1 }}
+            >
+              ×
+            </button>
+          </div>
+          <div style={{ fontSize: '12px', color: '#9ca3af' }}>
+            {context} · {target}
+          </div>
+        </div>
+        
+        <div style={{ padding: '24px' }}>
+          {step === 'form' ? (
             <form onSubmit={handleSubmit}>
               <div style={{ marginBottom: '24px' }}>
                 <textarea 
@@ -108,32 +114,43 @@ const ReportSessionModal = () => {
                 Submit Report
               </button>
             </form>
-          </>
-        ) : (
-          <div style={{ textAlign: 'center', padding: '16px 0' }}>
-            <IconCircleCheckFilled size={64} style={{ color: '#059669', marginBottom: '16px' }} />
-            <div style={{ fontSize: '20px', fontWeight: 600, color: '#111827', marginBottom: '8px' }}>Report submitted</div>
-            <div style={{ fontSize: '14px', color: '#6b7280', marginBottom: '32px', lineHeight: 1.5 }}>
-              We've received your report for {context} · {target} and will review it shortly.
+          ) : (
+            <div style={{ textAlign: 'center', padding: '8px 0' }}>
+              <div style={{
+                width: '64px',
+                height: '64px',
+                borderRadius: '50%',
+                background: '#dcfce7',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                margin: '0 auto 16px'
+              }}>
+                <IconCheck size={32} color="#22c55e" stroke={3} />
+              </div>
+              <div style={{ fontSize: '16px', fontWeight: 600, color: '#111827', marginBottom: '8px' }}>Report submitted</div>
+              <div style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '32px', lineHeight: 1.5 }}>
+                Our team will review and follow up within 24 hours.
+              </div>
+              <button 
+                onClick={handleClose}
+                style={{ 
+                  width: '100%', 
+                  padding: '12px', 
+                  background: '#1d4ed8', 
+                  color: '#ffffff', 
+                  border: 'none', 
+                  borderRadius: '10px', 
+                  fontSize: '14px', 
+                  fontWeight: 600, 
+                  cursor: 'pointer' 
+                }}
+              >
+                Done
+              </button>
             </div>
-            <button 
-              onClick={handleClose}
-              style={{ 
-                width: '100%', 
-                padding: '12px', 
-                background: '#534AB7', 
-                color: '#ffffff', 
-                border: 'none', 
-                borderRadius: '24px', 
-                fontSize: '14px', 
-                fontWeight: 600, 
-                cursor: 'pointer' 
-              }}
-            >
-              Done
-            </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>,
     document.body

@@ -33,7 +33,7 @@ const EditProfile = () => {
     { bg: '#EAF3DE', text: '#27500A' },
     { bg: '#FAEEDA', text: '#633806' },
     { bg: '#FBEAF0', text: '#72243E' },
-    { bg: '#534AB7', text: '#EEEDFE' }
+    { bg: '#1d4ed8', text: '#eff6ff' }
   ];
 
   const getInitials = () => {
@@ -101,7 +101,7 @@ const EditProfile = () => {
   const labelStyle = { display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-inactive)', marginBottom: '6px' };
 
   return (
-    <div id="editprofile" className="pg on" style={{ padding: '24px', background: 'var(--cs-bg-light)', minHeight: '100vh', maxWidth: '800px', margin: '0 auto' }}>
+    <div id="editprofile" className="pg on" style={{ padding: '24px', background: 'var(--cs-bg-light)', minHeight: '100vh', width: '100%' }}>
       <button 
         onClick={() => navigate('/app/profile')} 
         style={{ fontSize: '13px', color: 'var(--cs-text-inactive)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '24px', fontWeight: 500 }}
@@ -118,7 +118,7 @@ const EditProfile = () => {
           )}
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-          <div className="ep-av-wrap" onClick={() => fileInputRef.current?.click()} style={{ cursor: 'pointer', position: 'relative' }}>
+          <div className="ep-av-wrap" onClick={() => fileInputRef.current?.click()} style={{ cursor: 'pointer', position: 'relative', width: '80px', height: '80px', flexShrink: 0 }}>
             <input 
               type="file" 
               ref={fileInputRef} 
@@ -192,7 +192,7 @@ const EditProfile = () => {
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
           <input type="text" placeholder="Add a skill you want to learn…" value={learnInp} onChange={e => setLearnInp(e.target.value)} onKeyPress={e => e.key === 'Enter' && addLearn()} style={inputStyle}/>
-          <button onClick={addLearn} style={{ padding: '0 20px', borderRadius: 'var(--cs-radius-md)', border: 'none', background: 'var(--cs-primary)', color: '#fff', fontSize: '14px', cursor: 'pointer', fontWeight: 600, whiteSpace: 'nowrap' }}>Add</button>
+          <button onClick={addLearn} style={{ padding: '0 20px', borderRadius: '100px', border: 'none', background: 'var(--cs-primary)', color: '#fff', fontSize: '14px', cursor: 'pointer', fontWeight: 700, whiteSpace: 'nowrap' }}>Add</button>
         </div>
       </div>
 
@@ -232,10 +232,10 @@ const EditProfile = () => {
 
       {/* Save / Cancel */}
       <div style={{ display: 'flex', gap: '16px' }}>
-        <button onClick={handleSave} style={{ flex: 1, padding: '14px', borderRadius: 'var(--cs-radius-md)', border: 'none', background: 'var(--cs-primary)', color: '#fff', fontSize: '15px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+        <button onClick={handleSave} style={{ flex: 1, padding: '14px', borderRadius: '100px', border: 'none', background: 'var(--cs-primary)', color: '#fff', fontSize: '15px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
           <IconCheck size={18} /> Save changes
         </button>
-        <button onClick={() => navigate('/app/profile')} style={{ padding: '14px 24px', borderRadius: 'var(--cs-radius-md)', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-white)', color: 'var(--cs-text-main)', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>
+        <button onClick={() => navigate('/app/profile')} style={{ padding: '14px 24px', borderRadius: '100px', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-white)', color: 'var(--cs-text-main)', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}>
           Cancel
         </button>
       </div>

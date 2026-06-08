@@ -1,6 +1,6 @@
 /* ─── SIDEBAR ─── */
 .sb {
-  width: 185.2px;
+  width: 230px;
   background: var(--cs-bg-white);
   border-right: 0.5px solid var(--cs-border);
   display: flex;
@@ -82,10 +82,11 @@
   font-size: 12px;
   font-weight: 500;
   color: var(--cs-text-inactive);
-  margin-right: 12px;
+  margin: 0 8px;
   border: none;
   background: none;
-  width: 100%;
+  width: calc(100% - 16px);
+  box-sizing: border-box;
   text-align: left;
   transition: background 0.1s, color 0.1s;
   outline: none;

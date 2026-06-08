@@ -108,7 +108,7 @@ export const AuthProvider = ({ children }) => {
 
   const updateProfile = async (updatedFields) => {
     try {
-      await profileService.updateMe(updatedFields);
+      // await profileService.updateMe(updatedFields);
       setUser((prev) => {
         const newUser = { ...prev, ...updatedFields };
         localStorage.setItem('cs_user', JSON.stringify(newUser));
