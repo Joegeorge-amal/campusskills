@@ -1,7 +1,9 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { IconArrowLeft, IconSchool } from '@tabler/icons-react';
+import { getTopics } from '../services/topicService';
+import AutocompleteInput from '../components/AutocompleteInput';
 
 const SetupPage = () => {
   const [step, setStep] = useState(1);
@@ -14,9 +16,10 @@ const SetupPage = () => {
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [countryCode, setCountryCode] = useState('+91');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [year, setYear] = useState('3rd year');
-  const [branch, setBranch] = useState('CSE');
-  const [college, setCollege] = useState('PESU Bengaluru');
+  const [programme, setProgramme] = useState('');
   const [bio, setBio] = useState('');
   const [upi, setUpi] = useState('');
   const [avatarColor, setAvatarColor] = useState({ bg: '#EEEDFE', text: '#3C3489' });
@@ -27,11 +30,28 @@ const SetupPage = () => {
   // Step 2 states
   const [teachSkills, setTeachSkills] = useState([]);
   const [learnSkills, setLearnSkills] = useState([]);
-  const [teachInput, setTeachInput] = useState('');
-  const [learnInput, setLearnInput] = useState('');
-  const [experience, setExperience] = useState('Intermediate');
-  const [interests, setInterests] = useState('');
+  const [teachInput, setTeachInput] = useState(''); // not strictly needed anymore, kept for stability
+  const [learnInput, setLearnInput] = useState(''); // not strictly needed anymore
+  const [experience, setExperience] = useState('Beginner');
   const [category, setCategory] = useState('Technology');
+  const [interests, setInterests] = useState('');
+  const [allTopicsList, setAllTopicsList] = useState([]);
+
+  useEffect(() => {
+    if (step === 2 && allTopicsList.length === 0) {
+      getTopics().then(res => {
+        const topics = res?.data || res;
+        if (Array.isArray(topics) && topics.length > 0) {
+          setAllTopicsList(topics.map(t => t.name));
+        } else {
+          setAllTopicsList(['Python', 'Java', 'React', 'Figma', 'Graphic Design', 'TypeScript', 'Node.js']);
+        }
+      }).catch(err => {
+        console.error("Failed to load topics", err);
+        setAllTopicsList(['Python', 'Java', 'React', 'Figma', 'Graphic Design', 'TypeScript', 'Node.js']);
+      });
+    }
+  }, [step]);
 
   // Step 3 states
   const [availability, setAvailability] = useState(['Mon–Fri evenings', 'Weekend mornings']);
@@ -52,10 +72,12 @@ const SetupPage = () => {
     if (step === 1) {
       if (!email.trim().toLowerCase().endsWith('@kristujayanti.com')) {
         setError('Only University emal adresses are allowed.');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
       if (password.length < 8) {
         setError('Password must be at least 8 characters long.');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
     }
@@ -83,9 +105,9 @@ const SetupPage = () => {
       
       // Update profile with onboarding data via Profile Phase 1
       await updateProfile({
+        phoneNumber: `${countryCode} ${phoneNumber}`.trim(),
         year, 
-        branch, 
-        college, 
+        branch: programme, 
         bio, 
         upi,
         topicsOffered: teachSkills, 
@@ -96,6 +118,7 @@ const SetupPage = () => {
       navigate('/app/dashboard');
     } catch (err) {
       setError(err.message || 'Setup failed');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       // If setup fails, stay on page and show error
       if (err.message.includes('Email already exists')) {
         setStep(1); // Go back to step 1 to fix email
@@ -179,8 +202,8 @@ const SetupPage = () => {
           <div className="setup-brand" style={{ fontSize: '18px' }}>campus<span>skills</span></div>
         </div>
         <div className="setup-hdr">
-          <div className="setup-title" style={{ color: '#1e1b4b', fontSize: '24px' }}>Set up your profile</div>
-          <div className="setup-sub" style={{ color: '#6b7280' }}>Tell us about yourself to get matched with the right people</div>
+          <div className="setup-title" style={{ color: '#1e1b4b', fontSize: '22px', marginBottom: '6px' }}>Set up your profile</div>
+          <div className="setup-sub" style={{ color: '#6b7280', fontSize: '13px' }}>Tell us about yourself to get matched with the right people</div>
         </div>
 
         {/* Step indicator */}
@@ -199,7 +222,7 @@ const SetupPage = () => {
               <div className={`sp-dot ${step === 2 ? 'active' : (step > 2 ? 'done' : 'idle')}`}>2</div>
               <div className={`spw-line ${step > 2 ? 'done' : ''}`}></div>
             </div>
-            <div className="sp-lbl">Your skills</div>
+            <div className="sp-lbl">Your topics</div>
           </div>
           <div className="spw-item" onClick={() => highestStep >= 3 && setStep(3)} style={{ cursor: highestStep >= 3 ? 'pointer' : 'default' }}>
             <div className="spw-top">
@@ -212,14 +235,15 @@ const SetupPage = () => {
         </div>
       </div>
 
-      <div className="setup-card fade-in" style={{ width: '100%', maxWidth: '600px', margin: '0 auto', zIndex: 2, padding: '40px 48px' }}>
+      <div className="fade-in" style={{ position: 'relative', width: '100%', maxWidth: '580px', margin: '0 auto', zIndex: 2 }}>
+        {error && <div className="setup-error" style={{ color: '#E24B4A', fontSize: '13px', marginBottom: '24px', background: '#FBEAF0', padding: '12px 16px', borderRadius: '8px', fontWeight: 500, border: '1px solid #f9d0e0' }}>{error}</div>}
         <form onSubmit={handleNext}>
           {/* Step 1: Basic info */}
           {step === 1 && (
-            <div className="setup-step on">
-              <div>
+            <div className="setup-step on fade-in">
+              <div className="setup-card" style={{ padding: '24px 32px', marginBottom: '16px', borderRadius: '16px', maxWidth: '100%', width: '100%', position: 'relative' }}>
                 <div className="ch" style={{ marginBottom: '24px' }}>
-                  <span className="ct" style={{ fontSize: '16px', color: '#111827', fontWeight: 700 }}>Create your account</span>
+                  <span className="ct" style={{ fontSize: '14px', color: '#111827', fontWeight: 600 }}>Create your account</span>
                 </div>
 
                 <div className="form-grid" style={{ marginBottom: '24px' }}>
@@ -236,11 +260,11 @@ const SetupPage = () => {
                 <div style={{ height: '1px', background: '#e5e7eb', margin: '32px 0' }}></div>
 
                 <div className="ch" style={{ marginBottom: '24px' }}>
-                  <span className="ct" style={{ fontSize: '16px', color: '#111827', fontWeight: 700 }}>Basic information</span>
+                  <span className="ct" style={{ fontSize: '14px', color: '#111827', fontWeight: 600 }}>Basic information</span>
                 </div>
                 
                 <div className="avatar-pick" style={{ marginBottom: '32px' }}>
-                  <div className="av-wrap" onClick={() => fileInputRef.current?.click()} style={{ cursor: 'pointer', width: '64px', height: '64px' }}>
+                  <div className="av-wrap" onClick={() => fileInputRef.current?.click()} style={{ cursor: 'pointer', width: '80px', height: '80px' }}>
                     <input 
                       type="file" 
                       ref={fileInputRef} 
@@ -249,37 +273,46 @@ const SetupPage = () => {
                       onChange={handleImageChange}
                     />
                     <div className="av-big" style={{ 
-                      width: '64px', height: '64px', fontSize: '24px',
-                      background: avatarColor.bg, color: avatarColor.text,
-                      ...(avatarImg ? { backgroundImage: `url(${avatarImg})`, backgroundSize: 'cover', backgroundPosition: 'center', color: 'transparent' } : {})
+                      width: '80px', height: '80px', fontSize: '32px',
+                      ...(avatarImg 
+                        ? { backgroundImage: `url(${avatarImg})`, backgroundSize: 'cover', backgroundPosition: 'center', color: 'transparent', backgroundColor: 'transparent' }
+                        : { backgroundColor: avatarColor.bg, color: avatarColor.text })
                     }}>
                       {!avatarImg && getInitials()}
                     </div>
-                    <div className="av-cam" style={{ width: '24px', height: '24px', bottom: '-4px', right: '-4px' }}>
-                      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style={{ width: '12px', height: '12px' }}><path d="M12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7zm7-13h-1.5l-1.7-2H8.2L6.5 2.5H5A3 3 0 0 0 2 5.5v13A3 3 0 0 0 5 21.5h14a3 3 0 0 0 3-3v-13A3 3 0 0 0 19 2.5z" fill="#fff"/></svg>
+                    <div className="av-cam" style={{ width: '28px', height: '28px', bottom: '0px', right: '0px', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
+                      <svg viewBox="0 0 24 24" fill="#fff" style={{ width: '15px', height: '15px', display: 'block' }}>
+                        <path d="M12 9a3.75 3.75 0 100 7.5A3.75 3.75 0 0012 9z" />
+                        <path fillRule="evenodd" d="M9.344 3.071a49.52 49.52 0 015.312 0c.967.052 1.83.585 2.332 1.39l.821 1.317c.24.383.645.643 1.11.71.386.054.77.113 1.152.177 1.432.239 2.429 1.493 2.429 2.909V18a3 3 0 01-3 3h-15a3 3 0 01-3-3V9.574c0-1.416.997-2.67 2.429-2.909.382-.064.766-.123 1.151-.178a1.56 1.56 0 001.11-.71l.822-1.315a2.942 2.942 0 012.332-1.39zM6.75 12.75a5.25 5.25 0 1110.5 0 5.25 5.25 0 01-10.5 0z" clipRule="evenodd" />
+                      </svg>
                     </div>
                   </div>
                   <div style={{ marginLeft: '12px' }}>
-                    <div style={{ fontSize: '13px', color: '#4b5563', marginBottom: '8px', fontWeight: 500, display: 'flex', justifyContent: 'space-between' }}>
-                      <span>Choose avatar colour</span>
-                      {avatarImg && (
+                    {avatarImg ? (
+                      <div style={{ fontSize: '13px', color: '#4b5563', fontWeight: 500 }}>
                         <button type="button" onClick={(e) => { 
                           e.stopPropagation(); 
                           setAvatarImg(null); 
                           if (fileInputRef.current) fileInputRef.current.value = '';
-                        }} style={{ background: 'none', border: 'none', color: '#E24B4A', fontSize: '12px', cursor: 'pointer', padding: 0 }}>Remove</button>
-                      )}
-                    </div>
-                    <div className="av-colors">
-                      {colors.map((c, i) => (
-                        <div 
-                          key={i}
-                          className={`av-col ${avatarColor.bg === c.bg ? 'on' : ''}`} 
-                          style={{ background: c.bg, borderColor: avatarColor.bg === c.bg ? '#534AB7' : 'transparent', width: '28px', height: '28px' }} 
-                          onClick={() => setAvatarColor(c)}
-                        ></div>
-                      ))}
-                    </div>
+                        }} style={{ background: 'none', border: 'none', color: '#E24B4A', fontSize: '13px', cursor: 'pointer', padding: 0, fontWeight: 600 }}>Remove photo</button>
+                      </div>
+                    ) : (
+                      <>
+                        <div style={{ fontSize: '13px', color: '#4b5563', marginBottom: '8px', fontWeight: 500 }}>
+                          <span>Choose avatar colour</span>
+                        </div>
+                        <div className="av-colors">
+                          {colors.map((c, i) => (
+                            <div 
+                              key={i}
+                              className={`av-col ${avatarColor.bg === c.bg ? 'on' : ''}`} 
+                              style={{ background: c.bg, borderColor: avatarColor.bg === c.bg ? '#534AB7' : 'transparent', width: '28px', height: '28px' }} 
+                              onClick={() => setAvatarColor(c)}
+                            ></div>
+                          ))}
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
 
@@ -291,6 +324,29 @@ const SetupPage = () => {
                   <div className="sfld">
                     <label>Last name *</label>
                     <input type="text" placeholder="Kumar" value={lastName} onChange={e => setLastName(e.target.value)} required />
+                  </div>
+                </div>
+
+                <div className="sfld" style={{ marginBottom: '20px' }}>
+                  <label>Phone number *</label>
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <select 
+                      value={countryCode} 
+                      onChange={e => setCountryCode(e.target.value)} 
+                      style={{ width: '120px', flexShrink: 0 }}
+                    >
+                      <option value="+91">IN +91</option>
+                      <option value="+1">US +1</option>
+                      <option value="+44">UK +44</option>
+                    </select>
+                    <input 
+                      type="tel" 
+                      placeholder="9876543210" 
+                      value={phoneNumber} 
+                      onChange={e => setPhoneNumber(e.target.value)} 
+                      required 
+                      style={{ flexGrow: 1 }}
+                    />
                   </div>
                 </div>
 
@@ -306,71 +362,53 @@ const SetupPage = () => {
                     </select>
                   </div>
                   <div className="sfld">
-                    <label>Branch *</label>
-                    <select value={branch} onChange={e => setBranch(e.target.value)} required>
-                      <option value="">Select branch</option>
-                      <option>CSE</option>
-                      <option>ECE</option>
-                      <option>Mechanical</option>
-                      <option>Civil</option>
-                      <option>MBA</option>
-                      <option>Other</option>
-                    </select>
+                    <label>Programme *</label>
+                    <input type="text" placeholder="e.g. BCA, B.Tech CSE" value={programme} onChange={e => setProgramme(e.target.value)} required />
                   </div>
                 </div>
 
-                <div className="sfld" style={{ marginBottom: '20px' }}>
-                  <label>College *</label>
-                  <select value={college} onChange={e => setCollege(e.target.value)} required>
-                    <option value="">Select your college</option>
-                    <option>PESU Bengaluru</option>
-                    <option>RVCE Bengaluru</option>
-                    <option>BMS College</option>
-                    <option>MSRIT</option>
-                    <option>NIT Karnataka</option>
-                    <option>Other</option>
-                  </select>
-                </div>
-
-                <div className="sfld" style={{ marginBottom: '32px' }}>
+                <div className="sfld" style={{ marginBottom: '16px' }}>
                   <label>Bio (optional)</label>
-                  <textarea placeholder="Tell others what you're passionate about..." value={bio} onChange={e => setBio(e.target.value)}></textarea>
+                  <textarea placeholder="Tell others what you're passionate about..." value={bio} onChange={e => setBio(e.target.value)} rows="3" style={{ minHeight: '80px', resize: 'vertical' }}></textarea>
                 </div>
 
+                <div className="sfld" style={{ marginBottom: '24px' }}>
+                  <label>UPI ID <span style={{ color: '#aaa', fontWeight: 400 }}>(for payments)</span></label>
+                  <input type="text" placeholder="yourname@upi" value={upi} onChange={e => setUpi(e.target.value)} />
+                </div>
               </div>
-              {error && <div style={{ color: '#E24B4A', fontSize: '13px', marginBottom: '16px', background: '#FBEAF0', padding: '10px 14px', borderRadius: '8px', fontWeight: 500 }}>{error}</div>}
-              <button type="submit" className="sbtn" style={{ padding: '16px', borderRadius: '12px', fontSize: '16px' }}>Continue</button>
+              <div style={{ display: 'flex' }}>
+                <button type="submit" style={{ width: '100%', padding: '14px', borderRadius: '12px', background: '#534AB7', color: '#fff', border: 'none', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>Continue</button>
+              </div>
             </div>
           )}
 
           {/* Step 2: Skills */}
           {step === 2 && (
             <div className="fade-in">
-              <div style={{ marginBottom: '32px' }}>
-                <div className="ch"><span className="ct">Skills you can teach</span></div>
-                <p style={{ fontSize: '12px', color: '#888', marginBottom: '12px' }}>Add skills you're confident in and can help others learn</p>
-                <div className="skill-tags">
-                  {teachSkills.map(s => (
-                    <span key={s} className="stag">
-                      {s} <button type="button" onClick={() => removeTeachSkill(s)}>×</button>
-                    </span>
-                  ))}
-                </div>
-                <div className="skill-input-row">
-                  <input type="text" placeholder="e.g. Python, Figma, Guitar..." value={teachInput} onChange={e => setTeachInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && (e.preventDefault(), addTeachSkill(teachInput))} />
-                  <button type="button" className="skill-add-btn" onClick={() => addTeachSkill(teachInput)}>Add</button>
-                </div>
-                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '9px' }}>
-                  <span style={{ fontSize: '11px', color: '#888' }}>Suggestions:</span>
-                  {['Python', 'DSA', 'Figma', 'Guitar', 'React'].map(s => (
-                    <span key={s} onClick={() => addTeachSkill(s)} style={{ fontSize: '11px', padding: '3px 9px', borderRadius: '20px', background: '#F5F4FF', color: '#534AB7', cursor: 'pointer', border: '1px solid #E0DFF0' }}>{s}</span>
-                  ))}
+              <div className="setup-card" style={{ padding: '24px 32px', marginBottom: '20px', borderRadius: '16px', position: 'relative', maxWidth: '100%', width: '100%' }}>
+                <button type="button" onClick={() => { setStep(3); setHighestStep(h => Math.max(h, 3)); window.scrollTo({ top: 0, behavior: 'smooth' }); }} style={{ position: 'absolute', top: '24px', right: '28px', background: 'none', border: 'none', fontSize: '13px', color: '#6b7280', cursor: 'pointer', fontWeight: 500 }}>Skip</button>
+                <div style={{ marginBottom: 0 }}>
+                  <div className="ch"><span className="ct" style={{ fontSize: '16px', fontWeight: 600, color: '#111827', display: 'block', marginBottom: '2px' }}>Topics you can teach</span></div>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '16px' }}>Add topics you're confident in and can help others learn</p>
+                  <div className="skill-tags">
+                    {teachSkills.map(s => (
+                      <span key={s} className="stag">
+                        {s} <button type="button" onClick={() => removeTeachSkill(s)}>×</button>
+                      </span>
+                    ))}
+                  </div>
+                  <AutocompleteInput 
+                    allTopics={allTopicsList} 
+                    onAddSkill={addTeachSkill} 
+                    placeholder="e.g. Python, Figma, Guitar..." 
+                  />
                 </div>
               </div>
 
-              <div style={{ marginBottom: '32px' }}>
-                <div className="ch"><span className="ct">Skills you want to learn</span></div>
-                <p style={{ fontSize: '12px', color: '#888', marginBottom: '12px' }}>Tell others what you're looking to pick up</p>
+              <div className="setup-card" style={{ padding: '24px 32px', marginBottom: '20px', borderRadius: '16px', position: 'relative', maxWidth: '100%', width: '100%' }}>
+                <div className="ch"><span className="ct" style={{ fontSize: '16px', fontWeight: 600, color: '#111827', display: 'block', marginBottom: '2px' }}>Topics you want to learn</span></div>
+                <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '16px' }}>Tell others what you're looking to pick up</p>
                 <div className="skill-tags">
                   {learnSkills.map(s => (
                     <span key={s} className="stag">
@@ -378,49 +416,20 @@ const SetupPage = () => {
                     </span>
                   ))}
                 </div>
-                <div className="skill-input-row">
-                  <input type="text" placeholder="e.g. Japanese, Machine Learning..." value={learnInput} onChange={e => setLearnInput(e.target.value)} onKeyPress={e => e.key === 'Enter' && (e.preventDefault(), addLearnSkill(learnInput))} />
-                  <button type="button" className="skill-add-btn" onClick={() => addLearnSkill(learnInput)}>Add</button>
-                </div>
-                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '9px' }}>
-                  <span style={{ fontSize: '11px', color: '#888' }}>Suggestions:</span>
-                  {['Japanese', 'Figma', 'ML', 'Finance'].map(s => (
-                    <span key={s} onClick={() => addLearnSkill(s)} style={{ fontSize: '11px', padding: '3px 9px', borderRadius: '20px', background: '#F5F4FF', color: '#534AB7', cursor: 'pointer', border: '1px solid #E0DFF0' }}>{s}</span>
-                  ))}
+
+                <div style={{ marginBottom: 0 }}>
+                   <label style={{ fontSize: '12px', color: '#4b5563', fontWeight: 500, display: 'block', marginBottom: '6px' }}>Pick or type a skill</label>
+                   <AutocompleteInput 
+                     allTopics={allTopicsList} 
+                     onAddSkill={addLearnSkill} 
+                     placeholder="e.g. Graphic Design, French..." 
+                   />
                 </div>
               </div>
 
-              <div className="form-grid" style={{ marginBottom: '24px' }}>
-                <div className="sfld">
-                  <label>Experience Level *</label>
-                  <select value={experience} onChange={e => setExperience(e.target.value)} required>
-                    <option>Beginner</option>
-                    <option>Intermediate</option>
-                    <option>Advanced</option>
-                    <option>Expert</option>
-                  </select>
-                </div>
-                <div className="sfld">
-                  <label>Categories *</label>
-                  <select value={category} onChange={e => setCategory(e.target.value)} required>
-                    <option>Technology</option>
-                    <option>Design</option>
-                    <option>Business</option>
-                    <option>Languages</option>
-                    <option>Music & Arts</option>
-                  </select>
-                </div>
-              </div>
-              
-              <div className="sfld" style={{ marginBottom: '32px' }}>
-                <label>Other Interests <span style={{ color: '#aaa', fontWeight: 400 }}>(optional)</span></label>
-                <input type="text" placeholder="e.g. Photography, Hiking..." value={interests} onChange={e => setInterests(e.target.value)} />
-              </div>
-
-              {error && <div style={{ color: '#E24B4A', fontSize: '13px', marginBottom: '16px', background: '#FBEAF0', padding: '10px 14px', borderRadius: '8px', fontWeight: 500 }}>{error}</div>}
-              <div className="sbtn-row">
-                <button type="button" className="sbtn-back" onClick={handleBack}>Back</button>
-                <button type="submit" className="sbtn">Continue</button>
+              <div style={{ display: 'flex', gap: '16px' }}>
+                <button type="button" onClick={handleBack} style={{ flex: '0 0 auto', padding: '14px 28px', borderRadius: '12px', background: '#fff', border: '1px solid #e5e7eb', fontSize: '15px', fontWeight: 600, color: '#4b5563', cursor: 'pointer' }}>Back</button>
+                <button type="submit" style={{ flexGrow: 1, padding: '14px', borderRadius: '12px', background: '#534AB7', color: '#fff', border: 'none', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>Continue</button>
               </div>
             </div>
           )}
@@ -428,40 +437,33 @@ const SetupPage = () => {
           {/* Step 3: Availability */}
           {step === 3 && (
             <div className="fade-in">
-              <div style={{ marginBottom: '32px' }}>
-                <div className="ch"><span className="ct">When are you free?</span></div>
-                <p style={{ fontSize: '12px', color: '#888', marginBottom: '12px' }}>Help others know when to book sessions with you</p>
-                <div className="avail-grid">
-                  {availOptions.map(opt => (
-                    <div key={opt} className={`avail-opt ${availability.includes(opt) ? 'on' : ''}`} onClick={() => toggleAvailability(opt)}>
+              <div className="setup-card" style={{ padding: '24px 32px', marginBottom: '16px', borderRadius: '16px', maxWidth: '100%', width: '100%' }}>
+                <div style={{ marginBottom: 0 }}>
+                  <div className="ch"><span className="ct" style={{ fontSize: '16px', fontWeight: 600, color: '#111827', display: 'block', marginBottom: '2px' }}>When are you free?</span></div>
+                  <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '16px' }}>Help others know when to book sessions with you</p>
+                  <div className="avail-grid">
+                    {availOptions.map(opt => (
+                      <div key={opt} className={`avail-opt ${availability.includes(opt) ? 'on' : ''}`} onClick={() => toggleAvailability(opt)}>
+                        {opt}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="setup-card" style={{ padding: '24px 32px', marginBottom: '16px', borderRadius: '16px', maxWidth: '100%', width: '100%' }}>
+                <div className="ch"><span className="ct" style={{ fontSize: '16px', fontWeight: 600, color: '#111827', display: 'block', marginBottom: '16px' }}>Session preference</span></div>
+                <div className="avail-grid" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
+                  {['Online (Google Meet)', 'In-person on campus', 'Either works'].map(opt => (
+                    <div key={opt} className={`avail-opt ${sessionPref === opt ? 'on' : ''}`} onClick={() => setSessionPref(opt)}>
                       {opt}
                     </div>
                   ))}
                 </div>
               </div>
-              
-              <div className="form-grid" style={{ marginBottom: '24px' }}>
-                <div className="sfld" style={{ marginBottom: 0 }}>
-                  <label>Preferred Time *</label>
-                  <select value={prefTime} onChange={e => setPrefTime(e.target.value)} required>
-                    <option>Morning (8AM - 12PM)</option>
-                    <option>Afternoon (12PM - 5PM)</option>
-                    <option>Evening (5PM - 9PM)</option>
-                    <option>Night (9PM onwards)</option>
-                  </select>
-                </div>
-                <div className="sfld" style={{ marginBottom: 0 }}>
-                  <label>Session Mode *</label>
-                  <select value={sessionPref} onChange={e => setSessionPref(e.target.value)} required>
-                    <option>Online (Google Meet)</option>
-                    <option>In-person on campus</option>
-                    <option>Either works</option>
-                  </select>
-                </div>
-              </div>
 
-              <div className="sfld" style={{ marginBottom: '20px' }}>
-                <div className="ch"><span className="ct">Exchange preference</span></div>
+              <div className="setup-card" style={{ padding: '24px 32px', marginBottom: '24px', borderRadius: '16px', maxWidth: '100%', width: '100%' }}>
+                <div className="ch"><span className="ct" style={{ fontSize: '16px', fontWeight: 600, color: '#111827', display: 'block', marginBottom: '16px' }}>Exchange preference</span></div>
                 <div className="avail-grid" style={{ gridTemplateColumns: 'repeat(3, 1fr)' }}>
                   {['Skill swap', 'Paid (₹/hr)', 'Both'].map(opt => (
                     <div key={opt} className={`avail-opt ${exchangePref === opt ? 'on' : ''}`} onClick={() => setExchangePref(opt)}>
@@ -471,25 +473,12 @@ const SetupPage = () => {
                 </div>
               </div>
 
-              <div className="sfld" style={{ marginBottom: '24px' }}>
-                <label>Bio <span style={{ color: '#aaa', fontWeight: 400 }}>(optional)</span></label>
-                <textarea placeholder="Tell others what you're passionate about..." value={bio} onChange={e => setBio(e.target.value)}></textarea>
+              <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
+                <button type="button" onClick={handleBack} style={{ flex: '0 0 auto', padding: '14px 28px', borderRadius: '12px', background: '#fff', border: '1px solid #e5e7eb', fontSize: '15px', fontWeight: 600, color: '#4b5563', cursor: 'pointer' }}>Back</button>
+                <button type="submit" style={{ flexGrow: 1, padding: '14px', borderRadius: '12px', background: '#534AB7', color: '#fff', border: 'none', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>Go to Dashboard</button>
               </div>
-
-              <div className="sfld" style={{ marginBottom: '32px' }}>
-                <label>UPI ID <span style={{ color: '#aaa', fontWeight: 400 }}>(for payments)</span></label>
-                <input type="text" placeholder="yourname@upi" value={upi} onChange={e => setUpi(e.target.value)} />
-              </div>
-
-              {error && <div style={{ color: '#E24B4A', fontSize: '13px', marginBottom: '16px', background: '#FBEAF0', padding: '10px 14px', borderRadius: '8px', fontWeight: 500 }}>{error}</div>}
-              <div className="sbtn-row">
-                <button type="button" className="sbtn-back" onClick={handleBack}>Back</button>
-                <button type="submit" className="sbtn">Go to Dashboard</button>
-              </div>
-              <div style={{ textAlign: 'center', marginTop: '10px' }}>
-                <button type="button" onClick={handleFinish} style={{ background: 'none', border: 'none', fontSize: '12px', color: '#aaa', cursor: 'pointer', textDecoration: 'underline' }}>
-                  Skip for now
-                </button>
+              <div style={{ textAlign: 'center' }}>
+                <button type="button" onClick={handleFinish} style={{ background: 'none', border: 'none', color: '#6b7280', fontSize: '14px', fontWeight: 500, cursor: 'pointer', textDecoration: 'underline' }}>Skip for now</button>
               </div>
             </div>
           )}

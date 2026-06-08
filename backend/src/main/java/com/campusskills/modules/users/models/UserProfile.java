@@ -10,6 +10,7 @@ public class UserProfile {
     private String userId;
     private String displayName;
     private String department;
+    private String phoneNumber;
     private String sem;
     private String year;
     private String bio;
@@ -38,6 +39,9 @@ public class UserProfile {
 
     public String getDepartment() { return department; }
     public void setDepartment(String department) { this.department = department; }
+
+    public String getPhoneNumber() { return phoneNumber; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
 
     public String getSem() { return sem; }
     public void setSem(String sem) { this.sem = sem; }

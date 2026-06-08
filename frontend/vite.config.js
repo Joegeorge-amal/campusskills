@@ -9,6 +9,12 @@ export default defineConfig({
     open: true,
     fs: {
       allow: ['..']
+    },
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true
+      }
     }
   }
 });

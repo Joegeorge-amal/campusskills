@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Create central API client pointing to your Java Vert.x back-end relative API endpoint
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || '/api',
+  baseURL: '/api/v1',
   headers: {
     'Content-Type': 'application/json'
   },
