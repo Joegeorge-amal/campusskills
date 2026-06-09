@@ -9,6 +9,7 @@ import {
   IconSparkles, 
   IconCheck, 
   IconStarFilled, 
+  IconStar,
   IconArrowUpRight 
 } from '@tabler/icons-react';
 
@@ -106,8 +107,8 @@ const Dashboard = () => {
           
           {/* Stat 1 */}
           <div className="glossy-card" style={{ background: '#ffffff', borderRadius: '12px', padding: '16px', border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <IconSparkles size={20} strokeWidth={2} />
+            <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: '#f0f6ff', color: '#1e3a8a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 2px rgba(0, 0, 0, 0.15)' }}>
+              <IconSparkles size={24} strokeWidth={1.5} />
             </div>
             <div>
               <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '2px', lineHeight: 1 }}>{stats.skillsOffered}</div>
@@ -120,8 +121,8 @@ const Dashboard = () => {
 
           {/* Stat 2 */}
           <div className="glossy-card" style={{ background: '#ffffff', borderRadius: '12px', padding: '16px', border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#ecfdf5', color: '#059669', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <IconCheck size={20} strokeWidth={2.5} />
+            <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: '#ecfdf5', color: '#065f46', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 2px rgba(0, 0, 0, 0.15)' }}>
+              <IconCheck size={24} strokeWidth={1.5} />
             </div>
             <div>
               <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '2px', lineHeight: 1 }}>{stats.sessionsDone}</div>
@@ -134,8 +135,8 @@ const Dashboard = () => {
 
           {/* Stat 3 */}
           <div className="glossy-card" style={{ background: '#ffffff', borderRadius: '12px', padding: '16px', border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#fef3c7', color: '#d97706', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <IconStarFilled size={20} />
+            <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: '#fef3c7', color: '#92400e', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 2px rgba(0, 0, 0, 0.15)' }}>
+              <IconStar size={24} strokeWidth={1.5} />
             </div>
             <div>
               <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '2px', lineHeight: 1 }}>{stats.trustScore}</div>
@@ -159,20 +160,20 @@ const Dashboard = () => {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', overflowY: 'auto' }}>
               {upcomingSessions.length > 0 ? upcomingSessions.map((session, i) => (
-                <div key={session.id || i} style={{ border: '1px solid #f3f4f6', borderRadius: '10px', padding: '12px', display: 'flex', alignItems: 'center', gap: '12px', background: '#ffffff' }}>
-                  <div style={{ background: '#1d4ed8', borderRadius: '8px', width: '40px', height: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#ffffff' }}>
-                    <div style={{ fontSize: '14px', fontWeight: 700, lineHeight: 1.1 }}>{session.date?.split(' ')[0] || '22'}</div>
-                    <div style={{ fontSize: '9px', fontWeight: 600, textTransform: 'uppercase' }}>{session.month || 'MAY'}</div>
+                <div key={session.id || i} style={{ border: '1px solid #dbeafe', borderRadius: '16px', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '16px', background: 'linear-gradient(to bottom right, rgba(239, 246, 255, 0.6) 0%, rgba(255, 255, 255, 0.6) 100%)' }}>
+                  <div style={{ background: session.status === 'soon' ? '#3b82f6' : '#1d4ed8', borderRadius: '14px', width: '48px', height: '56px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#ffffff', boxShadow: session.status === 'soon' ? '0 4px 12px rgba(59, 130, 246, 0.4)' : '0 4px 12px rgba(29, 78, 216, 0.4)' }}>
+                    <div style={{ fontSize: '18px', fontWeight: 700, lineHeight: 1.1 }}>{session.date?.split(' ')[0] || '22'}</div>
+                    <div style={{ fontSize: '10px', fontWeight: 600, textTransform: 'uppercase' }}>{session.month || 'MAY'}</div>
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#111827', marginBottom: '2px' }}>{session.title || 'React.js'} · {session.partner || 'Priya S.'}</div>
-                    <div style={{ fontSize: '11px', color: '#6b7280', fontWeight: 500 }}>{session.time || '4:00 PM'} · {session.type === 'swap' ? 'Swap' : 'Online'}</div>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#111827', marginBottom: '2px' }}>{session.title || 'React.js'}{session.partner ? ` · ${session.partner}` : ''}</div>
+                    <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500 }}>{session.time || '4:00 PM'} · {session.type === 'swap' ? 'Swap' : 'Online'}</div>
                   </div>
                   <div>
                     {session.status === 'soon' ? (
-                      <button style={{ fontSize: '11px', padding: '6px 16px', borderRadius: '100px', border: '1px solid #e5e7eb', background: '#ffffff', color: '#6b7280', fontWeight: 700 }} disabled>Soon</button>
+                      <button style={{ fontSize: '12px', padding: '8px 20px', borderRadius: '14px', border: '1px solid #e5e7eb', background: '#ffffff', color: '#9ca3af', fontWeight: 700 }} disabled>Soon</button>
                     ) : (
-                      <button style={{ fontSize: '11px', padding: '6px 16px', borderRadius: '100px', border: 'none', background: '#1d4ed8', color: '#ffffff', cursor: 'pointer', fontWeight: 700 }}>Join</button>
+                      <button style={{ fontSize: '12px', padding: '8px 20px', borderRadius: '14px', border: 'none', background: '#1e3a8a', color: '#ffffff', cursor: 'pointer', fontWeight: 700 }}>Join</button>
                     )}
                   </div>
                 </div>

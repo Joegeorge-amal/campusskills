@@ -10,20 +10,17 @@ public class AdminService {
     private final AdminRepository adminRepository;
     private final com.campusskills.modules.sessions.repositories.SessionRepository sessionRepository;
     private final com.campusskills.modules.users.repositories.UserRepository userRepository;
-    private final com.campusskills.modules.users.repositories.SkillVerificationRepository verificationRepository;
     private final com.campusskills.modules.users.repositories.UserProfileRepository userProfileRepository;
     private final io.vertx.core.eventbus.EventBus eventBus;
 
     public AdminService(AdminRepository adminRepository, 
                         com.campusskills.modules.sessions.repositories.SessionRepository sessionRepository, 
                         com.campusskills.modules.users.repositories.UserRepository userRepository, 
-                        com.campusskills.modules.users.repositories.SkillVerificationRepository verificationRepository,
                         com.campusskills.modules.users.repositories.UserProfileRepository userProfileRepository,
                         io.vertx.core.eventbus.EventBus eventBus) {
         this.adminRepository = adminRepository;
         this.sessionRepository = sessionRepository;
         this.userRepository = userRepository;
-        this.verificationRepository = verificationRepository;
         this.userProfileRepository = userProfileRepository;
         this.eventBus = eventBus;
     }
@@ -51,39 +48,7 @@ public class AdminService {
         });
     }
 
-    public Future<List<com.campusskills.modules.users.models.SkillVerification>> getPendingVerifications() {
-        return verificationRepository.findPending();
-    }
 
-    public Future<Boolean> assignVerification(String id, String evaluatorId) {
-        return verificationRepository.assign(id, evaluatorId);
-    }
-
-    public Future<Boolean> evaluateVerification(String id, String evaluatorId, com.campusskills.modules.users.models.VerificationStatus status, String notes) {
-        if (status != com.campusskills.modules.users.models.VerificationStatus.APPROVED && status != com.campusskills.modules.users.models.VerificationStatus.REJECTED) {
-            return Future.failedFuture("Invalid evaluation status. Must be APPROVED or REJECTED.");
-        }
-
-        return verificationRepository.findById(id).compose(verification -> {
-            if (verification == null) {
-                return Future.failedFuture("Verification request not found");
-            }
-            if (verification.getStatus() != com.campusskills.modules.users.models.VerificationStatus.ASSIGNED) {
-                return Future.failedFuture("Verification request must be ASSIGNED before evaluation");
-            }
-            if (!evaluatorId.equals(verification.getEvaluatorId())) {
-                return Future.failedFuture("Only the assigned evaluator can complete this verification");
-            }
-
-            return verificationRepository.evaluate(id, status, notes).compose(updated -> {
-                if (updated && status == com.campusskills.modules.users.models.VerificationStatus.APPROVED) {
-                    // Sync to user profile immediately
-                    return userProfileRepository.addVerifiedSkill(verification.getUserId(), verification.getSkillName());
-                }
-                return Future.succeededFuture(updated);
-            });
-        });
-    }
 
     private void sendNotification(String userId, com.campusskills.shared.constants.NotificationType type, String title, String message, String sourceType, String sourceId) {
         if (eventBus == null || userId == null) return;

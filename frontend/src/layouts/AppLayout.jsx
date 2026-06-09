@@ -5,12 +5,13 @@ import { useAppData } from '../context/AppDataContext';
 import Toast from '../components/common/Toast';
 import Sidebar from '../components/common/Sidebar/Sidebar';
 import AppHeader from '../components/common/AppHeader/AppHeader';
+import ConfirmModal from '../components/modals/ConfirmModal';
 import {
   IconHome,
   IconLayoutGrid,
   IconMessageCircle,
   IconArrowsRightLeft,
-  IconCalendarEvent,
+  IconCalendarMonth,
   IconHistory,
   IconUserCircle
 } from "@tabler/icons-react";
@@ -21,9 +22,17 @@ const AppLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
-  const [isCompact, setIsCompact] = React.useState(false);
+  const [isCompact, setIsCompact] = React.useState(() => {
+    const saved = localStorage.getItem('sidebar_compact');
+    return saved === 'true';
+  });
   const [activeChip, setActiveChip] = React.useState('');
+
+  React.useEffect(() => {
+    localStorage.setItem('sidebar_compact', isCompact);
+  }, [isCompact]);
   const [isFilterModalOpen, setIsFilterModalOpen] = React.useState(false);
+  const [isLogoutModalOpen, setIsLogoutModalOpen] = React.useState(false);
 
   // Reset active chip on navigation
   React.useEffect(() => {
@@ -53,6 +62,11 @@ const AppLayout = () => {
   const { showSearch, chips, isAdvanced } = getPageConfig();
 
   const handleSignOut = () => {
+    setIsLogoutModalOpen(true);
+  };
+
+  const confirmSignOut = () => {
+    setIsLogoutModalOpen(false);
     logout();
     navigate('/login');
   };
@@ -80,7 +94,7 @@ const AppLayout = () => {
     { label: 'Marketplace', path: '/app/marketplace', icon: <IconLayoutGrid stroke={1.5} /> },
     { label: 'Messages', path: '/app/messages', icon: <IconMessageCircle stroke={1.5} />, badge: unreadMessagesCount },
     { label: 'Requests', path: '/app/requests', icon: <IconArrowsRightLeft stroke={1.5} />, badge: pendingRequestsCount },
-    { label: 'Sessions', path: '/app/sessions', icon: <IconCalendarEvent stroke={1.5} /> },
+    { label: 'Sessions', path: '/app/sessions', icon: <IconCalendarMonth stroke={1.5} /> },
     { label: 'My profile', path: '/app/profile', icon: <IconUserCircle stroke={1.5} />, section: 'Me' }
   ];
 
@@ -178,6 +192,17 @@ const AppLayout = () => {
           </div>
         </div>
       )}
+
+      {/* Logout Confirmation Modal */}
+      <ConfirmModal 
+        isOpen={isLogoutModalOpen}
+        onClose={() => setIsLogoutModalOpen(false)}
+        onConfirm={confirmSignOut}
+        title="Sign Out"
+        message="Are you sure you want to sign out of Campus Skills?"
+        confirmText="Sign Out"
+        isDanger={true}
+      />
     </div>
   );
 };

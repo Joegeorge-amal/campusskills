@@ -8,36 +8,43 @@ import OtpVerificationModal from '../components/modals/OtpVerificationModal';
 import { APP_CONFIG } from '../config';
 
 const SetupPage = () => {
-  const [step, setStep] = useState(1);
-  const [highestStep, setHighestStep] = useState(1);
+  const [initData] = useState(() => {
+    try {
+      const saved = localStorage.getItem('setup_form_data');
+      return saved ? JSON.parse(saved) : {};
+    } catch(e) { return {}; }
+  });
+
+  const [step, setStep] = useState(initData.step || 1);
+  const [highestStep, setHighestStep] = useState(initData.highestStep || 1);
   const navigate = useNavigate();
   const { register, login, updateProfile } = useAuth();
 
   // Step 1 states
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [countryCode, setCountryCode] = useState('+91');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [year, setYear] = useState('3rd year');
-  const [programme, setProgramme] = useState('');
-  const [bio, setBio] = useState('');
-  const [upi, setUpi] = useState('');
-  const [avatarColor, setAvatarColor] = useState({ bg: '#EEEDFE', text: '#3C3489' });
-  const [avatarImg, setAvatarImg] = useState(null);
+  const [email, setEmail] = useState(initData.email || '');
+  const [password, setPassword] = useState(initData.password || '');
+  const [firstName, setFirstName] = useState(initData.firstName || '');
+  const [lastName, setLastName] = useState(initData.lastName || '');
+  const [countryCode, setCountryCode] = useState(initData.countryCode || '+91');
+  const [phoneNumber, setPhoneNumber] = useState(initData.phoneNumber || '');
+  const [year, setYear] = useState(initData.year || '3rd year');
+  const [programme, setProgramme] = useState(initData.programme || '');
+  const [bio, setBio] = useState(initData.bio || '');
+  const [upi, setUpi] = useState(initData.upi || '');
+  const [avatarColor, setAvatarColor] = useState(initData.avatarColor || { bg: '#EEEDFE', text: '#3C3489' });
+  const [avatarImg, setAvatarImg] = useState(initData.avatarImg || null);
   const [error, setError] = useState('');
   const [isFinishing, setIsFinishing] = useState(false);
   const fileInputRef = useRef(null);
 
   // Step 2 states
-  const [teachSkills, setTeachSkills] = useState([]);
-  const [learnSkills, setLearnSkills] = useState([]);
-  const [teachInput, setTeachInput] = useState(''); // not strictly needed anymore, kept for stability
-  const [learnInput, setLearnInput] = useState(''); // not strictly needed anymore
-  const [experience, setExperience] = useState('Beginner');
-  const [category, setCategory] = useState('Technology');
-  const [interests, setInterests] = useState('');
+  const [teachSkills, setTeachSkills] = useState(initData.teachSkills || []);
+  const [learnSkills, setLearnSkills] = useState(initData.learnSkills || []);
+  const [teachInput, setTeachInput] = useState(''); 
+  const [learnInput, setLearnInput] = useState(''); 
+  const [experience, setExperience] = useState(initData.experience || 'Beginner');
+  const [category, setCategory] = useState(initData.category || 'Technology');
+  const [interests, setInterests] = useState(initData.interests || '');
   const [allTopicsList, setAllTopicsList] = useState([]);
 
   useEffect(() => {
@@ -54,16 +61,24 @@ const SetupPage = () => {
         setAllTopicsList(['Python', 'Java', 'React', 'Figma', 'Graphic Design', 'TypeScript', 'Node.js']);
       });
     }
-  }, [step]);
+  }, [step, allTopicsList.length]);
 
   // Step 3 states
-  const [availability, setAvailability] = useState(['Mon–Fri evenings', 'Weekend mornings']);
-  const [prefTime, setPrefTime] = useState('Evening (5PM - 9PM)');
-  const [sessionPref, setSessionPref] = useState('Online (Google Meet)');
-  const [exchangePref, setExchangePref] = useState('Skill swap');
+  const [availability, setAvailability] = useState(initData.availability || ['Mon–Fri evenings', 'Weekend mornings']);
+  const [prefTime, setPrefTime] = useState(initData.prefTime || 'Evening (5PM - 9PM)');
+  const [sessionPref, setSessionPref] = useState(initData.sessionPref || 'Online (Google Meet)');
+  const [exchangePref, setExchangePref] = useState(initData.exchangePref || 'Skill swap');
   const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
 
+  useEffect(() => {
+    const data = {
+      step, highestStep, email, password, firstName, lastName, countryCode, phoneNumber, year, programme, bio, upi, avatarColor, avatarImg, teachSkills, learnSkills, experience, category, interests, availability, prefTime, sessionPref, exchangePref
+    };
+    localStorage.setItem('setup_form_data', JSON.stringify(data));
+  }, [step, highestStep, email, password, firstName, lastName, countryCode, phoneNumber, year, programme, bio, upi, avatarColor, avatarImg, teachSkills, learnSkills, experience, category, interests, availability, prefTime, sessionPref, exchangePref]);
+
   const handleOtpSuccess = () => {
+    localStorage.removeItem('setup_form_data');
     setIsOtpModalOpen(false);
     navigate('/app/dashboard');
   };
@@ -141,6 +156,7 @@ const SetupPage = () => {
       if (userData && userData.emailVerified === false) {
         setIsOtpModalOpen(true);
       } else {
+        localStorage.removeItem('setup_form_data');
         navigate('/app/dashboard');
       }
     } catch (err) {

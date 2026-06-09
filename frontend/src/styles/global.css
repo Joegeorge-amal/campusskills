@@ -219,23 +219,7 @@ button, input, select, textarea {
   border-color: rgba(37, 99, 235, 0.3) !important;
 }
 
-.glossy-card::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -150%;
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
-  transform: skewX(-25deg);
-  transition: all 0.7s ease;
-  z-index: 10;
-  pointer-events: none;
-}
 
-.glossy-card:hover::after {
-  left: 200%;
-}
 
 /* ─── EMAIL COMPOSITE INPUT ─── */
 .email-composite {

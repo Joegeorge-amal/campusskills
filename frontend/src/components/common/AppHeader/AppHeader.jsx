@@ -114,9 +114,13 @@ const AppHeader = ({
               bg="#eff6ff"
               color="#1e40af"
               backgroundImage={avatarData.backgroundImage}
-              size="28px"
-              fontSize="12px"
-              style={{ borderRadius: '8px', fontWeight: 700 }}
+              size="30px"
+              fontSize="13px"
+              style={{ 
+                borderRadius: '10px', 
+                fontWeight: 700,
+                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.12)'
+              }}
             />
           </div>
         )}
