@@ -95,4 +95,42 @@ public class AuthHandler {
             ApiResponse.badRequest(ctx, "Invalid JSON format");
         }
     }
+
+    public void forgotPassword(RoutingContext ctx) {
+        try {
+            JsonObject body = ctx.body().asJsonObject();
+            String email = body.getString("email");
+            userService.forgotPassword(email)
+                .onSuccess(data -> ApiResponse.ok(ctx, data))
+                .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
+        } catch (Exception e) {
+            ApiResponse.badRequest(ctx, "Invalid JSON format");
+        }
+    }
+
+    public void verifyResetOtp(RoutingContext ctx) {
+        try {
+            JsonObject body = ctx.body().asJsonObject();
+            String email = body.getString("email");
+            String otp = body.getString("otp");
+            userService.verifyResetOtp(email, otp)
+                .onSuccess(data -> ApiResponse.ok(ctx, data))
+                .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
+        } catch (Exception e) {
+            ApiResponse.badRequest(ctx, "Invalid JSON format");
+        }
+    }
+
+    public void resetPassword(RoutingContext ctx) {
+        try {
+            JsonObject body = ctx.body().asJsonObject();
+            String token = body.getString("token");
+            String newPassword = body.getString("newPassword");
+            userService.resetPassword(token, newPassword)
+                .onSuccess(data -> ApiResponse.ok(ctx, data))
+                .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
+        } catch (Exception e) {
+            ApiResponse.badRequest(ctx, "Invalid JSON format");
+        }
+    }
 }

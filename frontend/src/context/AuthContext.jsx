@@ -1,6 +1,7 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { authService } from '../services/authService';
 import { profileService } from '../services/profileService';
+import { userService } from '../services/userService';
 
 const AuthContext = createContext();
 
@@ -17,11 +18,17 @@ export const AuthProvider = ({ children }) => {
   const fetchProfile = async () => {
     if (!isAuthenticated) return;
     try {
-      const response = await profileService.getMe();
-      const profileData = response.data || response;
-      if (profileData) {
+      const response = await userService.getMe();
+      const fullData = response.data || response;
+      if (fullData && fullData.user) {
         setUser(prev => {
-          const updated = { ...prev, ...profileData };
+          const updated = { 
+            ...prev, 
+            ...fullData.user, 
+            ...(fullData.profile || {}), 
+            stats: fullData.stats, 
+            wallet: fullData.wallet 
+          };
           localStorage.setItem('cs_user', JSON.stringify(updated));
           return updated;
         });
@@ -44,36 +51,28 @@ export const AuthProvider = ({ children }) => {
         throw new Error('Please enter both email and password.');
       }
 
-      // MOCK LOGIN FOR TESTING
-      console.log('Mocking login for testing. Bypassing backend.');
-      
-      const mockRole = requestedRole;
+      const response = await authService.login(email, password);
+      const data = response.data || response;
+      const { token, refreshToken, user: userData } = data;
 
-      const userData = {
-        id: 'mock-id-123',
-        name: mockRole === 'admin' ? 'Admin User' : 'Student User',
-        email: email,
-        role: mockRole,
-        meta: mockRole === 'admin' ? 'Admin Access' : '3rd yr CSE'
-      };
-      
-      const token = 'mock-token-abc';
-      const refreshToken = 'mock-refresh-xyz';
+      if (!token) throw new Error('Invalid response from server');
 
       setUser(userData);
-      setRole(mockRole);
+      setRole(userData.role?.toLowerCase() || 'student');
       setIsAuthenticated(true);
       
       localStorage.setItem('cs_user', JSON.stringify(userData));
-      localStorage.setItem('cs_role', mockRole);
+      localStorage.setItem('cs_role', userData.role?.toLowerCase() || 'student');
       localStorage.setItem('cs_token', token);
-      localStorage.setItem('cs_refresh_token', refreshToken);
+      if (refreshToken) {
+        localStorage.setItem('cs_refresh_token', refreshToken);
+      }
       localStorage.setItem('cs_av_bg', avBg);
       localStorage.setItem('cs_av_col', avCol);
       
-      return true;
+      return userData;
     } catch (error) {
-      const msg = error.message || 'Login failed';
+      const msg = error.response?.data?.error || error.response?.data?.message || error.message || 'Login failed';
       throw new Error(msg);
     }
   };
@@ -99,7 +98,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('cs_av_bg', avBg);
       localStorage.setItem('cs_av_col', avCol);
       
-      return true;
+      return userData;
     } catch (error) {
       const msg = error.response?.data?.error || error.response?.data?.message || error.message || 'Registration failed';
       throw new Error(msg);
@@ -108,7 +107,7 @@ export const AuthProvider = ({ children }) => {
 
   const updateProfile = async (updatedFields) => {
     try {
-      // await profileService.updateMe(updatedFields);
+      await profileService.updateMe(updatedFields);
       setUser((prev) => {
         const newUser = { ...prev, ...updatedFields };
         localStorage.setItem('cs_user', JSON.stringify(newUser));
@@ -158,6 +157,7 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         updateProfile,
+        fetchProfile,
         logout,
         changeAvColor
       }}

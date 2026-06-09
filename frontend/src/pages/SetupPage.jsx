@@ -4,12 +4,14 @@ import { useAuth } from '../context/AuthContext';
 import { IconArrowLeft, IconSchool } from '@tabler/icons-react';
 import { getTopics } from '../services/topicService';
 import AutocompleteInput from '../components/AutocompleteInput';
+import OtpVerificationModal from '../components/modals/OtpVerificationModal';
+import { APP_CONFIG } from '../config';
 
 const SetupPage = () => {
   const [step, setStep] = useState(1);
   const [highestStep, setHighestStep] = useState(1);
   const navigate = useNavigate();
-  const { register, updateProfile } = useAuth();
+  const { register, login, updateProfile } = useAuth();
 
   // Step 1 states
   const [email, setEmail] = useState('');
@@ -25,6 +27,7 @@ const SetupPage = () => {
   const [avatarColor, setAvatarColor] = useState({ bg: '#EEEDFE', text: '#3C3489' });
   const [avatarImg, setAvatarImg] = useState(null);
   const [error, setError] = useState('');
+  const [isFinishing, setIsFinishing] = useState(false);
   const fileInputRef = useRef(null);
 
   // Step 2 states
@@ -58,6 +61,12 @@ const SetupPage = () => {
   const [prefTime, setPrefTime] = useState('Evening (5PM - 9PM)');
   const [sessionPref, setSessionPref] = useState('Online (Google Meet)');
   const [exchangePref, setExchangePref] = useState('Skill swap');
+  const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
+
+  const handleOtpSuccess = () => {
+    setIsOtpModalOpen(false);
+    navigate('/app/dashboard');
+  };
 
   const getInitials = () => {
     if (!firstName && !lastName) return 'AK';
@@ -70,8 +79,8 @@ const SetupPage = () => {
 
     // Validate Step 1 before proceeding
     if (step === 1) {
-      if (!email.trim().toLowerCase().endsWith('@kristujayanti.com')) {
-        setError('Only University emal adresses are allowed.');
+      if (!email.trim()) {
+        setError('Please enter your university username.');
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
@@ -96,14 +105,28 @@ const SetupPage = () => {
   };
 
   const handleFinish = async () => {
+    if (isFinishing) return;
     try {
+      setIsFinishing(true);
       setError('');
       const displayName = `${firstName} ${lastName}`.trim();
+      const fullEmail = `${email.trim()}${APP_CONFIG.DEFAULT_DOMAIN}`;
       
-      // Create user account via Auth V2
-      await register(email, password, displayName);
+      let userData;
+      try {
+        userData = await register(fullEmail, password, displayName);
+      } catch (regErr) {
+        if (regErr.message && regErr.message.includes('Email already exists')) {
+          try {
+            userData = await login(fullEmail, password);
+          } catch (loginErr) {
+            throw new Error('Account exists, but login failed: ' + loginErr.message);
+          }
+        } else {
+          throw regErr;
+        }
+      }
       
-      // Update profile with onboarding data via Profile Phase 1
       await updateProfile({
         phoneNumber: `${countryCode} ${phoneNumber}`.trim(),
         year, 
@@ -115,14 +138,19 @@ const SetupPage = () => {
         avatarImg: avatarImg
       });
       
-      navigate('/app/dashboard');
+      if (userData && userData.emailVerified === false) {
+        setIsOtpModalOpen(true);
+      } else {
+        navigate('/app/dashboard');
+      }
     } catch (err) {
       setError(err.message || 'Setup failed');
       window.scrollTo({ top: 0, behavior: 'smooth' });
-      // If setup fails, stay on page and show error
       if (err.message.includes('Email already exists')) {
-        setStep(1); // Go back to step 1 to fix email
+        setStep(1);
       }
+    } finally {
+      setIsFinishing(false);
     }
   };
 
@@ -248,8 +276,11 @@ const SetupPage = () => {
 
                 <div className="form-grid" style={{ marginBottom: '24px' }}>
                   <div className="sfld">
-                    <label>Email *</label>
-                    <input type="email" placeholder="yourname@college.edu" value={email} onChange={e => setEmail(e.target.value)} required />
+                    <label>Username *</label>
+                    <div className="email-composite">
+                      <input type="text" placeholder="24cpeb04" value={email} onChange={e => setEmail(e.target.value)} required />
+                      <div className="email-domain-suffix">{APP_CONFIG.DEFAULT_DOMAIN}</div>
+                    </div>
                   </div>
                   <div className="sfld">
                     <label>Password *</label>
@@ -474,16 +505,23 @@ const SetupPage = () => {
               </div>
 
               <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
-                <button type="button" onClick={handleBack} style={{ flex: '0 0 auto', padding: '14px 28px', borderRadius: '12px', background: '#fff', border: '1px solid #e5e7eb', fontSize: '15px', fontWeight: 600, color: '#4b5563', cursor: 'pointer' }}>Back</button>
-                <button type="submit" style={{ flexGrow: 1, padding: '14px', borderRadius: '12px', background: '#534AB7', color: '#fff', border: 'none', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>Go to Dashboard</button>
+                <button type="button" onClick={handleBack} disabled={isFinishing} style={{ flex: '0 0 auto', padding: '14px 28px', borderRadius: '12px', background: '#fff', border: '1px solid #e5e7eb', fontSize: '15px', fontWeight: 600, color: '#4b5563', cursor: isFinishing ? 'not-allowed' : 'pointer', opacity: isFinishing ? 0.5 : 1 }}>Back</button>
+                <button type="submit" disabled={isFinishing} style={{ flexGrow: 1, padding: '14px', borderRadius: '12px', background: '#534AB7', color: '#fff', border: 'none', fontSize: '15px', fontWeight: 600, cursor: isFinishing ? 'not-allowed' : 'pointer', opacity: isFinishing ? 0.8 : 1 }}>{isFinishing ? 'Creating Account...' : 'Go to Dashboard'}</button>
               </div>
               <div style={{ textAlign: 'center' }}>
-                <button type="button" onClick={handleFinish} style={{ background: 'none', border: 'none', color: '#6b7280', fontSize: '14px', fontWeight: 500, cursor: 'pointer', textDecoration: 'underline' }}>Skip for now</button>
+                <button type="button" onClick={handleFinish} disabled={isFinishing} style={{ background: 'none', border: 'none', color: '#6b7280', fontSize: '14px', fontWeight: 500, cursor: isFinishing ? 'not-allowed' : 'pointer', textDecoration: 'underline', opacity: isFinishing ? 0.5 : 1 }}>Skip for now</button>
               </div>
             </div>
           )}
         </form>
       </div>
+
+      <OtpVerificationModal
+        isOpen={isOtpModalOpen}
+        onClose={() => setIsOtpModalOpen(false)}
+        onSuccess={handleOtpSuccess}
+        email={`${email.trim()}${APP_CONFIG.DEFAULT_DOMAIN}`}
+      />
     </div>
   );
 };

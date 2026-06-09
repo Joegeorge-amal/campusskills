@@ -104,6 +104,7 @@
   line-height: 1;
   margin-top: 4px;
   letter-spacing: 0.2px;
+  margin-left: 1.5px; /* Optical alignment with the curved 'C' */
 }
 
 .login-heading {
@@ -246,13 +247,13 @@
   font-size: 0.95rem;
   color: #111827;
   background: #f9fafb;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-sizing: border-box;
 }
 
 .linp.with-icon {
   padding-left: 44px;
-  padding-right: 44px; /* Space for the eye toggle if needed */
+  padding-right: 44px;
 }
 
 .linp::placeholder {
@@ -262,7 +263,8 @@
 .linp:focus {
   outline: none;
   border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.25);
+  background: #ffffff;
 }
 
 /* Hide native Edge password reveal eye to prevent duplicate icons */

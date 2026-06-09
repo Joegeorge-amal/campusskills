@@ -6,7 +6,7 @@ const api = axios.create({
   headers: {
     'Content-Type': 'application/json'
   },
-  timeout: 10000 // 10s timeout limit
+  timeout: 30000 // 30s timeout limit
 });
 
 // Request Interceptor: Attach JWT Token if available in local storage
@@ -33,9 +33,15 @@ api.interceptors.response.use(
       const status = error.response.status;
 
       if (status === 401) {
-        console.error('[API] JWT Token expired or unauthorized. Redirecting to login...');
+        console.error('[API] JWT Token expired or unauthorized.');
         localStorage.clear();
-        window.location.href = '/login';
+        
+        // Only redirect if we are not already on an auth page, to prevent infinite reloads 
+        // when submitting invalid credentials on the login page itself
+        const path = window.location.pathname;
+        if (path !== '/login' && path !== '/setup' && path !== '/') {
+          window.location.href = '/login';
+        }
       } else if (status === 403) {
         console.error('[API] You do not have permissions to perform this action.');
       } else if (status === 500) {

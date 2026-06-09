@@ -47,6 +47,10 @@ public class AuthRouter {
         router.post("/refresh").handler(handler::refresh);
         router.post("/logout").handler(handler::logout);
 
+        
+        router.post("/forgot-password").handler(handler::forgotPassword);
+        router.post("/verify-reset-otp").handler(handler::verifyResetOtp);
+        router.post("/reset-password").handler(handler::resetPassword);
         return router;
     }
 }

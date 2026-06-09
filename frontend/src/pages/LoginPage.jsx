@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import ForgotPasswordModal from '../components/modals/ForgotPasswordModal';
+import OtpVerificationModal from '../components/modals/OtpVerificationModal';
 import { IconArrowLeft, IconUser, IconShieldLock, IconLogin, IconMail, IconLock, IconEye, IconEyeClosed } from '@tabler/icons-react';
 import logo from '../assets/kju_campus_logo.png';
 import '../styles/login.css';
+import { APP_CONFIG } from '../config';
 
 const LoginPage = () => {
   const [tab, setTab] = useState('student'); // 'student' | 'admin'
@@ -13,9 +15,29 @@ const LoginPage = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isForgotOpen, setIsForgotOpen] = useState(false);
+  const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
+
+  const handleTabChange = (newTab) => {
+    if (tab !== newTab) {
+      setTab(newTab);
+      setEmail('');
+      setError('');
+    }
+  };
+
+  const handleOtpSuccess = () => {
+    setIsOtpModalOpen(false);
+    const savedRole = localStorage.getItem('cs_role');
+    if (savedRole === 'admin') {
+      navigate('/admin/dashboard');
+    } else {
+      navigate('/app/dashboard');
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -27,8 +49,15 @@ const LoginPage = () => {
         throw new Error('Please enter both email and password.');
       }
 
-      await login(email, password, tab);
+      const fullEmail = tab === 'student' ? `${email.trim()}${APP_CONFIG.DEFAULT_DOMAIN}` : email.trim();
+      const userData = await login(fullEmail, password, tab);
 
+      if (userData && userData.emailVerified === false) {
+        setUnverifiedEmail(fullEmail);
+        setIsOtpModalOpen(true);
+        return;
+      }
+      
       const savedRole = localStorage.getItem('cs_role');
       if (savedRole === 'admin') {
         navigate('/admin/dashboard');
@@ -76,7 +105,7 @@ const LoginPage = () => {
           <div className="login-type-selector">
             <div 
               className={`type-card ${tab === 'student' ? 'active' : ''}`}
-              onClick={() => setTab('student')}
+              onClick={() => handleTabChange('student')}
             >
               <div className="type-icon">
                 <IconUser size={24} />
@@ -86,7 +115,7 @@ const LoginPage = () => {
             </div>
             <div 
               className={`type-card ${tab === 'admin' ? 'active' : ''}`}
-              onClick={() => setTab('admin')}
+              onClick={() => handleTabChange('admin')}
             >
               <div className="type-icon">
                 <IconShieldLock size={24} />
@@ -98,16 +127,30 @@ const LoginPage = () => {
 
           <form onSubmit={handleLogin} className="login-form">
             <div className="lfld">
-              <label className="lbl">College Email Address</label>
+              <label className="lbl">{tab === 'student' ? 'College Username' : 'Admin Email Address'}</label>
               <div className="input-wrapper">
-                <input
-                  className="linp"
-                  type="email"
-                  placeholder="yourname@kristujayanti.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
+                {tab === 'student' ? (
+                  <div className="email-composite">
+                    <input
+                      className="linp"
+                      type="text"
+                      placeholder="24cpeb04"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value.toLowerCase().replace(/\s/g, ''))}
+                      required
+                    />
+                    <div className="email-domain-suffix">{APP_CONFIG.DEFAULT_DOMAIN}</div>
+                  </div>
+                ) : (
+                  <input
+                    className="linp"
+                    type="email"
+                    placeholder="admin@kristujayanti.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value.toLowerCase().replace(/\s/g, ''))}
+                    required
+                  />
+                )}
               </div>
             </div>
             <div className="lfld">
@@ -171,6 +214,13 @@ const LoginPage = () => {
       <ForgotPasswordModal 
         isOpen={isForgotOpen} 
         onClose={() => setIsForgotOpen(false)} 
+        tab={tab}
+      />
+      <OtpVerificationModal
+        isOpen={isOtpModalOpen}
+        onClose={() => setIsOtpModalOpen(false)}
+        onSuccess={handleOtpSuccess}
+        email={unverifiedEmail}
       />
     </div>
   );

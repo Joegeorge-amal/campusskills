@@ -6,15 +6,19 @@ public class StubEmailService implements EmailService {
 
     @Override
     public Future<Void> sendOtpEmail(String email, String otp) {
-        System.out.println("----------------------------------------");
-        System.out.println("EMAIL DELIVERY STUB");
-        System.out.println("To: " + email);
-        System.out.println("Subject: Your CampusSkills Verification Code");
-        System.out.println("Body:");
-        System.out.println("OTP for " + email + ": " + otp);
-        System.out.println("This code will expire in 15 minutes.");
-        System.out.println("----------------------------------------");
-        
+        System.out.println("STUB: Sending OTP " + otp + " to " + email);
+        return Future.succeededFuture();
+    }
+
+    @Override
+    public Future<Void> sendPasswordResetOtpEmail(String email, String otp) {
+        System.out.println("STUB: Sending Password Reset OTP " + otp + " to " + email);
+        return Future.succeededFuture();
+    }
+
+    @Override
+    public Future<Void> sendPasswordChangeConfirmationEmail(String email) {
+        System.out.println("STUB: Sending Password Change Confirmation to " + email);
         return Future.succeededFuture();
     }
 }

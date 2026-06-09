@@ -70,3 +70,6 @@ backend/.vscode/
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Runbooks and temporary notes
+testing_runbook.md

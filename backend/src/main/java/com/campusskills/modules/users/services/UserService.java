@@ -34,6 +34,7 @@ public class UserService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final com.campusskills.modules.users.repositories.OtpVerificationRepository otpRepository;
     private final com.campusskills.shared.services.EmailService emailService;
+        private final com.campusskills.modules.users.repositories.PasswordResetTokenRepository passwordResetTokenRepository = new com.campusskills.modules.users.repositories.PasswordResetTokenRepository();
     private final JWTAuth jwtAuth;
     private final List<String> allowedDomains;
 
@@ -161,8 +162,11 @@ public class UserService {
                 otpVerification.setLastResentAt(System.currentTimeMillis());
 
                 Future<String> otpFut = otpRepository.create(otpVerification)
-                    .compose(v -> emailService.sendOtpEmail(normalizedEmail, otp))
-                    .map("otp-sent");
+                    .compose(v -> {
+                        emailService.sendOtpEmail(normalizedEmail, otp)
+                            .onFailure(err -> System.out.println("[AUTH] Failed to send OTP email: " + err.getMessage()));
+                        return Future.succeededFuture("otp-sent");
+                    });
 
                 return CompositeFuture.all(profileFut, statsFut, walletFut, otpFut)
                     .compose(cf -> generateAuthResponse(user));
@@ -204,13 +208,11 @@ public class UserService {
         if (!user.getEmailVerified()) {
             otpRepository.findByUserIdAndType(user.getId(), com.campusskills.modules.users.models.OtpVerification.TYPE_EMAIL_VERIFICATION).onSuccess(verification -> {
                 long now = System.currentTimeMillis();
-                // If no OTP exists or it has expired, generate and send a new one
-                if (verification == null || verification.getExpiresAt() < now) {
-                    resendOtp(user.getId()).onFailure(err -> {
-                        System.out.println("[AUTH] Failed to auto-send OTP during login: " + err.getMessage());
-                    });
-                }
-                // Otherwise, reuse the existing valid OTP (meaning, do nothing as it's already in their inbox)
+                // Always attempt to resend. The resendOtp method has a built-in 1-minute cooldown 
+                // to prevent spam, so it's safe to call it unconditionally here.
+                resendOtp(user.getId()).onFailure(err -> {
+                    System.out.println("[AUTH] Auto-send OTP during login skipped/failed: " + err.getMessage());
+                });
             }).onFailure(err -> {
                 System.out.println("[AUTH] Error checking OTP status: " + err.getMessage());
             });
@@ -351,7 +353,11 @@ public class UserService {
                         return Future.failedFuture("Please wait at least 1 minute before requesting a new OTP.");
                     }
                     return otpRepository.updateOtp(verification.getId(), newHash, newExpiry, now)
-                        .compose(v -> emailService.sendOtpEmail(user.getEmail(), newOtp));
+                        .compose(v -> {
+                            emailService.sendOtpEmail(user.getEmail(), newOtp)
+                                .onFailure(err -> System.out.println("[AUTH] Failed to resend OTP email: " + err.getMessage()));
+                            return Future.succeededFuture();
+                        });
                 } else {
                     // Create new
                     com.campusskills.modules.users.models.OtpVerification newVerification = new com.campusskills.modules.users.models.OtpVerification();
@@ -364,7 +370,11 @@ public class UserService {
                     newVerification.setLastResentAt(now);
 
                     return otpRepository.create(newVerification)
-                        .compose(v -> emailService.sendOtpEmail(user.getEmail(), newOtp));
+                        .compose(v -> {
+                            emailService.sendOtpEmail(user.getEmail(), newOtp)
+                                .onFailure(err -> System.out.println("[AUTH] Failed to resend OTP email: " + err.getMessage()));
+                            return Future.succeededFuture();
+                        });
                 }
             });
         });
@@ -396,6 +406,120 @@ public class UserService {
                 .put("token", accessToken)
                 .put("refreshToken", rawRefreshToken)
                 .put("user", userJson);
+        });
+    }
+
+    public Future<JsonObject> forgotPassword(String email) {
+        if (email == null) return Future.failedFuture("Email is required");
+        final String normalizedEmail = email.toLowerCase().trim();
+
+        return userRepository.findByEmail(normalizedEmail).compose(user -> {
+            if (user == null) {
+                return Future.succeededFuture(new JsonObject().put("message", "If an account exists for this email, a verification code has been sent."));
+            }
+
+            return otpRepository.findByUserIdAndType(user.getId(), com.campusskills.modules.users.models.OtpVerification.TYPE_PASSWORD_RESET).compose(verification -> {
+                long now = System.currentTimeMillis();
+                String otp = generateOtp();
+                String hashedOtp = BCrypt.hashpw(otp, BCrypt.gensalt());
+                Long expiry = now + 15 * 60 * 1000L;
+
+                if (verification != null) {
+                    if (now - verification.getLastResentAt() < 60000) {
+                        return Future.failedFuture("Please wait at least 1 minute before requesting a new OTP.");
+                    }
+                    return otpRepository.updateOtp(verification.getId(), hashedOtp, expiry, now)
+                        .compose(v -> {
+                            emailService.sendPasswordResetOtpEmail(normalizedEmail, otp)
+                                .onFailure(err -> System.out.println("[AUTH] Failed to send Reset OTP email: " + err.getMessage()));
+                            return Future.succeededFuture();
+                        })
+                        .map(v -> new JsonObject().put("message", "If an account exists for this email, a verification code has been sent."));
+                } else {
+                    com.campusskills.modules.users.models.OtpVerification newVerification = new com.campusskills.modules.users.models.OtpVerification();
+                    newVerification.setUserId(user.getId());
+                    newVerification.setEmail(normalizedEmail);
+                    newVerification.setType(com.campusskills.modules.users.models.OtpVerification.TYPE_PASSWORD_RESET);
+                    newVerification.setOtpHash(hashedOtp);
+                    newVerification.setAttempts(0);
+                    newVerification.setExpiresAt(expiry);
+                    newVerification.setLastResentAt(now);
+
+                    return otpRepository.create(newVerification)
+                        .compose(v -> {
+                            emailService.sendPasswordResetOtpEmail(normalizedEmail, otp)
+                                .onFailure(err -> System.out.println("[AUTH] Failed to send Reset OTP email: " + err.getMessage()));
+                            return Future.succeededFuture();
+                        })
+                        .map(v -> new JsonObject().put("message", "If an account exists for this email, a verification code has been sent."));
+                }
+            });
+        });
+    }
+
+    public Future<JsonObject> verifyResetOtp(String email, String otp) {
+        if (email == null || otp == null) return Future.failedFuture("Email and OTP are required");
+        final String normalizedEmail = email.toLowerCase().trim();
+
+        return userRepository.findByEmail(normalizedEmail).compose(user -> {
+            if (user == null) return Future.failedFuture("Invalid request");
+
+            return otpRepository.findByUserIdAndType(user.getId(), com.campusskills.modules.users.models.OtpVerification.TYPE_PASSWORD_RESET).compose(verification -> {
+                if (verification == null || verification.getExpiresAt() < System.currentTimeMillis()) {
+                    return Future.failedFuture("No pending verification found or OTP has expired");
+                }
+                if (verification.getAttempts() >= 5) {
+                    return otpRepository.deleteByUserIdAndType(user.getId(), com.campusskills.modules.users.models.OtpVerification.TYPE_PASSWORD_RESET)
+                        .compose(v -> Future.failedFuture("Too many incorrect attempts. Please request a new OTP."));
+                }
+                if (!BCrypt.checkpw(otp.trim(), verification.getOtpHash())) {
+                    return otpRepository.incrementAttempts(verification.getId())
+                        .compose(v -> Future.failedFuture("Invalid OTP"));
+                }
+
+                return otpRepository.deleteByUserIdAndType(user.getId(), com.campusskills.modules.users.models.OtpVerification.TYPE_PASSWORD_RESET).compose(v -> {
+                    String rawToken = generateSecureToken();
+                    String tokenHash = hashToken(rawToken);
+                    
+                    com.campusskills.modules.users.models.PasswordResetToken resetToken = new com.campusskills.modules.users.models.PasswordResetToken();
+                    resetToken.setUserId(user.getId());
+                    resetToken.setTokenHash(tokenHash);
+                    resetToken.setExpiresAt(System.currentTimeMillis() + 15 * 60 * 1000L);
+
+                    return passwordResetTokenRepository.create(resetToken).map(v2 -> {
+                        return new JsonObject()
+                            .put("message", "OTP verified successfully")
+                            .put("resetToken", rawToken);
+                    });
+                });
+            });
+        });
+    }
+
+    public Future<JsonObject> resetPassword(String token, String newPassword) {
+        if (token == null || newPassword == null) return Future.failedFuture("Token and new password are required");
+
+        String tokenHash = hashToken(token);
+        return passwordResetTokenRepository.findByTokenHash(tokenHash).compose(resetToken -> {
+            if (resetToken == null || resetToken.getExpiresAt() < System.currentTimeMillis()) {
+                if (resetToken != null) passwordResetTokenRepository.deleteById(resetToken.getId());
+                return Future.failedFuture("Invalid or expired reset token");
+            }
+
+            return userRepository.findById(resetToken.getUserId()).compose(user -> {
+                if (user == null) return Future.failedFuture("User not found");
+
+                String newHash = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+                user.setPasswordHash(newHash);
+
+                return userRepository.updateUser(user).compose(v -> {
+                    return passwordResetTokenRepository.deleteByUserId(user.getId()).compose(v2 -> {
+                        emailService.sendPasswordChangeConfirmationEmail(user.getEmail())
+                            .onFailure(err -> System.out.println("[AUTH] Failed to send password change confirmation: " + err.getMessage()));
+                        return Future.succeededFuture(new JsonObject().put("message", "Password successfully reset"));
+                    });
+                });
+            });
         });
     }
 }
