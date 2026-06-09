@@ -16,7 +16,7 @@ import java.util.List;
 
 public class AuthRouter {
 
-    public static Router create(Vertx vertx, JWTAuth jwtAuth) {
+    public static Router create(Vertx vertx, JWTAuth jwtAuth, com.campusskills.shared.services.EmailService emailService) {
         Router router = Router.router(vertx);
         
         UserRepository userRepository = new UserRepository();
@@ -25,7 +25,6 @@ public class AuthRouter {
         UserWalletRepository walletRepository = new UserWalletRepository();
         RefreshTokenRepository refreshTokenRepository = new RefreshTokenRepository();
         com.campusskills.modules.users.repositories.OtpVerificationRepository otpRepository = new com.campusskills.modules.users.repositories.OtpVerificationRepository();
-        com.campusskills.shared.services.EmailService emailService = new com.campusskills.shared.services.EmailService();
         
         // Load allowed domains (configurable, hardcoded here for testing setup as requested)
         List<String> allowedDomains = Arrays.asList("kristujayanti.com");

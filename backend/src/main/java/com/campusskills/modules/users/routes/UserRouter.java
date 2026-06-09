@@ -13,7 +13,7 @@ import io.vertx.ext.web.Router;
 
 public class UserRouter {
 
-    public static Router create(Vertx vertx, JWTAuth jwtAuth) {
+    public static Router create(Vertx vertx, JWTAuth jwtAuth, com.campusskills.shared.services.EmailService emailService) {
         Router router = Router.router(vertx);
         
         UserRepository userRepository = new UserRepository();
@@ -22,7 +22,6 @@ public class UserRouter {
         UserWalletRepository walletRepository = new UserWalletRepository();
         com.campusskills.modules.users.repositories.RefreshTokenRepository refreshTokenRepository = new com.campusskills.modules.users.repositories.RefreshTokenRepository();
         com.campusskills.modules.users.repositories.OtpVerificationRepository otpRepository = new com.campusskills.modules.users.repositories.OtpVerificationRepository();
-        com.campusskills.shared.services.EmailService emailService = new com.campusskills.shared.services.EmailService();
         
         java.util.List<String> allowedDomains = java.util.Arrays.asList("kristujayanti.com");
         

@@ -154,9 +154,10 @@ public class UserService {
                 com.campusskills.modules.users.models.OtpVerification otpVerification = new com.campusskills.modules.users.models.OtpVerification();
                 otpVerification.setUserId(userId);
                 otpVerification.setEmail(normalizedEmail);
+                otpVerification.setType(com.campusskills.modules.users.models.OtpVerification.TYPE_EMAIL_VERIFICATION);
                 otpVerification.setOtpHash(hashedOtp);
                 otpVerification.setAttempts(0);
-                otpVerification.setExpiresAt(new java.util.Date(System.currentTimeMillis() + 15 * 60 * 1000)); // 15 mins
+                otpVerification.setExpiresAt(System.currentTimeMillis() + 15 * 60 * 1000L); // 15 mins
                 otpVerification.setLastResentAt(System.currentTimeMillis());
 
                 Future<String> otpFut = otpRepository.create(otpVerification)
@@ -188,11 +189,32 @@ public class UserService {
             if (isSuperAdmin(user.getEmail()) && user.getRole() != UserRole.SUPER_ADMIN) {
                 user.setRole(UserRole.SUPER_ADMIN);
                 return userRepository.updateUserRole(user.getId(), UserRole.SUPER_ADMIN)
-                    .compose(v -> generateAuthResponse(user));
+                    .compose(v -> {
+                        triggerAutoOtpIfNeeded(user);
+                        return generateAuthResponse(user);
+                    });
             }
 
+            triggerAutoOtpIfNeeded(user);
             return generateAuthResponse(user);
         });
+    }
+
+    private void triggerAutoOtpIfNeeded(User user) {
+        if (!user.getEmailVerified()) {
+            otpRepository.findByUserIdAndType(user.getId(), com.campusskills.modules.users.models.OtpVerification.TYPE_EMAIL_VERIFICATION).onSuccess(verification -> {
+                long now = System.currentTimeMillis();
+                // If no OTP exists or it has expired, generate and send a new one
+                if (verification == null || verification.getExpiresAt() < now) {
+                    resendOtp(user.getId()).onFailure(err -> {
+                        System.out.println("[AUTH] Failed to auto-send OTP during login: " + err.getMessage());
+                    });
+                }
+                // Otherwise, reuse the existing valid OTP (meaning, do nothing as it's already in their inbox)
+            }).onFailure(err -> {
+                System.out.println("[AUTH] Error checking OTP status: " + err.getMessage());
+            });
+        }
     }
 
     public Future<JsonObject> refresh(String rawRefreshToken) {
@@ -220,7 +242,8 @@ public class UserService {
                     new JsonObject()
                         .put("userId", user.getId())
                         .put("role", user.getRole().name())
-                        .put("emailVerified", user.getEmailVerified()),
+                        .put("emailVerified", user.getEmailVerified())
+                        .put("requiresEmailVerification", !user.getEmailVerified()),
                     new JWTOptions().setExpiresInMinutes(15) // 15 mins
                 );
                 
@@ -277,13 +300,13 @@ public class UserService {
             return Future.failedFuture("OTP is required");
         }
 
-        return otpRepository.findByUserId(userId).compose(verification -> {
+        return otpRepository.findByUserIdAndType(userId, com.campusskills.modules.users.models.OtpVerification.TYPE_EMAIL_VERIFICATION).compose(verification -> {
             if (verification == null) {
                 return Future.failedFuture("No pending verification found or OTP has expired");
             }
 
             if (verification.getAttempts() >= 5) {
-                return otpRepository.deleteByUserId(userId)
+                return otpRepository.deleteByUserIdAndType(userId, com.campusskills.modules.users.models.OtpVerification.TYPE_EMAIL_VERIFICATION)
                     .compose(v -> Future.failedFuture("Too many incorrect attempts. Please request a new OTP."));
             }
 
@@ -299,7 +322,7 @@ public class UserService {
                 }
                 user.setEmailVerified(true);
                 return userRepository.updateUser(user).compose(v -> {
-                    return otpRepository.deleteByUserId(userId).compose(v2 -> {
+                    return otpRepository.deleteByUserIdAndType(userId, com.campusskills.modules.users.models.OtpVerification.TYPE_EMAIL_VERIFICATION).compose(v2 -> {
                         return generateAuthResponse(user);
                     });
                 });
@@ -316,11 +339,11 @@ public class UserService {
                 return Future.failedFuture("Email is already verified");
             }
 
-            return otpRepository.findByUserId(userId).compose(verification -> {
+            return otpRepository.findByUserIdAndType(userId, com.campusskills.modules.users.models.OtpVerification.TYPE_EMAIL_VERIFICATION).compose(verification -> {
                 long now = System.currentTimeMillis();
                 String newOtp = generateOtp();
                 String newHash = BCrypt.hashpw(newOtp, BCrypt.gensalt());
-                java.util.Date newExpiry = new java.util.Date(now + 15 * 60 * 1000);
+                Long newExpiry = now + 15 * 60 * 1000L;
 
                 if (verification != null) {
                     // Check cooldown (1 minute)
@@ -334,6 +357,7 @@ public class UserService {
                     com.campusskills.modules.users.models.OtpVerification newVerification = new com.campusskills.modules.users.models.OtpVerification();
                     newVerification.setUserId(userId);
                     newVerification.setEmail(user.getEmail());
+                    newVerification.setType(com.campusskills.modules.users.models.OtpVerification.TYPE_EMAIL_VERIFICATION);
                     newVerification.setOtpHash(newHash);
                     newVerification.setAttempts(0);
                     newVerification.setExpiresAt(newExpiry);
@@ -351,7 +375,8 @@ public class UserService {
             new JsonObject()
                 .put("userId", user.getId())
                 .put("role", user.getRole().name())
-                .put("emailVerified", user.getEmailVerified()),
+                .put("emailVerified", user.getEmailVerified())
+                .put("requiresEmailVerification", !user.getEmailVerified()),
             new JWTOptions().setExpiresInMinutes(15) // 15 minutes access token
         );
         

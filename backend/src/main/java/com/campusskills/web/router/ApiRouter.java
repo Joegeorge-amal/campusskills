@@ -41,8 +41,18 @@ public class ApiRouter {
         // 3. Body parsing
         router.route().handler(BodyHandler.create());
         
+        // 3.5 Email Service
+        // Changed default to "gmail" so you don't need to pass the environment variable every time!
+        String emailProvider = System.getenv().getOrDefault("EMAIL_PROVIDER", "gmail");
+        com.campusskills.shared.services.EmailService emailService;
+        if ("gmail".equalsIgnoreCase(emailProvider)) {
+            emailService = new com.campusskills.shared.services.GmailEmailService(vertx);
+        } else {
+            emailService = new com.campusskills.shared.services.StubEmailService();
+        }
+
         // 4. Public Routes
-        router.mountSubRouter("/auth", AuthRouter.create(vertx, jwtAuth));
+        router.mountSubRouter("/auth", AuthRouter.create(vertx, jwtAuth, emailService));
 
         // 5. Protected Routes Middleware
         router.route("/users/*").handler(JwtAuthMiddleware.create(jwtAuth));
@@ -67,7 +77,7 @@ public class ApiRouter {
         router.post("/verifications/*").handler(verifiedHandler);
 
         // 7. Modules Routing
-        router.mountSubRouter("/users", UserRouter.create(vertx, jwtAuth));
+        router.mountSubRouter("/users", UserRouter.create(vertx, jwtAuth, emailService));
         router.mountSubRouter("/profiles", com.campusskills.modules.users.routes.ProfileRouter.create(vertx));
         router.mountSubRouter("/chats", ChatRouter.create(vertx));
         router.mountSubRouter("/messages", MessageRouter.create(vertx));
