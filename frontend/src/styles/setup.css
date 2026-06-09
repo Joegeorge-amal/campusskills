@@ -17,12 +17,12 @@
 .setup-mark {
   width: 32px;
   height: 32px;
-  background: #534AB7;
+  background: #1d4ed8;
   border-radius: 9px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #EEEDFE;
+  color: #eef2ff;
   font-size: 13px;
   font-weight: 600;
 }
@@ -34,7 +34,7 @@
 }
 
 .setup-brand span {
-  color: #534AB7;
+  color: #1d4ed8;
 }
 
 .setup-title {
@@ -76,7 +76,7 @@
 }
 
 .spw-line.done {
-  background: #534AB7;
+  background: #1d4ed8;
 }
 
 .spw-line.hidden {
@@ -109,14 +109,14 @@
 }
 
 .sp-dot.done {
-  background: #534AB7;
+  background: #1d4ed8;
   color: #fff;
 }
 
 .sp-dot.active {
-  background: #534AB7;
+  background: #1d4ed8;
   color: #fff;
-  box-shadow: 0 0 0 4px rgba(83, 74, 183, 0.2);
+  box-shadow: 0 0 0 4px rgba(31, 62, 151, 0.2);
 }
 
 .sp-dot.idle {
@@ -181,7 +181,7 @@
 .sfld input:focus,
 .sfld select:focus,
 .sfld textarea:focus {
-  border-color: #534AB7;
+  border-color: #1d4ed8;
   background: #fff;
 }
 
@@ -207,15 +207,15 @@
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: #EEEDFE;
-  color: #3C3489;
+  background: #eef2ff;
+  color: #1d4ed8;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 24px;
   font-weight: 600;
   flex-shrink: 0;
-  border: 3px solid #534AB7;
+  border: 3px solid #1d4ed8;
   background-size: cover;
   background-position: center;
 }
@@ -240,7 +240,7 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #534AB7;
+  background: #1d4ed8;
   border: 2px solid #fff;
   display: flex;
   align-items: center;
@@ -276,7 +276,7 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #534AB7;
+  background: #1d4ed8;
   border: 2px solid #fff;
   display: flex;
   align-items: center;
@@ -407,9 +407,9 @@
   font-size: 12px;
   padding: 5px 11px;
   border-radius: 20px;
-  background: #EEEDFE;
-  color: #3C3489;
-  border: 1px solid #AFA9EC;
+  background: #eef2ff;
+  color: #1d4ed8;
+  border: 1px solid #93c5fd;
   display: flex;
   align-items: center;
   gap: 5px;
@@ -419,7 +419,7 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #534AB7;
+  color: #1d4ed8;
   font-size: 13px;
   line-height: 1;
   padding: 0;
@@ -439,7 +439,7 @@
   padding: 9px 14px;
   border-radius: 10px;
   border: none;
-  background: #534AB7;
+  background: #1d4ed8;
   color: #fff;
   font-size: 13px;
   cursor: pointer;
@@ -449,7 +449,7 @@
 }
 
 .skill-add-btn:hover {
-  background: #3C3489;
+  background: #1d4ed8;
 }
 
 .avail-grid {
@@ -471,9 +471,9 @@
 }
 
 .avail-opt.on {
-  border-color: #534AB7 !important;
-  background: #EEEDFE !important;
-  color: #3C3489 !important;
+  border-color: #1d4ed8 !important;
+  background: #eef2ff !important;
+  color: #1d4ed8 !important;
 }
 
 .sbtn {

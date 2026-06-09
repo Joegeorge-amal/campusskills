@@ -84,8 +84,8 @@ const SetupPage = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
-      if (password.length < 8) {
-        setError('Password must be at least 8 characters long.');
+      if (password.length < 8 || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+        setError('Please meet all password requirements.');
         window.scrollTo({ top: 0, behavior: 'smooth' });
         return;
       }
@@ -197,13 +197,38 @@ const SetupPage = () => {
     { bg: '#EAF3DE', text: '#27500A' },
     { bg: '#FAEEDA', text: '#633806' },
     { bg: '#FBEAF0', text: '#72243E' },
-    { bg: '#534AB7', text: '#EEEDFE' },
+    { bg: '#1d4ed8', text: '#EEEDFE' },
   ];
 
   const availOptions = [
     'Mon–Fri evenings', 'Weekend mornings', 'Weekend afternoons',
     'Weekday afternoons', 'Anytime flexible', 'By appointment'
   ];
+
+  const hasMinLen = password.length >= 8;
+  const hasUpper = /[A-Z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const allCriteriaMet = hasMinLen && hasUpper && hasNumber;
+
+  const visibleRules = [];
+  if (password.length > 0 && !allCriteriaMet) {
+    visibleRules.push({ label: 'At least 8 characters', checked: hasMinLen });
+    if (hasMinLen) {
+      visibleRules.push({ label: 'One uppercase letter', checked: hasUpper });
+      if (hasUpper) {
+        visibleRules.push({ label: 'One number', checked: hasNumber });
+      }
+    }
+  }
+
+  const CheckItem = ({ label, checked }) => (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: checked ? '#00d26a' : '#6b7280', marginBottom: '6px' }}>
+      <div style={{ width: '14px', height: '14px', borderRadius: '50%', background: checked ? '#e6fbf0' : '#f3f4f6', color: checked ? '#00d26a' : '#9ca3af', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '9px', flexShrink: 0 }}>
+        ✓
+      </div>
+      {label}
+    </div>
+  );
 
   return (
     <div id="setup" className="auth-page" style={{ flexDirection: 'column', padding: '48px 16px', justifyContent: 'flex-start', backgroundColor: '#f5f3ff' }}>
@@ -225,7 +250,7 @@ const SetupPage = () => {
         <div className="setup-logo" style={{ marginBottom: '16px' }}>
           <div className="setup-mark" style={{ borderRadius: '50%', background: '#ffffff', width: '44px', height: '44px', padding: '4px', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
             <img src="/src/assets/kju_campus_logo.png" alt="logo" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '50%' }} onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }} />
-            <IconSchool size={28} color="#534AB7" style={{ display: 'none', margin: 'auto' }} />
+            <IconSchool size={28} color="#1d4ed8" style={{ display: 'none', margin: 'auto' }} />
           </div>
           <div className="setup-brand" style={{ fontSize: '20px' }}>campus<span>skills</span></div>
         </div>
@@ -274,11 +299,11 @@ const SetupPage = () => {
                   <span className="ct" style={{ fontSize: '14px', color: '#111827', fontWeight: 600 }}>Create your account</span>
                 </div>
 
-                <div className="form-grid" style={{ marginBottom: '24px' }}>
+                <div className="form-grid" style={{ marginBottom: password.length > 0 ? '16px' : '24px' }}>
                   <div className="sfld">
                     <label>Username *</label>
                     <div className="email-composite">
-                      <input type="text" placeholder="24cpeb04" value={email} onChange={e => setEmail(e.target.value)} required />
+                      <input type="text" placeholder="24cpeb04" value={email} onChange={e => setEmail(e.target.value.toLowerCase().replace(/\s/g, ''))} required />
                       <div className="email-domain-suffix">{APP_CONFIG.DEFAULT_DOMAIN}</div>
                     </div>
                   </div>
@@ -287,6 +312,15 @@ const SetupPage = () => {
                     <input type="password" placeholder="Min. 8 characters" value={password} onChange={e => setPassword(e.target.value)} required />
                   </div>
                 </div>
+
+                {password.length > 0 && !allCriteriaMet && (
+                  <div style={{ background: '#f9fafb', borderRadius: '12px', padding: '16px', marginBottom: '24px' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '12px' }}>Password must contain:</div>
+                    {visibleRules.map((rule, idx) => (
+                      <CheckItem key={idx} label={rule.label} checked={rule.checked} />
+                    ))}
+                  </div>
+                )}
 
                 <div style={{ height: '1px', background: '#e5e7eb', margin: '32px 0' }}></div>
 
@@ -337,7 +371,7 @@ const SetupPage = () => {
                             <div 
                               key={i}
                               className={`av-col ${avatarColor.bg === c.bg ? 'on' : ''}`} 
-                              style={{ background: c.bg, borderColor: avatarColor.bg === c.bg ? '#534AB7' : 'transparent', width: '28px', height: '28px' }} 
+                              style={{ background: c.bg, borderColor: avatarColor.bg === c.bg ? '#1d4ed8' : 'transparent', width: '28px', height: '28px' }} 
                               onClick={() => setAvatarColor(c)}
                             ></div>
                           ))}
@@ -409,7 +443,7 @@ const SetupPage = () => {
                 </div>
               </div>
               <div style={{ display: 'flex' }}>
-                <button type="submit" style={{ width: '100%', padding: '14px', borderRadius: '12px', background: '#534AB7', color: '#fff', border: 'none', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>Continue</button>
+                <button type="submit" style={{ width: '100%', padding: '14px', borderRadius: '12px', background: '#1d4ed8', color: '#fff', border: 'none', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>Continue</button>
               </div>
             </div>
           )}
@@ -460,7 +494,7 @@ const SetupPage = () => {
 
               <div style={{ display: 'flex', gap: '16px' }}>
                 <button type="button" onClick={handleBack} style={{ flex: '0 0 auto', padding: '14px 28px', borderRadius: '12px', background: '#fff', border: '1px solid #e5e7eb', fontSize: '15px', fontWeight: 600, color: '#4b5563', cursor: 'pointer' }}>Back</button>
-                <button type="submit" style={{ flexGrow: 1, padding: '14px', borderRadius: '12px', background: '#534AB7', color: '#fff', border: 'none', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>Continue</button>
+                <button type="submit" style={{ flexGrow: 1, padding: '14px', borderRadius: '12px', background: '#1d4ed8', color: '#fff', border: 'none', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>Continue</button>
               </div>
             </div>
           )}
@@ -506,7 +540,7 @@ const SetupPage = () => {
 
               <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
                 <button type="button" onClick={handleBack} disabled={isFinishing} style={{ flex: '0 0 auto', padding: '14px 28px', borderRadius: '12px', background: '#fff', border: '1px solid #e5e7eb', fontSize: '15px', fontWeight: 600, color: '#4b5563', cursor: isFinishing ? 'not-allowed' : 'pointer', opacity: isFinishing ? 0.5 : 1 }}>Back</button>
-                <button type="submit" disabled={isFinishing} style={{ flexGrow: 1, padding: '14px', borderRadius: '12px', background: '#534AB7', color: '#fff', border: 'none', fontSize: '15px', fontWeight: 600, cursor: isFinishing ? 'not-allowed' : 'pointer', opacity: isFinishing ? 0.8 : 1 }}>{isFinishing ? 'Creating Account...' : 'Go to Dashboard'}</button>
+                <button type="submit" disabled={isFinishing} style={{ flexGrow: 1, padding: '14px', borderRadius: '12px', background: '#1d4ed8', color: '#fff', border: 'none', fontSize: '15px', fontWeight: 600, cursor: isFinishing ? 'not-allowed' : 'pointer', opacity: isFinishing ? 0.8 : 1 }}>{isFinishing ? 'Creating Account...' : 'Go to Dashboard'}</button>
               </div>
               <div style={{ textAlign: 'center' }}>
                 <button type="button" onClick={handleFinish} disabled={isFinishing} style={{ background: 'none', border: 'none', color: '#6b7280', fontSize: '14px', fontWeight: 500, cursor: isFinishing ? 'not-allowed' : 'pointer', textDecoration: 'underline', opacity: isFinishing ? 0.5 : 1 }}>Skip for now</button>

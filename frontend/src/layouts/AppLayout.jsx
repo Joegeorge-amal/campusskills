@@ -21,6 +21,7 @@ const AppLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
+  const [isCompact, setIsCompact] = React.useState(false);
   const [activeChip, setActiveChip] = React.useState('');
   const [isFilterModalOpen, setIsFilterModalOpen] = React.useState(false);
 
@@ -31,10 +32,10 @@ const AppLayout = () => {
 
   const getPageConfig = () => {
     const path = location.pathname;
-    let config = { showSearch: false, chips: [], isAdvanced: false };
+    let config = { showSearch: true, chips: [], isAdvanced: false };
     
-    if (path.includes('/app/dashboard')) {
-      // No search needed on Dashboard
+    if (path.includes('/app/messages')) {
+      config.showSearch = false;
     } else if (path.includes('/app/marketplace')) {
       config.showSearch = true;
     } else if (path.includes('/app/sessions')) {
@@ -98,40 +99,42 @@ const AppLayout = () => {
 
   return (
     <div className="app">
-      <Sidebar 
-        isMobileMenuOpen={isMobileMenuOpen}
+      <AppHeader 
+        title={getPageTitle()}
         setIsMobileMenuOpen={setIsMobileMenuOpen}
-        navItems={navItems}
-        sections={sections}
-        brandIcon="cs"
-        brandText="Campus"
-        brandSpan="Skills"
-        profileData={profileData}
-        onLogout={handleSignOut}
+        isCompact={isCompact}
+        setIsCompact={setIsCompact}
+        showSearch={showSearch}
+        chips={chips}
+        activeChip={activeChip}
+        setActiveChip={setActiveChip}
+        isAdvanced={isAdvanced}
+        setIsFilterModalOpen={setIsFilterModalOpen}
+        avatarData={profileData}
+        notificationCount={notifications?.filter(n => n.unread).length || 0}
+        notifications={notifications}
+        markAllAsRead={markAllAsRead}
+        isAdminMode={false}
+        onAvatarClick={() => navigate('/app/profile')}
       />
 
-      <main className="main">
-        <AppHeader 
-          title={getPageTitle()}
+      <div className="app-body">
+        <Sidebar 
+          isMobileMenuOpen={isMobileMenuOpen}
           setIsMobileMenuOpen={setIsMobileMenuOpen}
-          showSearch={showSearch}
-          chips={chips}
-          activeChip={activeChip}
-          setActiveChip={setActiveChip}
-          isAdvanced={isAdvanced}
-          setIsFilterModalOpen={setIsFilterModalOpen}
-          avatarData={profileData}
-          notificationCount={notifications?.filter(n => n.unread).length || 0}
-          notifications={notifications}
-          markAllAsRead={markAllAsRead}
-          isAdminMode={false}
-          onAvatarClick={() => navigate('/app/profile')}
+          isCompact={isCompact}
+          navItems={navItems}
+          sections={sections}
+          profileData={profileData}
+          onLogout={handleSignOut}
         />
 
-        <div className="content">
-          <Outlet />
-        </div>
-      </main>
+        <main className="main">
+          <div className="content">
+            <Outlet />
+          </div>
+        </main>
+      </div>
 
       <Toast />
 

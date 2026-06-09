@@ -18,14 +18,14 @@
   align-items: center;
   gap: 8px;
   text-decoration: none;
-  color: #213b8a;
+  color: #1d4ed8;
   font-weight: 500;
   font-size: 0.95rem;
   transition: color 0.2s;
 }
 
 .auth-back-link:hover {
-  color: #1e337a;
+  color: #17307b;
 }
 
 .auth-container {
@@ -176,14 +176,14 @@
 
 /* Active State */
 .type-card.active {
-  border-color: #213b8a;
+  border-color: #1d4ed8;
   background: #f8fafc; 
   transform: translateY(-6px); 
-  box-shadow: 0 0 0 1px #213b8a, 0 14px 28px -6px rgba(33, 59, 138, 0.25); 
+  box-shadow: 0 0 0 1px #1d4ed8, 0 14px 28px -6px rgba(33, 59, 138, 0.25); 
 }
 
 .type-card.active .type-icon {
-  background: #213b8a;
+  background: #1d4ed8;
   color: #ffffff;
   transform: scale(1.05); /* Subtle icon pop */
 }
@@ -281,7 +281,7 @@
 
 .forgot-pwd-link {
   font-size: 0.8rem;
-  color: #213b8a;
+  color: #1d4ed8;
   font-weight: 600;
   cursor: pointer;
   text-decoration: none;
@@ -295,7 +295,7 @@
 .lbtn {
   width: 100%;
   padding: 12px;
-  background: #213b8a;
+  background: #1d4ed8;
   color: #fff;
   border: none;
   border-radius: 12px;
@@ -312,7 +312,7 @@
 }
 
 .lbtn:hover {
-  background: #1e337a;
+  background: #17307b;
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(33, 59, 138, 0.35);
 }
@@ -387,7 +387,7 @@
 }
 
 .create-account-link {
-  color: #213b8a;
+  color: #1d4ed8;
   font-weight: 700;
   font-size: 1rem;
   text-decoration: none;

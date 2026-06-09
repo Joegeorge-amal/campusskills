@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { IconMenu2, IconSearch, IconFilter, IconBell } from '@tabler/icons-react';
 import Avatar from '../Avatar';
+import logo from '../../../assets/kju_campus_logo.png';
 import NotificationPanel from './NotificationPanel';
 import './AppHeader.css';
 
 const AppHeader = ({
   title,
   setIsMobileMenuOpen,
+  isCompact,
+  setIsCompact,
   showSearch,
   chips,
   activeChip,
@@ -24,15 +27,41 @@ const AppHeader = ({
 
   return (
     <div className="topbar">
-      <button 
-        className="mobile-menu-btn" 
-        onClick={() => setIsMobileMenuOpen(true)}
-      >
-        <IconMenu2 size={20} />
-      </button>
+      <div className="topbar-left-brand">
+        <button 
+          className="topbar-menu-btn" 
+          onClick={() => {
+            if (window.innerWidth <= 768) {
+              setIsMobileMenuOpen(true);
+            } else {
+              setIsCompact(!isCompact);
+            }
+          }}
+        >
+          <IconMenu2 size={24} />
+        </button>
+        <img src={logo} alt="Campus Logo" className="topbar-university-logo" />
+        <div className="topbar-brand-text">
+          <div className="topbar-brand-name">Campus<span>Skills</span></div>
+        </div>
+      </div>
       
-      <div className="topbar-title">{title}</div>
+      {/* Title removed per user request */}
+      {/* Title removed per user request */}
       
+      {showSearch && (
+        <div className="topbar-center-search">
+          <div className="search-input-wrapper-yt">
+            <IconSearch className="search-icon" size={18} color="#666" />
+            <input 
+              type="text" 
+              placeholder="Search" 
+              className="search-input-yt"
+            />
+          </div>
+        </div>
+      )}
+
       <div className="topbar-actions">
         
         {isAdminMode && (
@@ -57,16 +86,7 @@ const AppHeader = ({
           </div>
         ))}
 
-        {showSearch && (
-          <div className="search-input-wrapper">
-            <IconSearch className="search-icon" />
-            <input 
-              type="text" 
-              placeholder="Search..." 
-              className="search-input"
-            />
-          </div>
-        )}
+
 
         <div 
           className="header-icon-box" 
