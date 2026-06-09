@@ -36,6 +36,13 @@ public class MainVerticle extends AbstractVerticle {
         // 2. Initialize Database Connection
         MongoManager.init(vertx, dbConfig);
         com.campusskills.core.database.DatabaseInitializer.initializeIndexes(MongoManager.getClient());
+        
+        // Seed Topics
+        new com.campusskills.modules.topics.services.TopicService(
+            new com.campusskills.modules.topics.repositories.TopicRepository()
+        ).seedSystemTopics()
+         .onSuccess(v -> log.info("System topics seeded successfully"))
+         .onFailure(err -> log.error("Failed to seed system topics", err));
 
         // 3. Initialize JWT Auth
         JWTAuth jwtAuth = JWTAuth.create(vertx, new JWTAuthOptions()
@@ -54,6 +61,9 @@ public class MainVerticle extends AbstractVerticle {
 
         // 5. Mount API Routes
         mainRouter.route("/api/v1/*").subRouter(ApiRouter.create(vertx, jwtAuth, frontendOrigin));
+
+        // Start Background Jobs
+        new com.campusskills.modules.sessions.jobs.AutoResolveJob().start(vertx);
 
         // 6. Start HTTP Server
         HttpServer server = vertx.createHttpServer();

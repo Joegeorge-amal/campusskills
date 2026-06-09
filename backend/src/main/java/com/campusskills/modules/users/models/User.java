@@ -1,7 +1,9 @@
 package com.campusskills.modules.users.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
 
     @JsonProperty("_id")
@@ -10,6 +12,7 @@ public class User {
     private String passwordHash;
     private UserRole role;
     private Boolean isActive;
+    private Boolean emailVerified;
     private Long createdAt;
     private Long updatedAt;
 
@@ -29,6 +32,9 @@ public class User {
     
     public Boolean getIsActive() { return isActive; }
     public void setIsActive(Boolean isActive) { this.isActive = isActive; }
+
+    public Boolean getEmailVerified() { return emailVerified; }
+    public void setEmailVerified(Boolean emailVerified) { this.emailVerified = emailVerified; }
 
     public Long getCreatedAt() { return createdAt; }
     public void setCreatedAt(Long createdAt) { this.createdAt = createdAt; }

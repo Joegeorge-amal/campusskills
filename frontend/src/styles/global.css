@@ -1,0 +1,303 @@
+:root {
+  /* Colors */
+  --cs-primary: #1d4ed8;
+  --cs-primary-light: #eff6ff;
+  --cs-primary-dark: #1e40af;
+  --cs-primary-gradient: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  
+  --cs-bg-light: #F4F5F9;
+  --cs-bg-white: #ffffff;
+  --cs-bg-hover: #eff6ff;
+  
+  --cs-text-main: #222222;
+  --cs-text-secondary: #666666;
+  --cs-text-inactive: #888888;
+  --cs-text-muted: #aaaaaa;
+  
+  --cs-border: rgba(0, 0, 0, 0.08);
+  
+  --cs-danger: #E24B4A;
+  --cs-danger-light: #FCEBEB;
+  
+  /* Spacing */
+  --cs-space-xs: 4px;
+  --cs-space-sm: 8px;
+  --cs-space-md: 16px;
+  --cs-space-lg: 24px;
+  --cs-space-xl: 32px;
+  
+  /* Border Radius */
+  --cs-radius-sm: 8px;
+  --cs-radius-md: 12px;
+  --cs-radius-lg: 20px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+img {
+  max-width: 100%;
+}
+
+html, body, #root {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: #F0EFF8;
+  color: #222;
+  display: block;
+  overflow-x: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+input, textarea, [contenteditable="true"] {
+  user-select: auto;
+  -webkit-user-select: auto;
+}
+
+.selectable-text {
+  user-select: text;
+  -webkit-user-select: text;
+  cursor: text;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+button, input, select, textarea {
+  font: inherit;
+}
+
+/* Scrollbar customization matching the prototype aesthetics */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* ─── SCREEN OVERLAYS ─── */
+.screen {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── HELPER UTILITIES ─── */
+.sep {
+  height: 0.5px;
+  background: rgba(0, 0, 0, 0.08);
+  margin: 11px 0;
+}
+
+/* ─── AVATAR TAG COLORS ─── */
+.cpill {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 20px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.c-code {
+  background: #E6F1FB;
+  color: #0C447C;
+}
+
+.c-des {
+  background: #FBEAF0;
+  color: #72243E;
+}
+
+.c-lan {
+  background: #EAF3DE;
+  color: #27500A;
+}
+
+.c-mat {
+  background: #FAEEDA;
+  color: #633806;
+}
+
+.c-mus {
+  background: #eff6ff;
+  color: #1e40af;
+}
+
+/* ─── TOAST AESTHETICS ─── */
+.toast-el {
+  position: fixed;
+  top: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #111827;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 12px 24px;
+  border-radius: 100px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  white-space: nowrap;
+  z-index: 9999;
+  pointer-events: none;
+  animation: toastFadeInTop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes toastFadeInTop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+/* ─── MODAL OVERLAYS ─── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.45);
+  z-index: 9999;
+}
+
+.modal-content {
+  width: min(500px, 92vw);
+  border-radius: 24px;
+  background: white;
+  animation: modalDropIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalDropIn {
+  from { opacity: 0; transform: translateY(-40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── GLOSSY CARD EFFECT ─── */
+.glossy-card {
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.3s ease !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.glossy-card:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 16px 32px -8px rgba(37, 99, 235, 0.2), 0 4px 12px -2px rgba(37, 99, 235, 0.1) !important;
+  border-color: rgba(37, 99, 235, 0.3) !important;
+}
+
+.glossy-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.4) 50%, rgba(255,255,255,0) 100%);
+  transform: skewX(-25deg);
+  transition: all 0.7s ease;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.glossy-card:hover::after {
+  left: 200%;
+}
+
+/* ─── EMAIL COMPOSITE INPUT ─── */
+.email-composite {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #f9fafb;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  width: 100%;
+}
+
+.email-composite:focus-within {
+  border-color: #6366f1;
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.25);
+  background: #ffffff;
+}
+
+.email-composite input {
+  border: none !important;
+  border-radius: 8px 0 0 8px;
+  box-shadow: none !important;
+  flex: 1 1 50%;
+  min-width: 0;
+  outline: none;
+  background: transparent;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: #111827;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.email-composite input:focus {
+  background: #f8fafc;
+  box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.03) !important;
+}
+
+.email-composite input::placeholder {
+  color: #9ca3af;
+}
+
+.email-domain-suffix {
+  flex: 1 1 50%;
+  min-width: 0;
+  padding: 12px 16px;
+  background: transparent;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  font-size: 0.95rem;
+  user-select: none;
+  position: relative;
+}
+
+.email-domain-suffix::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 18px;
+  width: 1px;
+  background-color: #e5e7eb;
+}

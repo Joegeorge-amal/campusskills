@@ -25,6 +25,8 @@ public class AuthHandler {
                 .onFailure(err -> {
                     if ("EMAIL_EXISTS".equals(err.getMessage())) {
                         ApiResponse.conflict(ctx, "Email already exists");
+                    } else if ("DOMAIN_NOT_ALLOWED".equals(err.getMessage())) {
+                        ApiResponse.sendError(ctx, 403, "Email domain not allowed for registration");
                     } else {
                         ApiResponse.badRequest(ctx, err.getMessage());
                     }
@@ -49,6 +51,84 @@ public class AuthHandler {
                         ApiResponse.badRequest(ctx, err.getMessage());
                     }
                 });
+        } catch (Exception e) {
+            ApiResponse.badRequest(ctx, "Invalid JSON format");
+        }
+    }
+
+    public void refresh(RoutingContext ctx) {
+        try {
+            JsonObject body = ctx.body().asJsonObject();
+            String refreshToken = body.getString("refreshToken");
+
+            userService.refresh(refreshToken)
+                .onSuccess(data -> ApiResponse.ok(ctx, data))
+                .onFailure(err -> {
+                    if ("INVALID_REFRESH_TOKEN".equals(err.getMessage()) || 
+                        "EXPIRED_REFRESH_TOKEN".equals(err.getMessage()) ||
+                        "MISSING_REFRESH_TOKEN".equals(err.getMessage())) {
+                        ApiResponse.sendError(ctx, 401, err.getMessage());
+                    } else {
+                        ApiResponse.badRequest(ctx, err.getMessage());
+                    }
+                });
+        } catch (Exception e) {
+            ApiResponse.badRequest(ctx, "Invalid JSON format");
+        }
+    }
+
+    public void logout(RoutingContext ctx) {
+        try {
+            JsonObject body = ctx.body().asJsonObject();
+            if (body == null) {
+                // If body is completely empty, fail safely
+                ApiResponse.ok(ctx, new JsonObject().put("message", "Logged out locally"));
+                return;
+            }
+            
+            String refreshToken = body.getString("refreshToken");
+
+            userService.logout(refreshToken)
+                .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("message", "Successfully logged out")))
+                .onFailure(err -> ApiResponse.internalError(ctx, "Failed to logout"));
+        } catch (Exception e) {
+            ApiResponse.badRequest(ctx, "Invalid JSON format");
+        }
+    }
+
+    public void forgotPassword(RoutingContext ctx) {
+        try {
+            JsonObject body = ctx.body().asJsonObject();
+            String email = body.getString("email");
+            userService.forgotPassword(email)
+                .onSuccess(data -> ApiResponse.ok(ctx, data))
+                .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
+        } catch (Exception e) {
+            ApiResponse.badRequest(ctx, "Invalid JSON format");
+        }
+    }
+
+    public void verifyResetOtp(RoutingContext ctx) {
+        try {
+            JsonObject body = ctx.body().asJsonObject();
+            String email = body.getString("email");
+            String otp = body.getString("otp");
+            userService.verifyResetOtp(email, otp)
+                .onSuccess(data -> ApiResponse.ok(ctx, data))
+                .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
+        } catch (Exception e) {
+            ApiResponse.badRequest(ctx, "Invalid JSON format");
+        }
+    }
+
+    public void resetPassword(RoutingContext ctx) {
+        try {
+            JsonObject body = ctx.body().asJsonObject();
+            String token = body.getString("token");
+            String newPassword = body.getString("newPassword");
+            userService.resetPassword(token, newPassword)
+                .onSuccess(data -> ApiResponse.ok(ctx, data))
+                .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
         } catch (Exception e) {
             ApiResponse.badRequest(ctx, "Invalid JSON format");
         }

@@ -44,5 +44,61 @@ public class DatabaseInitializer {
         client.createIndexWithOptions("notifications", new JsonObject().put("userId", 1), options)
             .onSuccess(v -> log.info("Created index: notifications(userId)"))
             .onFailure(err -> log.error("Failed to create index on notifications", err));
+
+        // otp_verifications(expiresAt) -> TTL index (expireAfterSeconds = 0 means expire at the exact date)
+        JsonObject ttlCommand = new JsonObject()
+            .put("createIndexes", "otp_verifications")
+            .put("indexes", new io.vertx.core.json.JsonArray().add(
+                new JsonObject()
+                    .put("name", "expiresAt_ttl")
+                    .put("key", new JsonObject().put("expiresAt", 1))
+                    .put("expireAfterSeconds", 0)
+            ));
+        client.runCommand("createIndexes", ttlCommand)
+            .onSuccess(v -> log.info("Created TTL index: otp_verifications(expiresAt)"))
+            .onFailure(err -> log.error("Failed to create TTL index on otp_verifications", err));
+
+        // topics(normalizedName) -> unique constraint for topics catalog
+        IndexOptions uniqueOptions = new IndexOptions();
+        // Since setUnique is not available in this version, we will manually run the command if needed,
+        // but let's just try running createIndex with a manual command to be safe.
+        JsonObject command = new JsonObject()
+            .put("createIndexes", "topics")
+            .put("indexes", new io.vertx.core.json.JsonArray().add(
+                new JsonObject()
+                    .put("name", "normalizedName_1")
+                    .put("key", new JsonObject().put("normalizedName", 1))
+                    .put("unique", true)
+            ));
+        client.runCommand("createIndexes", command)
+            .onSuccess(v -> log.info("Created unique index: topics(normalizedName)"))
+            .onFailure(err -> log.error("Failed to create index on topics", err));
+
+        // Text Indexes for Search
+        client.createIndexWithOptions("skill_listings", new JsonObject()
+            .put("title", "text")
+            .put("description", "text")
+            .put("skills.name", "text"), options)
+            .onSuccess(v -> log.info("Created text index on skill_listings"))
+            .onFailure(err -> log.error("Failed to create text index on skill_listings", err));
+
+        client.createIndexWithOptions("topics", new JsonObject()
+            .put("name", "text"), options)
+            .onSuccess(v -> log.info("Created text index on topics"))
+            .onFailure(err -> log.error("Failed to create text index on topics", err));
+
+        client.createIndexWithOptions("users", new JsonObject()
+            .put("firstName", "text")
+            .put("lastName", "text")
+            .put("university", "text")
+            .put("bio", "text"), options)
+            .onSuccess(v -> log.info("Created text index on users"))
+            .onFailure(err -> log.error("Failed to create text index on users", err));
+
+        client.createIndexWithOptions("sessions", new JsonObject()
+            .put("disputeReason", "text")
+            .put("status", "text"), options)
+            .onSuccess(v -> log.info("Created text index on sessions"))
+            .onFailure(err -> log.error("Failed to create text index on sessions", err));
     }
 }

@@ -10,13 +10,20 @@ public class UserProfile {
     private String userId;
     private String displayName;
     private String department;
+    private String phoneNumber;
     private String sem;
     private String year;
     private String bio;
     private String profilePicture;
     private List<SkillProfile> skillsOffered;
     private List<SkillProfile> skillsWanted;
+    private List<String> verifiedSkills;
+    private List<String> preferredTimes;
+    private String sessionPreference;
+    private String exchangePreference;
     private Boolean profileCompleted;
+    private Double averageRating;
+    private Integer reviewCount;
     private Long createdAt;
     private Long updatedAt;
 
@@ -33,6 +40,9 @@ public class UserProfile {
 
     public String getDepartment() { return department; }
     public void setDepartment(String department) { this.department = department; }
+
+    public String getPhoneNumber() { return phoneNumber; }
+    public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
 
     public String getSem() { return sem; }
     public void setSem(String sem) { this.sem = sem; }
@@ -52,6 +62,9 @@ public class UserProfile {
     public List<SkillProfile> getSkillsWanted() { return skillsWanted; }
     public void setSkillsWanted(List<SkillProfile> skillsWanted) { this.skillsWanted = skillsWanted; }
 
+    public List<String> getVerifiedSkills() { return verifiedSkills; }
+    public void setVerifiedSkills(List<String> verifiedSkills) { this.verifiedSkills = verifiedSkills; }
+
     public Boolean getProfileCompleted() { return profileCompleted; }
     public void setProfileCompleted(Boolean profileCompleted) { this.profileCompleted = profileCompleted; }
 
@@ -60,4 +73,19 @@ public class UserProfile {
 
     public Long getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(Long updatedAt) { this.updatedAt = updatedAt; }
+
+    public List<String> getPreferredTimes() { return preferredTimes; }
+    public void setPreferredTimes(List<String> preferredTimes) { this.preferredTimes = preferredTimes; }
+
+    public String getSessionPreference() { return sessionPreference; }
+    public void setSessionPreference(String sessionPreference) { this.sessionPreference = sessionPreference; }
+
+    public String getExchangePreference() { return exchangePreference; }
+    public void setExchangePreference(String exchangePreference) { this.exchangePreference = exchangePreference; }
+
+    public Double getAverageRating() { return averageRating; }
+    public void setAverageRating(Double averageRating) { this.averageRating = averageRating; }
+
+    public Integer getReviewCount() { return reviewCount; }
+    public void setReviewCount(Integer reviewCount) { this.reviewCount = reviewCount; }
 }

@@ -53,6 +53,11 @@
             <groupId>io.vertx</groupId>
             <artifactId>vertx-auth-jwt</artifactId>
         </dependency>
+        <!-- Vert.x Mail Client -->
+        <dependency>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-mail-client</artifactId>
+        </dependency>
 
         <!-- JSON processing -->
         <dependency>

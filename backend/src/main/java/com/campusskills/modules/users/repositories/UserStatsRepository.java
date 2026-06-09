@@ -30,4 +30,12 @@ public class UserStatsRepository {
             return doc.mapTo(UserStats.class);
         });
     }
+    public Future<Boolean> updateRatings(String userId, Double ratingAvg, Integer ratingCount) {
+        JsonObject query = new JsonObject().put("userId", userId);
+        JsonObject update = new JsonObject().put("$set", new JsonObject()
+            .put("ratingAvg", ratingAvg)
+            .put("ratingCount", ratingCount)
+            .put("updatedAt", System.currentTimeMillis()));
+        return client.updateCollection(COLLECTION, query, update).map(res -> res.getDocModified() > 0);
+    }
 }

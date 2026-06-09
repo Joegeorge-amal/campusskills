@@ -15,13 +15,11 @@ public class UserHandler {
 
     public void getMyProfile(RoutingContext ctx) {
         try {
-            JsonObject authUser = ctx.get("user");
-            if (authUser == null || authUser.getString("userId") == null) {
+            String userId = ctx.get("authenticatedUserId");
+            if (userId == null) {
                 ApiResponse.sendError(ctx, 401, "Unauthorized");
                 return;
             }
-            
-            String userId = authUser.getString("userId");
 
             userService.getFullProfile(userId)
                 .onSuccess(data -> ApiResponse.ok(ctx, data))
@@ -35,5 +33,35 @@ public class UserHandler {
         } catch (Exception e) {
             ApiResponse.sendError(ctx, 500, "Internal Server Error");
         }
+    }
+
+    public void verifyEmail(RoutingContext ctx) {
+        String userId = ctx.get("authenticatedUserId");
+        if (userId == null) {
+            ApiResponse.sendError(ctx, 401, "Unauthorized");
+            return;
+        }
+
+        JsonObject body = ctx.body().asJsonObject();
+        if (body == null || !body.containsKey("otp")) {
+            ApiResponse.badRequest(ctx, "Missing OTP");
+            return;
+        }
+
+        userService.verifyEmail(userId, body.getString("otp"))
+            .onSuccess(data -> ApiResponse.ok(ctx, data))
+            .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
+    }
+
+    public void resendOtp(RoutingContext ctx) {
+        String userId = ctx.get("authenticatedUserId");
+        if (userId == null) {
+            ApiResponse.sendError(ctx, 401, "Unauthorized");
+            return;
+        }
+
+        userService.resendOtp(userId)
+            .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("success", true).put("message", "OTP sent successfully")))
+            .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
     }
 }

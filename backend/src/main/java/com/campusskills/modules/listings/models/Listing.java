@@ -10,35 +10,92 @@ public class Listing {
 
     @JsonProperty("_id")
     private String id;
-    private String teacherId;
+    
+    private String ownerId; // NEW
+    @Deprecated
+    private String teacherId; // LEGACY
     
     private String title;
     private String description;
     
     private String category;
-    private List<SkillProfile> skills;
     
-    private SessionType sessionType;
+    private ListingType listingType; // NEW
+    @Deprecated
+    private SessionType sessionType; // LEGACY
+    
+    private List<SkillProfile> offeredSkills; // NEW
+    @Deprecated
+    private List<SkillProfile> skills; // LEGACY
+    
+    private List<SkillProfile> requestedSkills; // NEW
+    @Deprecated
+    private List<SkillProfile> preferredSkills; // LEGACY
+    
     private Double price;
-    private List<SkillProfile> preferredSkills;
+    private Double budget; // NEW for LEARN
     
     private Availability availability;
     
-    private List<String> availableDays;
-    private String availableHours;
+    private List<ListingSlot> availableSlots;
     
     private Boolean active;
+    
+    private String status;
     
     private Long createdAt;
     private Long updatedAt;
 
-    public Listing() {}
+    public Listing() {
+        this.status = "ACTIVE";
+    }
+
+    // --- Synchronization methods for dual-write ---
+    private void syncOwnerId() {
+        if (ownerId != null && teacherId == null) teacherId = ownerId;
+        else if (teacherId != null && ownerId == null) ownerId = teacherId;
+        else if (ownerId != null && teacherId != null && !ownerId.equals(teacherId)) teacherId = ownerId;
+    }
+    
+    private void syncListingType() {
+        if (listingType != null) {
+            if (listingType == ListingType.TEACH || listingType == ListingType.LEARN) {
+                sessionType = SessionType.PAID;
+            } else if (listingType == ListingType.SWAP) {
+                sessionType = SessionType.SWAP;
+            }
+        } else if (sessionType != null) {
+            if (sessionType == SessionType.PAID) listingType = ListingType.TEACH;
+            else if (sessionType == SessionType.SWAP) listingType = ListingType.SWAP;
+            else if (sessionType == SessionType.BOTH) listingType = ListingType.TEACH; // fallback
+        }
+    }
+    
+    private void syncSkills() {
+        if (offeredSkills != null && skills == null) skills = offeredSkills;
+        else if (skills != null && offeredSkills == null) offeredSkills = skills;
+        
+        if (requestedSkills != null && preferredSkills == null) preferredSkills = requestedSkills;
+        else if (preferredSkills != null && requestedSkills == null) requestedSkills = preferredSkills;
+    }
+    
+    // Ensure sync happens before db operations
+    public void prepareForSave() {
+        syncOwnerId();
+        syncListingType();
+        syncSkills();
+    }
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
 
-    public String getTeacherId() { return teacherId; }
-    public void setTeacherId(String teacherId) { this.teacherId = teacherId; }
+    public String getOwnerId() { syncOwnerId(); return ownerId; }
+    public void setOwnerId(String ownerId) { this.ownerId = ownerId; syncOwnerId(); }
+
+    @Deprecated
+    public String getTeacherId() { syncOwnerId(); return teacherId; }
+    @Deprecated
+    public void setTeacherId(String teacherId) { this.teacherId = teacherId; syncOwnerId(); }
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
@@ -49,26 +106,41 @@ public class Listing {
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
 
-    public List<SkillProfile> getSkills() { return skills; }
-    public void setSkills(List<SkillProfile> skills) { this.skills = skills; }
+    public ListingType getListingType() { syncListingType(); return listingType; }
+    public void setListingType(ListingType listingType) { this.listingType = listingType; syncListingType(); }
 
-    public SessionType getSessionType() { return sessionType; }
-    public void setSessionType(SessionType sessionType) { this.sessionType = sessionType; }
+    @Deprecated
+    public SessionType getSessionType() { syncListingType(); return sessionType; }
+    @Deprecated
+    public void setSessionType(SessionType sessionType) { this.sessionType = sessionType; syncListingType(); }
+
+    public List<SkillProfile> getOfferedSkills() { syncSkills(); return offeredSkills; }
+    public void setOfferedSkills(List<SkillProfile> offeredSkills) { this.offeredSkills = offeredSkills; syncSkills(); }
+
+    @Deprecated
+    public List<SkillProfile> getSkills() { syncSkills(); return skills; }
+    @Deprecated
+    public void setSkills(List<SkillProfile> skills) { this.skills = skills; syncSkills(); }
+
+    public List<SkillProfile> getRequestedSkills() { syncSkills(); return requestedSkills; }
+    public void setRequestedSkills(List<SkillProfile> requestedSkills) { this.requestedSkills = requestedSkills; syncSkills(); }
+
+    @Deprecated
+    public List<SkillProfile> getPreferredSkills() { syncSkills(); return preferredSkills; }
+    @Deprecated
+    public void setPreferredSkills(List<SkillProfile> preferredSkills) { this.preferredSkills = preferredSkills; syncSkills(); }
 
     public Double getPrice() { return price; }
     public void setPrice(Double price) { this.price = price; }
 
-    public List<SkillProfile> getPreferredSkills() { return preferredSkills; }
-    public void setPreferredSkills(List<SkillProfile> preferredSkills) { this.preferredSkills = preferredSkills; }
+    public Double getBudget() { return budget; }
+    public void setBudget(Double budget) { this.budget = budget; }
 
     public Availability getAvailability() { return availability; }
     public void setAvailability(Availability availability) { this.availability = availability; }
 
-    public List<String> getAvailableDays() { return availableDays; }
-    public void setAvailableDays(List<String> availableDays) { this.availableDays = availableDays; }
-
-    public String getAvailableHours() { return availableHours; }
-    public void setAvailableHours(String availableHours) { this.availableHours = availableHours; }
+    public List<ListingSlot> getAvailableSlots() { return availableSlots; }
+    public void setAvailableSlots(List<ListingSlot> availableSlots) { this.availableSlots = availableSlots; }
 
     public Boolean getActive() { return active; }
     public void setActive(Boolean active) { this.active = active; }
@@ -78,4 +150,7 @@ public class Listing {
 
     public Long getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(Long updatedAt) { this.updatedAt = updatedAt; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

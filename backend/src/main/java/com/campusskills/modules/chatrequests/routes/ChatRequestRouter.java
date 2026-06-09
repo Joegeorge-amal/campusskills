@@ -15,7 +15,8 @@ public class ChatRequestRouter {
         
         ChatRepository chatRepository = new ChatRepository();
         com.campusskills.modules.messages.repositories.MessageRepository messageRepository = new com.campusskills.modules.messages.repositories.MessageRepository();
-        ChatService chatService = new ChatService(chatRepository, messageRepository);
+        com.campusskills.modules.users.repositories.UserRepository userRepository = new com.campusskills.modules.users.repositories.UserRepository();
+        ChatService chatService = new ChatService(chatRepository, messageRepository, userRepository);
         
         ChatRequestRepository repository = new ChatRequestRepository();
         com.campusskills.modules.users.repositories.UserProfileRepository userProfileRepository = new com.campusskills.modules.users.repositories.UserProfileRepository();

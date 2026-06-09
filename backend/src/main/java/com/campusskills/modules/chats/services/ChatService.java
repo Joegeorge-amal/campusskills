@@ -17,10 +17,12 @@ import java.util.ArrayList;
 public class ChatService {
     private final ChatRepository repository;
     private final MessageRepository messageRepository;
+    private final com.campusskills.modules.users.repositories.UserRepository userRepository;
 
-    public ChatService(ChatRepository repository, MessageRepository messageRepository) {
+    public ChatService(ChatRepository repository, MessageRepository messageRepository, com.campusskills.modules.users.repositories.UserRepository userRepository) {
         this.repository = repository;
         this.messageRepository = messageRepository;
+        this.userRepository = userRepository;
     }
 
     public Future<JsonObject> createChat(Chat chat, String authId) {
@@ -65,52 +67,70 @@ public class ChatService {
         });
     }
 
-    public Future<JsonObject> getUserChats(String userId, String statusFilter, int page, int limit) {
+    public Future<JsonObject> getUserChats(String userId, String statusFilter, String q, int page, int limit) {
         if (userId == null || userId.trim().isEmpty()) {
             return Future.failedFuture("userId is required");
         }
         int skip = (page - 1) * limit;
 
-        return repository.countUserChats(userId, statusFilter).compose(total -> 
-            repository.fetchUserChats(userId, statusFilter, skip, limit).compose(chats -> {
-                if (chats.isEmpty()) {
-                    return Future.succeededFuture(new JsonObject()
-                        .put("items", new JsonArray())
-                        .put("page", page)
-                        .put("limit", limit)
-                        .put("total", total));
-                }
+        Future<List<String>> matchingUserIdsFuture;
+        if (q != null && !q.trim().isEmpty()) {
+            matchingUserIdsFuture = userRepository.searchUserIdsByName(q);
+        } else {
+            matchingUserIdsFuture = Future.succeededFuture(null); // null means no text filter
+        }
 
-                List<Future> futures = new ArrayList<>();
-                JsonArray items = new JsonArray();
-
-                for (Chat chat : chats) {
-                    JsonObject chatJson = JsonObject.mapFrom(chat);
-                    items.add(chatJson);
-                    
-                    Future<Void> lastMsgFut = messageRepository.findLastMessageByChatId(chat.getId()).map(lastMessage -> {
-                        if (lastMessage != null) {
-                            chatJson.put("lastMessagePreview", lastMessage.getMessage());
-                            chatJson.put("lastMessageAt", lastMessage.getCreatedAt());
-                        }
-                        return null;
-                    });
-                    
-                    Future<Void> unreadCountFut = messageRepository.countUnreadMessagesForUser(chat.getId(), userId).map(count -> {
-                        chatJson.put("unreadCount", count != null ? count : 0L);
-                        return null;
-                    });
-                    
-                    futures.add(CompositeFuture.all(lastMsgFut, unreadCountFut).mapEmpty());
-                }
-
-                return CompositeFuture.all(futures).map(v -> new JsonObject()
-                    .put("items", items)
+        return matchingUserIdsFuture.compose(matchingUserIds -> {
+            // If user searched for a name and NO users matched, return empty results immediately
+            if (matchingUserIds != null && matchingUserIds.isEmpty()) {
+                return Future.succeededFuture(new JsonObject()
+                    .put("items", new JsonArray())
                     .put("page", page)
                     .put("limit", limit)
-                    .put("total", total)
-                );
-            })
-        );
+                    .put("total", 0L));
+            }
+
+            return repository.countUserChats(userId, statusFilter, matchingUserIds).compose(total -> 
+                repository.fetchUserChats(userId, statusFilter, matchingUserIds, skip, limit).compose(chats -> {
+                    if (chats.isEmpty()) {
+                        return Future.succeededFuture(new JsonObject()
+                            .put("items", new JsonArray())
+                            .put("page", page)
+                            .put("limit", limit)
+                            .put("total", total));
+                    }
+
+                    List<Future> futures = new ArrayList<>();
+                    JsonArray items = new JsonArray();
+
+                    for (Chat chat : chats) {
+                        JsonObject chatJson = JsonObject.mapFrom(chat);
+                        items.add(chatJson);
+                        
+                        Future<Void> lastMsgFut = messageRepository.findLastMessageByChatId(chat.getId()).map(lastMessage -> {
+                            if (lastMessage != null) {
+                                chatJson.put("lastMessagePreview", lastMessage.getMessage());
+                                chatJson.put("lastMessageAt", lastMessage.getCreatedAt());
+                            }
+                            return null;
+                        });
+                        
+                        Future<Void> unreadCountFut = messageRepository.countUnreadMessagesForUser(chat.getId(), userId).map(count -> {
+                            chatJson.put("unreadCount", count != null ? count : 0L);
+                            return null;
+                        });
+                        
+                        futures.add(CompositeFuture.all(lastMsgFut, unreadCountFut).mapEmpty());
+                    }
+
+                    return CompositeFuture.all(futures).map(v -> new JsonObject()
+                        .put("items", items)
+                        .put("page", page)
+                        .put("limit", limit)
+                        .put("total", total)
+                    );
+                })
+            );
+        });
     }
 }

@@ -41,6 +41,9 @@ public class ListingHandler {
                 return;
             }
 
+            // Trigger dual-write sync so legacy and new fields are populated
+            listing.prepareForSave();
+
             // 1. Required Text Fields
             if (listing.getTitle() == null || listing.getTitle().trim().isEmpty()) {
                 ApiResponse.badRequest(ctx, "Title is required");
@@ -54,62 +57,70 @@ public class ListingHandler {
                 ApiResponse.badRequest(ctx, "Category is required");
                 return;
             }
-            if (listing.getAvailableHours() == null || listing.getAvailableHours().trim().isEmpty()) {
-                ApiResponse.badRequest(ctx, "Available hours are required");
-                return;
-            }
 
-            // 2. Skills Validation
-            if (listing.getSkills() == null || listing.getSkills().isEmpty()) {
-                ApiResponse.badRequest(ctx, "At least one skill is required");
-                return;
-            }
-            for (SkillProfile skill : listing.getSkills()) {
-                if (skill.getName() == null || skill.getName().trim().isEmpty()) {
-                    ApiResponse.badRequest(ctx, "Skill name is required and cannot be blank");
-                    return;
-                }
-                if (skill.getLevel() == null) {
-                    ApiResponse.badRequest(ctx, "Skill level is required");
-                    return;
+            // 2. Deep Skill Validation (Check any populated skill arrays)
+            if (listing.getOfferedSkills() != null) {
+                for (SkillProfile skill : listing.getOfferedSkills()) {
+                    if (skill.getName() == null || skill.getName().trim().isEmpty()) {
+                        ApiResponse.badRequest(ctx, "Skill name is required and cannot be blank");
+                        return;
+                    }
+                    if (skill.getLevel() == null) {
+                        ApiResponse.badRequest(ctx, "Skill level is required");
+                        return;
+                    }
                 }
             }
-
-            // 3. Available Days Validation
-            if (listing.getAvailableDays() == null || listing.getAvailableDays().isEmpty()) {
-                ApiResponse.badRequest(ctx, "At least one available day is required");
-                return;
-            }
-            for (String day : listing.getAvailableDays()) {
-                if (day == null || day.trim().isEmpty()) {
-                    ApiResponse.badRequest(ctx, "Available day cannot be blank");
-                    return;
-                }
-                if (!VALID_DAYS.contains(day.trim().toUpperCase())) {
-                    ApiResponse.badRequest(ctx, "Invalid available day: " + day);
-                    return;
+            if (listing.getRequestedSkills() != null) {
+                for (SkillProfile skill : listing.getRequestedSkills()) {
+                    if (skill.getName() == null || skill.getName().trim().isEmpty()) {
+                        ApiResponse.badRequest(ctx, "Requested Skill name is required and cannot be blank");
+                        return;
+                    }
+                    if (skill.getLevel() == null) {
+                        ApiResponse.badRequest(ctx, "Requested Skill level is required");
+                        return;
+                    }
                 }
             }
 
-            // 4. Enums Null Checks (Since they could be missing from payload)
-            if (listing.getSessionType() == null) {
-                ApiResponse.badRequest(ctx, "SessionType is required");
-                return;
+            // 3. Available Slots Validation (Optional, but if present validate deeply)
+            if (listing.getAvailableSlots() != null && !listing.getAvailableSlots().isEmpty()) {
+                for (com.campusskills.modules.listings.models.ListingSlot slot : listing.getAvailableSlots()) {
+                    if (slot.getDayOfWeek() == null) {
+                        ApiResponse.badRequest(ctx, "Slot day of week is required");
+                        return;
+                    }
+                    if (slot.getStartTime() == null || slot.getStartTime().trim().isEmpty()) {
+                        ApiResponse.badRequest(ctx, "Slot start time is required");
+                        return;
+                    }
+                    if (slot.getDurationMinutes() == null || slot.getDurationMinutes() <= 0) {
+                        ApiResponse.badRequest(ctx, "Slot duration must be greater than 0");
+                        return;
+                    }
+                    if (slot.getId() == null || slot.getId().trim().isEmpty()) {
+                        slot.setId(java.util.UUID.randomUUID().toString());
+                    }
+                }
             }
-            if (listing.getAvailability() == null) {
-                ApiResponse.badRequest(ctx, "Availability is required");
+
+            // 4. Enums Null Checks (Optional because older schemas might differ)
+            if (listing.getListingType() == null && listing.getSessionType() == null) {
+                ApiResponse.badRequest(ctx, "ListingType or SessionType is required");
                 return;
             }
 
-            // ENFORCE authenticated user identity! Ignore any teacherId passed from frontend
-            listing.setTeacherId(authenticatedUserId);
+            // ENFORCE authenticated user identity! Ignore any teacherId/ownerId passed from frontend
+            listing.setOwnerId(authenticatedUserId);
+            listing.setTeacherId(authenticatedUserId); // legacy sync
 
             listingService.createListing(listing)
                 .onSuccess(listingId -> {
                     JsonObject response = new JsonObject().put("id", listingId);
                     ApiResponse.created(ctx, response);
                 })
-                .onFailure(err -> ApiResponse.sendError(ctx, 500, "Failed to create listing"));
+                .onFailure(err -> ApiResponse.sendError(ctx, 400, err.getMessage())); // Service layer handles deep schema validation
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -118,13 +129,29 @@ public class ListingHandler {
     }
 
     public void getAllListings(RoutingContext ctx) {
-        listingService.findAllActive()
-            .onSuccess(listings -> {
-                io.vertx.core.json.JsonArray jsonArray = new io.vertx.core.json.JsonArray();
-                for (Listing l : listings) {
-                    jsonArray.add(JsonObject.mapFrom(l));
-                }
-                ApiResponse.ok(ctx, jsonArray);
+        String q = ctx.request().getParam("q");
+        List<String> topics = ctx.queryParam("topics");
+        List<String> paymentTypes = ctx.queryParam("payment_types");
+        List<String> modes = ctx.queryParam("modes");
+        String sort = ctx.request().getParam("sort");
+        
+        int page = 1;
+        int limit = 20;
+        try {
+            if (ctx.request().getParam("page") != null) page = Integer.parseInt(ctx.request().getParam("page"));
+            if (ctx.request().getParam("limit") != null) limit = Integer.parseInt(ctx.request().getParam("limit"));
+        } catch (NumberFormatException ignored) {}
+
+        JsonObject filters = new JsonObject();
+        if (q != null && !q.trim().isEmpty()) filters.put("q", q.trim());
+        if (topics != null && !topics.isEmpty()) filters.put("topics", new io.vertx.core.json.JsonArray(topics));
+        if (paymentTypes != null && !paymentTypes.isEmpty()) filters.put("payment_types", new io.vertx.core.json.JsonArray(paymentTypes));
+        if (modes != null && !modes.isEmpty()) filters.put("modes", new io.vertx.core.json.JsonArray(modes));
+        if (sort != null && !sort.trim().isEmpty()) filters.put("sort", sort.trim());
+
+        listingService.searchListings(filters, page, limit)
+            .onSuccess(result -> {
+                ApiResponse.ok(ctx, result);
             })
             .onFailure(err -> {
                 err.printStackTrace();

@@ -33,10 +33,21 @@ public class ChatRepository {
         return client.save(COLLECTION, document);
     }
 
-    public Future<List<Chat>> fetchUserChats(String userId, String statusFilter, int skip, int limit) {
+    public Future<List<Chat>> fetchUserChats(String userId, String statusFilter, List<String> matchingUserIds, int skip, int limit) {
         JsonObject query = new JsonObject().put("participants", userId);
         if (statusFilter != null && !statusFilter.isEmpty()) {
             query.put("status", statusFilter);
+        }
+        if (matchingUserIds != null && !matchingUserIds.isEmpty()) {
+            query.put("participants", new JsonObject().put("$in", matchingUserIds));
+            // Since we need to match BOTH userId AND the matchingUserIds, we must use $and because 'participants' is used twice
+            query = new JsonObject().put("$and", new JsonArray()
+                .add(new JsonObject().put("participants", userId))
+                .add(new JsonObject().put("participants", new JsonObject().put("$in", matchingUserIds)))
+            );
+            if (statusFilter != null && !statusFilter.isEmpty()) {
+                query.getJsonArray("$and").add(new JsonObject().put("status", statusFilter));
+            }
         }
         
         io.vertx.ext.mongo.FindOptions options = new io.vertx.ext.mongo.FindOptions()
@@ -50,10 +61,19 @@ public class ChatRepository {
                         .collect(Collectors.toList()));
     }
 
-    public Future<Long> countUserChats(String userId, String statusFilter) {
+    public Future<Long> countUserChats(String userId, String statusFilter, List<String> matchingUserIds) {
         JsonObject query = new JsonObject().put("participants", userId);
         if (statusFilter != null && !statusFilter.isEmpty()) {
             query.put("status", statusFilter);
+        }
+        if (matchingUserIds != null && !matchingUserIds.isEmpty()) {
+            query = new JsonObject().put("$and", new JsonArray()
+                .add(new JsonObject().put("participants", userId))
+                .add(new JsonObject().put("participants", new JsonObject().put("$in", matchingUserIds)))
+            );
+            if (statusFilter != null && !statusFilter.isEmpty()) {
+                query.getJsonArray("$and").add(new JsonObject().put("status", statusFilter));
+            }
         }
         return client.count(COLLECTION, query);
     }

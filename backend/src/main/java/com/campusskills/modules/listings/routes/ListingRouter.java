@@ -18,7 +18,7 @@ public class ListingRouter {
         ListingHandler handler = new ListingHandler(service);
 
         // POST /listings is protected
-        router.post("/").handler(JwtAuthMiddleware.create(jwtAuth)).handler(handler::createListing);
+        router.post("/").handler(JwtAuthMiddleware.create(jwtAuth)).handler(com.campusskills.web.middleware.EmailVerifiedMiddleware.create()).handler(handler::createListing);
 
         // GET /listings is public
         router.get("/").handler(handler::getAllListings);
