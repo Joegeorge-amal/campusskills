@@ -195,11 +195,11 @@ const SetupPage = () => {
       {/* HEADER & STEPS OUTSIDE CARD */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: '850px', margin: '0 auto 24px', zIndex: 2 }}>
         <div className="setup-logo" style={{ marginBottom: '16px' }}>
-          <div className="setup-mark" style={{ borderRadius: '50%', background: 'transparent', width: '36px', height: '36px', padding: 0 }}>
-            <img src="/src/assets/kju_campus_logo.png" alt="logo" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }} />
+          <div className="setup-mark" style={{ borderRadius: '50%', background: '#ffffff', width: '44px', height: '44px', padding: '4px', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
+            <img src="/src/assets/kju_campus_logo.png" alt="logo" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '50%' }} onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }} />
             <IconSchool size={28} color="#534AB7" style={{ display: 'none', margin: 'auto' }} />
           </div>
-          <div className="setup-brand" style={{ fontSize: '18px' }}>campus<span>skills</span></div>
+          <div className="setup-brand" style={{ fontSize: '20px' }}>campus<span>skills</span></div>
         </div>
         <div className="setup-hdr">
           <div className="setup-title" style={{ color: '#1e1b4b', fontSize: '22px', marginBottom: '6px' }}>Set up your profile</div>

@@ -58,33 +58,7 @@ const Sidebar = ({
         </div>
         
         <div className="sb-foot">
-          <div 
-            className="sb-profile-btn"
-            onClick={() => { 
-              if (profileData.path) {
-                navigate(profileData.path); 
-                setIsMobileMenuOpen(false); 
-              }
-            }}
-          >
-            <Avatar 
-              initials={profileData.initials}
-              bg={profileData.bg}
-              color={profileData.color}
-              backgroundImage={profileData.backgroundImage}
-              size="27px"
-              fontSize="10px"
-            />
-            <div className="sb-profile-info">
-              <div className="sb-profile-name">
-                {profileData.name}
-              </div>
-              <div className="sb-profile-meta">
-                {profileData.meta}
-              </div>
-            </div>
-          </div>
-          
+
           <button onClick={onLogout} className="sb-logout-btn">
             Logout
           </button>

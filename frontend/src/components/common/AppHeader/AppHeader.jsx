@@ -69,12 +69,11 @@ const AppHeader = ({
         )}
 
         <div 
-          className="notification-bell" 
+          className="header-icon-box" 
           onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-          style={{ cursor: 'pointer' }}
         >
-          <IconBell />
-          {notificationCount > 0 && <div className="notification-dot"></div>}
+          <IconBell size={20} color="#6b7280" stroke={2} />
+          {notificationCount > 0 && <div className="notification-badge">{notificationCount}</div>}
         </div>
 
         {isNotificationOpen && (
@@ -89,16 +88,17 @@ const AppHeader = ({
         )}
 
         {avatarData && (
-          <Avatar 
-            initials={avatarData.initials}
-            bg={avatarData.bg}
-            color={avatarData.color}
-            backgroundImage={avatarData.backgroundImage}
-            size="29px"
-            fontSize="11px"
-            onClick={onAvatarClick}
-            style={{ cursor: onAvatarClick ? 'pointer' : 'default' }}
-          />
+          <div className="header-icon-box" onClick={onAvatarClick}>
+            <Avatar 
+              initials={avatarData.initials}
+              bg="#eff6ff"
+              color="#1e40af"
+              backgroundImage={avatarData.backgroundImage}
+              size="28px"
+              fontSize="12px"
+              style={{ borderRadius: '8px', fontWeight: 700 }}
+            />
+          </div>
         )}
       </div>
     </div>

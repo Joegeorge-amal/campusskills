@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
 import { Map, CalendarDays, Star, MessageCircle, CreditCard, Trophy, Key, IdCard, Search, Rocket, GraduationCap, Handshake, Lock } from 'lucide-react';
 import campusLogo from '../../../docs/assets/kju_campus_logo.png';
 import heroImage from '../../../docs/assets/kju_campus_hero_image.jpeg';
 import './LandingPage.css';
 
 const LandingPage = () => {
+  const bottomCtaRef = useRef(null);
+  const isAtBottom = useInView(bottomCtaRef, { amount: 0.4 });
+
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -53,8 +56,12 @@ const LandingPage = () => {
           <a href="#features">Features</a>
           <a href="#access">Access</a>
         </div>
-        <div className="nav-actions">
-          <Link to="/login" className="btn-signin">Sign in <span className="btn-arrow">&rarr;</span></Link>
+        <div className="nav-actions" style={{ minWidth: '100px', display: 'flex', justifyContent: 'flex-end' }}>
+          {!isAtBottom && (
+            <motion.div layoutId="floating-signin-btn" style={{ zIndex: 1000 }} transition={{ type: "spring", bounce: 0.15, duration: 1.2 }}>
+              <Link to="/login" className="btn-signin">Sign in <span className="btn-arrow">&rarr;</span></Link>
+            </motion.div>
+          )}
         </div>
       </motion.nav>
 
@@ -136,7 +143,7 @@ const LandingPage = () => {
               transition={{ duration: 0.6, ease: "easeOut" }}
             >
               <div className="about-card-icon icon-purple">
-                <GraduationCap color="#4f46e5" size={24} strokeWidth={2.5} />
+                <GraduationCap color="#2563eb" size={24} strokeWidth={2.5} />
               </div>
               <div className="about-card-text">
                 <h3>Peer-to-Peer Learning</h3>
@@ -234,7 +241,7 @@ const LandingPage = () => {
           </motion.div>
           <motion.div className="step-card" variants={itemVariants}>
             <div className="step-icon">
-              <Search color="#9333ea" size={32} strokeWidth={2} />
+              <Search color="#1d4ed8" size={32} strokeWidth={2} />
             </div>
             <h3>Get matched</h3>
             <p>Browse smart suggestions — people who need what you know, and know what you need.</p>
@@ -277,7 +284,7 @@ const LandingPage = () => {
             transition={{ duration: 0.6, ease: "easeOut", delay: 0 }}
           >
             <div className="feature-icon bg-purple">
-              <Map color="#4f46e5" size={22} strokeWidth={2.5} />
+              <Map color="#2563eb" size={22} strokeWidth={2.5} />
             </div>
             <h3>Smart Skill Matching</h3>
             <p>The app surfaces the best peer matches based on what you're teaching and learning — no endless scrolling.</p>
@@ -342,7 +349,7 @@ const LandingPage = () => {
             transition={{ duration: 0.6, ease: "easeOut", delay: 0.3 }}
           >
             <div className="feature-icon bg-indigo">
-              <Trophy color="#4338ca" size={22} strokeWidth={2.5} />
+              <Trophy color="#1e3a8a" size={22} strokeWidth={2.5} />
             </div>
             <h3>Skill Portfolio</h3>
             <p>Your profile becomes your campus résumé — skills taught, sessions done, ratings earned.</p>
@@ -380,6 +387,7 @@ const LandingPage = () => {
 
       {/* Bottom CTA */}
       <motion.section 
+        ref={bottomCtaRef}
         className="section bottom-cta"
         initial="hidden"
         whileInView="show"
@@ -394,7 +402,14 @@ const LandingPage = () => {
       >
         <motion.h2 variants={itemVariants}>Ready to learn<br/>from your campus?</motion.h2>
         <motion.p variants={itemVariants}>Your seniors know things you don't yet. Your juniors are<br/>hungry to learn what you have. CampusSkills brings<br/>them all together.</motion.p>
-        <motion.div variants={itemVariants} style={{ marginTop: '2.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
+        <motion.div variants={itemVariants} style={{ marginTop: '2.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', minHeight: '60px' }}>
+          {isAtBottom && (
+            <motion.div layoutId="floating-signin-btn" style={{ zIndex: 1000 }} transition={{ type: "spring", bounce: 0.15, duration: 1.2 }}>
+              <Link to="/login" className="btn-signin" style={{ padding: '14px 40px', fontSize: '1.1rem' }}>
+                Sign in <span className="btn-arrow">&rarr;</span>
+              </Link>
+            </motion.div>
+          )}
           <button 
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} 
             style={{ background: 'none', border: 'none', color: '#6b7280', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '0.5rem' }}

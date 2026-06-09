@@ -243,24 +243,27 @@ const SkillQuizModal = ({ isOpen, skillName, onClose, onComplete }) => {
   return ReactDOM.createPortal(
     <div style={{
       position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-      background: '#f9fafb',
-      zIndex: 2000,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '24px'
+      background: 'rgba(0,0,0,0.6)', zIndex: 1000,
+      display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '16px', paddingTop: '80px'
     }}>
-      <div style={{
-        background: '#ffffff',
-        width: '100%',
-        maxWidth: '800px',
-        height: '600px',
-        maxHeight: '90vh',
-        borderRadius: '24px',
-        boxShadow: '0 20px 40px rgba(0,0,0,0.08)',
-        border: '1px solid #e5e7eb',
-        overflow: 'hidden'
-      }}>
+      <style>{`
+        .sqm-wrapper {
+          background: #ffffff;
+          border-radius: 16px;
+          width: 100%;
+          max-width: 500px;
+          overflow: hidden;
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+          display: flex;
+          flex-direction: column;
+          animation: modalDropIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes modalDropIn {
+          from { opacity: 0; transform: translateY(-40px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
+      <div className="sqm-wrapper">
         {step === 'quiz' && renderQuizStep()}
         {step === 'confirm' && renderConfirmStep()}
         {step === 'pass' && renderPassStep()}

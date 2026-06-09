@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAppData } from '../context/AppDataContext';
 import SessionCard from '../components/common/SessionCard'; // Kept just in case, but unused
 import SessionsCardV2 from '../components/common/SessionsCardV2';
 import ReportSessionModal from '../components/modals/ReportSessionModal';
+import ActiveSessionModal from '../components/modals/ActiveSessionModal';
+
 const Sessions = () => {
   const { bookedSessions, triggerToast } = useAppData();
+  const [activeSession, setActiveSession] = useState(null);
 
   const handleBook = (name) => {
     triggerToast(`Booking request sent to ${name}!`);
@@ -25,17 +28,22 @@ const Sessions = () => {
   };
 
   // Pre-defined generic button styles
-  const btnJoin = { fontSize: '13px', padding: '8px 16px', borderRadius: '24px', border: 'none', background: '#534AB7', color: '#ffffff', cursor: 'pointer', fontWeight: 600 };
-  const btnSoon = { fontSize: '13px', padding: '8px 16px', borderRadius: '24px', border: '1px solid #e5e7eb', background: '#f3f4f6', color: '#9ca3af', fontWeight: 500 };
-  const btnSwap = { fontSize: '13px', padding: '8px 16px', borderRadius: '24px', border: 'none', background: '#f5f4ff', color: '#534AB7', cursor: 'pointer', fontWeight: 600 };
-  const btnRate = { fontSize: '13px', padding: '8px 16px', borderRadius: '24px', border: '1px solid #e5e7eb', background: '#ffffff', color: '#534AB7', cursor: 'pointer', fontWeight: 500 };
-  const btnReviewed = { fontSize: '13px', padding: '8px 16px', borderRadius: '24px', border: '1px solid #e5e7eb', background: '#f9fafb', color: '#9ca3af', fontWeight: 500 };
-  const btnReport = { fontSize: '13px', padding: '8px 16px', borderRadius: '24px', border: 'none', background: '#ffedd5', color: '#ea580c', cursor: 'pointer', fontWeight: 500 };
+  const btnJoin = { fontSize: '11px', padding: '6px 14px', borderRadius: '6px', border: 'none', background: '#1d4ed8', color: '#ffffff', cursor: 'pointer', fontWeight: 600 };
+  const btnSoon = { fontSize: '12px', padding: '6px 14px', borderRadius: '100px', border: '1px solid #e5e7eb', background: '#ffffff', color: '#9ca3af', fontWeight: 700 };
+  const btnSwap = { fontSize: '12px', padding: '6px 14px', borderRadius: '100px', border: '1px solid #1d4ed8', background: 'transparent', color: '#1d4ed8', cursor: 'pointer', fontWeight: 700 };
+  const btnRate = { fontSize: '11px', padding: '5px 12px', borderRadius: '100px', border: '1px solid #93c5fd', background: '#ffffff', color: '#3b82f6', cursor: 'pointer', fontWeight: 600 };
+  const btnReviewed = { fontSize: '11px', padding: '5px 12px', borderRadius: '100px', border: '1px solid #e5e7eb', background: '#ffffff', color: '#9ca3af', fontWeight: 600 };
+  const btnReport = { fontSize: '11px', padding: '5px 12px', borderRadius: '100px', border: '1px solid #fca5a5', background: '#ffffff', color: '#ef4444', cursor: 'pointer', fontWeight: 600 };
 
   return (
-    <div id="sessions" className="pg on" style={{ padding: 0, overflow: 'hidden' }}>
+    <div id="sessions" className="pg on" style={{ padding: 0, height: 'calc(100vh - 60px)', overflow: 'hidden' }}>
       <ReportSessionModal />
-      <div style={{ display: 'flex', height: '100%', minHeight: '560px' }}>
+      <ActiveSessionModal 
+        isOpen={!!activeSession} 
+        session={activeSession} 
+        onClose={() => setActiveSession(null)} 
+      />
+      <div style={{ display: 'flex', height: '100%' }}>
 
         {/* LEFT: All college sessions */}
         <div style={{ flex: 1, padding: '24px', borderRight: '0.5px solid var(--cs-border)', overflowY: 'auto', background: 'var(--cs-bg-white)' }}>
@@ -43,7 +51,7 @@ const Sessions = () => {
             <div style={{ fontSize: '18px', fontWeight: 600, color: 'var(--cs-text-main)' }}>All College Sessions</div>
             <button 
               onClick={() => document.dispatchEvent(new Event('openCreateSession'))} 
-              style={{ fontSize: '13px', padding: '8px 16px', borderRadius: 'var(--cs-radius-sm)', border: 'none', background: 'var(--cs-primary)', color: '#fff', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+              style={{ fontSize: '13px', padding: '8px 16px', borderRadius: '100px', border: 'none', background: '#1d4ed8', color: '#fff', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
             >
               New
             </button>
@@ -54,12 +62,12 @@ const Sessions = () => {
           <SessionsCardV2
             date="26" month="MAY"
             title="React.js · Priya S." subtitle="4:00 PM · Online · ₹300/hr"
-            actions={<button style={btnJoin} onClick={() => handleBook('Priya S.')}>Book</button>}
+            actions={<button style={btnJoin} onClick={() => handleBook('Priya S.')}>Send Request</button>}
           />
           <SessionsCardV2
             date="26" month="MAY"
             title="Guitar basics · Sneha K." subtitle="6:00 PM · In-person · ₹150/hr"
-            actions={<button style={btnJoin} onClick={() => handleBook('Sneha K.')}>Book</button>}
+            actions={<button style={btnJoin} onClick={() => handleBook('Sneha K.')}>Send Request</button>}
           />
           
           <div style={{ fontSize: '12px', fontWeight: 600, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.5px', margin: '24px 0 12px' }}>Upcoming · 27–31 May</div>
@@ -67,22 +75,22 @@ const Sessions = () => {
           <SessionsCardV2
             date="27" month="MAY"
             title="Figma UI · Rohan M." subtitle="3:00 PM · Online · ₹250/hr"
-            actions={<button style={btnJoin} onClick={() => handleBook('Rohan M.')}>Book</button>}
+            actions={<button style={btnJoin} onClick={() => handleBook('Rohan M.')}>Send Request</button>}
           />
           <SessionsCardV2
             date="28" month="MAY"
             title="Linear Algebra · Vikram N." subtitle="5:00 PM · Either · ₹200/hr"
-            actions={<button style={btnJoin} onClick={() => handleBook('Vikram N.')}>Book</button>}
+            actions={<button style={btnJoin} onClick={() => handleBook('Vikram N.')}>Send Request</button>}
           />
           <SessionsCardV2
             date="29" month="MAY"
             title="Japanese N5 · Aisha T." subtitle="4:30 PM · Online · Swap only"
-            actions={<button style={btnSwap} onClick={() => handleSwap('Aisha T.', 'Japanese N5')}>Swap</button>}
+            actions={<button style={btnSwap} onClick={() => handleSwap('Aisha T.', 'Japanese N5')}>Send Request</button>}
           />
           <SessionsCardV2
             date="30" month="MAY"
             title="Python & Data · Dev R." subtitle="2:00 PM · Online · Swap only"
-            actions={<button style={btnSwap} onClick={() => handleSwap('Dev R.', 'Python & Data Analysis')}>Swap</button>}
+            actions={<button style={btnSwap} onClick={() => handleSwap('Dev R.', 'Python & Data Analysis')}>Send Request</button>}
           />
         </div>
 
@@ -97,13 +105,18 @@ const Sessions = () => {
               date={session.date}
               month={session.month}
               title={session.title}
-              subtitle={session.time}
+              subtitle={
+                <>
+                  {session.time} ·<br />
+                  {session.info ? session.info.split(' · ').pop() : ''}
+                </>
+              }
               status={session.status === 'soon' ? 'soon' : 'upcoming'}
               actions={
                 session.status === 'soon' ? (
                   <button style={btnSoon} disabled>Soon</button>
                 ) : (
-                  <button style={btnJoin} onClick={() => console.log('Join session', session.id)}>Join</button>
+                  <button style={btnJoin} onClick={() => setActiveSession(session)}>Join</button>
                 )
               }
             />

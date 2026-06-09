@@ -28,7 +28,7 @@
 /* Standard Bubble */
 .msg-bubble {
   padding: 10px 14px;
-  border-radius: var(--cs-radius-md);
+  border-radius: 20px;
   font-size: 14px;
   line-height: 1.4;
   max-width: 70%;
@@ -38,13 +38,13 @@
 .msg-bubble-them {
   background: var(--cs-bg-white);
   color: var(--cs-text-main);
-  border: 0.5px solid var(--cs-border);
+  border: 1px solid #e5e7eb;
   border-bottom-left-radius: 4px;
 }
 
 .msg-bubble-me {
-  background: var(--cs-primary);
-  color: var(--cs-bg-white);
+  background: #1d4ed8;
+  color: #ffffff;
   border-bottom-right-radius: 4px;
 }
 
@@ -79,7 +79,7 @@
 .msg-btn-accept {
   flex: 1;
   padding: 8px;
-  border-radius: var(--cs-radius-sm);
+  border-radius: 100px;
   background: var(--cs-primary);
   color: var(--cs-bg-white);
   font-size: 12px;
@@ -92,7 +92,7 @@
 .msg-btn-decline {
   flex: 1;
   padding: 8px;
-  border-radius: var(--cs-radius-sm);
+  border-radius: 100px;
   background: var(--cs-bg-light);
   color: var(--cs-text-main);
   font-size: 12px;

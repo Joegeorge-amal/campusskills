@@ -30,7 +30,7 @@ const CreateSessionModal = ({ isOpen, onClose }) => {
     <div className="modal-overlay" onClick={onClose} style={{
       position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
       background: 'rgba(0,0,0,0.5)', zIndex: 1000,
-      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px'
+      display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '16px', paddingTop: '80px'
     }}>
       <style>{`
         .csm-wrapper {
@@ -43,9 +43,14 @@ const CreateSessionModal = ({ isOpen, onClose }) => {
           box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
           display: flex;
           flex-direction: column;
+          animation: modalDropIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes modalDropIn {
+          from { opacity: 0; transform: translateY(-40px); }
+          to { opacity: 1; transform: translateY(0); }
         }
         .csm-header {
-          background: #3b368c;
+          background: linear-gradient(105deg, #1e3a8a 0%, #3b82f6 55%, #1e3a8a 100%);
           padding: 24px;
           display: flex;
           justify-content: space-between;
@@ -103,7 +108,7 @@ const CreateSessionModal = ({ isOpen, onClose }) => {
           font-family: inherit;
         }
         .csm-input:focus {
-          border-color: #534AB7;
+          border-color: #1d4ed8;
         }
         .csm-row {
           display: grid;
@@ -115,7 +120,7 @@ const CreateSessionModal = ({ isOpen, onClose }) => {
         .csm-pill-group {
           display: flex;
           background: #f9fafb;
-          border-radius: 8px;
+          border-radius: 100px;
           padding: 4px;
           border: 1px solid #e5e7eb;
         }
@@ -127,30 +132,30 @@ const CreateSessionModal = ({ isOpen, onClose }) => {
           font-weight: 500;
           color: #6b7280;
           cursor: pointer;
-          border-radius: 6px;
+          border-radius: 100px;
           transition: all 0.2s;
         }
         .csm-pill.active {
           background: #ffffff;
-          color: #534AB7;
-          font-weight: 600;
+          color: #1d4ed8;
+          font-weight: 700;
           box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         .csm-submit {
           width: 100%;
-          background: #b4ace5;
+          background: #1d4ed8;
           color: #ffffff;
           border: none;
           padding: 14px;
-          border-radius: 12px;
+          border-radius: 100px;
           font-size: 15px;
-          font-weight: 600;
+          font-weight: 700;
           cursor: pointer;
           transition: background 0.2s;
           margin-top: 4px;
         }
         .csm-submit:hover {
-          background: #9d94d1;
+          background: #1e40af;
         }
         @media (max-width: 600px) {
           .csm-row-2, .csm-row-3 { grid-template-columns: 1fr; gap: 20px; }

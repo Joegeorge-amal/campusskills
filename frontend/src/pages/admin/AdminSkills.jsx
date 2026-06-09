@@ -1,58 +1,118 @@
 import React, { useState } from 'react';
+import { IconSearch, IconStarFilled } from '@tabler/icons-react';
 import { useAppData } from '../../context/AppDataContext';
-import AdminTable from '../../components/common/AdminTable';
-import CategoryFilterTabs from '../../components/common/CategoryFilterTabs/CategoryFilterTabs';
-import StatusBadge from '../../components/common/StatusBadge';
-import { IconStar } from '@tabler/icons-react';
 
 const AdminSkills = () => {
   const { skills, adminRemoveSkill } = useAppData();
-  const [filter, setFilter] = useState('All');
+  
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState('All');
 
-  const categories = ['All', 'Coding', 'Design', 'Language', 'Math', 'Music'];
+  const filteredSkills = skills.filter(skill => {
+    if (activeFilter !== 'All' && skill.cat !== activeFilter) return false;
 
-  const filteredSkills = filter === 'All' 
-    ? skills 
-    : skills.filter(s => s.cat === filter);
-
-  const columns = ['Skill / Teacher', 'Category', 'Sessions', 'Rating', 'Action'];
-  const gridTemplate = '2fr 1fr 1fr 1fr 80px';
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      if (
+        !skill.name.toLowerCase().includes(q) &&
+        !skill.teacher.name.toLowerCase().includes(q)
+      ) {
+        return false;
+      }
+    }
+    return true;
+  });
 
   return (
-    <div id="adm-skills" className="pg on">
-      <div style={{ marginBottom: '16px' }}>
-        <CategoryFilterTabs 
-          categories={categories}
-          activeCategory={filter}
-          onSelectCategory={setFilter}
-        />
+    <div className="fade-in">
+      <div className="admin-page-header">
+        <div>
+          <h1 className="admin-page-title">Skills Marketplace</h1>
+          <p className="admin-page-subtitle">Manage skill listings and offerings on the platform.</p>
+        </div>
       </div>
 
-      <AdminTable columns={columns} gridTemplate={gridTemplate} emptyText="No skills found.">
-        {filteredSkills.map(skill => (
-          <div key={skill.id}>
-            <div>
-              <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--cs-text-main)' }}>{skill.name}</div>
-              <div style={{ fontSize: '13px', color: 'var(--cs-text-inactive)', marginTop: '4px' }}>
-                {skill.teacher.name} · {skill.teacher.year} · {skill.teacher.branch}
-              </div>
-            </div>
-            <div>
-              <StatusBadge status={skill.cat} />
-            </div>
-            <span style={{ fontSize: '13px', color: 'var(--cs-text-main)' }}>{skill.sessions}</span>
-            <span style={{ fontSize: '13px', color: 'var(--cs-warning)', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <IconStar size={16} /> {skill.rating}
-            </span>
-            <button 
-              onClick={() => adminRemoveSkill(skill.id)} 
-              style={{ fontSize: '12px', padding: '6px 12px', borderRadius: 'var(--cs-radius-sm)', border: 'none', background: 'var(--cs-danger-light)', color: 'var(--cs-danger)', cursor: 'pointer', fontWeight: 600 }}
-            >
-              Remove
-            </button>
+      <div className="admin-table-container">
+        <div className="admin-table-toolbar">
+          <div className="admin-search-wrapper">
+            <IconSearch size={16} className="admin-search-icon" />
+            <input 
+              type="text" 
+              className="admin-search-input" 
+              placeholder="Search by skill name or tutor..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
-        ))}
-      </AdminTable>
+          
+          <div className="admin-header-actions">
+            <select 
+              style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.875rem', outline: 'none' }}
+              value={activeFilter}
+              onChange={(e) => setActiveFilter(e.target.value)}
+            >
+              <option value="All">All Categories</option>
+              <option value="Coding">Coding</option>
+              <option value="Design">Design</option>
+              <option value="Language">Language</option>
+              <option value="Math">Math</option>
+              <option value="Music">Music</option>
+            </select>
+          </div>
+        </div>
+
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Skill / Tutor</th>
+              <th>Category</th>
+              <th style={{ textAlign: 'center' }}>Sessions</th>
+              <th style={{ textAlign: 'center' }}>Rating</th>
+              <th style={{ textAlign: 'right' }}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredSkills.length === 0 ? (
+              <tr>
+                <td colSpan="5" style={{ textAlign: 'center', padding: '48px', color: '#64748b' }}>
+                  No skills found matching the criteria.
+                </td>
+              </tr>
+            ) : (
+              filteredSkills.map((skill) => (
+                <tr key={skill.id}>
+                  <td>
+                    <div style={{ fontWeight: 600, color: '#0f172a' }}>{skill.name}</div>
+                    <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                      {skill.teacher.name} · {skill.teacher.year} · {skill.teacher.branch}
+                    </div>
+                  </td>
+                  <td>
+                    <span className="badge badge-neutral">{skill.cat}</span>
+                  </td>
+                  <td style={{ textAlign: 'center', fontWeight: 500 }}>
+                    {skill.sessions}
+                  </td>
+                  <td style={{ textAlign: 'center' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', fontWeight: 600, color: '#f59e0b' }}>
+                      {skill.rating} <IconStarFilled size={14} />
+                    </div>
+                  </td>
+                  <td style={{ textAlign: 'right' }}>
+                    <button 
+                      className="admin-btn admin-btn-outline" 
+                      style={{ padding: '6px 12px', fontSize: '0.75rem', color: '#ef4444' }}
+                      onClick={() => adminRemoveSkill(skill.id)}
+                    >
+                      Remove
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

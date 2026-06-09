@@ -100,11 +100,10 @@ const LoginPage = () => {
             <div className="lfld">
               <label className="lbl">College Email Address</label>
               <div className="input-wrapper">
-                <IconMail className="input-icon" size={20} strokeWidth={1.5} />
                 <input
-                  className="linp with-icon"
+                  className="linp"
                   type="email"
-                  placeholder={tab === 'student' ? "yourname@kristujayanti.com" : "admin@kristujayanti.com"}
+                  placeholder="yourname@kristujayanti.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -114,9 +113,8 @@ const LoginPage = () => {
             <div className="lfld">
               <label className="lbl">Password</label>
               <div className="input-wrapper">
-                <IconLock className="input-icon" size={20} strokeWidth={1.5} />
                 <input
-                  className="linp with-icon"
+                  className="linp"
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
                   value={password}
@@ -140,8 +138,11 @@ const LoginPage = () => {
             </div>
             
             <button className="lbtn" type="submit" disabled={isLoading}>
-              <IconLogin size={20} style={{ transform: 'scaleX(-1)' }} />
-              {isLoading ? 'Signing In...' : `Sign In as ${tab === 'student' ? 'Student' : 'Admin'}`}
+              {isLoading ? 'Signing In...' : (
+                tab === 'admin' ? (
+                  <><IconLogin size={18} /> Sign In as Admin</>
+                ) : 'Sign In'
+              )}
             </button>
             
 
@@ -158,7 +159,7 @@ const LoginPage = () => {
               <span>New to CampusSkills?</span>
             </div>
             <a className="create-account-link" onClick={() => navigate('/setup')}>
-              {tab === 'student' ? 'Create an Account' : 'Create a student account'}
+              {tab === 'student' ? 'Create a student account' : 'Create an account'}
             </a>
           </div>
         </div>

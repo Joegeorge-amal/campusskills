@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { IconX } from '@tabler/icons-react';
+import { IconX, IconCheck } from '@tabler/icons-react';
 
 const BookSessionModal = ({
   slots = [
@@ -14,7 +14,7 @@ const BookSessionModal = ({
 }) => {
   const primarySlot = slots.find(s => s.isPrimary) || slots[0];
   const otherSlots = slots.filter(s => !s.isPrimary);
-  const [selectedSlotId, setSelectedSlotId] = useState(primarySlot?.id);
+  const [selectedSlotId, setSelectedSlotId] = useState(null); // No slot selected by default to match screenshot state
 
   const handleContinue = () => {
     if (onContinue) {
@@ -27,47 +27,41 @@ const BookSessionModal = ({
     <div style={{
       position: 'fixed',
       top: 0, left: 0, right: 0, bottom: 0,
-      background: 'rgba(0, 0, 0, 0.4)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 9999,
-      padding: '20px'
-    }}>
+      background: 'rgba(0,0,0,0.4)', zIndex: 1000,
+      display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '16px', paddingTop: '80px'
+    }} onClick={onClose}>
       <div style={{
         background: '#ffffff',
-        width: '420px',
+        width: '380px',
         borderRadius: '16px',
         overflow: 'hidden',
-        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.15)',
-        display: 'flex',
-        flexDirection: 'column',
-        animation: 'slideUp 0.2s ease-out'
-      }}>
-        {/* Scoped CSS for the modal */}
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+        animation: 'modalDropIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+      }} onClick={e => e.stopPropagation()}>
         <style>{`
-          @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
+          @keyframes modalDropIn {
+            from { opacity: 0; transform: translateY(-40px); }
             to { opacity: 1; transform: translateY(0); }
           }
           .bsm-slot-card {
             border: 1px solid #e5e7eb;
             border-radius: 12px;
-            padding: 16px;
+            padding: 12px;
             display: flex;
             align-items: center;
             gap: 16px;
             cursor: pointer;
             transition: all 0.2s;
             margin-bottom: 12px;
+            background: #ffffff;
+            user-select: none;
           }
           .bsm-slot-card:hover {
             border-color: #d1d5db;
-            background: #f9fafb;
           }
           .bsm-slot-card.selected {
-            border-color: #534AB7;
-            background: #f5f4ff;
+            border: 1.5px solid #2563eb;
+            background: #eff6ff;
           }
           .bsm-date-box {
             display: flex;
@@ -75,59 +69,69 @@ const BookSessionModal = ({
             align-items: center;
             justify-content: center;
             background: transparent;
+            border-radius: 10px;
+            padding: 10px 0;
+            width: 44px;
+            box-sizing: border-box;
+          }
+          .bsm-slot-card.selected .bsm-date-box {
+            background: #172554; /* Matches header */
           }
           .bsm-date-num {
-            font-size: 20px;
+            font-size: 15px;
             font-weight: 700;
             color: #111827;
             line-height: 1;
           }
+          .bsm-slot-card.selected .bsm-date-num {
+            color: #ffffff;
+          }
           .bsm-date-month {
-            font-size: 11px;
+            font-size: 9px;
             font-weight: 600;
             color: #6b7280;
             text-transform: uppercase;
             margin-top: 4px;
           }
+          .bsm-slot-card.selected .bsm-date-month {
+            color: rgba(255, 255, 255, 0.8);
+          }
           .bsm-time-info {
             flex: 1;
-            border-left: 1px solid #e5e7eb;
-            padding-left: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
           }
           .bsm-time {
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 14px;
+            font-weight: 700;
             color: #111827;
           }
           .bsm-label {
-            font-size: 13px;
+            font-size: 12px;
             color: #6b7280;
-            margin-top: 2px;
           }
           .bsm-btn {
             width: 100%;
-            padding: 16px;
-            border-radius: 12px;
+            padding: 14px;
+            border-radius: 10px;
             border: none;
-            background: #b1a7ea; /* Lavender shade from PNG */
+            background: #93c5fd; 
             color: #ffffff;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: background 0.2s;
-            margin-top: 24px;
-          }
-          .bsm-btn:hover {
-            background: #9f94de;
+            margin-top: 16px;
           }
           .bsm-btn.active-state {
-            background: #534AB7;
+            background: #2563eb;
           }
           .bsm-btn.active-state:hover {
-            background: #4338ca;
+            background: #1d4ed8;
           }
           .bsm-section-title {
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: #9ca3af;
             text-transform: uppercase;
@@ -139,21 +143,21 @@ const BookSessionModal = ({
 
         {/* Header */}
         <div style={{
-          background: '#3b368c',
-          padding: '24px',
+          background: '#172554',
+          padding: '20px 24px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'flex-start',
           color: '#ffffff'
         }}>
           <div>
-            <div style={{ fontSize: '20px', fontWeight: 600, marginBottom: '6px' }}>Available Timings</div>
-            <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.8)' }}>
+            <div style={{ fontSize: '16px', fontWeight: 600, marginBottom: '4px' }}>Available Timings</div>
+            <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)' }}>
               {selectedSkill} &middot; {selectedTutor}
             </div>
           </div>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', cursor: 'pointer', padding: '4px' }}>
-            <IconX size={20} />
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', cursor: 'pointer', padding: 0 }}>
+            <IconX size={18} />
           </button>
         </div>
 
@@ -175,6 +179,7 @@ const BookSessionModal = ({
                   <div className="bsm-time">{primarySlot.time}</div>
                   <div className="bsm-label">{primarySlot.label}</div>
                 </div>
+                {selectedSlotId === primarySlot.id && <IconCheck size={20} color="#3b82f6" style={{ marginRight: '8px' }} />}
               </div>
             </>
           )}
@@ -196,6 +201,7 @@ const BookSessionModal = ({
                     <div className="bsm-time">{slot.time}</div>
                     <div className="bsm-label">{slot.label}</div>
                   </div>
+                  {selectedSlotId === slot.id && <IconCheck size={20} color="#3b82f6" style={{ marginRight: '8px' }} />}
                 </div>
               ))}
             </>

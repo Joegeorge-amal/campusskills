@@ -14,7 +14,7 @@ import Marketplace from '../pages/Marketplace';
 import Messages from '../pages/Messages';
 import Requests from '../pages/Requests';
 import Sessions from '../pages/Sessions';
-import Wallet from '../pages/Wallet';
+
 import History from '../pages/History';
 import Payment from '../pages/Payment';
 import Withdraw from '../pages/Withdraw';
@@ -73,7 +73,6 @@ const AppRoutes = () => {
         <Route path="messages" element={<Messages />} />
         <Route path="requests" element={<Requests />} />
         <Route path="sessions" element={<Sessions />} />
-        <Route path="wallet" element={<Wallet />} />
         <Route path="history" element={<History />} />
         <Route path="payment" element={<Payment />} />
         <Route path="withdraw" element={<Withdraw />} />

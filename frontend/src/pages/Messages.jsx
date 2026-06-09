@@ -38,25 +38,19 @@ const Messages = () => {
   };
 
   return (
-    <div id="chat" className="pg on" style={{ padding: 0, height: '100%', background: 'var(--cs-bg-light)', display: 'flex', flexDirection: 'column' }}>
+    <div id="chat" className="pg on" style={{ padding: 0, height: 'calc(100vh - 60px)', background: 'var(--cs-bg-light)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <div style={{ display: 'flex', height: '100%', background: 'var(--cs-bg-white)', borderLeft: '0.5px solid var(--cs-border)' }}>
         {/* Left: Chat List */}
-        <div style={{ width: '320px', display: 'flex', flexDirection: 'column', borderRight: '0.5px solid var(--cs-border)' }}>
-          <div style={{ padding: '20px 24px', borderBottom: '0.5px solid var(--cs-border)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <span style={{ fontSize: '18px', fontWeight: 600, color: 'var(--cs-text-main)' }}>Messages</span>
-              <button style={{ width: '32px', height: '32px', borderRadius: 'var(--cs-radius-sm)', border: '0.5px solid var(--cs-border)', background: 'var(--cs-bg-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--cs-text-inactive)' }}>
-                <IconEdit size={18} />
-              </button>
-            </div>
+        <div style={{ width: '280px', display: 'flex', flexDirection: 'column', borderRight: '0.5px solid var(--cs-border)' }}>
+          <div style={{ height: '60px', boxSizing: 'border-box', padding: '0 16px', borderBottom: '0.5px solid var(--cs-border)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <div style={{ position: 'relative' }}>
-              <IconSearch style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--cs-text-inactive)' }} size={16} />
+              <IconSearch style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--cs-text-inactive)' }} size={14} />
               <input 
                 type="text" 
                 placeholder="Search..." 
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px 10px 36px', borderRadius: 'var(--cs-radius-md)', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-light)', fontSize: '13px', outline: 'none', color: 'var(--cs-text-main)' }}
+                style={{ width: '100%', padding: '8px 12px 8px 30px', borderRadius: '100px', border: '1px solid var(--cs-border)', background: '#f3f4f6', fontSize: '13px', outline: 'none', color: 'var(--cs-text-main)' }}
               />
             </div>
           </div>
@@ -64,7 +58,7 @@ const Messages = () => {
             {filteredConversations.map(chat => (
               <ChatListItem 
                 key={chat.id}
-                avatarProps={{ letters: chat.init, bgColor: chat.bg, textColor: chat.col, size: '40px', fontSize: '14px' }}
+                avatarProps={{ letters: chat.init, bgColor: chat.bg, textColor: chat.col, size: '36px', fontSize: '13px' }}
                 isOnline={chat.online}
                 name={chat.name}
                 preview={chat.preview}
@@ -78,21 +72,18 @@ const Messages = () => {
         </div>
 
         {/* Right: Chat Main */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--cs-bg-light)' }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'var(--cs-bg-light)', overflow: 'hidden' }}>
           {activeChat ? (
             <>
               {/* Header */}
-              <div style={{ padding: '20px 24px', background: 'var(--cs-bg-white)', borderBottom: '0.5px solid var(--cs-border)', display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <Avatar letters={activeChat.init} bgColor={activeChat.bg} textColor={activeChat.col} size="48px" fontSize="16px" />
+              <div style={{ height: '60px', boxSizing: 'border-box', padding: '0 24px', background: 'var(--cs-bg-white)', borderBottom: '0.5px solid var(--cs-border)', display: 'flex', alignItems: 'center', gap: '12px', userSelect: 'none' }}>
+                <Avatar letters={activeChat.init} bgColor={activeChat.bg} textColor={activeChat.col} size="36px" fontSize="14px" />
                 <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--cs-text-main)' }}>{activeChat.name}</div>
-                  <div style={{ fontSize: '12px', color: 'var(--cs-text-inactive)', marginTop: '4px' }}>
-                    {activeChat.online ? <span style={{ color: '#1D9E75', fontWeight: 500 }}>● Online</span> : 'Offline'} · {activeChat.skill}
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--cs-text-main)' }}>{activeChat.name}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--cs-text-inactive)', marginTop: '2px' }}>
+                    {activeChat.online ? <span style={{ color: '#1D9E75', fontWeight: 500 }}>Online</span> : 'Offline'}
                   </div>
                 </div>
-                <button style={{ width: '36px', height: '36px', borderRadius: 'var(--cs-radius-md)', border: '0.5px solid var(--cs-border)', background: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--cs-text-inactive)' }}>
-                  <IconInfoCircle size={20} />
-                </button>
               </div>
 
               {/* Messages Area */}
