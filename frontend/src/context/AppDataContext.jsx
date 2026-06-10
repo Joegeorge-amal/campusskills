@@ -7,8 +7,37 @@ export const AppDataProvider = ({ children }) => {
   const { user, updateProfile } = useAuth();
   const [toastMessage, setToastMessage] = useState(null);
   
-  // 0. Notifications (future-ready empty state)
-  const [notifications, setNotifications] = useState([]);
+  // 0. Notifications
+  const [notifications, setNotifications] = useState([
+    {
+      id: 1,
+      type: 'booked',
+      title: 'Session Reminder',
+      message: 'You have a session with Priya S. in 30 minutes.',
+      timestamp: '30m ago',
+      unread: true,
+      actionUrl: '/app/sessions',
+      actionLabel: 'View Session'
+    },
+    {
+      id: 2,
+      type: 'swap_accepted',
+      title: 'Swap Request Accepted',
+      message: 'Aisha T. accepted your Japanese N5 swap request.',
+      timestamp: '1h ago',
+      unread: true,
+      actionUrl: '/app/sessions',
+      actionLabel: 'View Details'
+    },
+    {
+      id: 3,
+      type: 'payment',
+      title: 'Payment Received',
+      message: 'Dev R. paid ₹300 for the C++ session.',
+      timestamp: '2h ago',
+      unread: true
+    }
+  ]);
   
   const markAllAsRead = () => {
     setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
@@ -797,6 +826,9 @@ export const AppDataProvider = ({ children }) => {
     triggerToast('Report dismissed.');
   };
 
+  const unreadMessagesCount = conversations.reduce((acc, c) => acc + (c.unread || 0), 0);
+  const pendingRequestsCount = requests.filter(r => r.status.toLowerCase() === 'pending').length;
+
   return (
     <AppDataContext.Provider
       value={{
@@ -825,7 +857,9 @@ export const AppDataProvider = ({ children }) => {
         adminDismissReport,
         createSession,
         notifications,
-        markAllAsRead
+        markAllAsRead,
+        unreadMessagesCount,
+        pendingRequestsCount
       }}
     >
       {children}

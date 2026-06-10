@@ -105,6 +105,32 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const verifyEmail = async (otp) => {
+    try {
+      const response = await authService.verifyEmail(otp);
+      const data = response.data || response;
+      const { token, refreshToken, user: userData } = data;
+
+      if (!token) throw new Error('Invalid response from server');
+
+      setUser(userData);
+      setRole(userData.role?.toLowerCase() || 'student');
+      setIsAuthenticated(true);
+      
+      localStorage.setItem('cs_user', JSON.stringify(userData));
+      localStorage.setItem('cs_role', userData.role?.toLowerCase() || 'student');
+      localStorage.setItem('cs_token', token);
+      if (refreshToken) {
+        localStorage.setItem('cs_refresh_token', refreshToken);
+      }
+      
+      return userData;
+    } catch (error) {
+      const msg = error.response?.data?.error || error.response?.data?.message || error.message || 'Verification failed';
+      throw new Error(msg);
+    }
+  };
+
   const updateProfile = async (updatedFields) => {
     try {
       await profileService.updateMe(updatedFields);
@@ -121,18 +147,20 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = async () => {
+    // Optimistically clear local state for instant UI feedback
+    setUser(null);
+    setRole(null);
+    setIsAuthenticated(false);
+    localStorage.removeItem('cs_user');
+    localStorage.removeItem('cs_role');
+    localStorage.removeItem('cs_token');
+    
     try {
       const refreshToken = localStorage.getItem('cs_refresh_token');
       if (refreshToken) {
         await authService.logout(refreshToken).catch(err => console.error("Backend logout failed:", err));
       }
     } finally {
-      setUser(null);
-      setRole(null);
-      setIsAuthenticated(false);
-      localStorage.removeItem('cs_user');
-      localStorage.removeItem('cs_role');
-      localStorage.removeItem('cs_token');
       localStorage.removeItem('cs_refresh_token');
       localStorage.removeItem('cs_av_bg');
       localStorage.removeItem('cs_av_col');
@@ -156,6 +184,7 @@ export const AuthProvider = ({ children }) => {
         avCol,
         login,
         register,
+        verifyEmail,
         updateProfile,
         fetchProfile,
         logout,

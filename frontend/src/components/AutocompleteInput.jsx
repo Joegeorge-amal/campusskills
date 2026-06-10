@@ -80,13 +80,13 @@ const AutocompleteInput = ({ allTopics, onAddSkill, placeholder }) => {
           onKeyDown={handleKeyDown}
           style={{ flexGrow: 1, border: 'none', outline: 'none', padding: '8px 12px', background: 'transparent', fontSize: '14px', position: 'relative', zIndex: 1, width: '100%' }}
         />
-        <button type="button" onClick={commitSkill} style={{ background: '#534AB7', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 20px', fontWeight: 600, fontSize: '14px', cursor: 'pointer', zIndex: 2 }}>Add</button>
+        <button type="button" onClick={commitSkill} style={{ background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: '8px', padding: '8px 20px', fontWeight: 600, fontSize: '14px', cursor: 'pointer', zIndex: 2 }}>Add</button>
       </div>
 
       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
         <span style={{ fontSize: '12px', color: '#6b7280' }}>Suggestions:</span>
         {suggestions.length > 0 ? suggestions.map(s => (
-          <span key={s} onClick={() => { onAddSkill(s); setInputValue(''); }} style={{ fontSize: '12px', padding: '3px 10px', borderRadius: '20px', background: '#F5F4FF', color: '#534AB7', cursor: 'pointer', border: '1px solid #E0DFF0' }}>{s}</span>
+          <span key={s} onClick={() => { onAddSkill(s); setInputValue(''); }} style={{ fontSize: '12px', padding: '3px 10px', borderRadius: '20px', background: '#eef2ff', color: '#1d4ed8', cursor: 'pointer', border: '1px solid #dbeafe' }}>{s}</span>
         )) : (
           <span style={{ fontSize: '12px', color: '#9ca3af', fontStyle: 'italic' }}>Press Enter to add custom skill</span>
         )}

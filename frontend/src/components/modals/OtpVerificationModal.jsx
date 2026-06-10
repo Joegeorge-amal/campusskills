@@ -9,7 +9,7 @@ const OtpVerificationModal = ({ isOpen, onClose, onSuccess }) => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const inputRefs = useRef([]);
-  const { fetchProfile } = useAuth();
+  const { verifyEmail } = useAuth();
 
   useEffect(() => {
     let interval;
@@ -75,11 +75,10 @@ const OtpVerificationModal = ({ isOpen, onClose, onSuccess }) => {
     setIsLoading(true);
     setError('');
     try {
-      await authService.verifyEmail(otpString);
-      await fetchProfile(); // Refresh context
+      await verifyEmail(otpString);
       if (onSuccess) onSuccess();
     } catch (err) {
-      setError(err.response?.data?.error || err.message || 'Verification failed. Please try again.');
+      setError(err.message || 'Verification failed. Please try again.');
     } finally {
       setIsLoading(false);
     }

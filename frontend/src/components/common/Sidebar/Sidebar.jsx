@@ -1,18 +1,14 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import Avatar from '../Avatar';
-import logo from '../../../assets/kju_campus_logo.png';
+import { IconLogout } from '@tabler/icons-react';
 import './Sidebar.css';
 
 const Sidebar = ({ 
   isMobileMenuOpen, 
   setIsMobileMenuOpen, 
+  isCompact,
   navItems, 
   sections, 
-  brandIcon, 
-  brandText, 
-  brandSpan, 
-  profileData, 
   onLogout 
 }) => {
   const navigate = useNavigate();
@@ -27,11 +23,9 @@ const Sidebar = ({
       ></div>
 
       {/* SIDEBAR NAVIGATION */}
-      <div className={`sb ${isMobileMenuOpen ? 'open' : ''}`}>
-        <div className="sb-logo">
-          <img src={logo} alt="Campus Logo" style={{ width: '28px', height: '28px', objectFit: 'contain', borderRadius: '4px' }} />
-          <div className="wordmark">{brandText}<span>{brandSpan}</span></div>
-        </div>
+      <div 
+        className={`sb ${isMobileMenuOpen ? 'open' : ''} ${isCompact ? 'compact' : ''}`}
+      >
         
         <div className="sb-nav">
           {sections.map((sect) => (
@@ -47,8 +41,7 @@ const Sidebar = ({
                       className={`ni ${isActive ? 'on' : ''}`}
                       onClick={() => { navigate(item.path); setIsMobileMenuOpen(false); }}
                     >
-                      {item.icon} 
-                      {item.label}
+                      {item.icon}<span className="ni-label">{item.label}</span>
                       {item.badge > 0 && <span className="nbdg">{item.badge}</span>}
                     </button>
                   );
@@ -58,9 +51,8 @@ const Sidebar = ({
         </div>
         
         <div className="sb-foot">
-
           <button onClick={onLogout} className="sb-logout-btn">
-            Logout
+            <IconLogout size={20} stroke={1.5} /><span className="sb-logout-btn-text">Sign out</span>
           </button>
         </div>
       </div>

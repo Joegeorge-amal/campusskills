@@ -2,6 +2,7 @@
 
 .app {
   display: flex;
+  flex-direction: column;
   background: #F0EFF8;
   width: 100%;
   height: 100vh;
@@ -9,21 +10,14 @@
   margin: 0;
 }
 
-/* ─── SIDEBAR ─── */
-.sb {
-  width: 230px;
-  background: #fff;
-  border-right: 0.5px solid rgba(0, 0, 0, 0.08);
+.app-body {
   display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-  height: 100vh;
-  position: sticky;
-  top: 0;
-  transition: transform 0.25s ease-in-out;
-  z-index: 100;
+  flex: 1;
+  min-height: 0;
+  height: calc(100vh - 60px);
 }
 
+/* ─── SIDEBAR ─── (Removed duplicate, see Sidebar.css) */
 /* For mobile overlay background */
 .sb-overlay {
   display: none;
@@ -33,66 +27,12 @@
   z-index: 90;
 }
 
-.sb-logo {
-  height: 60px;
-  box-sizing: border-box;
-  padding: 0 16px;
-  border-bottom: 0.5px solid rgba(0, 0, 0, 0.08);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
 
-.mark {
-  width: 26px;
-  height: 26px;
-  background: #1d4ed8;
-  border-radius: 7px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #eff6ff;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.wordmark {
-  font-size: 13px;
-  font-weight: 500;
-  color: #222;
-}
-
-.wordmark span {
-  color: #1d4ed8;
-}
 
 .sb-nav {
   padding: 7px 5px;
   flex: 1;
   overflow-y: auto;
-}
-
-.sxn {
-  font-size: 10px;
-  font-weight: 500;
-  color: #aaa;
-  padding: 9px 8px 3px;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-}
-
-.ni {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 16px;
-  border-radius: 100px;
-  cursor: pointer;
-  font-size: 13px;
-  color: #666;
-  margin: 0 8px;
-  width: calc(100% - 16px);
-  box-sizing: border-box;
 }
 
 /* ─── FILTER CHIPS ─── */
@@ -143,52 +83,6 @@
   transform: translateY(-1px);
 }
 
-.ni {
-  border: none;
-  background: none;
-  text-align: left;
-  transition: background 0.1s, color 0.1s;
-  outline: none;
-  font-family: inherit;
-}
-
-.ni i, .ni svg {
-  font-size: 15px;
-  width: 15px;
-  height: 15px;
-}
-
-.ni:hover {
-  background: #eff6ff;
-  color: #222;
-}
-
-.ni.on {
-  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-  color: #ffffff;
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
-}
-
-.ni.on i, .ni.on svg {
-  color: #ffffff;
-}
-
-.nbdg {
-  margin-left: auto;
-  background: #ff0055;
-  color: #ffffff;
-  border-radius: 100px;
-  font-size: 11px;
-  padding: 2px 8px;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.sb-foot {
-  padding: 9px 5px;
-  border-top: 0.5px solid rgba(0, 0, 0, 0.08);
-}
 
 .avr {
   border-radius: 50%;
@@ -209,24 +103,11 @@
   min-width: 0;
   width: 100%;
   background: #fff;
-  height: 100vh;
+  height: 100%;
   overflow-y: auto;
 }
 
-/* ─── TOPBAR ─── */
-.topbar {
-  background: #fff;
-  border-bottom: 0.5px solid rgba(0, 0, 0, 0.08);
-  padding: 0 24px;
-  height: 60px;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  position: sticky;
-  top: 0;
-  z-index: 90;
-}
+/* ─── TOPBAR ─── (Removed duplicate, see AppHeader.css) */
 
 .content {
   flex: 1;
