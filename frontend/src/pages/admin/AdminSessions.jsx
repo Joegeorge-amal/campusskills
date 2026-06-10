@@ -1,21 +1,20 @@
 import React, { useState } from 'react';
 import { IconSearch } from '@tabler/icons-react';
-import { useAppData } from '../../context/AppDataContext';
+import { adminSessionsList } from '../../data/adminDashboardData';
 
 const AdminSessions = () => {
-  const { adminSessions } = useAppData();
-  
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
 
-  const filteredSessions = adminSessions.filter(session => {
+  const filteredSessions = adminSessionsList.filter(session => {
     if (activeFilter !== 'All' && session.status.toLowerCase() !== activeFilter.toLowerCase()) return false;
 
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       if (
         !session.title.toLowerCase().includes(q) &&
-        !session.participants.toLowerCase().includes(q)
+        !session.tutor.toLowerCase().includes(q) &&
+        !session.learner.toLowerCase().includes(q)
       ) {
         return false;
       }
@@ -23,104 +22,96 @@ const AdminSessions = () => {
     return true;
   });
 
-  const getBadgeClass = (status) => {
-    if (status === 'LIVE' || status === 'Active') return 'badge badge-success';
-    if (status === 'Upcoming') return 'badge badge-info';
-    if (status === 'Completed') return 'badge badge-neutral';
-    return 'badge badge-warning';
-  };
-
   return (
-    <div className="fade-in">
-      <div className="admin-page-header">
-        <div>
-          <h1 className="admin-page-title">Live & Upcoming Sessions</h1>
-          <p className="admin-page-subtitle">Monitor platform sessions, participants, and payments.</p>
+    <div className="admin-sessions-page fade-in">
+      
+      {/* Top Toolbar */}
+      <div className="admin-sessions-toolbar">
+        <div className="as-search-wrapper">
+          <IconSearch size={18} color="#9ca3af" />
+          <input 
+            type="text" 
+            placeholder="Search by skill, tutor or learner..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <div className="as-filter-pills">
+          <button 
+            className={`as-pill ${activeFilter === 'All' ? 'active' : ''}`}
+            onClick={() => setActiveFilter('All')}
+          >
+            All
+          </button>
+          <button 
+            className={`as-pill ${activeFilter === 'LIVE' ? 'active' : ''}`}
+            onClick={() => setActiveFilter('LIVE')}
+          >
+            Live
+          </button>
+          <button 
+            className={`as-pill ${activeFilter === 'Upcoming' ? 'active' : ''}`}
+            onClick={() => setActiveFilter('Upcoming')}
+          >
+            Upcoming
+          </button>
+          <button 
+            className={`as-pill ${activeFilter === 'Completed' ? 'active' : ''}`}
+            onClick={() => setActiveFilter('Completed')}
+          >
+            Completed
+          </button>
         </div>
       </div>
 
-      <div className="admin-table-container">
-        <div className="admin-table-toolbar">
-          <div className="admin-search-wrapper">
-            <IconSearch size={16} className="admin-search-icon" />
-            <input 
-              type="text" 
-              className="admin-search-input" 
-              placeholder="Search by skill, tutor or learner..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          
-          <div className="admin-header-actions">
-            <select 
-              style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.875rem', outline: 'none' }}
-              value={activeFilter}
-              onChange={(e) => setActiveFilter(e.target.value)}
-            >
-              <option value="All">All Statuses</option>
-              <option value="Live">Live</option>
-              <option value="Upcoming">Upcoming</option>
-              <option value="Completed">Completed</option>
-            </select>
-          </div>
+      {/* Top Stat Cards */}
+      <div className="admin-sessions-stats">
+        <div className="as-stat-card live">
+          <div className="as-stat-val">1</div>
+          <div className="as-stat-lbl">LIVE NOW</div>
         </div>
-
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>Topic</th>
-              <th>Participants</th>
-              <th>Date & Time</th>
-              <th style={{ textAlign: 'center' }}>Amount</th>
-              <th style={{ textAlign: 'center' }}>Status</th>
-              <th style={{ textAlign: 'right' }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredSessions.length === 0 ? (
-              <tr>
-                <td colSpan="6" style={{ textAlign: 'center', padding: '48px', color: '#64748b' }}>
-                  No sessions found matching the criteria.
-                </td>
-              </tr>
-            ) : (
-              filteredSessions.map((session) => (
-                <tr key={session.id}>
-                  <td>
-                    <div style={{ fontWeight: 600, color: '#0f172a' }}>{session.title}</div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b' }}>Online</div>
-                  </td>
-                  <td>
-                    <div style={{ fontWeight: 500, color: '#334155' }}>
-                      {session.participants.replace('→', ' → ')}
-                    </div>
-                  </td>
-                  <td style={{ color: '#64748b', fontSize: '0.875rem' }}>
-                    {session.dateTime}
-                  </td>
-                  <td style={{ textAlign: 'center', fontWeight: 600, color: '#0f172a' }}>
-                    {session.amount === 'Swap' ? 'Swap' : `₹${session.amount.replace('₹', '')}`}
-                  </td>
-                  <td style={{ textAlign: 'center' }}>
-                    <span className={getBadgeClass(session.status)}>
-                      {session.status}
-                    </span>
-                  </td>
-                  <td style={{ textAlign: 'right' }}>
-                    <button 
-                      className="admin-btn admin-btn-outline" 
-                      style={{ padding: '6px 12px', fontSize: '0.75rem', color: '#ef4444' }}
-                    >
-                      Cancel
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        <div className="as-stat-card upcoming">
+          <div className="as-stat-val">6</div>
+          <div className="as-stat-lbl">UPCOMING</div>
+        </div>
+        <div className="as-stat-card today">
+          <div className="as-stat-val">9</div>
+          <div className="as-stat-lbl">TODAY TOTAL</div>
+        </div>
+        <div className="as-stat-card completed">
+          <div className="as-stat-val">463</div>
+          <div className="as-stat-lbl">COMPLETED</div>
+        </div>
       </div>
+
+      {/* Sessions List */}
+      <div className="admin-sessions-list">
+        {filteredSessions.length === 0 ? (
+          <div className="as-empty-state">No sessions found matching your criteria.</div>
+        ) : (
+          filteredSessions.map(session => (
+            <div key={session.id} className="as-card">
+              <div className="as-card-left">
+                <div className="as-dot" style={{ background: session.dot }}></div>
+                <div className="as-info">
+                  <div className="as-title-row">
+                    <span className="as-title">{session.title}</span>
+                    {session.status === 'LIVE' && <span className="as-status-pill live">LIVE</span>}
+                    {session.status === 'Done' && <span className="as-status-pill done">Done</span>}
+                  </div>
+                  <div className="as-meta">
+                    {session.tutor} &rarr; {session.learner} &middot; {session.time} &middot; {session.location} &middot; <span className="as-price">{session.price}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="as-card-right">
+                <button className="as-cancel-btn">Cancel</button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
     </div>
   );
 };

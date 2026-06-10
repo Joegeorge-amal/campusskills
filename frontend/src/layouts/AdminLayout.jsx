@@ -6,10 +6,13 @@ import {
   IconUsers, 
   IconAlertTriangle, 
   IconCalendarEvent, 
-  IconBook,
-  IconLogout
+  IconChartBar,
+  IconCurrencyRupee,
+  IconSettings
 } from '@tabler/icons-react';
 import Toast from '../components/common/Toast';
+import AdminNotifications from '../components/admin/AdminNotifications';
+import logo from '../assets/kju_campus_logo.png';
 import '../styles/admin.css';
 
 const AdminLayout = () => {
@@ -23,74 +26,74 @@ const AdminLayout = () => {
   };
 
   const navItems = [
-    { label: 'Overview', path: '/admin/dashboard', icon: <IconLayoutDashboard size={20} /> },
-    { label: 'Users', path: '/admin/users', icon: <IconUsers size={20} /> },
-    { label: 'Disputes', path: '/admin/reports', icon: <IconAlertTriangle size={20} /> },
-    { label: 'Sessions', path: '/admin/sessions', icon: <IconCalendarEvent size={20} /> },
-    { label: 'Skills', path: '/admin/skills', icon: <IconBook size={20} /> }
+    { label: 'Overview', path: '/admin/dashboard', icon: <IconLayoutDashboard size={18} /> },
+    { label: 'Users', path: '/admin/users', icon: <IconUsers size={18} /> },
+    { label: 'Disputes', path: '/admin/reports', icon: <IconAlertTriangle size={18} />, badge: '3' },
+    { label: 'Sessions', path: '/admin/sessions', icon: <IconCalendarEvent size={18} />, status: 'LIVE' },
+    { label: 'Analytics', path: '/admin/analytics', icon: <IconChartBar size={18} /> },
+    { label: 'Payments', path: '/admin/payments', icon: <IconCurrencyRupee size={18} /> },
+    { label: 'Settings', path: '/admin/settings', icon: <IconSettings size={18} /> }
   ];
 
-  const currentNav = navItems.find(item => location.pathname.includes(item.path)) || navItems[0];
-
   return (
-    <div className="admin-layout">
-      {/* Sidebar */}
-      <aside className="admin-sidebar">
-        <div className="admin-brand">
-          <div className="admin-logo-mark">CS</div>
-          <div className="admin-brand-text">
-            Campus<span>Admin</span>
+    <div className="admin-layout-top">
+      {/* Top Dark Navbar */}
+      <header className="admin-topnav">
+        <div className="admin-topnav-left">
+          <div className="admin-logo-group">
+            <div className="admin-logo-circle">
+              <img src={logo} alt="Logo" className="admin-logo-img" onError={(e) => e.target.style.display='none'} />
+            </div>
+            <div className="admin-brand-name">CampusSkills</div>
+            <div className="admin-badge-pill">ADMIN</div>
           </div>
         </div>
         
-        <nav className="admin-nav">
-          {navItems.map((item) => (
-            <Link 
-              key={item.path}
-              to={item.path}
-              className={`admin-nav-item ${location.pathname.includes(item.path) ? 'active' : ''}`}
-            >
-              {item.icon}
-              {item.label}
-            </Link>
-          ))}
-        </nav>
-
-        <div className="admin-sidebar-footer">
-          <button className="admin-logout-btn" onClick={handleSignOut}>
-            <IconLogout size={20} />
+        <div className="admin-topnav-right">
+          <AdminNotifications />
+          
+          <div className="admin-user-profile">
+            <div className="admin-avatar">
+              {user?.name ? user.name[0].toUpperCase() : 'A'}
+            </div>
+            <div className="admin-user-info">
+              <span className="admin-user-name">{user?.name || 'Admin'}</span>
+              <span className="admin-user-role">Super Admin</span>
+            </div>
+          </div>
+          
+          <button className="admin-signout-btn" onClick={handleSignOut}>
             Sign out
           </button>
         </div>
-      </aside>
+      </header>
 
-      {/* Content Wrapper */}
-      <div className="admin-content-wrapper">
-        
-        {/* Top Header */}
-        <header className="admin-topbar">
-          <div className="admin-topbar-left">
-            <span className="admin-breadcrumb">{currentNav.label}</span>
-          </div>
-          
-          <div className="admin-topbar-right">
-            <div className="admin-profile">
-              <div className="admin-profile-text" style={{ textAlign: 'right' }}>
-                <span className="admin-profile-name">{user?.name || 'Administrator'}</span>
-                <span className="admin-profile-role">Super Admin</span>
+      {/* Secondary Tab Bar */}
+      <div className="admin-subnav-bar">
+        <div className="admin-subnav-container">
+          {navItems.map((item) => {
+            const isActive = location.pathname.includes(item.path);
+            return (
+              <div 
+                key={item.label}
+                className={`admin-subnav-item ${isActive ? 'active' : ''} ${item.disabled ? 'disabled' : ''}`}
+                onClick={() => !item.disabled && navigate(item.path)}
+                style={{ cursor: item.disabled ? 'not-allowed' : 'pointer' }}
+              >
+                {item.icon}
+                {item.label}
+                {item.badge && <span className="subnav-badge">{item.badge}</span>}
+                {item.status && <span className="subnav-status">{item.status}</span>}
               </div>
-              <div style={{ width: '36px', height: '36px', background: '#3b82f6', color: '#fff', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600, fontSize: '0.9rem' }}>
-                {user?.name ? user.name[0].toUpperCase() : 'A'}
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* Main View */}
-        <main className="admin-main">
-          <Outlet />
-        </main>
+            );
+          })}
+        </div>
       </div>
+
+      {/* Main Content */}
+      <main className="admin-main-content">
+        <Outlet />
+      </main>
 
       <Toast />
     </div>

@@ -1,12 +1,25 @@
-import React, { useState } from 'react';
-import { IconSearch } from '@tabler/icons-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { IconSearch, IconAdjustmentsHorizontal, IconChevronDown } from '@tabler/icons-react';
 import { useAppData } from '../../context/AppDataContext';
+import '../../styles/admin.css';
 
 const AdminUsers = () => {
   const { adminUsers, adminSuspendStudent } = useAppData();
   
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const filterRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (filterRef.current && !filterRef.current.contains(event.target)) {
+        setIsFilterOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const filteredUsers = adminUsers.filter(user => {
     if (activeFilter === 'Active' && !user.active) return false;
@@ -27,109 +40,96 @@ const AdminUsers = () => {
   });
 
   return (
-    <div className="fade-in">
-      <div className="admin-page-header">
-        <div>
-          <h1 className="admin-page-title">User Management</h1>
-          <p className="admin-page-subtitle">Manage student accounts, suspensions, and trust scores.</p>
+    <div className="admin-users-page fade-in">
+      {/* Top Search Bar */}
+      <div className="admin-users-toolbar">
+        <div className="admin-u-search">
+          <IconSearch size={18} color="#9ca3af" />
+          <input 
+            type="text" 
+            placeholder="Search by name or email..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        
+        <div className="admin-u-filter-custom" ref={filterRef}>
+          <button 
+            className="admin-u-filter-btn"
+            onClick={() => setIsFilterOpen(!isFilterOpen)}
+          >
+            <IconAdjustmentsHorizontal size={18} /> 
+            {activeFilter === 'All' ? 'Filters' : `Filter: ${activeFilter}`}
+            <IconChevronDown size={16} />
+          </button>
+
+          {isFilterOpen && (
+            <div className="admin-u-filter-menu">
+              {['All', 'Active', 'Suspended'].map(filter => (
+                <button
+                  key={filter}
+                  className={`admin-u-filter-option ${activeFilter === filter ? 'selected' : ''}`}
+                  onClick={() => {
+                    setActiveFilter(filter);
+                    setIsFilterOpen(false);
+                  }}
+                >
+                  {filter === 'All' ? 'All Users' : `${filter} Users`}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="admin-table-container">
-        <div className="admin-table-toolbar">
-          <div className="admin-search-wrapper">
-            <IconSearch size={16} className="admin-search-icon" />
-            <input 
-              type="text" 
-              className="admin-search-input" 
-              placeholder="Search users..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          
-          <div className="admin-header-actions">
-            <select 
-              style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.875rem', outline: 'none' }}
-              value={activeFilter}
-              onChange={(e) => setActiveFilter(e.target.value)}
-            >
-              <option value="All">All Statuses</option>
-              <option value="Active">Active</option>
-              <option value="Suspended">Suspended</option>
-            </select>
-          </div>
-        </div>
-
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>User</th>
-              <th>Branch / Year</th>
-              <th style={{ textAlign: 'center' }}>Sessions</th>
-              <th style={{ textAlign: 'center' }}>Trust Score</th>
-              <th style={{ textAlign: 'center' }}>Status</th>
-              <th style={{ textAlign: 'right' }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredUsers.length === 0 ? (
-              <tr>
-                <td colSpan="6" style={{ textAlign: 'center', padding: '48px', color: '#64748b' }}>
-                  No users found matching your criteria.
-                </td>
-              </tr>
-            ) : (
-              filteredUsers.map((user, idx) => (
-                <tr key={idx}>
-                  <td>
-                    <div className="admin-user-cell">
-                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: user.bg, color: user.col, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 600 }}>
-                        {user.init}
-                      </div>
-                      <div className="admin-user-meta">
-                        <span className="admin-user-name">{user.name}</span>
-                        <span className="admin-user-sub">{user.name.toLowerCase().replace(' ', '.')}@college.edu</span>
-                      </div>
-                    </div>
-                  </td>
-                  <td>{user.meta}</td>
-                  <td style={{ textAlign: 'center', fontWeight: 500 }}>{user.sessions}</td>
-                  <td style={{ textAlign: 'center' }}>
-                    <span style={{ color: user.rating >= 4.5 ? '#10b981' : user.rating >= 3.5 ? '#f59e0b' : '#ef4444', fontWeight: 600 }}>
-                      {Math.round(user.rating * 20)}%
-                    </span>
-                  </td>
-                  <td style={{ textAlign: 'center' }}>
-                    {user.active ? (
-                      <span className="badge badge-success">Active</span>
-                    ) : (
-                      <span className="badge badge-danger">Suspended</span>
-                    )}
-                  </td>
-                  <td style={{ textAlign: 'right' }}>
-                    {user.active ? (
-                      <button 
-                        className="admin-btn admin-btn-outline" 
-                        style={{ padding: '6px 12px', fontSize: '0.75rem', color: '#ef4444' }}
-                        onClick={() => adminSuspendStudent(user.name)}
-                      >
-                        Suspend
-                      </button>
-                    ) : (
-                      <button 
-                        className="admin-btn admin-btn-outline" 
-                        style={{ padding: '6px 12px', fontSize: '0.75rem', color: '#10b981' }}
-                      >
-                        Reinstate
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+      {/* Users List */}
+      <div className="admin-users-list">
+        {filteredUsers.length === 0 ? (
+          <div className="admin-users-empty">No users found matching your criteria.</div>
+        ) : (
+          filteredUsers.map((user, idx) => (
+            <div key={idx} className="admin-user-row">
+              <div className="au-row-left">
+                <div className="au-avatar" style={{background: user.bg, color: user.col}}>
+                  {user.init}
+                </div>
+                <div className="au-info">
+                  <div className="au-name">{user.name}</div>
+                  <div className="au-meta">
+                    {user.name.toLowerCase().replace(' ', '.')}@college.edu · {user.meta}
+                  </div>
+                </div>
+              </div>
+              <div className="au-row-right">
+                <div className="au-stats">
+                  <div className="au-sessions">{user.sessions} sessions</div>
+                  <div className="au-trust">Trust {Math.round(user.rating * 20)}%</div>
+                </div>
+                <div className="au-status">
+                  {user.active ? (
+                    <span className="au-pill active">active</span>
+                  ) : (
+                    <span className="au-pill suspended">suspended</span>
+                  )}
+                </div>
+                <div className="au-action">
+                  {user.active ? (
+                    <button 
+                      className="au-btn-suspend"
+                      onClick={() => adminSuspendStudent(user.name)}
+                    >
+                      Suspend
+                    </button>
+                  ) : (
+                    <button className="au-btn-reinstate">
+                      Reinstate
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

@@ -1,25 +1,26 @@
 import React, { useState } from 'react';
 import { IconSearch } from '@tabler/icons-react';
 import { useAppData } from '../../context/AppDataContext';
+import { adminDisputesDetailed } from '../../data/adminDashboardData';
 
 const AdminReports = () => {
-  const { adminReports, adminDismissReport } = useAppData();
+  const { adminDismissReport } = useAppData();
   
+  // Use new detailed mock data, but preserve local state so we can 'resolve' them
+  const [localDisputes, setLocalDisputes] = useState(adminDisputesDetailed);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
 
-  const filteredReports = adminReports.filter(report => {
-    if (activeFilter !== 'All' && report.status.toLowerCase() !== activeFilter.toLowerCase()) return false;
+  const filteredDisputes = localDisputes.filter(disp => {
+    if (activeFilter !== 'All' && disp.status.toLowerCase() !== activeFilter.toLowerCase()) return false;
 
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
-      const reportIdStr = `d-${String(report.id).padStart(3, '0')}`;
       if (
-        !reportIdStr.includes(q) &&
-        !(report.reporter && report.reporter.toLowerCase().includes(q)) &&
-        !(report.target && report.target.toLowerCase().includes(q)) &&
-        !(report.title && report.title.toLowerCase().includes(q)) &&
-        !(report.desc && report.desc.toLowerCase().includes(q))
+        !disp.id.toLowerCase().includes(q) &&
+        !disp.parties.toLowerCase().includes(q) &&
+        !disp.meta.toLowerCase().includes(q) &&
+        !disp.description.toLowerCase().includes(q)
       ) {
         return false;
       }
@@ -27,115 +28,87 @@ const AdminReports = () => {
     return true;
   });
 
-  const getBadgeClass = (status) => {
-    if (status === 'open') return 'badge badge-danger';
-    if (status === 'reviewing') return 'badge badge-warning';
-    return 'badge badge-neutral';
+  const handleResolve = (id) => {
+    // 1. Remove from local detailed UI state
+    setLocalDisputes(prev => prev.filter(d => d.id !== id));
+    
+    // 2. Preserve existing moderation callback workflow
+    // If the ID format matches what the context expects, this will clean up the global state too.
+    // In our mock data, IDs are like 'D-041'. If context expects numeric, we can parse it, 
+    // but calling it guarantees we don't regress workflows.
+    const numericId = parseInt(id.replace('D-', ''), 10);
+    if (!isNaN(numericId)) {
+      adminDismissReport(numericId);
+    }
   };
 
   return (
-    <div className="fade-in">
-      <div className="admin-page-header">
-        <div>
-          <h1 className="admin-page-title">Disputes & Reports</h1>
-          <p className="admin-page-subtitle">Manage session disputes and user reports.</p>
+    <div className="admin-disputes-page fade-in">
+      
+      {/* Top Toolbar */}
+      <div className="admin-reports-toolbar">
+        <div className="ar-search-wrapper">
+          <IconSearch size={18} color="#9ca3af" />
+          <input 
+            type="text" 
+            placeholder="Search by student, tutor or reason..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+        <div className="ar-filter-pills">
+          <button 
+            className={`ar-pill ${activeFilter === 'All' ? 'active' : ''}`}
+            onClick={() => setActiveFilter('All')}
+          >
+            All
+          </button>
+          <button 
+            className={`ar-pill ${activeFilter === 'Open' ? 'active' : ''}`}
+            onClick={() => setActiveFilter('Open')}
+          >
+            Open
+          </button>
+          <button 
+            className={`ar-pill ${activeFilter === 'Reviewing' ? 'active' : ''}`}
+            onClick={() => setActiveFilter('Reviewing')}
+          >
+            Reviewing
+          </button>
         </div>
       </div>
 
-      <div className="admin-table-container">
-        <div className="admin-table-toolbar">
-          <div className="admin-search-wrapper">
-            <IconSearch size={16} className="admin-search-icon" />
-            <input 
-              type="text" 
-              className="admin-search-input" 
-              placeholder="Search by ID, user, or reason..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </div>
-          
-          <div className="admin-header-actions">
-            <select 
-              style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.875rem', outline: 'none' }}
-              value={activeFilter}
-              onChange={(e) => setActiveFilter(e.target.value)}
-            >
-              <option value="All">All Statuses</option>
-              <option value="Open">Open</option>
-              <option value="Reviewing">Reviewing</option>
-              <option value="Resolved">Resolved</option>
-            </select>
-          </div>
-        </div>
-
-        <table className="admin-table">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Parties Involved</th>
-              <th>Issue Description</th>
-              <th style={{ textAlign: 'center' }}>Amount</th>
-              <th style={{ textAlign: 'center' }}>Status</th>
-              <th style={{ textAlign: 'right' }}>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredReports.length === 0 ? (
-              <tr>
-                <td colSpan="6" style={{ textAlign: 'center', padding: '48px', color: '#64748b' }}>
-                  No disputes or reports found matching the criteria.
-                </td>
-              </tr>
-            ) : (
-              filteredReports.map((report) => (
-                <tr key={report.id}>
-                  <td style={{ fontWeight: 600, color: '#0f172a' }}>
-                    D-{String(report.id).padStart(3, '0')}
-                  </td>
-                  <td>
-                    <div style={{ fontWeight: 500, color: '#0f172a' }}>{report.reporter}</div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b' }}>vs {report.target}</div>
-                  </td>
-                  <td>
-                    <div style={{ fontWeight: 500, color: '#0f172a' }}>{report.title}</div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b', maxWidth: '300px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {report.desc}
-                    </div>
-                  </td>
-                  <td style={{ textAlign: 'center', fontWeight: 500 }}>
-                    ₹{report.amount || 200}
-                  </td>
-                  <td style={{ textAlign: 'center' }}>
-                    <span className={getBadgeClass(report.status)}>
-                      {report.status}
-                    </span>
-                  </td>
-                  <td style={{ textAlign: 'right' }}>
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                      {report.status !== 'resolved' && (
-                        <button 
-                          className="admin-btn admin-btn-success" 
-                          style={{ padding: '6px 12px', fontSize: '0.75rem' }}
-                          onClick={() => adminDismissReport(report.id)}
-                        >
-                          Resolve
-                        </button>
-                      )}
-                      <button 
-                        className="admin-btn admin-btn-outline" 
-                        style={{ padding: '6px 12px', fontSize: '0.75rem' }}
-                      >
-                        Details
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+      {/* Disputes List */}
+      <div className="admin-reports-list">
+        {filteredDisputes.length === 0 ? (
+          <div className="ar-empty-state">No disputes found matching your criteria.</div>
+        ) : (
+          filteredDisputes.map(disp => (
+            <div key={disp.id} className="ar-card">
+              <div className="ar-card-header">
+                <div className="ar-badges">
+                  <span className="ar-id-pill">{disp.id}</span>
+                  <span className={`ar-status-pill ${disp.status}`}>{disp.status}</span>
+                </div>
+                <div className="ar-header-actions">
+                  {/* Keep resolve workflow via a subtle action or as part of details view */}
+                  <button onClick={() => handleResolve(disp.id)} className="ar-resolve-btn" style={{ marginRight: '16px', background: 'transparent', border: 'none', color: '#10b981', fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem' }}>Resolve</button>
+                  <button className="ar-view-details">View details &rarr;</button>
+                </div>
+              </div>
+              
+              <div className="ar-card-body">
+                <h3 className="ar-parties">{disp.parties}</h3>
+                <p className="ar-meta">{disp.meta}</p>
+                <div className="ar-description-block">
+                  {disp.description}
+                </div>
+              </div>
+            </div>
+          ))
+        )}
       </div>
+
     </div>
   );
 };
