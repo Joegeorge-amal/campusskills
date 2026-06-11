@@ -14,26 +14,24 @@ public class UserProfile {
     @JsonProperty("name")
     @JsonAlias("displayName")
     private String displayName;
-    @JsonProperty("branch")
-    @JsonAlias("department")
-    private String department;
+    @JsonProperty("programme")
+    private String programme;
     private String phoneNumber;
-    private String sem;
     private String year;
     private String bio;
     @JsonProperty("avatarImg")
     @JsonAlias("profilePicture")
     private String profilePicture;
+    private String bannerImg;
+    private Object avatarColor;
     private String upi;
     private List<SkillProfile> skillsOffered;
-    private List<SkillProfile> skillsWanted;
+    private List<String> skillsWanted;
     private List<String> verifiedSkills;
     private List<String> preferredTimes;
     private String sessionPreference;
     private String exchangePreference;
     private Boolean profileCompleted;
-    private Double averageRating;
-    private Integer reviewCount;
     private Long createdAt;
     private Long updatedAt;
 
@@ -48,14 +46,11 @@ public class UserProfile {
     public String getDisplayName() { return displayName; }
     public void setDisplayName(String displayName) { this.displayName = displayName; }
 
-    public String getDepartment() { return department; }
-    public void setDepartment(String department) { this.department = department; }
+    public String getProgramme() { return programme; }
+    public void setProgramme(String programme) { this.programme = programme; }
 
     public String getPhoneNumber() { return phoneNumber; }
     public void setPhoneNumber(String phoneNumber) { this.phoneNumber = phoneNumber; }
-
-    public String getSem() { return sem; }
-    public void setSem(String sem) { this.sem = sem; }
 
     public String getYear() { return year; }
     public void setYear(String year) { this.year = year; }
@@ -66,14 +61,20 @@ public class UserProfile {
     public String getProfilePicture() { return profilePicture; }
     public void setProfilePicture(String profilePicture) { this.profilePicture = profilePicture; }
 
+    public String getBannerImg() { return bannerImg; }
+    public void setBannerImg(String bannerImg) { this.bannerImg = bannerImg; }
+
+    public Object getAvatarColor() { return avatarColor; }
+    public void setAvatarColor(Object avatarColor) { this.avatarColor = avatarColor; }
+
     public String getUpi() { return upi; }
     public void setUpi(String upi) { this.upi = upi; }
 
     public List<SkillProfile> getSkillsOffered() { return skillsOffered; }
     public void setSkillsOffered(List<SkillProfile> skillsOffered) { this.skillsOffered = skillsOffered; }
 
-    public List<SkillProfile> getSkillsWanted() { return skillsWanted; }
-    public void setSkillsWanted(List<SkillProfile> skillsWanted) { this.skillsWanted = skillsWanted; }
+    public List<String> getSkillsWanted() { return skillsWanted; }
+    public void setSkillsWanted(List<String> skillsWanted) { this.skillsWanted = skillsWanted; }
 
     public List<String> getVerifiedSkills() { return verifiedSkills; }
     public void setVerifiedSkills(List<String> verifiedSkills) { this.verifiedSkills = verifiedSkills; }
@@ -95,10 +96,4 @@ public class UserProfile {
 
     public String getExchangePreference() { return exchangePreference; }
     public void setExchangePreference(String exchangePreference) { this.exchangePreference = exchangePreference; }
-
-    public Double getAverageRating() { return averageRating; }
-    public void setAverageRating(Double averageRating) { this.averageRating = averageRating; }
-
-    public Integer getReviewCount() { return reviewCount; }
-    public void setReviewCount(Integer reviewCount) { this.reviewCount = reviewCount; }
 }

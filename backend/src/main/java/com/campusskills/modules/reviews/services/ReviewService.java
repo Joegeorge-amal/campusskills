@@ -98,6 +98,8 @@ public class ReviewService {
                     // Send notification to reviewee
                     sendNotification(finalRevieweeId, com.campusskills.shared.constants.NotificationType.REVIEW_RECEIVED, "New Review Received", "You have received a new review with a rating of " + req.getRating() + " stars.", "REVIEW", id);
                     
+                    userStatsRepository.recordActivity(reviewerId);
+
                     return Future.succeededFuture(id);
                 });
             });

@@ -5,6 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { IconX, IconPlus, IconTrash } from '@tabler/icons-react';
 import { listingService } from '../../services/listingService';
 import MarketplaceCard from '../common/MarketplaceCard/MarketplaceCard';
+import AutocompleteInput from '../AutocompleteInput';
 
 const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
   const { triggerToast } = useAppData();
@@ -28,6 +29,22 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
   const [newSkillName, setNewSkillName] = useState('');
   const [newSkillLevel, setNewSkillLevel] = useState('Beginner');
   const [isPreviewing, setIsPreviewing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const [topicMap, setTopicMap] = useState({});
+
+  React.useEffect(() => {
+    import('../../services/topicService').then(({ getTopics }) => {
+      getTopics().then(res => {
+        const topics = res?.data || res;
+        if (Array.isArray(topics)) {
+          const map = {};
+          topics.forEach(t => { map[t.name.toLowerCase()] = t.category; });
+          setTopicMap(map);
+        }
+      }).catch(console.error);
+    });
+  }, []);
 
   React.useEffect(() => {
     if (isOpen) {
@@ -53,6 +70,7 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
         setTopicsStr('');
       }
       setIsPreviewing(false);
+      setIsSubmitting(false);
     }
   }, [isOpen, editData]);
 
@@ -67,33 +85,25 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
   };
 
   const handleAddOfferedSkill = () => {
-    if (!newSkillName.trim()) return;
-    setOfferedSkills([...offeredSkills, { name: newSkillName.trim(), level: newSkillLevel }]);
-    setNewSkillName('');
+    if (newSkillName.trim()) {
+      setOfferedSkills([...offeredSkills, { name: newSkillName.trim(), level: newSkillLevel }]);
+      setNewSkillName('');
+    }
   };
 
   const handleAddRequestedSkill = () => {
-    if (!newSkillName.trim()) return;
-    setRequestedSkills([...requestedSkills, { name: newSkillName.trim(), level: newSkillLevel }]);
-    setNewSkillName('');
+    const sel = document.getElementById('req-skill-select');
+    const lev = document.getElementById('req-skill-level');
+    if (sel && sel.value.trim()) {
+      setRequestedSkills([...requestedSkills, { name: sel.value.trim(), level: lev.value }]);
+      sel.value = '';
+    }
   };
 
   const getAutoCategory = () => {
-    const allSkills = [...offeredSkills, ...requestedSkills].map(s => s.name.toLowerCase());
-    const coding = ['react', 'java', 'python', 'c++', 'c#', 'html', 'css', 'js', 'javascript', 'sql', 'node', 'code', 'programming', 'dsa'];
-    const design = ['figma', 'design', 'ui', 'ux', 'photoshop', 'illustrator', 'canva', 'art'];
-    const language = ['english', 'spanish', 'french', 'japanese', 'language', 'german', 'hindi', 'korean'];
-    const math = ['math', 'algebra', 'calculus', 'geometry', 'statistics', 'physics'];
-    const music = ['guitar', 'piano', 'music', 'singing', 'vocal', 'drums', 'flute'];
-
-    for (let s of allSkills) {
-      if (coding.some(k => s.includes(k))) return 'Coding';
-      if (design.some(k => s.includes(k))) return 'Design';
-      if (language.some(k => s.includes(k))) return 'Language';
-      if (math.some(k => s.includes(k))) return 'Math';
-      if (music.some(k => s.includes(k))) return 'Music';
-    }
-    return 'Coding'; // Default category if unknown
+    const primarySkill = offeredSkills[0]?.name || requestedSkills[0]?.name;
+    if (!primarySkill) return 'General';
+    return topicMap[primarySkill.toLowerCase()] || 'General';
   };
 
   const handlePreview = (e) => {
@@ -124,25 +134,28 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
   };
 
   const handleConfirm = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     try {
       const payload = {
         title,
         description,
         category: getAutoCategory(),
         listingType,
+        active: true,
         price: price ? parseFloat(price) : 0,
         availability,
         availableSlots: slots.map(s => ({ dayOfWeek: s.dayOfWeek.toUpperCase(), startTime: s.startTime, durationMinutes: s.durationMinutes })),
-        topics: topicsStr.split(',').map(t => t.trim()).filter(t => t),
+        topics: topicsStr.split(',').map(t => t.trim()).filter(t => t).map(t => t ? t.charAt(0).toUpperCase() + t.slice(1) : ''),
         offeredSkills: (listingType === 'TEACH' || listingType === 'SWAP' || listingType === 'TEACH_SWAP' || listingType === 'LEARN_SWAP') 
-          ? offeredSkills.map(s => ({ ...s, level: s.level.toUpperCase() })) : [],
+          ? offeredSkills.map(s => ({ ...s, name: s.name ? s.name.charAt(0).toUpperCase() + s.name.slice(1) : '', level: s.level.toUpperCase() })) : [],
         requestedSkills: (listingType === 'LEARN' || listingType === 'SWAP' || listingType === 'TEACH_SWAP' || listingType === 'LEARN_SWAP') 
-          ? requestedSkills.map(s => ({ ...s, level: s.level.toUpperCase() })) : [],
-        ownerId: user?._id || user?.id
+          ? requestedSkills.map(s => ({ ...s, name: s.name ? s.name.charAt(0).toUpperCase() + s.name.slice(1) : '', level: s.level ? s.level.toUpperCase() : 'BEGINNER' })) : [],
+        ownerId: user?.userId || user?._id || user?.id
       };
       
       if (editData) {
-        await listingService.updateListing(editData.id, payload);
+        await listingService.updateListing(editData._id || editData.id, payload);
         triggerToast('Listing updated successfully!');
       } else {
         await listingService.createListing(payload);
@@ -152,6 +165,8 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
     } catch (err) {
       triggerToast(editData ? 'Failed to update listing' : 'Failed to create listing');
       console.error(err);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -276,9 +291,9 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
             <textarea className="clm-input" rows="3" value={description} onChange={(e) => setDescription(e.target.value)} required />
           </div>
 
-          {(listingType === 'TEACH' || listingType === 'TEACH_SWAP') && (
+          {(listingType !== 'SWAP') && (
             <div className="clm-field">
-              <label>Price per hour (₹)</label>
+              <label>{listingType.startsWith('LEARN') ? 'Willing to pay per hour (₹)' : 'Price per hour (₹)'}</label>
               <input type="number" className="clm-input" value={price} onChange={(e) => setPrice(e.target.value)} required />
             </div>
           )}
@@ -295,18 +310,18 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
                     You haven't added any skills to teach yet. Please go to your Profile and add a skill to your "I can teach" list first.
                   </div>
                 ) : (
-                  <div style={{ display: 'flex', gap: '8px' }}>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
                     <select className="clm-input" value={newSkillName} onChange={e => {
                       setNewSkillName(e.target.value);
                       const skillObj = user.skillsOffered.find(s => s.name === e.target.value);
                       if (skillObj) setNewSkillLevel(skillObj.level);
-                    }} style={{flex: 2}}>
+                    }} style={{flex: 2, height: '42px', boxSizing: 'border-box'}}>
                       <option value="" disabled hidden>Select a skill from your profile...</option>
                       {user.skillsOffered.map((s, idx) => (
                         <option key={`off-${idx}`} value={s.name}>{s.name}</option>
                       ))}
                     </select>
-                    <select className="clm-input" value={newSkillLevel} onChange={e => setNewSkillLevel(e.target.value)} style={{flex: 1}}>
+                    <select className="clm-input" value={newSkillLevel} onChange={e => setNewSkillLevel(e.target.value)} style={{flex: 1, height: '42px', boxSizing: 'border-box'}}>
                       <option value="Beginner">Beginner</option>
                       <option value="Intermediate">Intermediate</option>
                       <option value="Advanced">Advanced</option>
@@ -315,7 +330,7 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
                       if (!newSkillName) return;
                       setOfferedSkills([...offeredSkills, { name: newSkillName, level: newSkillLevel }]);
                       setNewSkillName('');
-                    }} style={{padding: '0 16px', background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer'}}>+ Offer</button>
+                    }} style={{padding: '0 16px', background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', height: '42px', fontWeight: 600, boxSizing: 'border-box'}}>+ Offer</button>
                   </div>
                 )}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: offeredSkills.length ? '8px' : '0' }}>
@@ -332,41 +347,19 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
             {(listingType === 'LEARN' || listingType === 'SWAP' || listingType === 'TEACH_SWAP' || listingType === 'LEARN_SWAP') && (
               <div style={{marginTop: listingType === 'LEARN' ? '0' : '8px'}}>
                 <label style={{fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '4px', display: 'block'}}>What are you requesting to learn?</label>
-                {(!user?.skillsWanted || user.skillsWanted.length === 0) ? (
-                  <div style={{ fontSize: '13px', color: '#dc2626', background: '#fef2f2', padding: '8px', borderRadius: '4px' }}>
-                    You haven't added any skills to learn yet. Please go to your Profile and add a skill to your "I want to learn" list first.
-                  </div>
-                ) : (
-                  <div style={{ display: 'flex', gap: '8px' }}>
-                    <select className="clm-input" id="req-skill-select" style={{flex: 2}} onChange={(e) => {
-                      const skillObj = user.skillsWanted.find(s => s.name === e.target.value);
-                      if (skillObj) {
-                        document.getElementById('req-skill-level').value = skillObj.level;
-                      }
-                    }}>
-                      <option value="" disabled hidden>Select a skill from your profile...</option>
-                      {user.skillsWanted.map((s, idx) => (
-                        <option key={`req-${idx}`} value={s.name}>{s.name}</option>
-                      ))}
-                    </select>
-                    <select className="clm-input" id="req-skill-level" style={{flex: 1}}>
-                      <option value="Beginner">Beginner</option>
-                      <option value="Intermediate">Intermediate</option>
-                      <option value="Advanced">Advanced</option>
-                    </select>
-                    <button type="button" onClick={() => {
-                      const selectEl = document.getElementById('req-skill-select');
-                      const levelEl = document.getElementById('req-skill-level');
-                      if (!selectEl.value) return;
-                      setRequestedSkills([...requestedSkills, { name: selectEl.value, level: levelEl.value }]);
-                      selectEl.value = '';
-                    }} style={{padding: '0 16px', background: '#059669', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer'}}>+ Request</button>
-                  </div>
-                )}
+                <AutocompleteInput 
+                  allTopics={Object.keys(topicMap)} 
+                  placeholder="e.g. Figma, Python, Guitar..."
+                  onAddSkill={(skill) => {
+                    if (!requestedSkills.find(s => s.name.toLowerCase() === skill.toLowerCase())) {
+                      setRequestedSkills([...requestedSkills, { name: skill }]);
+                    }
+                  }} 
+                />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: requestedSkills.length ? '8px' : '0' }}>
                   {requestedSkills.map((s, i) => (
                     <div key={i} style={{ display: 'flex', justifyContent: 'space-between', background: '#fff', padding: '8px 12px', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '13px' }}>
-                      <span><strong style={{color: '#059669'}}>Requesting:</strong> {s.name} ({s.level})</span>
+                      <span><strong style={{color: '#059669'}}>Requesting:</strong> {s.name}</span>
                       <button type="button" onClick={() => setRequestedSkills(requestedSkills.filter((_, idx) => idx !== i))} style={{background:'none', border:'none', color:'#ef4444', cursor:'pointer'}}><IconTrash size={14}/></button>
                     </div>
                   ))}
@@ -375,10 +368,45 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
             )}
           </div>
 
-          <div className="clm-field">
-            <label>Syllabus <span style={{fontWeight: 400, color: '#6b7280'}}>(optional)</span></label>
-            <input type="text" className="clm-input" placeholder="e.g. JSX & Components, State Management" value={topicsStr} onChange={(e) => setTopicsStr(e.target.value)} />
-          </div>
+          {!(listingType === 'LEARN' || listingType === 'LEARN_SWAP') && (
+            <div className="clm-field">
+              <label>Syllabus <span style={{fontWeight: 400, color: '#6b7280'}}>(optional)</span></label>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', padding: '6px 12px', border: '1px solid #e5e7eb', borderRadius: '8px', minHeight: '42px', alignItems: 'center', background: '#fff' }}>
+                {topicsStr.split(',').map(t => t.trim()).filter(Boolean).map((t, i) => (
+                  <div key={i} style={{ background: '#e0e7ff', color: '#3730a3', padding: '4px 10px', borderRadius: '100px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    {t}
+                    <IconX size={14} style={{ cursor: 'pointer', opacity: 0.7 }} onClick={() => {
+                      const newTopics = topicsStr.split(',').map(t => t.trim()).filter(Boolean);
+                      newTopics.splice(i, 1);
+                      setTopicsStr(newTopics.join(', '));
+                    }} />
+                  </div>
+                ))}
+                <input 
+                  type="text" 
+                  placeholder={!topicsStr ? "Type topic and press comma to separate" : ""} 
+                  style={{ border: 'none', outline: 'none', flex: 1, minWidth: '150px', background: 'transparent', fontSize: '14px', color: '#374151', padding: '4px 0' }}
+                  onKeyDown={(e) => {
+                    if (e.key === ',' || e.key === 'Enter') {
+                      e.preventDefault();
+                      const val = e.target.value.trim();
+                      if (val) {
+                        setTopicsStr(prev => prev ? `${prev}, ${val}` : val);
+                        e.target.value = '';
+                      }
+                    } else if (e.key === 'Backspace' && !e.target.value) {
+                      e.preventDefault();
+                      const newTopics = topicsStr.split(',').map(t => t.trim()).filter(Boolean);
+                      if (newTopics.length > 0) {
+                        newTopics.pop();
+                        setTopicsStr(newTopics.join(', '));
+                      }
+                    }
+                  }}
+                />
+              </div>
+            </div>
+          )}
 
           {/* Availability Slots */}
           <div style={{ background: '#f9fafb', padding: '16px', borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -407,8 +435,11 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {slots.map((s, i) => (
-                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', background: '#fff', padding: '8px 12px', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '13px' }}>
-                  <span>{s.dayOfWeek} at {s.startTime} ({s.durationMinutes}m)</span>
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', background: i === 0 ? '#eff6ff' : '#fff', padding: '8px 12px', border: i === 0 ? '1px solid #bfdbfe' : '1px solid #e5e7eb', borderRadius: '6px', fontSize: '13px' }}>
+                  <span>
+                    <strong style={{ color: i === 0 ? '#1d4ed8' : '#6b7280', marginRight: '6px' }}>{i === 0 ? 'Primary:' : 'Alternate:'}</strong>
+                    {s.dayOfWeek} at {s.startTime} ({s.durationMinutes}m)
+                  </span>
                   <button type="button" onClick={() => handleRemoveSlot(i)} style={{background:'none', border:'none', color:'#ef4444', cursor:'pointer'}}><IconTrash size={14}/></button>
                 </div>
               ))}
@@ -426,7 +457,7 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
               <div>
                 <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{getAutoCategory()} • {listingType.replace('_', ' ')}</div>
                 <div style={{ fontSize: '20px', fontWeight: 700, color: '#111827', marginTop: '4px' }}>{title || 'Untitled Listing'}</div>
-                {listingType !== 'SWAP' && <div style={{ fontSize: '16px', fontWeight: 600, color: '#059669', marginTop: '8px' }}>{price ? `₹${price}/hr` : 'Free'}</div>}
+                {listingType !== 'SWAP' && <div style={{ fontSize: '16px', fontWeight: 600, color: '#059669', marginTop: '8px' }}>{price ? (listingType.startsWith('LEARN') ? `Willing to pay: ₹${price}/hr` : `Price: ₹${price}/hr`) : 'Free'}</div>}
               </div>
 
               <div>
@@ -467,7 +498,7 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
                         {requestedSkills.map((s, i) => (
                           <div key={i} style={{ fontSize: '13px', color: '#4b5563', display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#059669' }}></div>
-                            {s.name} <span style={{ color: '#9ca3af', fontSize: '12px' }}>({s.level})</span>
+                            {s.name} {s.level && <span style={{ color: '#9ca3af', fontSize: '12px' }}>({s.level})</span>}
                           </div>
                         ))}
                       </div>
@@ -485,7 +516,8 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
                 {slots.length > 0 && (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                     {slots.map((s, i) => (
-                      <div key={i} style={{ background: '#ffffff', border: '1px solid #d1d5db', padding: '6px 12px', borderRadius: '6px', fontSize: '12px', color: '#374151', fontWeight: 500 }}>
+                      <div key={i} style={{ background: i === 0 ? '#eff6ff' : '#ffffff', border: i === 0 ? '1px solid #bfdbfe' : '1px solid #d1d5db', padding: '6px 12px', borderRadius: '6px', fontSize: '12px', color: i === 0 ? '#1e3a8a' : '#374151', fontWeight: 500 }}>
+                        <span style={{ fontWeight: 700, marginRight: '4px', color: i === 0 ? '#1d4ed8' : '#6b7280' }}>{i === 0 ? 'Primary:' : 'Alternate:'}</span>
                         {s.dayOfWeek} • {s.startTime} ({s.durationMinutes}m)
                       </div>
                     ))}
@@ -495,8 +527,10 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
             </div>
 
             <div style={{ display: 'flex', gap: '12px', marginTop: '12px', width: '100%' }}>
-              <button type="button" onClick={() => setIsPreviewing(false)} style={{flex: 1, padding: '12px', background: '#e5e7eb', color: '#374151', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer'}}>Back to Edit</button>
-              <button type="button" onClick={handleConfirm} style={{flex: 1, padding: '12px', background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer'}}>Confirm & Publish</button>
+              <button type="button" onClick={() => setIsPreviewing(false)} disabled={isSubmitting} style={{flex: 1, padding: '12px', background: '#e5e7eb', color: '#374151', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: isSubmitting ? 'not-allowed' : 'pointer'}}>Back to Edit</button>
+              <button type="button" onClick={handleConfirm} disabled={isSubmitting} style={{flex: 1, padding: '12px', background: isSubmitting ? '#9ca3af' : '#1d4ed8', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: isSubmitting ? 'not-allowed' : 'pointer'}}>
+                {isSubmitting ? (editData ? 'Updating...' : 'Publishing...') : 'Confirm & Publish'}
+              </button>
             </div>
           </div>
         )}

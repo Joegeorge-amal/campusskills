@@ -12,7 +12,7 @@ const Requests = () => {
 
   return (
     <>
-      <div id="requests" className="pg on" style={{ padding: '32px 40px', background: '#F4F5F9', minHeight: '100vh', boxSizing: 'border-box' }}>
+      <div id="requests" className="pg on" style={{ padding: '32px 40px', backgroundColor: 'var(--cs-bg-light)', backgroundImage: 'radial-gradient(rgba(15, 23, 42, 0.06) 1px, transparent 1px)', backgroundSize: '24px 24px', minHeight: '100vh', boxSizing: 'border-box' }}>
       
       <div style={{ marginBottom: '28px' }}>
         <div style={{ fontSize: '12px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px' }}>Sent by you</div>

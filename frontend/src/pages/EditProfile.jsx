@@ -13,7 +13,7 @@ const EditProfile = () => {
   const [firstName, setFirstName] = useState(user?.name?.split(' ')[0] || '');
   const [lastName, setLastName] = useState(user?.name?.split(' ')[1] || '');
   const [year, setYear] = useState(user?.year || '3rd year');
-  const [branch, setBranch] = useState(user?.branch || 'CSE');
+  const [programme, setProgramme] = useState(user?.programme || 'BSc CSPHEL');
   const [bio, setBio] = useState(user?.bio || '');
   
   // Parse existing phone number (e.g. "+91 9876543210")
@@ -57,7 +57,7 @@ const EditProfile = () => {
       firstName !== (user?.name?.split(' ')[0] || '') ||
       lastName !== (user?.name?.split(' ')[1] || '') ||
       year !== (user?.year || '3rd year') ||
-      branch !== (user?.branch || 'CSE') ||
+      programme !== (user?.programme || 'BSc CSPHEL') ||
       bio !== (user?.bio || '') ||
       countryCode !== parsedCountryCode ||
       phoneNumber !== parsedPhone ||
@@ -124,11 +124,7 @@ const EditProfile = () => {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      const newSkillsWanted = learnSkills.map(skillName => {
-        const existing = user?.skillsWanted?.find(s => s.name === skillName);
-        if (existing) return existing;
-        return { name: skillName, level: 'BEGINNER' };
-      });
+      const newSkillsWanted = learnSkills;
 
       const finalAvatarColor = customSwatchColor || avatarColor;
 
@@ -136,7 +132,7 @@ const EditProfile = () => {
         name: `${firstName} ${lastName}`.trim(),
         phoneNumber: `${countryCode} ${phoneNumber}`.trim(),
         year,
-        branch,
+        programme,
         bio,
         upi,
         skillsOffered: user?.skillsOffered || [],
@@ -390,7 +386,7 @@ const EditProfile = () => {
               <option>1st year</option><option>2nd year</option><option>3rd year</option><option>4th year</option>
             </select>
           </div>
-          <div><label style={labelStyle}>Branch / Department</label><input style={inputStyle} type="text" value={branch} onChange={e => setBranch(e.target.value)} /></div>
+          <div><label style={labelStyle}>Programme / Department</label><input style={inputStyle} type="text" value={programme} onChange={e => setProgramme(e.target.value)} /></div>
         </div>
         <div>
           <label style={labelStyle}>Bio</label>

@@ -45,7 +45,7 @@ const Dashboard = () => {
   if (!user) return null;
 
   return (
-    <div id="home" className="pg on" style={{ padding: '20px 24px', background: '#F4F5F9', minHeight: '100%', boxSizing: 'border-box', position: 'relative', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+    <div id="home" className="pg on" style={{ padding: '20px 24px', backgroundColor: 'var(--cs-bg-light)', backgroundImage: 'radial-gradient(rgba(15, 23, 42, 0.06) 1px, transparent 1px)', backgroundSize: '24px 24px', minHeight: '100%', boxSizing: 'border-box', position: 'relative', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
       
       {activeRequest && (
         <SessionRequestPopup 

@@ -95,7 +95,7 @@ const Sessions = () => {
         </div>
 
         {/* RIGHT: My upcoming sessions only */}
-        <div style={{ width: '340px', flexShrink: 0, padding: '24px', overflowY: 'auto', background: '#f9fafb' }}>
+        <div style={{ width: '340px', flexShrink: 0, padding: '24px', overflowY: 'auto', backgroundColor: 'var(--cs-bg-light)', backgroundImage: 'radial-gradient(rgba(15, 23, 42, 0.06) 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
           <div style={{ fontSize: '18px', fontWeight: 600, color: 'var(--cs-text-main)', marginBottom: '24px' }}>My Upcoming Sessions</div>
           <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-inactive)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>Booked</div>
           

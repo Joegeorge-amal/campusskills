@@ -1,6 +1,11 @@
 package com.campusskills.modules.users.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.util.Map;
+import java.util.HashMap;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 
 public class UserStats {
     @JsonProperty("_id")
@@ -12,6 +17,7 @@ public class UserStats {
     private Integer sessionsAttended;
     private Long createdAt;
     private Long updatedAt;
+    private Map<String, Integer> dailyActivityCounts = new HashMap<>();
 
     public UserStats() {}
 
@@ -38,4 +44,7 @@ public class UserStats {
 
     public Long getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(Long updatedAt) { this.updatedAt = updatedAt; }
+
+    public Map<String, Integer> getDailyActivityCounts() { return dailyActivityCounts; }
+    public void setDailyActivityCounts(Map<String, Integer> dailyActivityCounts) { this.dailyActivityCounts = dailyActivityCounts; }
 }

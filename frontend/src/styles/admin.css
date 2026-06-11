@@ -4,7 +4,7 @@
   flex-direction: column;
   height: 100vh;
   width: 100%;
-  background-color: #f4f5f9;
+  background-color: var(--cs-bg-light);
   font-family: 'Inter', system-ui, sans-serif;
   color: #0f172a;
   overflow: hidden;

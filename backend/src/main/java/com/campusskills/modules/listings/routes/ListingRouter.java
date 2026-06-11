@@ -3,6 +3,7 @@ package com.campusskills.modules.listings.routes;
 import com.campusskills.modules.listings.handlers.ListingHandler;
 import com.campusskills.modules.listings.repositories.ListingRepository;
 import com.campusskills.modules.listings.services.ListingService;
+import com.campusskills.modules.users.repositories.UserStatsRepository;
 import com.campusskills.web.middleware.JwtAuthMiddleware;
 import io.vertx.core.Vertx;
 import io.vertx.ext.auth.jwt.JWTAuth;
@@ -14,7 +15,8 @@ public class ListingRouter {
         Router router = Router.router(vertx);
         
         ListingRepository repository = new ListingRepository();
-        ListingService service = new ListingService(repository);
+        UserStatsRepository statsRepository = new UserStatsRepository();
+        ListingService service = new ListingService(repository, statsRepository);
         ListingHandler handler = new ListingHandler(service);
 
         // POST /listings is protected

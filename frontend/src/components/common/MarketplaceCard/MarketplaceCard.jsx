@@ -13,35 +13,42 @@ const MarketplaceCard = ({
   mode,
   isVerified,
   isSelected,
-  onClick
+  onClick,
+  description,
+  skills,
+  variant = 'marketplace'
 }) => {
-  // Determine category pill color class
-  const getCategoryClass = (cat) => {
-    const c = (cat || '').toLowerCase();
-    if (c.includes('code') || c.includes('coding')) return 'c-code';
-    if (c.includes('design')) return 'c-des';
-    if (c.includes('lang')) return 'c-lan';
-    if (c.includes('math')) return 'c-mat';
-    if (c.includes('music')) return 'c-mus';
-    return 'c-mus'; // Default
+  const isPureRequesting = typeLabel === 'Requesting';
+
+  // Determine category pill color class based on verification
+  const getCategoryClass = () => {
+    if (isPureRequesting) {
+      return 'c-code';
+    }
+    return isVerified ? 'c-code' : 'c-warn';
   };
 
   const isSwap = typeof price === 'string' && price.toLowerCase().includes('swap');
 
   return (
     <div className={`mc-card ${isSelected ? 'selected' : ''} glossy-card`} onClick={onClick}>
-      <div className="mc-header">
-        <div style={{display: 'flex', gap: '8px', alignItems: 'center'}}>
-          <div className={`cpill ${getCategoryClass(category)}`}>
+      <div className="mc-header" style={{ alignItems: 'flex-start' }}>
+        <div style={{display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap', flex: 1, minWidth: 0, paddingRight: '8px'}}>
+          <div className={`cpill ${getCategoryClass()}`} style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>
             {category} {typeLabel && <><span style={{ opacity: 0.5, margin: '0 4px' }}>•</span>{typeLabel}</>}
           </div>
-          {isVerified && (
-            <div style={{fontSize: '10px', fontWeight: 600, color: '#059669', background: '#ecfdf5', padding: '2px 6px', borderRadius: '4px', border: '1px solid #a7f3d0'}}>
+          {isVerified === true && variant === 'profile' && !isPureRequesting && (
+            <div style={{fontSize: '10px', fontWeight: 600, color: '#059669', background: '#ecfdf5', padding: '2px 8px', borderRadius: '100px', border: '1px solid #a7f3d0', whiteSpace: 'nowrap', flexShrink: 0}}>
               ✓ Verified Skill
             </div>
           )}
+          {isVerified === false && variant === 'profile' && !isPureRequesting && (
+            <div style={{fontSize: '10px', fontWeight: 600, color: '#b45309', background: '#fefce8', padding: '2px 8px', borderRadius: '100px', border: '1px solid #fde047', whiteSpace: 'nowrap', flexShrink: 0}}>
+              ⚠️ Unverified
+            </div>
+          )}
         </div>
-        <div className="mc-price" style={{ color: isSwap ? '#1d4ed8' : '#0F6E56' }}>
+        <div className="mc-price" style={{ color: isSwap ? '#1d4ed8' : '#0F6E56', whiteSpace: 'nowrap', flexShrink: 0, textAlign: 'right' }}>
           {price}
         </div>
       </div>
@@ -50,8 +57,38 @@ const MarketplaceCard = ({
         {title}
       </div>
       
-      <div className="mc-user-info">
-        {user.name} &middot; {user.year} &middot; {user.branch}
+      {description && (
+        <div className="mc-description" style={{ fontSize: '13px', color: '#64748b', marginTop: '4px', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: '1.5' }}>
+          {description}
+        </div>
+      )}
+
+      {skills && skills.length > 0 && (
+        <div style={{ display: 'flex', gap: '6px', marginTop: '8px', flexWrap: 'wrap' }}>
+          {skills.slice(0, 3).map((s, i) => (
+            <span key={i} style={{ fontSize: '11px', padding: '2px 8px', background: '#f1f5f9', color: '#475569', borderRadius: '100px', border: '1px solid #e2e8f0', whiteSpace: 'nowrap' }}>
+              {s.name || s}
+            </span>
+          ))}
+          {skills.length > 3 && (
+            <span style={{ fontSize: '11px', padding: '2px 8px', background: '#f8fafc', color: '#94a3b8', borderRadius: '100px', border: '1px solid #e2e8f0' }}>
+              +{skills.length - 3}
+            </span>
+          )}
+        </div>
+      )}
+      
+      <div 
+        className="mc-user-info" 
+        style={{ marginTop: 'auto', paddingTop: '12px', cursor: user?.id ? 'pointer' : 'default', textDecoration: user?.id ? 'underline' : 'none' }}
+        onClick={(e) => {
+          if (user?.id) {
+            e.stopPropagation();
+            window.location.href = `/app/user/${user.id}`;
+          }
+        }}
+      >
+        {[user?.name, user?.year, user?.branch].filter(Boolean).join(' · ')}
       </div>
       
       <div className="mc-footer">

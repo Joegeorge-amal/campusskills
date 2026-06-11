@@ -145,11 +145,11 @@ const SetupPage = () => {
       await updateProfile({
         phoneNumber: `${countryCode} ${phoneNumber}`.trim(),
         year, 
-        branch: programme, 
+        programme: programme, 
         bio, 
         upi,
         skillsOffered: teachSkills.map(s => ({ name: s, level: 'BEGINNER' })), 
-        skillsWanted: learnSkills.map(s => ({ name: s, level: 'BEGINNER' })),
+        skillsWanted: learnSkills,
         avatarImg: avatarImg
       });
       

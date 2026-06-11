@@ -2,14 +2,17 @@ package com.campusskills.modules.listings.services;
 
 import com.campusskills.modules.listings.models.Listing;
 import com.campusskills.modules.listings.repositories.ListingRepository;
+import com.campusskills.modules.users.repositories.UserStatsRepository;
 import io.vertx.core.Future;
 
 public class ListingService {
     
     private final ListingRepository listingRepository;
+    private final UserStatsRepository statsRepository;
 
-    public ListingService(ListingRepository listingRepository) {
+    public ListingService(ListingRepository listingRepository, UserStatsRepository statsRepository) {
         this.listingRepository = listingRepository;
+        this.statsRepository = statsRepository;
     }
 
     public Future<String> createListing(Listing listing) {
@@ -38,6 +41,10 @@ public class ListingService {
         
         return listingRepository.create(listing).onSuccess(listingId -> {
             System.out.println("[LISTING] Created listing | listingId=" + listingId + " ownerId=" + listing.getOwnerId());
+            if (statsRepository != null) {
+                statsRepository.recordActivity(listing.getOwnerId())
+                    .onFailure(err -> System.out.println("[LISTING] Failed to record activity: " + err.getMessage()));
+            }
         });
     }
 

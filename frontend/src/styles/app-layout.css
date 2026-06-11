@@ -111,7 +111,7 @@
 
 .content {
   flex: 1;
-  background: #F4F5F9;
+  background: var(--cs-bg-light);
   min-height: calc(100vh - 60px);
 }
 

@@ -11,9 +11,11 @@ public class SessionService {
     private final SessionRepository repository;
 
     private final io.vertx.core.eventbus.EventBus eventBus;
+    private final com.campusskills.modules.users.repositories.UserStatsRepository statsRepository;
 
     public SessionService(io.vertx.core.eventbus.EventBus eventBus) {
         this.repository = new SessionRepository();
+        this.statsRepository = new com.campusskills.modules.users.repositories.UserStatsRepository();
         this.eventBus = eventBus;
     }
 
@@ -79,6 +81,8 @@ public class SessionService {
                         // Notify both parties that it is COMPLETED
                         sendNotification(session.getTeacherId(), com.campusskills.shared.constants.NotificationType.SESSION_COMPLETED, "Session Completed", "The session has been marked as completed.", "SESSION", sessionId);
                         sendNotification(session.getStudentId(), com.campusskills.shared.constants.NotificationType.SESSION_COMPLETED, "Session Completed", "The session has been marked as completed.", "SESSION", sessionId);
+                        statsRepository.recordActivity(session.getTeacherId());
+                        statsRepository.recordActivity(session.getStudentId());
                     }).mapEmpty();
                 } else {
                     return Future.succeededFuture();

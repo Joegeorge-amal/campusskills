@@ -412,14 +412,17 @@ const Profile = () => {
               </div>
             )}
           </div>
-          <div style={{ fontSize: '13px', color: '#4b5563', marginBottom: '8px', fontWeight: 500 }}>
-            {user?.branch || 'CSE'} Student · {user?.year || '3rd Year'}
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', fontSize: '11px', color: '#6b7280', fontWeight: 600 }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              Joined May 2024
-            </span>
-          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', color: '#6b7280', fontSize: '14px', fontWeight: 500, marginBottom: '8px' }}>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <IconMapPin size={16} strokeWidth={2.5} style={{ color: '#9ca3af' }} />
+                {user?.programme || 'BSc CSPHEL'} Student • {user?.year || '1st yr'}
+              </span>
+              <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#d1d5db' }}></span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <IconCalendarMonth size={16} strokeWidth={2.5} style={{ color: '#9ca3af' }} />
+                Joined {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'June 2026'}
+              </span>
+            </div>
           {user?.bio && (
             <div style={{ marginTop: '16px', fontSize: '14px', color: '#374151', lineHeight: '1.6', maxWidth: '600px', fontWeight: 500 }}>
               {user.bio}
@@ -646,7 +649,7 @@ const Profile = () => {
                         title={listing.title}
                         category={listing.category}
                         price={listing.listingType === 'SWAP' ? 'Skill Swap' : (listing.price ? `₹${listing.price}/hr` : 'Free')}
-                        user={{ name: user?.displayName || 'You', year: user?.year || '1st yr', branch: user?.department || 'CSE' }}
+                        user={{ name: user?.displayName || 'You', year: user?.year || '1st yr', branch: user?.programme || 'BSc CSPHEL' }}
                         rating={user?.stats?.ratingAvg?.toFixed(1) || '5.0'}
                         sessionsCount={user?.stats?.sessionsCompleted || 0}
                         mode={listing.availability === 'ONLINE' ? 'Online' : 'In-person'}

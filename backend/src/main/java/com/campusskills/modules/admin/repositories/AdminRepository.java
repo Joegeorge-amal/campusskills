@@ -121,7 +121,7 @@ public class AdminRepository {
                         .put("createdAt", user.getLong("createdAt"))
                         .put("displayName", profile.getString("displayName", "Unknown User"))
                         .put("avatar", profile.getString("profilePicture"))
-                        .put("course", profile.getString("department", "") + " " + profile.getString("year", ""))
+                        .put("course", profile.getString("programme", "") + " " + profile.getString("year", ""))
                         .put("sessionCount", sessionsCompleted)
                         .put("trustScore", trustScore)
                     );

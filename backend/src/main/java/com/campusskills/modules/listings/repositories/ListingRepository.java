@@ -23,6 +23,15 @@ public class ListingRepository {
         return client.insert(COLLECTION, doc);
     }
 
+    private Listing mapToListing(JsonObject doc) {
+        if (doc == null) return null;
+        Object idObj = doc.getValue("_id");
+        if (idObj instanceof JsonObject && ((JsonObject) idObj).containsKey("$oid")) {
+            doc.put("_id", ((JsonObject) idObj).getString("$oid"));
+        }
+        return doc.mapTo(Listing.class);
+    }
+
     public Future<Listing> findById(String id) {
         JsonObject query = new JsonObject().put("_id", id);
         io.vertx.core.json.JsonArray pipeline = new io.vertx.core.json.JsonArray()
@@ -51,7 +60,7 @@ public class ListingRepository {
             .collect(java.util.stream.Collectors.toList())
             .map(docs -> {
                 if (docs == null || docs.isEmpty()) return null;
-                return docs.get(0).mapTo(Listing.class);
+                return mapToListing(docs.get(0));
             });
     }
 
@@ -82,7 +91,10 @@ public class ListingRepository {
 
         String ownerId = filters.getString("ownerId");
         if (ownerId != null && !ownerId.isEmpty()) {
-            query.put("ownerId", ownerId);
+            query.put("$or", new io.vertx.core.json.JsonArray()
+                .add(new JsonObject().put("ownerId", ownerId))
+                .add(new JsonObject().put("teacherId", ownerId))
+            );
         }
 
         // Text Search (q)
@@ -201,7 +213,7 @@ public class ListingRepository {
             .collect(java.util.stream.Collectors.toList())
             .map(docs -> {
                 return docs.stream()
-                    .map(doc -> doc.mapTo(Listing.class))
+                    .map(this::mapToListing)
                     .collect(java.util.stream.Collectors.toList());
             });
     }
