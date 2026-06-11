@@ -13,6 +13,8 @@
 /* ─── TOP NAVBAR (DARK) ─── */
 .admin-topnav {
   height: 64px;
+  width: 100%;
+  box-sizing: border-box;
   background-color: rgba(17, 24, 39, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -289,6 +291,8 @@
 /* ─── SECONDARY SUB NAVBAR ─── */
 .admin-subnav-bar {
   height: 56px;
+  width: 100%;
+  box-sizing: border-box;
   background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -302,15 +306,18 @@
 
 .admin-subnav-container {
   display: flex;
-  gap: 32px;
+  width: 100%;
   height: 100%;
 }
 
 .admin-subnav-item {
   display: flex;
+  flex: 1;
   align-items: center;
+  justify-content: center;
+  height: 100%;
   gap: 8px;
-  padding: 0 4px 16px 4px;
+  padding: 0 12px;
   color: #64748b;
   font-weight: 500;
   font-size: 0.9rem;
@@ -450,11 +457,17 @@
 
 .admin-ostard {
   background: #ffffff;
-  border-radius: 12px;
+  border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-ostard:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
 }
 
 .ostard-icon {
@@ -508,8 +521,8 @@
 
 .admin-panel {
   background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
   overflow: hidden;

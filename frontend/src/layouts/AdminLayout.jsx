@@ -31,7 +31,6 @@ const AdminLayout = () => {
     { label: 'Disputes', path: '/admin/reports', icon: <IconAlertTriangle size={18} />, badge: '3' },
     { label: 'Sessions', path: '/admin/sessions', icon: <IconCalendarEvent size={18} />, status: 'LIVE' },
     { label: 'Analytics', path: '/admin/analytics', icon: <IconChartBar size={18} /> },
-    { label: 'Payments', path: '/admin/payments', icon: <IconCurrencyRupee size={18} /> },
     { label: 'Settings', path: '/admin/settings', icon: <IconSettings size={18} /> }
   ];
 

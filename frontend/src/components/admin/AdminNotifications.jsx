@@ -5,12 +5,16 @@ import '../../styles/admin.css';
 
 const AdminNotifications = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [showAll, setShowAll] = useState(false);
   const [notifications, setNotifications] = useState(mockNotifications);
   const dropdownRef = useRef(null);
 
   const unreadCount = notifications.filter(n => n.unread).length;
 
-  const toggleDropdown = () => setIsOpen(!isOpen);
+  const toggleDropdown = () => {
+    setIsOpen(!isOpen);
+    if (isOpen) setShowAll(false); // reset when closing
+  };
 
   // Close on outside click
   useEffect(() => {
@@ -91,7 +95,7 @@ const AdminNotifications = () => {
             {notifications.length === 0 ? (
               <div className="admin-notif-empty">No notifications</div>
             ) : (
-              notifications.map((notif) => (
+              (showAll ? notifications : notifications.slice(0, 3)).map((notif) => (
                 <div key={notif.id} className={`admin-notif-item ${notif.unread ? 'unread' : ''}`}>
                   <div className="admin-notif-icon-wrapper">
                     {getIcon(notif.type)}
@@ -106,9 +110,13 @@ const AdminNotifications = () => {
               ))
             )}
           </div>
-          <div className="admin-notif-footer">
-            <a href="#" className="admin-notif-view-all">View All Notifications →</a>
-          </div>
+          {!showAll && notifications.length > 3 && (
+            <div className="admin-notif-footer">
+              <button className="admin-notif-view-all" onClick={() => setShowAll(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', width: '100%', padding: '12px', fontSize: '13px' }}>
+                View All Notifications →
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>

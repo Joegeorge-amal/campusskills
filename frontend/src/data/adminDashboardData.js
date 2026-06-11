@@ -67,6 +67,9 @@ export const mockNotifications = [
   { id: 3, type: 'payment', title: 'Payment received', message: '₹300 received for DSA tutoring session.', time: '1 hr ago', unread: true },
   { id: 4, type: 'dispute', title: 'New dispute raised', message: 'Dispute #D-041 filed by Meera Singh.', time: '2 hr ago', unread: true },
   { id: 5, type: 'success', title: 'Dispute resolved', message: 'Dispute #D-038 closed successfully.', time: '5 hr ago', unread: false },
+  { id: 6, type: 'user', title: 'Profile updated', message: 'Arjun N. updated their tutor profile.', time: '1 day ago', unread: false },
+  { id: 7, type: 'payment', title: 'Payout processed', message: '₹1200 transferred to Dev Rao.', time: '2 days ago', unread: false },
+  { id: 8, type: 'success', title: 'System update', message: 'v1.4.2 deployed successfully.', time: '2 days ago', unread: false }
 ];
 
 export const adminAnalyticsStats = {
