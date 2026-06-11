@@ -1,8 +1,9 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useAppData } from '../context/AppDataContext';
 import { IconCheck } from '@tabler/icons-react';
+import { HexColorPicker } from "react-colorful";
 
 const EditProfile = () => {
   const { user, updateProfile } = useAuth();
@@ -11,30 +12,109 @@ const EditProfile = () => {
 
   const [firstName, setFirstName] = useState(user?.name?.split(' ')[0] || '');
   const [lastName, setLastName] = useState(user?.name?.split(' ')[1] || '');
-  const [college, setCollege] = useState(user?.college || 'PESU Bengaluru');
   const [year, setYear] = useState(user?.year || '3rd year');
   const [branch, setBranch] = useState(user?.branch || 'CSE');
   const [bio, setBio] = useState(user?.bio || '');
+  
+  // Parse existing phone number (e.g. "+91 9876543210")
+  const existingPhone = user?.phoneNumber || '';
+  const parsedCountryCode = existingPhone.includes(' ') ? existingPhone.split(' ')[0] : '+91';
+  const parsedPhone = existingPhone.includes(' ') ? existingPhone.split(' ')[1] : existingPhone;
+  
+  const [countryCode, setCountryCode] = useState(parsedCountryCode);
+  const [phoneNumber, setPhoneNumber] = useState(parsedPhone);
+  
   const [upi, setUpi] = useState(user?.upi || 'arjunkumar@upi');
   const [avatarImg, setAvatarImg] = useState(user?.avatarImg || null);
   const fileInputRef = useRef(null);
+  const [bannerImg, setBannerImg] = useState(user?.bannerImg || null);
+  const bannerInputRef = useRef(null);
+  const [showHeatmap, setShowHeatmap] = useState(user?.showHeatmap !== false);
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [customSwatchColor, setCustomSwatchColor] = useState(null);
   
-  const [learnSkills, setLearnSkills] = useState(user?.topicsWanted || []);
+  const [learnSkills, setLearnSkills] = useState((user?.skillsWanted || []).map(s => s.name || s));
   const [learnInp, setLearnInp] = useState('');
 
   const [availability, setAvailability] = useState(['Weekday mornings', 'Weekend mornings', 'Weekends anytime']);
   const [mode, setMode] = useState('Online');
 
-  const [avatarColor, setAvatarColor] = useState({ bg: '#EEEDFE', text: '#3C3489' });
+  const [avatarColor, setAvatarColor] = useState(user?.avatarColor || { bg: '#EEEDFE', text: '#3C3489' });
+  const [showSavePrompt, setShowSavePrompt] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  useEffect(() => {
+    const mainContent = document.querySelector('.main');
+    if (mainContent) {
+      mainContent.scrollTo(0, 0);
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }, []);
+
+  const handleBack = () => {
+    const hasChanges = 
+      firstName !== (user?.name?.split(' ')[0] || '') ||
+      lastName !== (user?.name?.split(' ')[1] || '') ||
+      year !== (user?.year || '3rd year') ||
+      branch !== (user?.branch || 'CSE') ||
+      bio !== (user?.bio || '') ||
+      countryCode !== parsedCountryCode ||
+      phoneNumber !== parsedPhone ||
+      upi !== (user?.upi || 'arjunkumar@upi') ||
+      avatarImg !== (user?.avatarImg || null) ||
+      bannerImg !== (user?.bannerImg || null) ||
+      showHeatmap !== (user?.showHeatmap !== false) ||
+      JSON.stringify(learnSkills) !== JSON.stringify((user?.skillsWanted || []).map(s => s.name || s)) ||
+      avatarColor?.bg !== (user?.avatarColor?.bg || '#EEEDFE') ||
+      avatarColor?.text !== (user?.avatarColor?.text || '#3C3489') ||
+      customSwatchColor !== null;
+
+    if (hasChanges) {
+      setShowSavePrompt(true);
+    } else {
+      navigate('/app/profile');
+    }
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        if (showColorPicker) {
+          setShowColorPicker(false);
+        } else if (!showSavePrompt) {
+          handleBack();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  });
 
   const colors = [
-    { bg: '#EEEDFE', text: '#3C3489' },
-    { bg: '#E6F1FB', text: '#0C447C' },
-    { bg: '#EAF3DE', text: '#27500A' },
-    { bg: '#FAEEDA', text: '#633806' },
-    { bg: '#FBEAF0', text: '#72243E' },
-    { bg: '#1d4ed8', text: '#eff6ff' }
+    // Light themes
+    { bg: '#EEEDFE', text: '#3C3489' }, // Purple
+    { bg: '#E6F1FB', text: '#0C447C' }, // Blue
+    { bg: '#EAF3DE', text: '#27500A' }, // Green
+    { bg: '#FAEEDA', text: '#633806' }, // Orange
+    { bg: '#FBEAF0', text: '#72243E' }, // Pink
+    // Dark themes
+    { bg: '#1d4ed8', text: '#eff6ff' }, // Royal Blue
+    { bg: '#b91c1c', text: '#fef2f2' }, // Crimson
+    { bg: '#047857', text: '#ecfdf5' }, // Emerald
+    { bg: '#6d28d9', text: '#f5f3ff' }, // Violet
+    { bg: '#be185d', text: '#fdf2f8' }, // Rose
+    { bg: '#0f766e', text: '#f0fdfa' }, // Teal
+    { bg: '#b45309', text: '#fffbeb' }  // Amber
   ];
+
+  const handleCustomColorChange = (hex) => {
+    const rgb = parseInt(hex.replace('#', ''), 16);
+    const lum = 0.299 * ((rgb >> 16) & 255) + 0.587 * ((rgb >> 8) & 255) + 0.114 * (rgb & 255);
+    // If background is very light, use dark slate text, else off-white text
+    const text = lum > 140 ? '#1e293b' : '#f8fafc';
+    setCustomSwatchColor({ bg: hex, text });
+  };
 
   const getInitials = () => {
     if (!firstName && !lastName) return 'AK';
@@ -42,21 +122,35 @@ const EditProfile = () => {
   };
 
   const handleSave = async () => {
+    setIsSaving(true);
     try {
+      const newSkillsWanted = learnSkills.map(skillName => {
+        const existing = user?.skillsWanted?.find(s => s.name === skillName);
+        if (existing) return existing;
+        return { name: skillName, level: 'BEGINNER' };
+      });
+
+      const finalAvatarColor = customSwatchColor || avatarColor;
+
       await updateProfile({
-        name: `${firstName} ${lastName}`,
-        college,
+        name: `${firstName} ${lastName}`.trim(),
+        phoneNumber: `${countryCode} ${phoneNumber}`.trim(),
         year,
         branch,
         bio,
         upi,
-        topicsOffered: user?.topicsOffered || [],
-        topicsWanted: learnSkills,
-        avatarImg
+        skillsOffered: user?.skillsOffered || [],
+        skillsWanted: newSkillsWanted,
+        avatarImg,
+        avatarColor: finalAvatarColor,
+        bannerImg,
+        showHeatmap
       });
       triggerToast('Profile updated successfully!');
+      setIsSaving(false);
       navigate('/app/profile');
     } catch (err) {
+      setIsSaving(false);
       triggerToast('Failed to update profile');
     }
   };
@@ -82,6 +176,27 @@ const EditProfile = () => {
     setAvatarImg(null);
   };
 
+  const handleBannerChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      triggerToast('Please select an image file');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setBannerImg(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveBanner = (e) => {
+    e.stopPropagation();
+    setBannerImg(null);
+  };
+
   const addLearn = () => {
     if (learnInp && !learnSkills.includes(learnInp)) {
       setLearnSkills([...learnSkills, learnInp]);
@@ -102,43 +217,84 @@ const EditProfile = () => {
 
   return (
     <div id="editprofile" className="pg on" style={{ padding: '24px', background: 'var(--cs-bg-light)', minHeight: '100vh', width: '100%' }}>
+      {showSavePrompt && (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)' }}>
+          <div style={{ background: '#fff', padding: '24px', borderRadius: '16px', width: '320px', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
+            <div style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px', color: '#111827' }}>Unsaved Changes</div>
+            <div style={{ fontSize: '14px', color: '#4b5563', marginBottom: '24px' }}>Do you want to save your changes?</div>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', alignItems: 'center' }}>
+              <button disabled={isSaving} onClick={() => navigate('/app/profile')} style={{ background: 'none', border: 'none', color: isSaving ? '#fca5a5' : '#ef4444', fontSize: '14px', fontWeight: 600, cursor: isSaving ? 'default' : 'pointer', marginRight: 'auto' }}>Discard</button>
+              <button disabled={isSaving} onClick={() => setShowSavePrompt(false)} style={{ padding: '8px 16px', background: '#f3f4f6', border: 'none', borderRadius: '8px', color: isSaving ? '#9ca3af' : '#374151', fontSize: '14px', fontWeight: 600, cursor: isSaving ? 'default' : 'pointer' }}>Cancel</button>
+              <button disabled={isSaving} onClick={handleSave} style={{ padding: '8px 16px', background: isSaving ? '#93c5fd' : 'var(--cs-primary)', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '14px', fontWeight: 600, cursor: isSaving ? 'default' : 'pointer', minWidth: '70px' }}>{isSaving ? 'Saving...' : 'Yes'}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <button 
-        onClick={() => navigate('/app/profile')} 
+        onClick={handleBack} 
         style={{ fontSize: '13px', color: 'var(--cs-text-inactive)', background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '24px', fontWeight: 500 }}
       >
         ← Back to profile
       </button>
 
-      {/* Avatar section */}
+      {/* Appearance section */}
       <div style={{ background: 'var(--cs-bg-white)', border: '0.5px solid var(--cs-border)', borderRadius: 'var(--cs-radius-lg)', padding: '24px', marginBottom: '24px' }}>
-        <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--cs-text-main)', marginBottom: '20px', display: 'flex', justifyContent: 'space-between' }}>
-          <span>Profile photo &amp; avatar</span>
-          {avatarImg && (
-            <button onClick={handleRemovePhoto} style={{ background: 'none', border: 'none', color: '#E24B4A', fontSize: '13px', cursor: 'pointer', fontWeight: 500 }}>Remove photo</button>
-          )}
+        <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--cs-text-main)', marginBottom: '20px' }}>
+          Appearance
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
-          <div className="ep-av-wrap" onClick={() => fileInputRef.current?.click()} style={{ cursor: 'pointer', position: 'relative', width: '80px', height: '80px', flexShrink: 0 }}>
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              style={{ display: 'none' }} 
-              accept="image/*" 
-              onChange={handleImageChange}
-            />
-            <div style={{ 
-              width: '80px', height: '80px', borderRadius: '50%', background: avatarColor.bg, color: avatarColor.text, fontSize: '28px', border: '3px solid var(--cs-primary)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600,
-              ...(avatarImg ? { backgroundImage: `url(${avatarImg})`, backgroundSize: 'cover', backgroundPosition: 'center', color: 'transparent' } : {})
-            }}>
-              {!avatarImg && getInitials()}
+        
+        {/* Banner Section */}
+        <div style={{ marginBottom: '24px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+            <div style={{ fontSize: '13px', color: 'var(--cs-text-inactive)', fontWeight: 500 }}>Banner Picture</div>
+            {bannerImg && (
+              <button onClick={handleRemoveBanner} style={{ background: 'none', border: 'none', color: '#E24B4A', fontSize: '13px', cursor: 'pointer', fontWeight: 500 }}>Remove banner</button>
+            )}
+          </div>
+          <div onClick={() => bannerInputRef.current?.click()} style={{ width: '100%', height: '120px', borderRadius: 'var(--cs-radius-md)', border: '2px dashed var(--cs-border)', background: bannerImg ? `url(${bannerImg}) center/cover` : 'var(--cs-bg-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', position: 'relative', overflow: 'hidden' }}>
+             <input type="file" ref={bannerInputRef} style={{ display: 'none' }} accept="image/*" onChange={handleBannerChange} />
+             {!bannerImg && <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--cs-primary)' }}>+ Upload Banner</span>}
+             {bannerImg && <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transition: 'opacity 0.2s' }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0}><span style={{ color: '#fff', fontSize: '13px', fontWeight: 600 }}>Change Banner</span></div>}
+          </div>
+        </div>
+
+        <div style={{ height: '1px', background: 'var(--cs-border)', margin: '24px 0' }}></div>
+
+        {/* Avatar and Theme row */}
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '32px', flexWrap: 'wrap' }}>
+          {/* Avatar Component */}
+          <div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+              <div style={{ fontSize: '13px', color: 'var(--cs-text-inactive)', fontWeight: 500 }}>Profile Photo</div>
+              {avatarImg && (
+                <button onClick={handleRemovePhoto} style={{ background: 'none', border: 'none', color: '#E24B4A', fontSize: '12px', cursor: 'pointer', fontWeight: 500 }}>Remove</button>
+              )}
             </div>
-            <div style={{ position: 'absolute', bottom: '0', right: '0', width: '24px', height: '24px', background: 'var(--cs-primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--cs-bg-white)' }}>
-              <svg viewBox="0 0 24 24" width="12" height="12" xmlns="http://www.w3.org/2000/svg"><path d="M12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7zm7-13h-1.5l-1.7-2H8.2L6.5 2.5H5A3 3 0 0 0 2 5.5v13A3 3 0 0 0 5 21.5h14a3 3 0 0 0 3-3v-13A3 3 0 0 0 19 2.5z" fill="#fff"/></svg>
+            <div className="ep-av-wrap" onClick={() => fileInputRef.current?.click()} style={{ cursor: 'pointer', position: 'relative', width: '80px', height: '80px', flexShrink: 0 }}>
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                style={{ display: 'none' }} 
+                accept="image/*" 
+                onChange={handleImageChange}
+              />
+              <div style={{ 
+                width: '80px', height: '80px', borderRadius: '50%', backgroundColor: avatarImg ? 'var(--cs-bg-white)' : avatarColor.bg, color: avatarColor.text, fontSize: '28px', border: '3px solid var(--cs-primary)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 600,
+                ...(avatarImg ? { backgroundImage: `url(${avatarImg})`, backgroundSize: 'cover', backgroundPosition: 'center', color: 'transparent' } : {})
+              }}>
+                {!avatarImg && getInitials()}
+              </div>
+              <div style={{ position: 'absolute', bottom: '0', right: '0', width: '24px', height: '24px', background: 'var(--cs-primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--cs-bg-white)' }}>
+                <svg viewBox="0 0 24 24" width="12" height="12" xmlns="http://www.w3.org/2000/svg"><path d="M12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7zm7-13h-1.5l-1.7-2H8.2L6.5 2.5H5A3 3 0 0 0 2 5.5v13A3 3 0 0 0 5 21.5h14a3 3 0 0 0 3-3v-13A3 3 0 0 0 19 2.5z" fill="#fff"/></svg>
+              </div>
             </div>
           </div>
-          <div>
-            <div style={{ fontSize: '13px', color: 'var(--cs-text-inactive)', marginBottom: '12px', fontWeight: 500 }}>Pick a colour</div>
-            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+
+          {/* Theme Component */}
+          <div style={{ flexGrow: 1 }}>
+            <div style={{ fontSize: '13px', color: 'var(--cs-text-inactive)', marginBottom: '12px', fontWeight: 500 }}>Profile Theme</div>
+            <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center' }}>
               {colors.map((c, i) => (
                 <div 
                   key={i} 
@@ -146,9 +302,57 @@ const EditProfile = () => {
                   style={{ width: '32px', height: '32px', borderRadius: '50%', background: c.bg, border: `2px solid ${avatarColor.bg === c.bg ? 'var(--cs-text-main)' : 'transparent'}`, cursor: 'pointer', transition: 'border-color 0.2s' }}
                 ></div>
               ))}
+              
+              <div style={{ width: '1px', height: '24px', background: 'var(--cs-border)', margin: '0 4px' }}></div>
+              
+              {customSwatchColor && (
+                <>
+                  <div 
+                    onClick={() => setAvatarColor(customSwatchColor)}
+                    style={{ width: '32px', height: '32px', borderRadius: '50%', background: customSwatchColor.bg, border: `2px solid ${avatarColor.bg === customSwatchColor.bg ? 'var(--cs-text-main)' : 'transparent'}`, cursor: 'pointer', transition: 'border-color 0.2s', position: 'relative' }}
+                  >
+                  </div>
+                  <div style={{ width: '1px', height: '24px', background: 'var(--cs-border)', margin: '0 4px' }}></div>
+                </>
+              )}
+              
+              {/* Custom Color Picker */}
+              <div style={{ position: 'relative' }}>
+                <div onClick={() => setShowColorPicker(!showColorPicker)} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                  <div style={{ position: 'relative', width: '32px', height: '32px', borderRadius: '50%', border: '2px dashed var(--cs-border)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: 'conic-gradient(red, yellow, lime, aqua, blue, magenta, red)' }}></div>
+                  </div>
+                  <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-inactive)' }}>Custom</span>
+                </div>
+                
+                {showColorPicker && (
+                  <div style={{ position: 'absolute', top: '100%', left: '0', zIndex: 100, marginTop: '8px', padding: '16px', background: 'var(--cs-bg-white)', borderRadius: '12px', boxShadow: '0 10px 25px rgba(0,0,0,0.1)', border: '1px solid var(--cs-border)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px', alignItems: 'center' }}>
+                      <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--cs-text-main)' }}>Custom Theme</span>
+                      <button onClick={() => setShowColorPicker(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '16px', color: 'var(--cs-text-inactive)', lineHeight: 1 }}>&times;</button>
+                    </div>
+                    <HexColorPicker color={customSwatchColor?.bg || '#ffffff'} onChange={handleCustomColorChange} />
+                  </div>
+                )}
+              </div>
+
             </div>
           </div>
         </div>
+
+        <div style={{ height: '1px', background: 'var(--cs-border)', margin: '24px 0' }}></div>
+
+        {/* Heatmap Toggle */}
+        <label style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}>
+          <div>
+            <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--cs-text-main)' }}>Show Activity Heatmap</div>
+            <div style={{ fontSize: '12px', color: 'var(--cs-text-inactive)' }}>Display your 6-month activity chart on your banner</div>
+          </div>
+          <div style={{ width: '40px', height: '24px', background: showHeatmap ? 'var(--cs-primary)' : 'var(--cs-border)', borderRadius: '12px', position: 'relative', transition: 'background 0.3s' }}>
+            <input type="checkbox" checked={showHeatmap} onChange={(e) => setShowHeatmap(e.target.checked)} style={{ display: 'none' }} />
+            <div style={{ width: '18px', height: '18px', background: '#fff', borderRadius: '50%', position: 'absolute', top: '3px', left: showHeatmap ? '19px' : '3px', transition: 'left 0.3s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }}></div>
+          </div>
+        </label>
       </div>
 
       {/* Basic info */}
@@ -158,7 +362,27 @@ const EditProfile = () => {
           <div><label style={labelStyle}>First name</label><input style={inputStyle} type="text" value={firstName} onChange={e => setFirstName(e.target.value)} /></div>
           <div><label style={labelStyle}>Last name</label><input style={inputStyle} type="text" value={lastName} onChange={e => setLastName(e.target.value)} /></div>
         </div>
-        <div style={{ marginBottom: '16px' }}><label style={labelStyle}>College / University</label><input style={inputStyle} type="text" value={college} onChange={e => setCollege(e.target.value)} /></div>
+        <div style={{ marginBottom: '16px' }}>
+          <label style={labelStyle}>Phone number</label>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <select 
+              value={countryCode} 
+              onChange={e => setCountryCode(e.target.value)} 
+              style={{ ...inputStyle, width: '120px', flexShrink: 0, cursor: 'pointer' }}
+            >
+              <option value="+91">IN +91</option>
+              <option value="+1">US +1</option>
+              <option value="+44">UK +44</option>
+            </select>
+            <input 
+              type="tel" 
+              placeholder="9876543210" 
+              value={phoneNumber} 
+              onChange={e => setPhoneNumber(e.target.value.replace(/\D/g, ''))} 
+              style={{ ...inputStyle, flexGrow: 1 }}
+            />
+          </div>
+        </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
           <div>
             <label style={labelStyle}>Year</label>
@@ -232,8 +456,8 @@ const EditProfile = () => {
 
       {/* Save / Cancel */}
       <div style={{ display: 'flex', gap: '16px' }}>
-        <button onClick={handleSave} style={{ flex: 1, padding: '14px', borderRadius: '100px', border: 'none', background: 'var(--cs-primary)', color: '#fff', fontSize: '15px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-          <IconCheck size={18} /> Save changes
+        <button disabled={isSaving} onClick={handleSave} style={{ flex: 1, padding: '14px', borderRadius: '100px', border: 'none', background: isSaving ? '#93c5fd' : 'var(--cs-primary)', color: '#fff', fontSize: '15px', fontWeight: 700, cursor: isSaving ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+          <IconCheck size={20} /> {isSaving ? 'Saving...' : 'Save Changes'}
         </button>
         <button onClick={() => navigate('/app/profile')} style={{ padding: '14px 24px', borderRadius: '100px', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-white)', color: 'var(--cs-text-main)', fontSize: '15px', fontWeight: 700, cursor: 'pointer' }}>
           Cancel

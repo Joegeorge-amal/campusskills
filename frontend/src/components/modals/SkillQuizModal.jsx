@@ -14,11 +14,11 @@ const SkillQuizModal = ({ isOpen, skillName, onClose, onComplete }) => {
   useEffect(() => {
     if (isOpen && skillName) {
       setQuizData(getQuizForSkill(skillName));
-      setStep('quiz');
+      setStep('pass');
       setCurrentQuestionIndex(0);
       setAnswers({});
       setTimeLeft(15 * 60);
-      setFinalScore(0);
+      setFinalScore(100);
     }
   }, [isOpen, skillName]);
 

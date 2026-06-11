@@ -134,6 +134,7 @@ public class ListingHandler {
         List<String> paymentTypes = ctx.queryParam("payment_types");
         List<String> modes = ctx.queryParam("modes");
         String sort = ctx.request().getParam("sort");
+        String ownerId = ctx.request().getParam("ownerId");
         
         int page = 1;
         int limit = 20;
@@ -148,6 +149,7 @@ public class ListingHandler {
         if (paymentTypes != null && !paymentTypes.isEmpty()) filters.put("payment_types", new io.vertx.core.json.JsonArray(paymentTypes));
         if (modes != null && !modes.isEmpty()) filters.put("modes", new io.vertx.core.json.JsonArray(modes));
         if (sort != null && !sort.trim().isEmpty()) filters.put("sort", sort.trim());
+        if (ownerId != null && !ownerId.trim().isEmpty()) filters.put("ownerId", ownerId.trim());
 
         listingService.searchListings(filters, page, limit)
             .onSuccess(result -> {
@@ -174,6 +176,72 @@ public class ListingHandler {
                 } else {
                     err.printStackTrace();
                     ApiResponse.internalError(ctx, "Failed to retrieve listing");
+                }
+            });
+    }
+
+    public void updateListing(RoutingContext ctx) {
+        String authenticatedUserId = ctx.get("authenticatedUserId");
+        if (authenticatedUserId == null) {
+            ApiResponse.sendError(ctx, 401, "Unauthorized");
+            return;
+        }
+
+        String id = ctx.pathParam("id");
+        if (id == null || id.trim().isEmpty()) {
+            ApiResponse.badRequest(ctx, "Listing ID is required");
+            return;
+        }
+
+        JsonObject body = ctx.body().asJsonObject();
+        if (body == null) {
+            ApiResponse.badRequest(ctx, "Missing request body");
+            return;
+        }
+
+        Listing listing;
+        try {
+            listing = body.mapTo(Listing.class);
+        } catch (IllegalArgumentException e) {
+            ApiResponse.badRequest(ctx, "Invalid payload or enum value");
+            return;
+        }
+
+        listingService.updateListing(id, authenticatedUserId, listing)
+            .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("message", "Listing updated")))
+            .onFailure(err -> {
+                if ("NOT_FOUND".equals(err.getMessage())) {
+                    ApiResponse.notFound(ctx, "Listing not found");
+                } else if ("UNAUTHORIZED".equals(err.getMessage())) {
+                    ApiResponse.sendError(ctx, 403, "Not authorized to update this listing");
+                } else {
+                    ApiResponse.badRequest(ctx, err.getMessage());
+                }
+            });
+    }
+
+    public void deleteListing(RoutingContext ctx) {
+        String authenticatedUserId = ctx.get("authenticatedUserId");
+        if (authenticatedUserId == null) {
+            ApiResponse.sendError(ctx, 401, "Unauthorized");
+            return;
+        }
+
+        String id = ctx.pathParam("id");
+        if (id == null || id.trim().isEmpty()) {
+            ApiResponse.badRequest(ctx, "Listing ID is required");
+            return;
+        }
+
+        listingService.deleteListing(id, authenticatedUserId)
+            .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("message", "Listing deleted")))
+            .onFailure(err -> {
+                if ("NOT_FOUND".equals(err.getMessage())) {
+                    ApiResponse.notFound(ctx, "Listing not found");
+                } else if ("UNAUTHORIZED".equals(err.getMessage())) {
+                    ApiResponse.sendError(ctx, 403, "Not authorized to delete this listing");
+                } else {
+                    ApiResponse.internalError(ctx, "Failed to delete listing");
                 }
             });
     }

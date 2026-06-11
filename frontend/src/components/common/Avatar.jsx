@@ -13,7 +13,7 @@ const Avatar = ({
   const avatarStyle = {
     width: size,
     height: size,
-    backgroundColor: backgroundImage ? 'transparent' : bg,
+    backgroundColor: backgroundImage ? '#ffffff' : bg,
     color: color,
     fontSize: fontSize,
     backgroundImage: backgroundImage ? `url(${backgroundImage})` : 'none',

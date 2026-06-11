@@ -25,6 +25,8 @@ public class ListingRouter {
         
         // GET /listings/:id is public
         router.get("/:id").handler(handler::getListingById);
+        router.put("/:id").handler(JwtAuthMiddleware.create(jwtAuth)).handler(com.campusskills.web.middleware.EmailVerifiedMiddleware.create()).handler(handler::updateListing);
+        router.delete("/:id").handler(JwtAuthMiddleware.create(jwtAuth)).handler(com.campusskills.web.middleware.EmailVerifiedMiddleware.create()).handler(handler::deleteListing);
 
         return router;
     }

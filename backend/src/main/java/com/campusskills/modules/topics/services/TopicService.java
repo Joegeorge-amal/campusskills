@@ -32,26 +32,37 @@ public class TopicService {
 
     public Future<Void> seedSystemTopics() {
         return topicRepository.findAll().compose(existingTopics -> {
-            if (!existingTopics.isEmpty()) {
-                System.out.println("Topics already seeded. Found " + existingTopics.size() + " topics.");
-                return Future.succeededFuture();
-            }
-
-            System.out.println("Seeding system topics...");
-            List<Future> futures = new ArrayList<>();
             List<TopicSeedData> seedList = getSeedList();
+            List<Future> futures = new ArrayList<>();
 
             for (TopicSeedData data : seedList) {
-                Topic topic = new Topic();
-                topic.setName(data.name);
-                topic.setNormalizedName(data.name.toLowerCase().replaceAll("[^a-z0-9]", ""));
-                topic.setCategory(data.category);
-                topic.setIsSystemTopic(true);
-                topic.setCertifiable(data.certifiable);
-                topic.setCreatedAt(System.currentTimeMillis());
-                topic.setUpdatedAt(System.currentTimeMillis());
+                boolean exists = existingTopics.stream()
+                        .anyMatch(t -> t.getName().equalsIgnoreCase(data.name));
                 
-                futures.add(topicRepository.create(topic));
+                if (!exists) {
+                    System.out.println("Adding missing topic: " + data.name);
+                    Topic topic = new Topic();
+                    topic.setName(data.name);
+                    
+                    String normalized = data.name.toLowerCase()
+                        .replace("+", "plus")
+                        .replace("#", "sharp")
+                        .replaceAll("[^a-z0-9]", "");
+                    topic.setNormalizedName(normalized);
+                    
+                    topic.setCategory(data.category);
+                    topic.setIsSystemTopic(true);
+                    topic.setCertifiable(data.certifiable);
+                    topic.setCreatedAt(System.currentTimeMillis());
+                    topic.setUpdatedAt(System.currentTimeMillis());
+                    
+                    futures.add(topicRepository.create(topic));
+                }
+            }
+
+            if (futures.isEmpty()) {
+                System.out.println("Topics already up to date. Found " + existingTopics.size() + " topics.");
+                return Future.succeededFuture();
             }
 
             return CompositeFuture.all(futures).mapEmpty();
@@ -65,6 +76,7 @@ public class TopicService {
             new TopicSeedData("Java", "Programming & Tech", true),
             new TopicSeedData("C++", "Programming & Tech", true),
             new TopicSeedData("C", "Programming & Tech", true),
+            new TopicSeedData("C#", "Programming & Tech", true),
             new TopicSeedData("JavaScript", "Programming & Tech", true),
             new TopicSeedData("TypeScript", "Programming & Tech", true),
             new TopicSeedData("React", "Programming & Tech", true),

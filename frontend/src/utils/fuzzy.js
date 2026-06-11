@@ -38,7 +38,7 @@ export function getBestMatch(query, list, maxDistance = 2) {
       const dist = itemLower.length - queryLower.length;
       if (dist < minDistance) {
         minDistance = dist;
-        bestMatch = { item, distance: 0, isPrefix: true };
+        bestMatch = { item, distance: dist, isPrefix: true };
       }
       continue;
     }
@@ -50,19 +50,12 @@ export function getBestMatch(query, list, maxDistance = 2) {
     }
     
     // Fuzzy match on full query
-    const distFull = levenshteinDistance(queryLower, itemLower);
-    // Fuzzy match if query is longer but starts with a typo of the item (e.g. "pythong prog" -> "python")
-    const queryPrefixDist = levenshteinDistance(queryLower.substring(0, itemLower.length), itemLower);
+    const dist = levenshteinDistance(queryLower, itemLower);
     
-    // Fuzzy match on any single word in query
-    let minWordDist = Infinity;
-    const queryWords = queryLower.split(/\s+/).filter(w => w.length > 2);
-    for (const qw of queryWords) {
-      const d = levenshteinDistance(qw, itemLower);
-      if (d < minWordDist) minWordDist = d;
+    // Penalize if the length difference is huge (e.g. typing a whole sentence shouldn't match a short word)
+    if (Math.abs(queryLower.length - itemLower.length) > 3 && dist > 1) {
+      continue;
     }
-    
-    const dist = Math.min(distFull, queryPrefixDist, minWordDist);
     
     if (dist <= maxDistance && dist < minDistance) {
       minDistance = dist;

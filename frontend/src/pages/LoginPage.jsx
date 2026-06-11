@@ -32,7 +32,7 @@ const LoginPage = () => {
   const handleOtpSuccess = () => {
     setIsOtpModalOpen(false);
     const savedRole = localStorage.getItem('cs_role');
-    if (savedRole === 'admin') {
+    if (savedRole === 'admin' || savedRole === 'super_admin') {
       navigate('/admin/dashboard');
     } else {
       navigate('/app/dashboard');
@@ -59,7 +59,7 @@ const LoginPage = () => {
       }
       
       const savedRole = localStorage.getItem('cs_role');
-      if (savedRole === 'admin') {
+      if (savedRole === 'admin' || savedRole === 'super_admin') {
         navigate('/admin/dashboard');
       } else {
         navigate('/app/dashboard');

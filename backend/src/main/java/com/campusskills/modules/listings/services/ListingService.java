@@ -22,10 +22,16 @@ public class ListingService {
             if (listing.getOfferedSkills() == null || listing.getOfferedSkills().isEmpty()) return Future.failedFuture("Offered skills are required for TEACH listings");
         } else if (listing.getListingType() == com.campusskills.modules.listings.models.ListingType.LEARN) {
             if (listing.getRequestedSkills() == null || listing.getRequestedSkills().isEmpty()) return Future.failedFuture("Requested skills are required for LEARN listings");
-            // Budget is optional
         } else if (listing.getListingType() == com.campusskills.modules.listings.models.ListingType.SWAP) {
             if (listing.getOfferedSkills() == null || listing.getOfferedSkills().isEmpty()) return Future.failedFuture("Offered skills are required for SWAP listings");
             if (listing.getRequestedSkills() == null || listing.getRequestedSkills().isEmpty()) return Future.failedFuture("Requested skills are required for SWAP listings");
+        } else if (listing.getListingType() == com.campusskills.modules.listings.models.ListingType.TEACH_SWAP) {
+            if (listing.getPrice() == null) return Future.failedFuture("Price is required for TEACH_SWAP listings");
+            if (listing.getOfferedSkills() == null || listing.getOfferedSkills().isEmpty()) return Future.failedFuture("Offered skills are required for TEACH_SWAP listings");
+            if (listing.getRequestedSkills() == null || listing.getRequestedSkills().isEmpty()) return Future.failedFuture("Requested skills are required for TEACH_SWAP listings");
+        } else if (listing.getListingType() == com.campusskills.modules.listings.models.ListingType.LEARN_SWAP) {
+            if (listing.getOfferedSkills() == null || listing.getOfferedSkills().isEmpty()) return Future.failedFuture("Offered skills are required for LEARN_SWAP listings");
+            if (listing.getRequestedSkills() == null || listing.getRequestedSkills().isEmpty()) return Future.failedFuture("Requested skills are required for LEARN_SWAP listings");
         } else {
             return Future.failedFuture("Invalid or missing ListingType");
         }
@@ -45,6 +51,53 @@ public class ListingService {
             }
             System.out.println("[LISTING] Retrieved listing | listingId=" + id);
             return Future.succeededFuture(listing);
+        });
+    }
+
+    public Future<Void> updateListing(String id, String ownerId, Listing updates) {
+        return getListingById(id).compose(existing -> {
+            if (!existing.getOwnerId().equals(ownerId)) {
+                return Future.failedFuture("UNAUTHORIZED");
+            }
+            updates.setId(id);
+            updates.setOwnerId(ownerId);
+            updates.setActive(existing.getActive());
+            updates.setCreatedAt(existing.getCreatedAt());
+            updates.prepareForSave();
+
+            if (updates.getListingType() == com.campusskills.modules.listings.models.ListingType.TEACH) {
+                if (updates.getPrice() == null) return Future.failedFuture("Price is required for TEACH listings");
+                if (updates.getOfferedSkills() == null || updates.getOfferedSkills().isEmpty()) return Future.failedFuture("Offered skills are required for TEACH listings");
+            } else if (updates.getListingType() == com.campusskills.modules.listings.models.ListingType.LEARN) {
+                if (updates.getRequestedSkills() == null || updates.getRequestedSkills().isEmpty()) return Future.failedFuture("Requested skills are required for LEARN listings");
+            } else if (updates.getListingType() == com.campusskills.modules.listings.models.ListingType.SWAP) {
+                if (updates.getOfferedSkills() == null || updates.getOfferedSkills().isEmpty()) return Future.failedFuture("Offered skills are required for SWAP listings");
+                if (updates.getRequestedSkills() == null || updates.getRequestedSkills().isEmpty()) return Future.failedFuture("Requested skills are required for SWAP listings");
+            } else if (updates.getListingType() == com.campusskills.modules.listings.models.ListingType.TEACH_SWAP) {
+                if (updates.getPrice() == null) return Future.failedFuture("Price is required for TEACH_SWAP listings");
+                if (updates.getOfferedSkills() == null || updates.getOfferedSkills().isEmpty()) return Future.failedFuture("Offered skills are required for TEACH_SWAP listings");
+                if (updates.getRequestedSkills() == null || updates.getRequestedSkills().isEmpty()) return Future.failedFuture("Requested skills are required for TEACH_SWAP listings");
+            } else if (updates.getListingType() == com.campusskills.modules.listings.models.ListingType.LEARN_SWAP) {
+                if (updates.getOfferedSkills() == null || updates.getOfferedSkills().isEmpty()) return Future.failedFuture("Offered skills are required for LEARN_SWAP listings");
+                if (updates.getRequestedSkills() == null || updates.getRequestedSkills().isEmpty()) return Future.failedFuture("Requested skills are required for LEARN_SWAP listings");
+            } else {
+                return Future.failedFuture("Invalid or missing ListingType");
+            }
+
+            return listingRepository.update(updates).onSuccess(v -> {
+                System.out.println("[LISTING] Updated listing | listingId=" + id + " ownerId=" + ownerId);
+            });
+        });
+    }
+
+    public Future<Void> deleteListing(String id, String ownerId) {
+        return getListingById(id).compose(existing -> {
+            if (!existing.getOwnerId().equals(ownerId)) {
+                return Future.failedFuture("UNAUTHORIZED");
+            }
+            return listingRepository.deactivate(id).onSuccess(v -> {
+                System.out.println("[LISTING] Deleted/Deactivated listing | listingId=" + id + " ownerId=" + ownerId);
+            });
         });
     }
 

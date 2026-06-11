@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useAppData } from '../context/AppDataContext';
 import SessionRequestPopup from '../components/common/SessionRequestPopup';
-import CreateSessionModal from '../components/modals/CreateSessionModal';
+import CreateListingModal from '../components/modals/CreateListingModal';
 import Avatar from '../components/common/Avatar';
 import { 
   IconSparkles, 
@@ -95,9 +95,9 @@ const Dashboard = () => {
             </div>
             <button 
               onClick={() => setIsCreateSessionOpen(true)}
-              style={{ padding: '8px 20px', background: '#ffffff', color: '#1e40af', border: 'none', borderRadius: '100px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+              style={{ padding: '8px 20px', background: '#ffffff', color: '#1e40af', border: 'none', borderRadius: '12px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
             >
-              + Create Session
+              + Create Listing
             </button>
           </div>
         </div>
@@ -218,7 +218,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <CreateSessionModal 
+      <CreateListingModal 
         isOpen={isCreateSessionOpen} 
         onClose={() => setIsCreateSessionOpen(false)} 
       />

@@ -17,9 +17,7 @@ public class TopicRouter {
         TopicService service = new TopicService(repository);
         TopicHandler handler = new TopicHandler(service);
 
-        // All topic reads are protected
-        router.route().handler(JwtAuthMiddleware.create(jwtAuth));
-
+        // Topic reads are public to allow onboarding to fetch them
         router.get("/").handler(handler::getAllTopics);
         router.get("/:id").handler(handler::getTopicById);
 

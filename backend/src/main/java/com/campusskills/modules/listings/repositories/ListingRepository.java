@@ -25,10 +25,34 @@ public class ListingRepository {
 
     public Future<Listing> findById(String id) {
         JsonObject query = new JsonObject().put("_id", id);
-        return client.findOne(COLLECTION, query, null).map(doc -> {
-            if (doc == null) return null;
-            return doc.mapTo(Listing.class);
-        });
+        io.vertx.core.json.JsonArray pipeline = new io.vertx.core.json.JsonArray()
+            .add(new JsonObject().put("$match", query))
+            .add(new JsonObject().put("$lookup", new JsonObject()
+                .put("from", "user_profiles")
+                .put("let", new JsonObject().put("oId", "$ownerId").put("tId", "$teacherId"))
+                .put("pipeline", new io.vertx.core.json.JsonArray().add(new JsonObject().put("$match", new JsonObject()
+                    .put("$expr", new JsonObject().put("$or", new io.vertx.core.json.JsonArray()
+                        .add(new JsonObject().put("$eq", new io.vertx.core.json.JsonArray().add("$userId").add("$$oId")))
+                        .add(new JsonObject().put("$eq", new io.vertx.core.json.JsonArray().add("$userId").add("$$tId")))
+                    ))
+                )))
+                .put("as", "owner_arr")
+            ))
+            .add(new JsonObject().put("$unwind", new JsonObject()
+                .put("path", "$owner_arr")
+                .put("preserveNullAndEmptyArrays", true)
+            ))
+            .add(new JsonObject().put("$addFields", new JsonObject()
+                .put("owner", "$owner_arr")
+            ));
+            
+        io.vertx.ext.mongo.AggregateOptions options = new io.vertx.ext.mongo.AggregateOptions();
+        return client.aggregateWithOptions(COLLECTION, pipeline, options)
+            .collect(java.util.stream.Collectors.toList())
+            .map(docs -> {
+                if (docs == null || docs.isEmpty()) return null;
+                return docs.get(0).mapTo(Listing.class);
+            });
     }
 
     public Future<Void> update(Listing listing) {
@@ -56,6 +80,11 @@ public class ListingRepository {
 
         if (filters == null) return query;
 
+        String ownerId = filters.getString("ownerId");
+        if (ownerId != null && !ownerId.isEmpty()) {
+            query.put("ownerId", ownerId);
+        }
+
         // Text Search (q)
         String q = filters.getString("q");
         if (q != null && !q.isEmpty()) {
@@ -67,7 +96,7 @@ public class ListingRepository {
         io.vertx.core.json.JsonArray topics = filters.getJsonArray("topics");
 
         if ("FIND_TUTORS".equals(searchMode)) {
-            query.put("listingType", "TEACH");
+            query.put("listingType", new JsonObject().put("$in", new io.vertx.core.json.JsonArray().add("TEACH").add("TEACH_SWAP")));
             if (topics != null && !topics.isEmpty()) {
                 query.put("$or", new io.vertx.core.json.JsonArray()
                     .add(new JsonObject().put("category", new JsonObject().put("$in", topics)))
@@ -76,7 +105,7 @@ public class ListingRepository {
                 );
             }
         } else if ("FIND_STUDENTS".equals(searchMode)) {
-            query.put("listingType", "LEARN");
+            query.put("listingType", new JsonObject().put("$in", new io.vertx.core.json.JsonArray().add("LEARN").add("LEARN_SWAP")));
             if (topics != null && !topics.isEmpty()) {
                 query.put("$or", new io.vertx.core.json.JsonArray()
                     .add(new JsonObject().put("category", new JsonObject().put("$in", topics)))
@@ -85,7 +114,7 @@ public class ListingRepository {
                 );
             }
         } else if ("FIND_SWAPS".equals(searchMode)) {
-            query.put("listingType", "SWAP");
+            query.put("listingType", new JsonObject().put("$in", new io.vertx.core.json.JsonArray().add("SWAP").add("TEACH_SWAP").add("LEARN_SWAP")));
             if (topics != null && !topics.isEmpty()) {
                 query.put("$or", new io.vertx.core.json.JsonArray()
                     .add(new JsonObject().put("category", new JsonObject().put("$in", topics)))
@@ -142,15 +171,38 @@ public class ListingRepository {
 
         int skip = (page - 1) * limit;
 
-        io.vertx.ext.mongo.FindOptions options = new io.vertx.ext.mongo.FindOptions()
-            .setSort(sortQuery)
-            .setSkip(skip)
-            .setLimit(limit);
+        io.vertx.core.json.JsonArray pipeline = new io.vertx.core.json.JsonArray()
+            .add(new JsonObject().put("$match", query))
+            .add(new JsonObject().put("$lookup", new JsonObject()
+                .put("from", "user_profiles")
+                .put("let", new JsonObject().put("oId", "$ownerId").put("tId", "$teacherId"))
+                .put("pipeline", new io.vertx.core.json.JsonArray().add(new JsonObject().put("$match", new JsonObject()
+                    .put("$expr", new JsonObject().put("$or", new io.vertx.core.json.JsonArray()
+                        .add(new JsonObject().put("$eq", new io.vertx.core.json.JsonArray().add("$userId").add("$$oId")))
+                        .add(new JsonObject().put("$eq", new io.vertx.core.json.JsonArray().add("$userId").add("$$tId")))
+                    ))
+                )))
+                .put("as", "owner_arr")
+            ))
+            .add(new JsonObject().put("$unwind", new JsonObject()
+                .put("path", "$owner_arr")
+                .put("preserveNullAndEmptyArrays", true)
+            ))
+            .add(new JsonObject().put("$addFields", new JsonObject()
+                .put("owner", "$owner_arr")
+            ))
+            .add(new JsonObject().put("$sort", sortQuery))
+            .add(new JsonObject().put("$skip", skip))
+            .add(new JsonObject().put("$limit", limit));
+
+        io.vertx.ext.mongo.AggregateOptions options = new io.vertx.ext.mongo.AggregateOptions();
             
-        return client.findWithOptions(COLLECTION, query, options).map(docs -> {
-            return docs.stream()
-                .map(doc -> doc.mapTo(Listing.class))
-                .collect(java.util.stream.Collectors.toList());
-        });
+        return client.aggregateWithOptions(COLLECTION, pipeline, options)
+            .collect(java.util.stream.Collectors.toList())
+            .map(docs -> {
+                return docs.stream()
+                    .map(doc -> doc.mapTo(Listing.class))
+                    .collect(java.util.stream.Collectors.toList());
+            });
     }
 }

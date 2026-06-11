@@ -3,6 +3,8 @@ package com.campusskills.modules.listings.models;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.campusskills.shared.models.SkillProfile;
+import com.campusskills.modules.users.models.UserProfile;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -19,6 +21,11 @@ public class Listing {
     private String description;
     
     private String category;
+    
+    private List<String> topics; // NEW
+    
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private UserProfile owner; // Populated field
     
     private ListingType listingType; // NEW
     @Deprecated
@@ -105,6 +112,12 @@ public class Listing {
 
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
+
+    public List<String> getTopics() { return topics; }
+    public void setTopics(List<String> topics) { this.topics = topics; }
+
+    public UserProfile getOwner() { return owner; }
+    public void setOwner(UserProfile owner) { this.owner = owner; }
 
     public ListingType getListingType() { syncListingType(); return listingType; }
     public void setListingType(ListingType listingType) { this.listingType = listingType; syncListingType(); }

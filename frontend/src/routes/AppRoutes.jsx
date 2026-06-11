@@ -42,13 +42,13 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
     return <Navigate to="/login" replace />;
   }
   
-  if (user.emailVerified !== true && role !== 'admin') {
+  if (user.emailVerified !== true && role !== 'admin' && role !== 'super_admin') {
     return <Navigate to="/login" replace />;
   }
   
   if (allowedRoles && !allowedRoles.includes(role)) {
     // If they have the wrong role, send them to their respective dashboard
-    if (role === 'admin') {
+    if (role === 'admin' || role === 'super_admin') {
       return <Navigate to="/admin/dashboard" replace />;
     } else {
       return <Navigate to="/app/dashboard" replace />;
@@ -63,8 +63,8 @@ const AppRoutes = () => {
 
   return (
     <Routes>
-      <Route path="/" element={(user && user.emailVerified === true) ? <Navigate to={role === 'admin' ? "/admin/dashboard" : "/app/dashboard"} replace /> : <LandingPage />} />
-      <Route path="/login" element={(user && user.emailVerified === true) ? <Navigate to={role === 'admin' ? "/admin/dashboard" : "/app/dashboard"} replace /> : <LoginPage />} />
+      <Route path="/" element={(user && user.emailVerified === true) ? <Navigate to={(role === 'admin' || role === 'super_admin') ? "/admin/dashboard" : "/app/dashboard"} replace /> : <LandingPage />} />
+      <Route path="/login" element={(user && user.emailVerified === true) ? <Navigate to={(role === 'admin' || role === 'super_admin') ? "/admin/dashboard" : "/app/dashboard"} replace /> : <LoginPage />} />
       <Route path="/setup" element={<SetupPage />} />
       
       {/* Student Layout */}
@@ -93,7 +93,7 @@ const AppRoutes = () => {
 
       {/* Admin Layout */}
       <Route path="/admin" element={
-        <ProtectedRoute allowedRoles={['admin']}>
+        <ProtectedRoute allowedRoles={['admin', 'super_admin']}>
           <AdminLayout />
         </ProtectedRoute>
       }>

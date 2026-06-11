@@ -23,21 +23,102 @@ api.interceptors.request.use(
   }
 );
 
-// Response Interceptor: Handle central server/authorization errors
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
+// Response Interceptor: Handle central server/authorization errors and silent refresh
 api.interceptors.response.use(
   (response) => {
     return response.data; // Simplify response data extraction across services
   },
   (error) => {
+    const originalRequest = error.config;
+
     if (error.response) {
       const status = error.response.status;
 
-      if (status === 401) {
-        console.error('[API] JWT Token expired or unauthorized.');
-        localStorage.clear();
+      if (status === 401 && !originalRequest._retry) {
+        if (originalRequest.url === '/auth/login' || originalRequest.url === '/auth/refresh' || originalRequest.url === '/api/v1/auth/login' || originalRequest.url === '/api/v1/auth/refresh') {
+          return Promise.reject(error);
+        }
+
+        if (isRefreshing) {
+          return new Promise(function(resolve, reject) {
+            failedQueue.push({ resolve, reject });
+          }).then(token => {
+            originalRequest.headers['Authorization'] = 'Bearer ' + token;
+            return api(originalRequest);
+          }).catch(err => {
+            return Promise.reject(err);
+          });
+        }
+
+        originalRequest._retry = true;
+        isRefreshing = true;
+
+        const refreshToken = localStorage.getItem('cs_refresh_token');
         
-        // Only redirect if we are not already on an auth page, to prevent infinite reloads 
-        // when submitting invalid credentials on the login page itself
+        if (!refreshToken) {
+          isRefreshing = false;
+          console.error('[API] JWT Token expired and no refresh token available.');
+          localStorage.clear();
+          const path = window.location.pathname;
+          if (path !== '/login' && path !== '/setup' && path !== '/') {
+            window.location.href = '/login';
+          }
+          return Promise.reject(error);
+        }
+
+        return new Promise(function (resolve, reject) {
+          axios.post('/api/v1/auth/refresh', { refreshToken }, {
+            headers: { 'Content-Type': 'application/json' }
+          })
+            .then(({ data }) => {
+              const resData = data.data || data;
+              const newToken = resData.token;
+              const newRefresh = resData.refreshToken;
+              
+              if (newToken) {
+                localStorage.setItem('cs_token', newToken);
+                if (newRefresh) {
+                  localStorage.setItem('cs_refresh_token', newRefresh);
+                }
+                
+                originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+                processQueue(null, newToken);
+                resolve(api(originalRequest));
+              } else {
+                throw new Error("Invalid token format from refresh");
+              }
+            })
+            .catch((err) => {
+              processQueue(err, null);
+              console.error('[API] Refresh token expired or invalid.');
+              localStorage.clear();
+              const path = window.location.pathname;
+              if (path !== '/login' && path !== '/setup' && path !== '/') {
+                window.location.href = '/login';
+              }
+              reject(err);
+            })
+            .finally(() => {
+              isRefreshing = false;
+            });
+        });
+      } else if (status === 401) {
+        console.error('[API] Unauthorized despite retry.');
+        localStorage.clear();
         const path = window.location.pathname;
         if (path !== '/login' && path !== '/setup' && path !== '/') {
           window.location.href = '/login';

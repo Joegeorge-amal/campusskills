@@ -1,0 +1,509 @@
+import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
+import { useAppData } from '../../context/AppDataContext';
+import { useAuth } from '../../context/AuthContext';
+import { IconX, IconPlus, IconTrash } from '@tabler/icons-react';
+import { listingService } from '../../services/listingService';
+import MarketplaceCard from '../common/MarketplaceCard/MarketplaceCard';
+
+const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
+  const { triggerToast } = useAppData();
+  const { user } = useAuth();
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [listingType, setListingType] = useState('TEACH');
+  const [price, setPrice] = useState('');
+  const [availability, setAvailability] = useState('ONLINE');
+  const [topicsStr, setTopicsStr] = useState('');
+  
+  // Available Slots
+  const [slots, setSlots] = useState([]);
+  const [newSlotDay, setNewSlotDay] = useState('Monday');
+  const [newSlotTime, setNewSlotTime] = useState('17:00');
+  const [newSlotDuration, setNewSlotDuration] = useState('60');
+
+  // Skills (now labeled Topics)
+  const [offeredSkills, setOfferedSkills] = useState([]);
+  const [requestedSkills, setRequestedSkills] = useState([]);
+  const [newSkillName, setNewSkillName] = useState('');
+  const [newSkillLevel, setNewSkillLevel] = useState('Beginner');
+  const [isPreviewing, setIsPreviewing] = useState(false);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      if (editData) {
+        setTitle(editData.title || '');
+        setDescription(editData.description || '');
+        setListingType(editData.listingType || 'TEACH');
+        setPrice(editData.price?.toString() || '');
+        setAvailability(editData.availability || 'ONLINE');
+        setSlots(editData.availableSlots || []);
+        setOfferedSkills(editData.offeredSkills || []);
+        setRequestedSkills(editData.requestedSkills || []);
+        setTopicsStr(editData.topics?.join(', ') || '');
+      } else {
+        setTitle('');
+        setDescription('');
+        setListingType('TEACH');
+        setPrice('');
+        setAvailability('ONLINE');
+        setSlots([]);
+        setOfferedSkills([]);
+        setRequestedSkills([]);
+        setTopicsStr('');
+      }
+      setIsPreviewing(false);
+    }
+  }, [isOpen, editData]);
+
+  if (!isOpen) return null;
+
+  const handleAddSlot = () => {
+    setSlots([...slots, { dayOfWeek: newSlotDay, startTime: newSlotTime, durationMinutes: parseInt(newSlotDuration) }]);
+  };
+
+  const handleRemoveSlot = (index) => {
+    setSlots(slots.filter((_, i) => i !== index));
+  };
+
+  const handleAddOfferedSkill = () => {
+    if (!newSkillName.trim()) return;
+    setOfferedSkills([...offeredSkills, { name: newSkillName.trim(), level: newSkillLevel }]);
+    setNewSkillName('');
+  };
+
+  const handleAddRequestedSkill = () => {
+    if (!newSkillName.trim()) return;
+    setRequestedSkills([...requestedSkills, { name: newSkillName.trim(), level: newSkillLevel }]);
+    setNewSkillName('');
+  };
+
+  const getAutoCategory = () => {
+    const allSkills = [...offeredSkills, ...requestedSkills].map(s => s.name.toLowerCase());
+    const coding = ['react', 'java', 'python', 'c++', 'c#', 'html', 'css', 'js', 'javascript', 'sql', 'node', 'code', 'programming', 'dsa'];
+    const design = ['figma', 'design', 'ui', 'ux', 'photoshop', 'illustrator', 'canva', 'art'];
+    const language = ['english', 'spanish', 'french', 'japanese', 'language', 'german', 'hindi', 'korean'];
+    const math = ['math', 'algebra', 'calculus', 'geometry', 'statistics', 'physics'];
+    const music = ['guitar', 'piano', 'music', 'singing', 'vocal', 'drums', 'flute'];
+
+    for (let s of allSkills) {
+      if (coding.some(k => s.includes(k))) return 'Coding';
+      if (design.some(k => s.includes(k))) return 'Design';
+      if (language.some(k => s.includes(k))) return 'Language';
+      if (math.some(k => s.includes(k))) return 'Math';
+      if (music.some(k => s.includes(k))) return 'Music';
+    }
+    return 'Coding'; // Default category if unknown
+  };
+
+  const handlePreview = (e) => {
+    e.preventDefault();
+    
+    if (newSkillName) {
+      triggerToast("Please click '+ Offer' to add the selected skill before previewing.");
+      return;
+    }
+    
+    const reqSelect = document.getElementById('req-skill-select');
+    if (reqSelect && reqSelect.value) {
+      triggerToast("Please click '+ Request' to add the selected skill before previewing.");
+      return;
+    }
+
+    if ((listingType === 'TEACH' || listingType === 'SWAP' || listingType === 'TEACH_SWAP' || listingType === 'LEARN_SWAP') && offeredSkills.length === 0) {
+      triggerToast("Please add at least one skill to offer.");
+      return;
+    }
+
+    if ((listingType === 'LEARN' || listingType === 'SWAP' || listingType === 'TEACH_SWAP' || listingType === 'LEARN_SWAP') && requestedSkills.length === 0) {
+      triggerToast("Please add at least one skill you are requesting.");
+      return;
+    }
+
+    setIsPreviewing(true);
+  };
+
+  const handleConfirm = async () => {
+    try {
+      const payload = {
+        title,
+        description,
+        category: getAutoCategory(),
+        listingType,
+        price: price ? parseFloat(price) : 0,
+        availability,
+        availableSlots: slots.map(s => ({ dayOfWeek: s.dayOfWeek.toUpperCase(), startTime: s.startTime, durationMinutes: s.durationMinutes })),
+        topics: topicsStr.split(',').map(t => t.trim()).filter(t => t),
+        offeredSkills: (listingType === 'TEACH' || listingType === 'SWAP' || listingType === 'TEACH_SWAP' || listingType === 'LEARN_SWAP') 
+          ? offeredSkills.map(s => ({ ...s, level: s.level.toUpperCase() })) : [],
+        requestedSkills: (listingType === 'LEARN' || listingType === 'SWAP' || listingType === 'TEACH_SWAP' || listingType === 'LEARN_SWAP') 
+          ? requestedSkills.map(s => ({ ...s, level: s.level.toUpperCase() })) : [],
+        ownerId: user?._id || user?.id
+      };
+      
+      if (editData) {
+        await listingService.updateListing(editData.id, payload);
+        triggerToast('Listing updated successfully!');
+      } else {
+        await listingService.createListing(payload);
+        triggerToast('Listing created successfully!');
+      }
+      onClose();
+    } catch (err) {
+      triggerToast(editData ? 'Failed to update listing' : 'Failed to create listing');
+      console.error(err);
+    }
+  };
+
+  return ReactDOM.createPortal(
+    <div className="modal-overlay" onClick={onClose} style={{
+      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+      background: 'rgba(0,0,0,0.5)', zIndex: 1000,
+      display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '16px', paddingTop: '40px'
+    }}>
+      <style>{`
+        .clm-wrapper {
+          background: #ffffff;
+          border-radius: 16px;
+          width: 100%;
+          max-width: 640px;
+          max-height: 90vh;
+          overflow: hidden;
+          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+          display: flex;
+          flex-direction: column;
+          animation: modalDropIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes modalDropIn {
+          from { opacity: 0; transform: translateY(-40px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .clm-header {
+          background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+          padding: 24px 32px;
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          color: #ffffff;
+        }
+        .clm-body {
+          padding: 24px;
+          overflow-y: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        }
+        .clm-field label {
+          display: block;
+          font-size: 14px;
+          font-weight: 500;
+          color: #111827;
+          margin-bottom: 8px;
+        }
+        .clm-input {
+          width: 100%;
+          padding: 10px 14px;
+          border: 1px solid #e5e7eb;
+          border-radius: 8px;
+          font-size: 14px;
+          color: #374151;
+          outline: none;
+          box-sizing: border-box;
+        }
+        .clm-row { display: grid; gap: 16px; }
+        .clm-row-2 { grid-template-columns: 1fr 1fr; }
+        .clm-pill-group {
+          display: flex; flex-wrap: wrap; gap: 8px;
+        }
+        .clm-pill {
+          padding: 6px 12px;
+          background: #f3f4f6;
+          border-radius: 100px;
+          font-size: 13px;
+          color: #374151;
+          cursor: pointer;
+        }
+        .clm-pill.active {
+          background: #1d4ed8; color: #fff;
+        }
+        .clm-submit {
+          width: 100%; padding: 14px; background: #1d4ed8; color: #fff; border: none; border-radius: 100px; font-weight: 700; cursor: pointer;
+        }
+      `}</style>
+      
+      <div className="clm-wrapper" onClick={(e) => e.stopPropagation()}>
+        <div className="clm-header">
+          <div>
+            <div style={{fontSize: '20px', fontWeight: 600}}>Create Listing</div>
+            <div style={{fontSize: '13px', opacity: 0.8}}>Share your skills or request to learn</div>
+          </div>
+          <button onClick={onClose} style={{background:'none', border:'none', color:'#fff', cursor:'pointer'}}><IconX/></button>
+        </div>
+
+        {!isPreviewing ? (
+          <form className="clm-body" onSubmit={handlePreview}>
+          
+          <div className="clm-row">
+            <div className="clm-field">
+              <label>Listing Type</label>
+              <div className="clm-pill-group">
+                {[
+                  { value: 'TEACH', label: 'I want to Teach' },
+                  { value: 'LEARN', label: 'I want to Learn' },
+                  { value: 'SWAP', label: 'Skill Swap' },
+                  { value: 'TEACH_SWAP', label: 'Teach or Swap' },
+                  { value: 'LEARN_SWAP', label: 'Learn or Swap' }
+                ].map(type => (
+                  <div
+                    key={type.value}
+                    className={`clm-pill ${listingType === type.value ? 'active' : ''}`}
+                    onClick={() => setListingType(type.value)}
+                  >
+                    {type.label}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="clm-field">
+            <label>Title</label>
+            <input type="text" className="clm-input" value={title} onChange={(e) => setTitle(e.target.value)} required />
+          </div>
+
+          <div className="clm-field">
+            <label>Description</label>
+            <textarea className="clm-input" rows="3" value={description} onChange={(e) => setDescription(e.target.value)} required />
+          </div>
+
+          {(listingType === 'TEACH' || listingType === 'TEACH_SWAP') && (
+            <div className="clm-field">
+              <label>Price per hour (₹)</label>
+              <input type="number" className="clm-input" value={price} onChange={(e) => setPrice(e.target.value)} required />
+            </div>
+          )}
+
+          {/* Skills builder (now labeled Topics) */}
+          <div style={{ background: '#f9fafb', padding: '16px', borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ fontWeight: 600, fontSize: '14px' }}>Topics & Level</div>
+            
+            {(listingType === 'TEACH' || listingType === 'SWAP' || listingType === 'TEACH_SWAP' || listingType === 'LEARN_SWAP') && (
+              <div>
+                <label style={{fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '4px', display: 'block'}}>What are you offering?</label>
+                {(!user?.skillsOffered || user.skillsOffered.length === 0) ? (
+                  <div style={{ fontSize: '13px', color: '#dc2626', background: '#fef2f2', padding: '8px', borderRadius: '4px' }}>
+                    You haven't added any skills to teach yet. Please go to your Profile and add a skill to your "I can teach" list first.
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <select className="clm-input" value={newSkillName} onChange={e => {
+                      setNewSkillName(e.target.value);
+                      const skillObj = user.skillsOffered.find(s => s.name === e.target.value);
+                      if (skillObj) setNewSkillLevel(skillObj.level);
+                    }} style={{flex: 2}}>
+                      <option value="" disabled hidden>Select a skill from your profile...</option>
+                      {user.skillsOffered.map((s, idx) => (
+                        <option key={`off-${idx}`} value={s.name}>{s.name}</option>
+                      ))}
+                    </select>
+                    <select className="clm-input" value={newSkillLevel} onChange={e => setNewSkillLevel(e.target.value)} style={{flex: 1}}>
+                      <option value="Beginner">Beginner</option>
+                      <option value="Intermediate">Intermediate</option>
+                      <option value="Advanced">Advanced</option>
+                    </select>
+                    <button type="button" onClick={() => {
+                      if (!newSkillName) return;
+                      setOfferedSkills([...offeredSkills, { name: newSkillName, level: newSkillLevel }]);
+                      setNewSkillName('');
+                    }} style={{padding: '0 16px', background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer'}}>+ Offer</button>
+                  </div>
+                )}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: offeredSkills.length ? '8px' : '0' }}>
+                  {offeredSkills.map((s, i) => (
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', background: '#fff', padding: '8px 12px', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '13px' }}>
+                      <span><strong style={{color: '#1d4ed8'}}>Offering:</strong> {s.name} ({s.level})</span>
+                      <button type="button" onClick={() => setOfferedSkills(offeredSkills.filter((_, idx) => idx !== i))} style={{background:'none', border:'none', color:'#ef4444', cursor:'pointer'}}><IconTrash size={14}/></button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {(listingType === 'LEARN' || listingType === 'SWAP' || listingType === 'TEACH_SWAP' || listingType === 'LEARN_SWAP') && (
+              <div style={{marginTop: listingType === 'LEARN' ? '0' : '8px'}}>
+                <label style={{fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '4px', display: 'block'}}>What are you requesting to learn?</label>
+                {(!user?.skillsWanted || user.skillsWanted.length === 0) ? (
+                  <div style={{ fontSize: '13px', color: '#dc2626', background: '#fef2f2', padding: '8px', borderRadius: '4px' }}>
+                    You haven't added any skills to learn yet. Please go to your Profile and add a skill to your "I want to learn" list first.
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <select className="clm-input" id="req-skill-select" style={{flex: 2}} onChange={(e) => {
+                      const skillObj = user.skillsWanted.find(s => s.name === e.target.value);
+                      if (skillObj) {
+                        document.getElementById('req-skill-level').value = skillObj.level;
+                      }
+                    }}>
+                      <option value="" disabled hidden>Select a skill from your profile...</option>
+                      {user.skillsWanted.map((s, idx) => (
+                        <option key={`req-${idx}`} value={s.name}>{s.name}</option>
+                      ))}
+                    </select>
+                    <select className="clm-input" id="req-skill-level" style={{flex: 1}}>
+                      <option value="Beginner">Beginner</option>
+                      <option value="Intermediate">Intermediate</option>
+                      <option value="Advanced">Advanced</option>
+                    </select>
+                    <button type="button" onClick={() => {
+                      const selectEl = document.getElementById('req-skill-select');
+                      const levelEl = document.getElementById('req-skill-level');
+                      if (!selectEl.value) return;
+                      setRequestedSkills([...requestedSkills, { name: selectEl.value, level: levelEl.value }]);
+                      selectEl.value = '';
+                    }} style={{padding: '0 16px', background: '#059669', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer'}}>+ Request</button>
+                  </div>
+                )}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: requestedSkills.length ? '8px' : '0' }}>
+                  {requestedSkills.map((s, i) => (
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', background: '#fff', padding: '8px 12px', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '13px' }}>
+                      <span><strong style={{color: '#059669'}}>Requesting:</strong> {s.name} ({s.level})</span>
+                      <button type="button" onClick={() => setRequestedSkills(requestedSkills.filter((_, idx) => idx !== i))} style={{background:'none', border:'none', color:'#ef4444', cursor:'pointer'}}><IconTrash size={14}/></button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="clm-field">
+            <label>Syllabus <span style={{fontWeight: 400, color: '#6b7280'}}>(optional)</span></label>
+            <input type="text" className="clm-input" placeholder="e.g. JSX & Components, State Management" value={topicsStr} onChange={(e) => setTopicsStr(e.target.value)} />
+          </div>
+
+          {/* Availability Slots */}
+          <div style={{ background: '#f9fafb', padding: '16px', borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ fontWeight: 600, fontSize: '14px' }}>Availability Slots</div>
+            <div className="clm-row clm-row-2">
+              <div className="clm-field">
+                <label>Mode</label>
+                <select className="clm-input" value={availability} onChange={(e) => setAvailability(e.target.value)}>
+                  <option value="ONLINE">Online</option>
+                  <option value="IN_PERSON">In Person</option>
+                  <option value="EITHER">Either</option>
+                </select>
+              </div>
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <select className="clm-input" value={newSlotDay} onChange={e => setNewSlotDay(e.target.value)}>
+                {['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map(d => <option key={d}>{d}</option>)}
+              </select>
+              <input type="time" className="clm-input" value={newSlotTime} onChange={e => setNewSlotTime(e.target.value)} />
+              <select className="clm-input" value={newSlotDuration} onChange={e => setNewSlotDuration(e.target.value)}>
+                <option value="30">30 min</option>
+                <option value="60">60 min</option>
+                <option value="90">90 min</option>
+              </select>
+              <button type="button" onClick={handleAddSlot} style={{padding: '0 16px', background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer'}}>Add</button>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {slots.map((s, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', background: '#fff', padding: '8px 12px', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '13px' }}>
+                  <span>{s.dayOfWeek} at {s.startTime} ({s.durationMinutes}m)</span>
+                  <button type="button" onClick={() => handleRemoveSlot(i)} style={{background:'none', border:'none', color:'#ef4444', cursor:'pointer'}}><IconTrash size={14}/></button>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <button type="submit" className="clm-submit" style={{cursor: 'pointer'}}>Preview Listing</button>
+          </form>
+        ) : (
+          <div className="clm-body" style={{ alignItems: 'flex-start' }}>
+            <h3 style={{marginTop: 0, marginBottom: '4px'}}>Review Listing Details</h3>
+            <p style={{fontSize: '13px', color: '#6b7280', marginTop: 0, marginBottom: '16px'}}>Please review the details below before publishing.</p>
+            
+            <div style={{ width: '100%', background: '#f9fafb', borderRadius: '12px', padding: '20px', border: '1px solid #e5e7eb', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{getAutoCategory()} • {listingType.replace('_', ' ')}</div>
+                <div style={{ fontSize: '20px', fontWeight: 700, color: '#111827', marginTop: '4px' }}>{title || 'Untitled Listing'}</div>
+                {listingType !== 'SWAP' && <div style={{ fontSize: '16px', fontWeight: 600, color: '#059669', marginTop: '8px' }}>{price ? `₹${price}/hr` : 'Free'}</div>}
+              </div>
+
+              <div>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '4px' }}>Description</div>
+                <div style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{description || 'No description provided.'}</div>
+              </div>
+
+              {topicsStr && (
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '4px' }}>Syllabus / Topics</div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                    {topicsStr.split(',').map(t => t.trim()).filter(Boolean).map((t, i) => (
+                      <span key={i} style={{ background: '#e0e7ff', color: '#3730a3', padding: '4px 10px', borderRadius: '100px', fontSize: '12px', fontWeight: 500 }}>{t}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {(offeredSkills.length > 0 || requestedSkills.length > 0) && (
+                <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', background: '#ffffff', padding: '16px', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+                  {offeredSkills.length > 0 && (
+                    <div style={{ flex: 1, minWidth: '200px' }}>
+                      <div style={{ fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '8px' }}>Offering</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        {offeredSkills.map((s, i) => (
+                          <div key={i} style={{ fontSize: '13px', color: '#4b5563', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#1d4ed8' }}></div>
+                            {s.name} <span style={{ color: '#9ca3af', fontSize: '12px' }}>({s.level})</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  {requestedSkills.length > 0 && (
+                    <div style={{ flex: 1, minWidth: '200px' }}>
+                      <div style={{ fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '8px' }}>Requesting</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                        {requestedSkills.map((s, i) => (
+                          <div key={i} style={{ fontSize: '13px', color: '#4b5563', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#059669' }}></div>
+                            {s.name} <span style={{ color: '#9ca3af', fontSize: '12px' }}>({s.level})</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '8px' }}>Availability</div>
+                <div style={{ fontSize: '13px', color: '#4b5563', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: availability === 'ONLINE' ? '#10b981' : '#f59e0b' }}></div>
+                  {availability === 'ONLINE' ? 'Online Mode' : availability === 'IN_PERSON' ? 'In-Person Mode' : 'Online or In-Person'}
+                </div>
+                {slots.length > 0 && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                    {slots.map((s, i) => (
+                      <div key={i} style={{ background: '#ffffff', border: '1px solid #d1d5db', padding: '6px 12px', borderRadius: '6px', fontSize: '12px', color: '#374151', fontWeight: 500 }}>
+                        {s.dayOfWeek} • {s.startTime} ({s.durationMinutes}m)
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '12px', marginTop: '12px', width: '100%' }}>
+              <button type="button" onClick={() => setIsPreviewing(false)} style={{flex: 1, padding: '12px', background: '#e5e7eb', color: '#374151', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer'}}>Back to Edit</button>
+              <button type="button" onClick={handleConfirm} style={{flex: 1, padding: '12px', background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer'}}>Confirm & Publish</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>,
+    document.body
+  );
+};
+
+export default CreateListingModal;

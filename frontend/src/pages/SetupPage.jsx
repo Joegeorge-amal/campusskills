@@ -148,8 +148,8 @@ const SetupPage = () => {
         branch: programme, 
         bio, 
         upi,
-        topicsOffered: teachSkills, 
-        topicsWanted: learnSkills,
+        skillsOffered: teachSkills.map(s => ({ name: s, level: 'BEGINNER' })), 
+        skillsWanted: learnSkills.map(s => ({ name: s, level: 'BEGINNER' })),
         avatarImg: avatarImg
       });
       
@@ -424,7 +424,7 @@ const SetupPage = () => {
                       type="tel" 
                       placeholder="9876543210" 
                       value={phoneNumber} 
-                      onChange={e => setPhoneNumber(e.target.value)} 
+                      onChange={e => setPhoneNumber(e.target.value.replace(/\D/g, ''))} 
                       required 
                       style={{ flexGrow: 1 }}
                     />

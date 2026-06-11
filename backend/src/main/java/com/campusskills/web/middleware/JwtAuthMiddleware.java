@@ -14,7 +14,7 @@ public class JwtAuthMiddleware {
         return ctx -> {
             String authHeader = ctx.request().getHeader("Authorization");
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-                ApiResponse.forbidden(ctx, "Missing or invalid Authorization header");
+                ApiResponse.unauthorized(ctx, "Missing or invalid Authorization header");
                 return;
             }
 
@@ -27,7 +27,7 @@ public class JwtAuthMiddleware {
                     String role = principal.getString("role");
                     
                     if (userId == null) {
-                        ApiResponse.forbidden(ctx, "Invalid token claims: missing userId");
+                        ApiResponse.unauthorized(ctx, "Invalid token claims: missing userId");
                         return;
                     }
                     
@@ -35,7 +35,7 @@ public class JwtAuthMiddleware {
                     userRepository.findById(userId)
                         .onSuccess(foundUser -> {
                             if (foundUser == null) {
-                                ApiResponse.forbidden(ctx, "User no longer exists");
+                                ApiResponse.unauthorized(ctx, "User no longer exists");
                                 return;
                             }
                             
@@ -43,6 +43,7 @@ public class JwtAuthMiddleware {
                             if (role != null) {
                                 ctx.put("authenticatedUserRole", role);
                             }
+                            ctx.put("user", foundUser);
                             
                             ctx.next();
                         })
@@ -51,7 +52,7 @@ public class JwtAuthMiddleware {
                         });
                 })
                 .onFailure(err -> {
-                    ApiResponse.forbidden(ctx, "Invalid or expired token");
+                    ApiResponse.unauthorized(ctx, "Invalid or expired token");
                 });
         };
     }

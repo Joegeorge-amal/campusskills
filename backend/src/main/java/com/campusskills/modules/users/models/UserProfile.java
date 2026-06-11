@@ -1,20 +1,30 @@
 package com.campusskills.modules.users.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.campusskills.shared.models.SkillProfile;
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class UserProfile {
     @JsonProperty("_id")
     private String id;
     private String userId;
+    @JsonProperty("name")
+    @JsonAlias("displayName")
     private String displayName;
+    @JsonProperty("branch")
+    @JsonAlias("department")
     private String department;
     private String phoneNumber;
     private String sem;
     private String year;
     private String bio;
+    @JsonProperty("avatarImg")
+    @JsonAlias("profilePicture")
     private String profilePicture;
+    private String upi;
     private List<SkillProfile> skillsOffered;
     private List<SkillProfile> skillsWanted;
     private List<String> verifiedSkills;
@@ -55,6 +65,9 @@ public class UserProfile {
 
     public String getProfilePicture() { return profilePicture; }
     public void setProfilePicture(String profilePicture) { this.profilePicture = profilePicture; }
+
+    public String getUpi() { return upi; }
+    public void setUpi(String upi) { this.upi = upi; }
 
     public List<SkillProfile> getSkillsOffered() { return skillsOffered; }
     public void setSkillsOffered(List<SkillProfile> skillsOffered) { this.skillsOffered = skillsOffered; }

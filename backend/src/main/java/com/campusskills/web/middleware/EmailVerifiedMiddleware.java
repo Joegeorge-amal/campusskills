@@ -9,17 +9,17 @@ public class EmailVerifiedMiddleware {
     
     public static Handler<RoutingContext> create() {
         return ctx -> {
-            JsonObject user = ctx.get("user");
+            com.campusskills.modules.users.models.User user = ctx.get("user");
             if (user == null) {
                 ApiResponse.sendError(ctx, 401, "Unauthorized");
                 return;
             }
 
-            Boolean emailVerified = user.getBoolean("emailVerified");
+            Boolean emailVerified = user.getEmailVerified();
             
             // Allow SUPER_ADMIN to bypass, just in case they don't have it set correctly
-            String role = user.getString("role");
-            if ("SUPER_ADMIN".equals(role)) {
+            com.campusskills.modules.users.models.UserRole role = user.getRole();
+            if (role != null && "SUPER_ADMIN".equals(role.name())) {
                 ctx.next();
                 return;
             }
