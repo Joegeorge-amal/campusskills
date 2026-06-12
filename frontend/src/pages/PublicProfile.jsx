@@ -48,7 +48,7 @@ const PublicProfile = () => {
 
         if (data.profile?.userId) {
           const listingsRes = await listingService.searchListings({ ownerId: data.profile.userId });
-          setListings(listingsRes.data || []);
+          setListings(listingsRes?.listings || listingsRes?.data || (Array.isArray(listingsRes) ? listingsRes : []));
         }
       } catch (err) {
         console.error("Failed to load public profile", err);

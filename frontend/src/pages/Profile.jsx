@@ -15,7 +15,8 @@ import {
   IconMapPin,
   IconCircle,
   IconCamera,
-  IconTrash
+  IconTrash,
+  IconX
 } from '@tabler/icons-react';
 import SkillQuizModal from '../components/modals/SkillQuizModal';
 import CreateListingModal from '../components/modals/CreateListingModal';
@@ -39,6 +40,7 @@ const Profile = () => {
   const [hoveredCell, setHoveredCell] = useState(null);
   const [myListings, setMyListings] = useState([]);
   const [editingListing, setEditingListing] = useState(null);
+  const [listingToDelete, setListingToDelete] = useState(null);
   const [allTopicsList, setAllTopicsList] = useState([]);
   const [topicMap, setTopicMap] = useState({});
 
@@ -62,17 +64,20 @@ const Profile = () => {
   }, []);
 
   const fetchMyListings = async () => {
-    const userId = user?._id || user?.id;
+    const userId = user?.userId || user?.id || user?._id;
     if (userId) {
       listingService.searchListings({ ownerId: userId })
-        .then(res => setMyListings(res.data || []))
+        .then(res => {
+          const listingsArray = res?.listings || res?.data || (Array.isArray(res) ? res : []);
+          setMyListings(listingsArray);
+        })
         .catch(console.error);
     }
   };
 
   useEffect(() => {
     fetchMyListings();
-  }, [user?._id, user?.id]);
+  }, [user?.userId, user?.id, user?._id]);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -127,7 +132,7 @@ const Profile = () => {
   const skillsOfferedObjects = user?.skillsOffered || [];
   const skillsOffered = skillsOfferedObjects.map(s => s.name || s);
   
-  const verifiedSkills = user?.verifiedSkills || [];
+  const verifiedSkills = Array.from(new Set(user?.verifiedSkills || []));
   const pendingSkills = skillsOffered.filter(skill => !verifiedSkills.includes(skill));
 
   const initials = user?.name ? user.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'U';
@@ -217,7 +222,7 @@ const Profile = () => {
 
   const handleQuizComplete = (skill, score, domain) => {
     updateProfile({
-      verifiedSkills: [...verifiedSkills, skill]
+      verifiedSkills: Array.from(new Set([...verifiedSkills, skill]))
     }).then(() => {
       setActiveQuizSkill(null);
       triggerToast(`${skill} has been verified successfully!`);
@@ -282,6 +287,32 @@ const Profile = () => {
             fetchMyListings();
         }} 
       />
+
+      {listingToDelete && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '16px', paddingTop: '80px', backdropFilter: 'blur(4px)' }}>
+          <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', width: '100%', maxWidth: '400px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#111827' }}>Delete Listing</h3>
+              <button onClick={() => setListingToDelete(null)} style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', padding: '4px', display: 'flex' }}><IconX size={20} /></button>
+            </div>
+            <p style={{ margin: 0, fontSize: '14px', color: '#4b5563', lineHeight: '1.5' }}>Are you sure you want to delete <strong style={{color: '#111827'}}>{listingToDelete.title}</strong>? This action cannot be undone.</p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '8px' }}>
+              <button onClick={() => setListingToDelete(null)} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #e5e7eb', background: '#fff', color: '#374151', fontWeight: 600, fontSize: '13px', cursor: 'pointer', transition: 'all 0.2s' }}>Cancel</button>
+              <button onClick={async () => {
+                try {
+                  await listingService.deactivateListing(listingToDelete._id || listingToDelete.id);
+                  setListingToDelete(null);
+                  fetchMyListings();
+                  triggerToast('Listing deleted successfully');
+                } catch (err) {
+                  console.error(err);
+                  triggerToast('Failed to delete listing');
+                }
+              }} style={{ padding: '8px 16px', borderRadius: '6px', border: 'none', background: '#dc2626', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Blue Banner */}
       <div 
@@ -655,13 +686,7 @@ const Profile = () => {
                         Edit
                       </button>
                       <button 
-                        onClick={async () => {
-                          if (window.confirm('Are you sure you want to delete this listing?')) {
-                            await listingService.deactivateListing(listing.id);
-                            fetchMyListings();
-                            triggerToast('Listing deleted successfully');
-                          }
-                        }}
+                        onClick={() => setListingToDelete(listing)}
                         style={{ flex: 1, padding: '8px', background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: '6px', fontWeight: 600, fontSize: '12px', cursor: 'pointer' }}
                       >
                         Delete
