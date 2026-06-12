@@ -14,7 +14,7 @@ public class SessionHandler {
     }
 
     public void getSessionsForAuthUser(RoutingContext ctx) {
-        String authId = ctx.user().principal().getString("sub");
+        String authId = ctx.get("authenticatedUserId");
         
         int page = 1;
         int limit = 20;
@@ -37,7 +37,7 @@ public class SessionHandler {
 
     public void getSessionById(RoutingContext ctx) {
         String sessionId = ctx.pathParam("sessionId");
-        String authId = ctx.user().principal().getString("sub");
+        String authId = ctx.get("authenticatedUserId");
 
         sessionService.getSessionByIdAuth(sessionId, authId)
             .onSuccess(session -> ApiResponse.ok(ctx, JsonObject.mapFrom(session)))
@@ -46,7 +46,7 @@ public class SessionHandler {
 
     public void confirmSession(RoutingContext ctx) {
         String sessionId = ctx.pathParam("sessionId");
-        String authId = ctx.user().principal().getString("sub");
+        String authId = ctx.get("authenticatedUserId");
         
         sessionService.confirmSession(sessionId, authId)
             .onSuccess(msg -> ApiResponse.ok(ctx, new JsonObject().put("message", "Session confirmed")))
@@ -55,7 +55,7 @@ public class SessionHandler {
 
     public void disputeSession(RoutingContext ctx) {
         String sessionId = ctx.pathParam("sessionId");
-        String authId = ctx.user().principal().getString("sub");
+        String authId = ctx.get("authenticatedUserId");
         
         sessionService.disputeSession(sessionId, authId)
             .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("message", "Session DISPUTED")))

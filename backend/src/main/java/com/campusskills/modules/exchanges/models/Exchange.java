@@ -20,7 +20,8 @@ public class Exchange {
     private ExchangeStatus status;
     private String message;
     private String chatId;
-    private java.util.List<JsonObject> proposedSessions; // array of { startTime, endTime, topic }
+    private java.util.List<java.util.Map<String, Object>> proposedSessions; // array of { startTime, endTime, topic }
+    private String offeredSkillName;
     private Long createdAt;
     private Long updatedAt;
 
@@ -50,8 +51,11 @@ public class Exchange {
     public String getChatId() { return chatId; }
     public void setChatId(String chatId) { this.chatId = chatId; }
 
-    public java.util.List<JsonObject> getProposedSessions() { return proposedSessions; }
-    public void setProposedSessions(java.util.List<JsonObject> proposedSessions) { this.proposedSessions = proposedSessions; }
+    public java.util.List<java.util.Map<String, Object>> getProposedSessions() { return proposedSessions; }
+    public void setProposedSessions(java.util.List<java.util.Map<String, Object>> proposedSessions) { this.proposedSessions = proposedSessions; }
+
+    public String getOfferedSkillName() { return offeredSkillName; }
+    public void setOfferedSkillName(String offeredSkillName) { this.offeredSkillName = offeredSkillName; }
 
     public Long getCreatedAt() { return createdAt; }
     public void setCreatedAt(Long createdAt) { this.createdAt = createdAt; }

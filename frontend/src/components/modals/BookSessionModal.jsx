@@ -9,17 +9,24 @@ const BookSessionModal = ({
   ],
   selectedTutor,
   selectedSkill,
+  isSwapRequest,
+  listingRequestedSkills = [],
+  userOfferedSkills = [],
   onContinue,
   onClose
 }) => {
   const primarySlot = slots.find(s => s.isPrimary) || slots[0];
   const otherSlots = slots.filter(s => !s.isPrimary);
-  const [selectedSlotId, setSelectedSlotId] = useState(null); // No slot selected by default to match screenshot state
+  const [selectedSlotId, setSelectedSlotId] = useState(null);
+  const [message, setMessage] = useState('');
+  
+  const dropdownOptions = listingRequestedSkills.length > 0 ? listingRequestedSkills : userOfferedSkills;
+  const [selectedOfferedSkill, setSelectedOfferedSkill] = useState(dropdownOptions.length > 0 ? (dropdownOptions[0].name || dropdownOptions[0]) : '');
 
   const handleContinue = () => {
     if (onContinue) {
       const selectedSlot = slots.find(s => s.id === selectedSlotId);
-      onContinue(selectedSlot);
+      onContinue(selectedSlot, message, selectedOfferedSkill);
     }
   };
 
@@ -139,6 +146,49 @@ const BookSessionModal = ({
             margin-bottom: 12px;
             margin-top: 24px;
           }
+          .bsm-textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            font-family: inherit;
+            font-size: 14px;
+            resize: none;
+            box-sizing: border-box;
+            background: #f9fafb;
+            color: #111827;
+          }
+          .bsm-textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+          }
+          .bsm-disclaimer {
+            font-size: 11px;
+            color: #6b7280;
+            margin-top: 12px;
+            line-height: 1.4;
+            text-align: center;
+          }
+          .bsm-select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #e5e7eb;
+            font-family: inherit;
+            font-size: 14px;
+            box-sizing: border-box;
+            background: #f9fafb;
+            color: #111827;
+            margin-bottom: 8px;
+          }
+          .bsm-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+          }
         `}</style>
 
         {/* Header */}
@@ -151,7 +201,7 @@ const BookSessionModal = ({
           color: '#ffffff'
         }}>
           <div>
-            <div style={{ fontSize: '16px', fontWeight: 600, marginBottom: '4px' }}>Available Timings</div>
+            <div style={{ fontSize: '16px', fontWeight: 600, marginBottom: '4px' }}>Request a Session</div>
             <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)' }}>
               {selectedSkill} &middot; {selectedTutor}
             </div>
@@ -207,13 +257,43 @@ const BookSessionModal = ({
             </>
           )}
 
+          {isSwapRequest && (
+            <>
+              <div className="bsm-section-title" style={{ marginTop: '24px' }}>Which skill are you offering to teach?</div>
+              <select 
+                className="bsm-select"
+                value={selectedOfferedSkill}
+                onChange={(e) => setSelectedOfferedSkill(e.target.value)}
+              >
+                {dropdownOptions.length === 0 && <option value="">No skills available</option>}
+                {dropdownOptions.map((skill, idx) => (
+                  <option key={idx} value={skill.name || skill}>
+                    {skill.name || skill}
+                  </option>
+                ))}
+              </select>
+            </>
+          )}
+
+          <div className="bsm-section-title" style={{ marginTop: isSwapRequest ? '12px' : '24px' }}>Message to Teacher (Optional)</div>
+          <textarea
+            className="bsm-textarea"
+            rows="3"
+            placeholder="Hi, I'd like to focus on..."
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          ></textarea>
+
           <button 
             className={`bsm-btn ${selectedSlotId ? 'active-state' : ''}`}
             onClick={handleContinue}
             disabled={!selectedSlotId}
           >
-            Continue with this slot
+            Send Request
           </button>
+          <div className="bsm-disclaimer">
+            If you would like to negotiate timings, please request to chat and ask them to update their availability.
+          </div>
         </div>
       </div>
     </div>

@@ -40,6 +40,13 @@ public class ExchangeService {
     }
 
     public Future<String> createExchange(Exchange request) {
+        if (request.getInitiatorId() != null && request.getInitiatorId().equals(request.getReceiverId())) {
+            return Future.failedFuture("You cannot request an exchange from yourself.");
+        }
+        if (request.getReceiverId() == null) {
+            return Future.failedFuture("Receiver ID is missing.");
+        }
+
         request.setStatus(ExchangeStatus.REQUESTED);
         return repository.createRequest(request).onSuccess(id -> {
             sendNotification(
@@ -76,7 +83,8 @@ public class ExchangeService {
                 if (exchange.getProposedSessions() != null) {
                     return listingRepository.findById(exchange.getListingId()).compose(listing -> {
                         List<Future<String>> sessionFutures = new ArrayList<>();
-                        for (JsonObject proposed : exchange.getProposedSessions()) {
+                        for (java.util.Map<String, Object> proposedMap : exchange.getProposedSessions()) {
+                            JsonObject proposed = new JsonObject(proposedMap);
                             Session session = new Session();
                             session.setExchangeId(exchangeId);
                             

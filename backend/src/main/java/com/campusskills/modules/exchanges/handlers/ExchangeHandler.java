@@ -15,16 +15,17 @@ public class ExchangeHandler {
     }
 
     public void createExchange(RoutingContext ctx) {
-        String authId = ctx.user().principal().getString("sub");
+        String authId = ctx.get("authenticatedUserId");
         try {
             Exchange request = ctx.body().asJsonObject().mapTo(Exchange.class);
             request.setInitiatorId(authId);
             
             service.createExchange(request)
-                .onSuccess(data -> ApiResponse.created(ctx, new JsonObject().put("id", data)))
-                .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
+                .onSuccess(id -> ApiResponse.created(ctx, new JsonObject().put("exchangeId", id)))
+                .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
         } catch (Exception e) {
-            ApiResponse.badRequest(ctx, "Invalid JSON format");
+            e.printStackTrace();
+            ApiResponse.badRequest(ctx, "Invalid JSON format: " + e.getMessage());
         }
     }
 
@@ -46,7 +47,7 @@ public class ExchangeHandler {
     }
 
     public void getMyExchanges(RoutingContext ctx) {
-        String authId = ctx.user().principal().getString("sub");
+        String authId = ctx.get("authenticatedUserId");
 
         service.getMyExchanges(authId)
             .onSuccess(res -> ApiResponse.ok(ctx, res))

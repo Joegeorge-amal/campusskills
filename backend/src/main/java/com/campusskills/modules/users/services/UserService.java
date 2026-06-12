@@ -381,6 +381,9 @@ public class UserService {
                 profileJson.remove("upi");
                 
                 response.put("profile", profileJson);
+                response.put("email", user.getEmail());
+                response.put("createdAt", user.getCreatedAt());
+                response.put("emailVerified", user.getEmailVerified());
                 
                 if (stats != null) {
                     response.put("stats", JsonObject.mapFrom(stats));

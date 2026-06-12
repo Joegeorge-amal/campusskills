@@ -36,7 +36,7 @@ public class AvailabilityHandler {
     }
 
     public void updateMySlots(RoutingContext ctx) {
-        String userId = ctx.user().principal().getString("sub");
+        String userId = ctx.get("authenticatedUserId");
         JsonArray body = ctx.body().asJsonArray();
         
         if (body == null) {
@@ -58,7 +58,7 @@ public class AvailabilityHandler {
     }
 
     public void addMyException(RoutingContext ctx) {
-        String userId = ctx.user().principal().getString("sub");
+        String userId = ctx.get("authenticatedUserId");
         AvailabilityException exception;
         try {
             exception = ctx.body().asJsonObject().mapTo(AvailabilityException.class);

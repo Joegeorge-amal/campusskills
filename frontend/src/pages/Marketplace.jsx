@@ -7,12 +7,17 @@ import BookSessionModal from '../components/modals/BookSessionModal';
 import { IconStar, IconUser, IconMessageCircle, IconRefresh } from '@tabler/icons-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { listingService } from '../services/listingService';
+import { exchangeService } from '../services/exchangeService';
+import { useAppData } from '../context/AppDataContext';
+import { useAuth } from '../context/AuthContext';
 
 // Simple global cache to instantly load listings when navigating back
 let cachedListings = null;
 
 const Marketplace = () => {
   const navigate = useNavigate();
+  const { triggerToast } = useAppData();
+  const { user } = useAuth();
   const [skills, setSkills] = useState(cachedListings || []);
   const [pendingSkills, setPendingSkills] = useState([]);
   const [isLoading, setIsLoading] = useState(!cachedListings);
@@ -337,17 +342,18 @@ const Marketplace = () => {
                     {selectedSkill.offeredSkills?.map((s, i) => {
                       const isSkillVerified = selectedSkill.owner?.verifiedSkills?.map(vs => (vs.name || vs).trim().toLowerCase())?.includes((s.name || s).trim().toLowerCase()) || false;
                       return (
-                      <span key={`off-${i}`} style={{ display: 'inline-flex', alignItems: 'stretch', borderRadius: '100px', fontSize: '13px', fontWeight: 600 }}>
-                        <span style={{ padding: '6px 14px', background: '#eff6ff', color: '#1d4ed8', display: 'flex', alignItems: 'center', border: '1px solid #bfdbfe', borderRight: 'none', borderTopLeftRadius: '100px', borderBottomLeftRadius: '100px' }}>
-                          {s.name ? s.name.charAt(0).toUpperCase() + s.name.slice(1) : ''} <span style={{ opacity: 0.8, marginLeft: '4px', fontSize: '11px', fontWeight: 500 }}>{s.level}</span>
+                        <span key={`off-${i}`} style={{ display: 'inline-flex', alignItems: 'stretch', borderRadius: '100px', fontSize: '13px', fontWeight: 600 }}>
+                          <span style={{ padding: '6px 14px', background: '#eff6ff', color: '#1d4ed8', display: 'flex', alignItems: 'center', border: '1px solid #bfdbfe', borderRight: 'none', borderTopLeftRadius: '100px', borderBottomLeftRadius: '100px' }}>
+                            {s.name ? s.name.charAt(0).toUpperCase() + s.name.slice(1) : ''} <span style={{ opacity: 0.8, marginLeft: '4px', fontSize: '11px', fontWeight: 500 }}>{s.level}</span>
+                          </span>
+                          {isSkillVerified ? (
+                            <span style={{ padding: '6px 12px', background: '#ecfdf5', color: '#059669', fontSize: '11px', display: 'flex', alignItems: 'center', border: '1px solid #a7f3d0', borderTopRightRadius: '100px', borderBottomRightRadius: '100px' }}>✓ Verified</span>
+                          ) : (
+                            <span style={{ padding: '6px 12px', background: '#fefce8', color: '#b45309', fontSize: '11px', display: 'flex', alignItems: 'center', border: '1px solid #fde047', borderTopRightRadius: '100px', borderBottomRightRadius: '100px' }}>⚠️ Unverified</span>
+                          )}
                         </span>
-                        {isSkillVerified ? (
-                          <span style={{ padding: '6px 12px', background: '#ecfdf5', color: '#059669', fontSize: '11px', display: 'flex', alignItems: 'center', border: '1px solid #a7f3d0', borderTopRightRadius: '100px', borderBottomRightRadius: '100px' }}>✓ Verified</span>
-                        ) : (
-                          <span style={{ padding: '6px 12px', background: '#fefce8', color: '#b45309', fontSize: '11px', display: 'flex', alignItems: 'center', border: '1px solid #fde047', borderTopRightRadius: '100px', borderBottomRightRadius: '100px' }}>⚠️ Unverified</span>
-                        )}
-                      </span>
-                    )})}
+                      )
+                    })}
                     {selectedSkill.requestedSkills?.map((s, i) => {
                       return (
                       <span key={`req-${i}`} style={{ display: 'inline-flex', alignItems: 'stretch', borderRadius: '100px', fontSize: '13px', fontWeight: 600 }}>
@@ -357,6 +363,13 @@ const Marketplace = () => {
                       </span>
                     )})}
                   </div>
+                  {selectedSkill.offeredSkills?.some(s => {
+                    return !(selectedSkill.owner?.verifiedSkills?.map(vs => (vs.name || vs).trim().toLowerCase())?.includes((s.name || s).trim().toLowerCase()) || false);
+                  }) && (
+                    <div style={{ fontSize: '13px', color: '#6b7280', lineHeight: 1.5, marginTop: '4px', background: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                      <span style={{ fontWeight: 600, color: '#4b5563' }}>Note:</span> This skill has not been verified by CampusSkills. You can still continue with this request, but we recommend reviewing the user's ratings, completed sessions, and profile information before accepting.
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -387,7 +400,7 @@ const Marketplace = () => {
                 {selectedSkill.listingType === 'TEACH' || selectedSkill.listingType === 'TEACH_SWAP' ? (
                   <button 
                     style={{ flex: 1, padding: '12px 20px', borderRadius: '100px', border: 'none', background: '#1d4ed8', color: '#fff', fontSize: '14px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(29, 78, 216, 0.2)' }}
-                    onClick={() => window.alert('Session request flow coming soon')}
+                    onClick={() => setIsBookModalOpen(true)}
                     onMouseOver={(e) => { e.currentTarget.style.background = '#1e40af'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
                     onMouseOut={(e) => { e.currentTarget.style.background = '#1d4ed8'; e.currentTarget.style.transform = 'translateY(0)'; }}
                   >
@@ -409,7 +422,7 @@ const Marketplace = () => {
                 {selectedSkill.listingType === 'SWAP' || selectedSkill.listingType === 'TEACH_SWAP' || selectedSkill.listingType === 'LEARN_SWAP' ? (
                   <button 
                     style={{ flex: 1, padding: '12px 20px', borderRadius: '100px', border: selectedSkill.listingType === 'SWAP' ? 'none' : '1px solid #1d4ed8', background: selectedSkill.listingType === 'SWAP' ? '#1d4ed8' : '#fff', color: selectedSkill.listingType === 'SWAP' ? '#fff' : '#1d4ed8', fontSize: '14px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', boxShadow: selectedSkill.listingType === 'SWAP' ? '0 4px 12px rgba(29, 78, 216, 0.2)' : 'none' }}
-                    onClick={() => window.alert('Swap Request flow coming soon')}
+                    onClick={() => setIsBookModalOpen(true)}
                     onMouseOver={(e) => { e.currentTarget.style.background = selectedSkill.listingType === 'SWAP' ? '#1e40af' : '#eff6ff'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
                     onMouseOut={(e) => { e.currentTarget.style.background = selectedSkill.listingType === 'SWAP' ? '#1d4ed8' : '#fff'; e.currentTarget.style.transform = 'translateY(0)'; }}
                   >
@@ -479,6 +492,9 @@ const Marketplace = () => {
         <BookSessionModal 
           selectedSkill={selectedSkill.title}
           selectedTutor={selectedSkill.owner?.name || 'Unknown User'}
+          isSwapRequest={selectedSkill.listingType === 'SWAP' || selectedSkill.listingType === 'TEACH_SWAP' || selectedSkill.listingType === 'LEARN_SWAP'}
+          listingRequestedSkills={selectedSkill.requestedSkills}
+          userOfferedSkills={user?.skillsOffered || []}
           slots={selectedSkill.availableSlots && selectedSkill.availableSlots.length > 0 ? selectedSkill.availableSlots.map((s, i) => ({
             id: String(i),
             date: s.dayOfWeek,
@@ -487,16 +503,23 @@ const Marketplace = () => {
             isPrimary: i === 0
           })) : undefined}
           onClose={() => setIsBookModalOpen(false)}
-          onContinue={(slot) => {
-            setIsBookModalOpen(false);
-            navigate('/app/book-request', {
-              state: {
-                skillName: selectedSkill.title,
-                tutorName: selectedSkill.owner?.name || 'Unknown User',
-                price: selectedSkill.price,
-                slot: `${slot.date} · ${slot.time}`
-              }
-            });
+          onContinue={async (slot, message, offeredSkillName) => {
+            try {
+              setIsBookModalOpen(false);
+              const isSwap = selectedSkill.listingType === 'SWAP' || selectedSkill.listingType === 'TEACH_SWAP' || selectedSkill.listingType === 'LEARN_SWAP';
+              await exchangeService.createExchange({
+                listingId: selectedSkill._id || selectedSkill.id,
+                receiverId: selectedSkill.owner?.userId || selectedSkill.ownerId,
+                type: isSwap ? 'SWAP' : 'TUTORING',
+                proposedSessions: [{ startTime: slot.date + ' ' + slot.time, endTime: '', topic: selectedSkill.title }],
+                message: message,
+                offeredSkillName: isSwap ? offeredSkillName : undefined
+              });
+              triggerToast('Session request sent successfully!');
+            } catch (err) {
+              console.error(err);
+              triggerToast('Failed to send session request');
+            }
           }}
         />
       )}
