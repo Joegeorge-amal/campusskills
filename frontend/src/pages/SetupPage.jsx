@@ -51,7 +51,7 @@ const SetupPage = () => {
       if (saved) {
         const data = JSON.parse(saved);
         if (data.avatarColor && data.avatarColor.bg === '#EEEDFE') {
-           data.avatarColor = { bg: '#0ea5e9', text: '#ffffff' };
+           data.avatarColor = { bg: '#1d4ed8', text: '#EEEDFE' };
         }
         return data;
       }
@@ -75,7 +75,7 @@ const SetupPage = () => {
   const [programme, setProgramme] = useState(initData.programme || '');
   const [bio, setBio] = useState(initData.bio || '');
   const [upi, setUpi] = useState(initData.upi || '');
-  const [avatarColor, setAvatarColor] = useState(initData.avatarColor || { bg: '#0ea5e9', text: '#ffffff' });
+  const [avatarColor, setAvatarColor] = useState(initData.avatarColor || { bg: '#1d4ed8', text: '#EEEDFE' });
   const [avatarImg, setAvatarImg] = useState(initData.avatarImg || null);
   const [avatarFile, setAvatarFile] = useState(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -284,7 +284,7 @@ const SetupPage = () => {
   };
 
   const colors = [
-    { bg: '#0ea5e9', text: '#ffffff' },
+    { bg: '#1d4ed8', text: '#EEEDFE' },
     { bg: '#EEEDFE', text: '#3C3489' },
     { bg: '#E6F1FB', text: '#0C447C' },
     { bg: '#EAF3DE', text: '#27500A' },

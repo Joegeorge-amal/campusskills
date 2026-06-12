@@ -1,11 +1,20 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { IconSearch, IconAdjustmentsHorizontal, IconChevronDown } from '@tabler/icons-react';
-import { useAppData } from '../../context/AppDataContext';
+import { IconSearch, IconAdjustmentsHorizontal, IconChevronDown, IconLoader2 } from '@tabler/icons-react';
+import adminService from '../../services/adminService';
 import '../../styles/admin.css';
 
+const bgColors = ['#f0fdf4', '#eff6ff', '#fdf2f8', '#fffbeb', '#fef2f2'];
+const textColors = ['#166534', '#1e40af', '#9d174d', '#92400e', '#991b1b'];
+const getAvatarProps = (name) => {
+  const idx = (name || '').length % bgColors.length;
+  return { bg: bgColors[idx], col: textColors[idx], init: (name || 'U').charAt(0).toUpperCase() };
+};
+
 const AdminUsers = () => {
-  const { adminUsers, adminSuspendStudent } = useAppData();
-  
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -21,27 +30,43 @@ const AdminUsers = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const filteredUsers = adminUsers.filter(user => {
-    if (activeFilter === 'Active' && !user.active) return false;
-    if (activeFilter === 'Suspended' && user.active) return false;
-
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      const email = `${user.name.toLowerCase().replace(' ', '.')}@college.edu`;
-      if (
-        !user.name.toLowerCase().includes(q) &&
-        !email.includes(q) &&
-        !(user.meta && user.meta.toLowerCase().includes(q))
-      ) {
-        return false;
-      }
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await adminService.getUsers({
+        q: searchQuery || undefined,
+        status: activeFilter !== 'All' ? activeFilter : undefined
+      });
+      setUsers(res.data || []);
+    } catch (err) {
+      console.error('Failed to fetch users:', err);
+      setError('Failed to load users. Please try again later.');
+    } finally {
+      setLoading(false);
     }
-    return true;
-  });
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchUsers();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery, activeFilter]);
+
+  const handleToggleStatus = async (user) => {
+    try {
+      const isActive = user.status === 'ACTIVE';
+      await adminService.updateUserStatus(user.id, !isActive);
+      fetchUsers();
+    } catch (err) {
+      console.error('Failed to toggle status:', err);
+      alert('Failed to update user status.');
+    }
+  };
 
   return (
     <div className="admin-users-page fade-in">
-      {/* Top Search Bar */}
       <div className="admin-users-toolbar">
         <div className="admin-u-search">
           <IconSearch size={18} color="#9ca3af" />
@@ -82,53 +107,66 @@ const AdminUsers = () => {
         </div>
       </div>
 
-      {/* Users List */}
       <div className="admin-users-list">
-        {filteredUsers.length === 0 ? (
+        {loading ? (
+          <div className="admin-users-empty">
+            <IconLoader2 className="spinner" size={24} style={{ marginBottom: '8px', color: '#3b82f6' }} />
+            <div>Loading users...</div>
+          </div>
+        ) : error ? (
+          <div className="admin-users-empty" style={{ color: '#ef4444' }}>{error}</div>
+        ) : users.length === 0 ? (
           <div className="admin-users-empty">No users found matching your criteria.</div>
         ) : (
-          filteredUsers.map((user, idx) => (
-            <div key={idx} className="admin-user-row">
-              <div className="au-row-left">
-                <div className="au-avatar" style={{background: user.bg, color: user.col}}>
-                  {user.init}
+          users.map((user, idx) => {
+            const { bg, col, init } = getAvatarProps(user.displayName);
+            const isActive = user.status === 'ACTIVE';
+            return (
+              <div key={user.id || idx} className="admin-user-row">
+                <div className="au-row-left">
+                  <div className="au-avatar" style={{ background: bg, color: col }}>
+                    {init}
+                  </div>
+                  <div className="au-info">
+                    <div className="au-name">{user.displayName}</div>
+                    <div className="au-meta">
+                      {user.email} · {user.course || 'No course'}
+                    </div>
+                  </div>
                 </div>
-                <div className="au-info">
-                  <div className="au-name">{user.name}</div>
-                  <div className="au-meta">
-                    {user.name.toLowerCase().replace(' ', '.')}@college.edu · {user.meta}
+                <div className="au-row-right">
+                  <div className="au-stats">
+                    <div className="au-sessions">{user.sessionCount || 0} sessions</div>
+                    <div className="au-trust">Trust {user.trustScore || 0}%</div>
+                  </div>
+                  <div className="au-status">
+                    {isActive ? (
+                      <span className="au-pill active">active</span>
+                    ) : (
+                      <span className="au-pill suspended">suspended</span>
+                    )}
+                  </div>
+                  <div className="au-action">
+                    {isActive ? (
+                      <button 
+                        className="au-btn-suspend"
+                        onClick={() => handleToggleStatus(user)}
+                      >
+                        Suspend
+                      </button>
+                    ) : (
+                      <button 
+                        className="au-btn-reinstate"
+                        onClick={() => handleToggleStatus(user)}
+                      >
+                        Reinstate
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
-              <div className="au-row-right">
-                <div className="au-stats">
-                  <div className="au-sessions">{user.sessions} sessions</div>
-                  <div className="au-trust">Trust {Math.round(user.rating * 20)}%</div>
-                </div>
-                <div className="au-status">
-                  {user.active ? (
-                    <span className="au-pill active">active</span>
-                  ) : (
-                    <span className="au-pill suspended">suspended</span>
-                  )}
-                </div>
-                <div className="au-action">
-                  {user.active ? (
-                    <button 
-                      className="au-btn-suspend"
-                      onClick={() => adminSuspendStudent(user.name)}
-                    >
-                      Suspend
-                    </button>
-                  ) : (
-                    <button className="au-btn-reinstate">
-                      Reinstate
-                    </button>
-                  )}
-                </div>
-              </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>

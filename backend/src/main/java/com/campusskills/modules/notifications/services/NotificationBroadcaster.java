@@ -15,8 +15,10 @@ public class NotificationBroadcaster {
                     .payload(JsonObject.mapFrom(notification))
                     .build();
 
-            if (notification.getUserId() != null) {
-                ConnectionManager.sendMessage(notification.getUserId(), event);
+            if (com.campusskills.modules.notifications.models.NotificationAudience.ADMIN.equals(notification.getRecipientType())) {
+                ConnectionManager.broadcastToAdmins(event);
+            } else if (notification.getUserId() != null) {
+                ConnectionManager.broadcastToUser(notification.getUserId(), event);
             }
         } catch (Exception e) {
             System.err.println("[BROADCAST WARN] Failed to broadcast NOTIFICATION: " + e.getMessage());

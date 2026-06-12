@@ -105,6 +105,18 @@ public class SessionService {
             return repository.updateSessionFields(sessionId, updates).onSuccess(v -> {
                 sendNotification(session.getTeacherId(), com.campusskills.shared.constants.NotificationType.SESSION_DISPUTED, "Session Disputed", "The session has been marked as disputed.", "SESSION", sessionId);
                 sendNotification(session.getStudentId(), com.campusskills.shared.constants.NotificationType.SESSION_DISPUTED, "Session Disputed", "The session has been marked as disputed.", "SESSION", sessionId);
+                
+                // Notify Admin
+                if (eventBus != null) {
+                    JsonObject adminNotif = new JsonObject()
+                        .put("recipientType", "ADMIN")
+                        .put("type", "ADMIN_DISPUTE_RAISED")
+                        .put("title", "New dispute raised")
+                        .put("message", "Dispute filed for session " + sessionId)
+                        .put("sourceType", "SESSION")
+                        .put("sourceId", sessionId);
+                    eventBus.send("internal.notification.create", adminNotif);
+                }
             }).mapEmpty();
         });
     }

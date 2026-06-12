@@ -1,27 +1,49 @@
-import React, { useState } from 'react';
-import { IconSearch, IconStarFilled } from '@tabler/icons-react';
-import { useAppData } from '../../context/AppDataContext';
+import React, { useState, useEffect } from 'react';
+import { IconSearch, IconStarFilled, IconLoader2 } from '@tabler/icons-react';
+import adminService from '../../services/adminService';
 
 const AdminSkills = () => {
-  const { skills, adminRemoveSkill } = useAppData();
+  const [skills, setSkills] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
 
-  const filteredSkills = skills.filter(skill => {
-    if (activeFilter !== 'All' && skill.cat !== activeFilter) return false;
-
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      if (
-        !skill.name.toLowerCase().includes(q) &&
-        !skill.teacher.name.toLowerCase().includes(q)
-      ) {
-        return false;
-      }
+  const fetchSkills = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await adminService.getListings({
+        q: searchQuery || undefined,
+        status: activeFilter !== 'All' ? activeFilter : undefined
+      });
+      setSkills(res.data || []);
+    } catch (err) {
+      console.error('Failed to fetch skills:', err);
+      setError('Failed to load skills. Please try again later.');
+    } finally {
+      setLoading(false);
     }
-    return true;
-  });
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchSkills();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery, activeFilter]);
+
+  const handleRemoveSkill = async (id) => {
+    if (!window.confirm("Are you sure you want to remove this skill?")) return;
+    try {
+      await adminService.updateListingStatus(id, 'ADMIN_DISABLED');
+      fetchSkills();
+    } catch (err) {
+      console.error('Failed to remove skill:', err);
+      alert('Failed to remove skill.');
+    }
+  };
 
   return (
     <div className="fade-in">
@@ -72,40 +94,55 @@ const AdminSkills = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredSkills.length === 0 ? (
+            {loading ? (
+              <tr>
+                <td colSpan="5" style={{ textAlign: 'center', padding: '48px', color: '#64748b' }}>
+                  <IconLoader2 className="spinner" size={24} style={{ marginBottom: '8px', color: '#3b82f6' }} />
+                  <div>Loading skills...</div>
+                </td>
+              </tr>
+            ) : error ? (
+              <tr>
+                <td colSpan="5" style={{ textAlign: 'center', padding: '48px', color: '#ef4444' }}>
+                  {error}
+                </td>
+              </tr>
+            ) : skills.length === 0 ? (
               <tr>
                 <td colSpan="5" style={{ textAlign: 'center', padding: '48px', color: '#64748b' }}>
                   No skills found matching the criteria.
                 </td>
               </tr>
             ) : (
-              filteredSkills.map((skill) => (
+              skills.map((skill) => (
                 <tr key={skill.id}>
                   <td>
-                    <div style={{ fontWeight: 600, color: '#0f172a' }}>{skill.name}</div>
+                    <div style={{ fontWeight: 600, color: '#0f172a' }}>{skill.title}</div>
                     <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
-                      {skill.teacher.name} · {skill.teacher.year} · {skill.teacher.branch}
+                      {skill.ownerName} · {skill.status === 'ADMIN_DISABLED' ? 'Disabled' : 'Active'}
                     </div>
                   </td>
                   <td>
-                    <span className="badge badge-neutral">{skill.cat}</span>
+                    <span className="badge badge-neutral">{skill.category}</span>
                   </td>
                   <td style={{ textAlign: 'center', fontWeight: 500 }}>
-                    {skill.sessions}
+                    {skill.sessions || 0}
                   </td>
                   <td style={{ textAlign: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', fontWeight: 600, color: '#f59e0b' }}>
-                      {skill.rating} <IconStarFilled size={14} />
+                      {skill.rating || 'New'} <IconStarFilled size={14} />
                     </div>
                   </td>
                   <td style={{ textAlign: 'right' }}>
-                    <button 
-                      className="admin-btn admin-btn-outline" 
-                      style={{ padding: '6px 12px', fontSize: '0.75rem', color: '#ef4444' }}
-                      onClick={() => adminRemoveSkill(skill.id)}
-                    >
-                      Remove
-                    </button>
+                    {skill.status !== 'ADMIN_DISABLED' && (
+                      <button 
+                        className="admin-btn admin-btn-outline" 
+                        style={{ padding: '6px 12px', fontSize: '0.75rem', color: '#ef4444' }}
+                        onClick={() => handleRemoveSkill(skill.id)}
+                      >
+                        Remove
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))

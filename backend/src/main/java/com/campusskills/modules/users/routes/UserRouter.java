@@ -10,6 +10,7 @@ import com.campusskills.web.middleware.JwtAuthMiddleware;
 import io.vertx.core.Vertx;
 import io.vertx.ext.auth.jwt.JWTAuth;
 import io.vertx.ext.web.Router;
+import com.campusskills.core.config.Env;
 
 public class UserRouter {
 
@@ -23,7 +24,8 @@ public class UserRouter {
         com.campusskills.modules.users.repositories.RefreshTokenRepository refreshTokenRepository = new com.campusskills.modules.users.repositories.RefreshTokenRepository();
         com.campusskills.modules.users.repositories.OtpVerificationRepository otpRepository = new com.campusskills.modules.users.repositories.OtpVerificationRepository();
         
-        java.util.List<String> allowedDomains = java.util.Arrays.asList("kristujayanti.com");
+        String domainsEnv = Env.getOrDefault("ALLOWED_DOMAINS", "kristujayanti.com");
+        java.util.List<String> allowedDomains = java.util.Arrays.asList(domainsEnv.split(","));
         
         UserService service = new UserService(
             userRepository, 
@@ -34,7 +36,8 @@ public class UserRouter {
             otpRepository,
             emailService,
             jwtAuth,
-            allowedDomains
+            allowedDomains,
+            vertx.eventBus()
         );
         
         UserHandler handler = new UserHandler(service);

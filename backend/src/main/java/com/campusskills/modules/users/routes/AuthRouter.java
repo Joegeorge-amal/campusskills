@@ -38,7 +38,8 @@ public class AuthRouter {
             otpRepository,
             emailService,
             jwtAuth,
-            allowedDomains
+            allowedDomains,
+            vertx.eventBus()
         );
         AuthHandler handler = new AuthHandler(service);
 

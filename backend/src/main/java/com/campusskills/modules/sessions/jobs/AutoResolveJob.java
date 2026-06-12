@@ -14,9 +14,11 @@ public class AutoResolveJob {
     
     private static final Logger log = LoggerFactory.getLogger(AutoResolveJob.class);
     private final SessionRepository repository;
+    private final io.vertx.core.eventbus.EventBus eventBus;
     
-    public AutoResolveJob() {
+    public AutoResolveJob(io.vertx.core.eventbus.EventBus eventBus) {
         this.repository = new SessionRepository();
+        this.eventBus = eventBus;
     }
     
     public void start(Vertx vertx) {
@@ -28,9 +30,32 @@ public class AutoResolveJob {
             
             repository.autoResolveExpiredSessions().onComplete(ar -> {
                 if (ar.succeeded()) {
-                    Long count = ar.result();
-                    if (count > 0) {
-                        log.info("AutoResolveJob completed. Auto-resolved {} sessions.", count);
+                    List<Session> resolvedSessions = ar.result();
+                    if (!resolvedSessions.isEmpty()) {
+                        log.info("AutoResolveJob completed. Auto-resolved {} sessions.", resolvedSessions.size());
+                        if (eventBus != null) {
+                            for (Session s : resolvedSessions) {
+                                JsonObject notifTeacher = new JsonObject()
+                                    .put("userId", s.getTeacherId())
+                                    .put("type", "SESSION_COMPLETED")
+                                    .put("title", "Session Auto-Closed")
+                                    .put("message", "Your session was automatically closed due to inactivity.")
+                                    .put("sourceType", "SESSION")
+                                    .put("sourceId", s.getId());
+                                eventBus.send("internal.notification.create", notifTeacher);
+                                
+                                if (!s.getTeacherId().equals(s.getStudentId())) {
+                                    JsonObject notifStudent = new JsonObject()
+                                        .put("userId", s.getStudentId())
+                                        .put("type", "SESSION_COMPLETED")
+                                        .put("title", "Session Auto-Closed")
+                                        .put("message", "Your session was automatically closed due to inactivity.")
+                                        .put("sourceType", "SESSION")
+                                        .put("sourceId", s.getId());
+                                    eventBus.send("internal.notification.create", notifStudent);
+                                }
+                            }
+                        }
                     }
                 } else {
                     log.error("AutoResolveJob failed", ar.cause());

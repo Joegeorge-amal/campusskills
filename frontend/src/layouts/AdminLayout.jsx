@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { 
@@ -14,6 +14,7 @@ import Toast from '../components/common/Toast';
 import AdminNotifications from '../components/admin/AdminNotifications';
 import logo from '../assets/kju_campus_logo.png';
 import '../styles/admin.css';
+import adminService from '../services/adminService';
 
 const AdminLayout = () => {
   const { logout, user } = useAuth();
@@ -25,11 +26,38 @@ const AdminLayout = () => {
     navigate('/login');
   };
 
+  const [disputeCount, setDisputeCount] = useState(0);
+  const [hasLiveSessions, setHasLiveSessions] = useState(false);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const [disputesRes, sessionsRes] = await Promise.all([
+          adminService.getDisputes({ limit: 1 }), // Just fetch to get total count
+          adminService.getSessions({ status: 'LIVE', limit: 1 })
+        ]);
+        
+        // Count open disputes only (client-side approximation if we just fetch first page, but actually let's just use the total returned or a specific status if we want)
+        // Since backend pagination.total is total of requested status, let's just fetch OPEN disputes.
+        const openDisputesRes = await adminService.getDisputes({ status: 'OPEN', limit: 1 });
+        setDisputeCount(openDisputesRes?.pagination?.total || 0);
+        
+        setHasLiveSessions((sessionsRes?.pagination?.total || 0) > 0);
+      } catch (err) {
+        console.error('Failed to fetch admin layout stats:', err);
+      }
+    };
+    
+    fetchStats();
+    const interval = setInterval(fetchStats, 60000); // refresh every minute
+    return () => clearInterval(interval);
+  }, []);
+
   const navItems = [
     { label: 'Overview', path: '/admin/dashboard', icon: <IconLayoutDashboard size={18} /> },
     { label: 'Users', path: '/admin/users', icon: <IconUsers size={18} /> },
-    { label: 'Disputes', path: '/admin/reports', icon: <IconAlertTriangle size={18} />, badge: '3' },
-    { label: 'Sessions', path: '/admin/sessions', icon: <IconCalendarEvent size={18} />, status: 'LIVE' },
+    { label: 'Disputes', path: '/admin/reports', icon: <IconAlertTriangle size={18} />, badge: disputeCount > 0 ? disputeCount.toString() : null },
+    { label: 'Sessions', path: '/admin/sessions', icon: <IconCalendarEvent size={18} />, status: hasLiveSessions ? 'LIVE' : null },
     { label: 'Analytics', path: '/admin/analytics', icon: <IconChartBar size={18} /> },
     { label: 'Settings', path: '/admin/settings', icon: <IconSettings size={18} /> }
   ];

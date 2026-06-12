@@ -41,13 +41,14 @@ public class WebSocketHandler implements Handler<ServerWebSocket> {
         jwtAuth.authenticate(new JsonObject().put("token", token))
             .onSuccess(user -> {
                 String userId = user.principal().getString("userId");
+                String role = user.principal().getString("role");
                 if (userId == null) {
                     ws.reject(401);
                     return;
                 }
 
-                log.info("New WebSocket connection for user: {}", userId);
-                ConnectionManager.addConnection(userId, ws);
+                log.info("New WebSocket connection for user: {} with role: {}", userId, role);
+                ConnectionManager.addConnection(userId, role, ws);
                 
                 ws.handler(buffer -> {
                     log.debug("Received message from {}: {}", userId, buffer.toString());

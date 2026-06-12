@@ -13,7 +13,7 @@ public class MessageRouter {
         MessageRepository repository = new MessageRepository();
         com.campusskills.modules.messages.services.TypingIndicatorService typingService = 
             new com.campusskills.modules.messages.services.TypingIndicatorService(vertx, repository);
-        MessageService service = new MessageService(repository, typingService);
+        MessageService service = new MessageService(repository, typingService, vertx.eventBus());
         MessageHandler handler = new MessageHandler(service);
 
         router.post("/").handler(handler::createMessage);

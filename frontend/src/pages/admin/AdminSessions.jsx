@@ -1,26 +1,56 @@
-import React, { useState } from 'react';
-import { IconSearch } from '@tabler/icons-react';
-import { adminSessionsList } from '../../data/adminDashboardData';
+import React, { useState, useEffect } from 'react';
+import { IconSearch, IconLoader2 } from '@tabler/icons-react';
+import adminService from '../../services/adminService';
 
 const AdminSessions = () => {
+  const [sessions, setSessions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
 
-  const filteredSessions = adminSessionsList.filter(session => {
-    if (activeFilter !== 'All' && session.status.toLowerCase() !== activeFilter.toLowerCase()) return false;
-
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      if (
-        !session.title.toLowerCase().includes(q) &&
-        !session.tutor.toLowerCase().includes(q) &&
-        !session.learner.toLowerCase().includes(q)
-      ) {
-        return false;
-      }
+  const fetchSessions = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await adminService.getSessions({
+        q: searchQuery || undefined,
+        status: activeFilter !== 'All' ? activeFilter : undefined
+      });
+      setSessions(res.data || []);
+    } catch (err) {
+      console.error('Failed to fetch sessions:', err);
+      setError('Failed to load sessions. Please try again later.');
+    } finally {
+      setLoading(false);
     }
-    return true;
-  });
+  };
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchSessions();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery, activeFilter]);
+
+  const handleCancel = async (id) => {
+    if (!window.confirm("Are you sure you want to cancel this session?")) return;
+    try {
+      await adminService.cancelSession(id, "Cancelled by Admin");
+      fetchSessions();
+    } catch (err) {
+      console.error('Failed to cancel session:', err);
+      alert('Failed to cancel session.');
+    }
+  };
+
+  // Compute stats locally from fetched data
+  const liveCount = sessions.filter(s => s.status === 'LIVE' || s.status === 'IN_PROGRESS').length;
+  const upcomingCount = sessions.filter(s => s.status === 'UPCOMING' || s.status === 'PENDING').length;
+  const completedCount = sessions.filter(s => s.status === 'COMPLETED').length;
+  const todayCount = liveCount + upcomingCount + completedCount; // Approximate for demo
+
 
   return (
     <div className="admin-sessions-page fade-in">
@@ -67,48 +97,64 @@ const AdminSessions = () => {
       {/* Top Stat Cards */}
       <div className="admin-sessions-stats">
         <div className="as-stat-card live">
-          <div className="as-stat-val">1</div>
+          <div className="as-stat-val">{liveCount}</div>
           <div className="as-stat-lbl">LIVE NOW</div>
         </div>
         <div className="as-stat-card upcoming">
-          <div className="as-stat-val">6</div>
+          <div className="as-stat-val">{upcomingCount}</div>
           <div className="as-stat-lbl">UPCOMING</div>
         </div>
         <div className="as-stat-card today">
-          <div className="as-stat-val">9</div>
+          <div className="as-stat-val">{todayCount}</div>
           <div className="as-stat-lbl">TODAY TOTAL</div>
         </div>
         <div className="as-stat-card completed">
-          <div className="as-stat-val">463</div>
+          <div className="as-stat-val">{completedCount}</div>
           <div className="as-stat-lbl">COMPLETED</div>
         </div>
       </div>
 
       {/* Sessions List */}
       <div className="admin-sessions-list">
-        {filteredSessions.length === 0 ? (
+        {loading ? (
+          <div className="as-empty-state">
+            <IconLoader2 className="spinner" size={24} style={{ marginBottom: '8px', color: '#3b82f6' }} />
+            <div>Loading sessions...</div>
+          </div>
+        ) : error ? (
+          <div className="as-empty-state" style={{ color: '#ef4444' }}>{error}</div>
+        ) : sessions.length === 0 ? (
           <div className="as-empty-state">No sessions found matching your criteria.</div>
         ) : (
-          filteredSessions.map(session => (
-            <div key={session.id} className="as-card">
-              <div className="as-card-left">
-                <div className="as-dot" style={{ background: session.dot }}></div>
-                <div className="as-info">
-                  <div className="as-title-row">
-                    <span className="as-title">{session.title}</span>
-                    {session.status === 'LIVE' && <span className="as-status-pill live">LIVE</span>}
-                    {session.status === 'Done' && <span className="as-status-pill done">Done</span>}
-                  </div>
-                  <div className="as-meta">
-                    {session.tutor} &rarr; {session.learner} &middot; {session.time} &middot; {session.location} &middot; <span className="as-price">{session.price}</span>
+          sessions.map(session => {
+            const statusUpper = (session.status || '').toUpperCase();
+            const timeStr = session.scheduledAt ? new Date(session.scheduledAt).toLocaleString() : 'Unknown time';
+            const priceStr = session.price ? `${session.currency || 'INR'} ${session.price}` : 'Free';
+            const dotColor = statusUpper === 'LIVE' || statusUpper === 'IN_PROGRESS' ? '#ef4444' : (statusUpper === 'COMPLETED' ? '#10b981' : '#3b82f6');
+            
+            return (
+              <div key={session.id} className="as-card">
+                <div className="as-card-left">
+                  <div className="as-dot" style={{ background: dotColor }}></div>
+                  <div className="as-info">
+                    <div className="as-title-row">
+                      <span className="as-title">{session.title || 'Untitled Session'}</span>
+                      {(statusUpper === 'LIVE' || statusUpper === 'IN_PROGRESS') && <span className="as-status-pill live">LIVE</span>}
+                      {statusUpper === 'COMPLETED' && <span className="as-status-pill done">Done</span>}
+                    </div>
+                    <div className="as-meta">
+                      {session.tutor} &rarr; {session.learner} &middot; {timeStr} &middot; {session.mode || 'Online'} &middot; <span className="as-price">{priceStr}</span>
+                    </div>
                   </div>
                 </div>
+                <div className="as-card-right">
+                  {statusUpper !== 'COMPLETED' && statusUpper !== 'CANCELLED' && (
+                    <button className="as-cancel-btn" onClick={() => handleCancel(session.id)}>Cancel</button>
+                  )}
+                </div>
               </div>
-              <div className="as-card-right">
-                <button className="as-cancel-btn">Cancel</button>
-              </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
 

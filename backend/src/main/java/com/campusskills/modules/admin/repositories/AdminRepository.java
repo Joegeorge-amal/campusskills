@@ -32,10 +32,15 @@ public class AdminRepository {
         
         pipeline.add(new JsonObject().put("$match", matchStage));
 
+        // Create string version of _id for lookups since other collections store userId as string
+        pipeline.add(new JsonObject().put("$addFields", new JsonObject()
+            .put("userIdStr", new JsonObject().put("$toString", "$_id"))
+        ));
+
         // 2. Lookup user_profiles
         pipeline.add(new JsonObject().put("$lookup", new JsonObject()
             .put("from", "user_profiles")
-            .put("localField", "_id")
+            .put("localField", "userIdStr")
             .put("foreignField", "userId")
             .put("as", "profile")
         ));
@@ -47,7 +52,7 @@ public class AdminRepository {
         // 3. Lookup user_stats
         pipeline.add(new JsonObject().put("$lookup", new JsonObject()
             .put("from", "user_stats")
-            .put("localField", "_id")
+            .put("localField", "userIdStr")
             .put("foreignField", "userId")
             .put("as", "stats")
         ));
@@ -61,7 +66,7 @@ public class AdminRepository {
             JsonObject regex = new JsonObject().put("$regex", q.trim()).put("$options", "i");
             JsonArray orConditions = new JsonArray()
                 .add(new JsonObject().put("email", regex))
-                .add(new JsonObject().put("profile.displayName", regex));
+                .add(new JsonObject().put("profile.name", regex));
             pipeline.add(new JsonObject().put("$match", new JsonObject().put("$or", orConditions)));
         }
 
@@ -113,15 +118,21 @@ public class AdminRepository {
                         trustScore = (int) Math.round((double) sessionsAttended / sessionsCompleted * 100);
                     }
 
+                    String prog = profile.getString("programme");
+                    String yr = profile.getString("year");
+                    String courseStr = "";
+                    if (prog != null && !prog.equals("null") && !prog.trim().isEmpty()) courseStr += prog.trim();
+                    if (yr != null && !yr.equals("null") && !yr.trim().isEmpty()) courseStr += (courseStr.isEmpty() ? "" : " ") + yr.trim();
+
                     formattedData.add(new JsonObject()
                         .put("id", user.getString("_id"))
                         .put("email", user.getString("email"))
                         .put("role", user.getString("role"))
                         .put("status", user.getBoolean("isActive", true) ? "ACTIVE" : "SUSPENDED")
                         .put("createdAt", user.getLong("createdAt"))
-                        .put("displayName", profile.getString("displayName", "Unknown User"))
+                        .put("displayName", profile.getString("name", "Unknown User"))
                         .put("avatar", profile.getString("profilePicture"))
-                        .put("course", profile.getString("programme", "") + " " + profile.getString("year", ""))
+                        .put("course", courseStr.isEmpty() ? null : courseStr)
                         .put("sessionCount", sessionsCompleted)
                         .put("trustScore", trustScore)
                     );
@@ -208,10 +219,10 @@ public class AdminRepository {
                     String participant2Name = "Unknown";
                     
                     if (profiles.size() > 0) {
-                        participant1Name = profiles.getJsonObject(0).getString("displayName", "Unknown");
+                        participant1Name = profiles.getJsonObject(0).getString("name", "Unknown");
                     }
                     if (profiles.size() > 1) {
-                        participant2Name = profiles.getJsonObject(1).getString("displayName", "Unknown");
+                        participant2Name = profiles.getJsonObject(1).getString("name", "Unknown");
                     }
 
                     formattedData.add(new JsonObject()
@@ -248,25 +259,33 @@ public class AdminRepository {
         }
 
         if (q != null && !q.trim().isEmpty()) {
-            // Text search on sessions (title, description, etc.)
-            matchStage.put("$text", new JsonObject().put("$search", q.trim()));
+            // regex search on topic instead of text index
+            matchStage.put("topic", new JsonObject().put("$regex", q.trim()).put("$options", "i"));
         }
 
         if (!matchStage.isEmpty()) {
             pipeline.add(new JsonObject().put("$match", matchStage));
         }
 
-        // 2. Lookup user_profiles for participants
+        // 2. Lookup teacher profile
         pipeline.add(new JsonObject().put("$lookup", new JsonObject()
             .put("from", "user_profiles")
-            .put("localField", "participants")
+            .put("localField", "teacherId")
             .put("foreignField", "userId")
-            .put("as", "participantProfiles")
+            .put("as", "teacherProfile")
+        ));
+        
+        // 3. Lookup student profile
+        pipeline.add(new JsonObject().put("$lookup", new JsonObject()
+            .put("from", "user_profiles")
+            .put("localField", "studentId")
+            .put("foreignField", "userId")
+            .put("as", "studentProfile")
         ));
 
-        // 3. Facet for pagination
+        // 4. Facet for pagination
         JsonArray dataFacet = new JsonArray()
-            .add(new JsonObject().put("$sort", new JsonObject().put("scheduledAt", 1))) // Ascending order to show upcoming next
+            .add(new JsonObject().put("$sort", new JsonObject().put("scheduledStart", 1))) // Ascending order to show upcoming next
             .add(new JsonObject().put("$skip", skip))
             .add(new JsonObject().put("$limit", limit));
 
@@ -298,28 +317,22 @@ public class AdminRepository {
                 JsonArray formattedData = new JsonArray();
                 for (int i = 0; i < data.size(); i++) {
                     JsonObject session = data.getJsonObject(i);
-                    JsonArray profiles = session.getJsonArray("participantProfiles", new JsonArray());
+                    JsonArray teacherArr = session.getJsonArray("teacherProfile", new JsonArray());
+                    JsonArray studentArr = session.getJsonArray("studentProfile", new JsonArray());
                     
-                    String participant1Name = "Unknown";
-                    String participant2Name = "Unknown";
-                    
-                    if (profiles.size() > 0) {
-                        participant1Name = profiles.getJsonObject(0).getString("displayName", "Unknown");
-                    }
-                    if (profiles.size() > 1) {
-                        participant2Name = profiles.getJsonObject(1).getString("displayName", "Unknown");
-                    }
+                    String teacherName = teacherArr.isEmpty() ? "Unknown Tutor" : teacherArr.getJsonObject(0).getString("name", "Unknown Tutor");
+                    String studentName = studentArr.isEmpty() ? "Unknown Learner" : studentArr.getJsonObject(0).getString("name", "Unknown Learner");
 
                     formattedData.add(new JsonObject()
                         .put("id", session.getString("_id"))
                         .put("status", session.getString("status"))
-                        .put("title", session.getString("listingTitle", "Session"))
-                        .put("tutor", participant1Name) // Assuming first participant is tutor based on how we usually structure it
-                        .put("learner", participant2Name)
-                        .put("mode", session.getString("mode", "Online"))
-                        .put("price", session.getDouble("price", 0.0))
-                        .put("currency", session.getString("currency", "INR"))
-                        .put("scheduledAt", session.getLong("scheduledAt"))
+                        .put("title", session.getString("topic", "Untitled Session"))
+                        .put("tutor", teacherName)
+                        .put("learner", studentName)
+                        .put("mode", session.getString("meetingPlatform", "Online"))
+                        .put("price", 0.0)
+                        .put("currency", "INR")
+                        .put("scheduledAt", session.getLong("scheduledStart"))
                     );
                 }
 
@@ -396,7 +409,7 @@ public class AdminRepository {
                 .add(new JsonObject().put("title", regex))
                 .add(new JsonObject().put("description", regex))
                 .add(new JsonObject().put("category", regex))
-                .add(new JsonObject().put("owner.displayName", regex));
+                .add(new JsonObject().put("owner.name", regex));
             pipeline.add(new JsonObject().put("$match", new JsonObject().put("$or", orConditions)));
         }
 
@@ -441,7 +454,7 @@ public class AdminRepository {
                         .put("status", listing.getString("status", "ACTIVE"))
                         .put("active", listing.getBoolean("active", true))
                         .put("createdAt", listing.getLong("createdAt"))
-                        .put("ownerName", owner.getString("displayName", "Unknown"))
+                        .put("ownerName", owner.getString("name", "Unknown"))
                         .put("ownerId", listing.getString("teacherId"))
                     );
                 }

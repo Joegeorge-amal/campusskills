@@ -1,4 +1,5 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
+import { useWebSocket } from './WebSocketContext';
 import { useAuth } from './AuthContext';
 
 const AppDataContext = createContext();
@@ -42,6 +43,41 @@ export const AppDataProvider = ({ children }) => {
   const markAllAsRead = () => {
     setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
   };
+
+  const { lastMessage } = useWebSocket();
+
+  useEffect(() => {
+    if (lastMessage && lastMessage.type === 'NOTIFICATION') {
+      const newNotif = {
+        id: lastMessage.payload.id || Date.now(),
+        type: lastMessage.payload.type.toLowerCase(),
+        title: lastMessage.payload.title,
+        message: lastMessage.payload.message,
+        time: 'Just now',
+        unread: true
+      };
+      setNotifications(prev => [newNotif, ...prev]);
+    } else if (lastMessage && lastMessage.type === 'NEW_MESSAGE') {
+      const msg = lastMessage.payload;
+      setConversations(prev => prev.map(chat => {
+        if (chat.id === msg.chatId || (chat.participants && chat.participants.includes(msg.senderId))) {
+          return {
+            ...chat,
+            lastMsg: msg.message,
+            time: 'Just now',
+            unreadCount: (chat.unreadCount || 0) + 1,
+            msgs: [...(chat.msgs || []), {
+              id: msg.id || Date.now(),
+              text: msg.message,
+              sender: 'them',
+              time: 'Just now'
+            }]
+          };
+        }
+        return chat;
+      }));
+    }
+  }, [lastMessage]);
 
   // 1. Marketplace skills list (removed, now fetching from backend, keeping empty array for mock references)
   const [skills, setSkills] = useState([]);
@@ -295,64 +331,6 @@ export const AppDataProvider = ({ children }) => {
     }
   ]);
 
-  // 7. Admin Sessions List
-  const [adminSessions, setAdminSessions] = useState([
-    {
-      id: 1,
-      title: 'React.js basics',
-      participants: 'Priya S. → Arjun K.',
-      dateTime: '22 May · 4PM',
-      amount: '₹300',
-      status: 'Upcoming',
-      statusCls: 'c-code'
-    },
-    {
-      id: 2,
-      title: 'C++ · Swap',
-      participants: 'Arjun K. → Sai M.',
-      dateTime: '25 May · 5:30PM',
-      amount: 'Swap',
-      status: 'Upcoming',
-      statusCls: 'c-mus'
-    },
-    {
-      id: 3,
-      title: 'DSA',
-      participants: 'Arjun K. → Rohan M.',
-      dateTime: '14 May · 3PM',
-      amount: '₹300',
-      status: 'Completed',
-      statusCls: 'c-code'
-    },
-    {
-      id: 4,
-      title: 'Japanese N5',
-      participants: 'Aisha T. → Priya S.',
-      dateTime: '18 May · 5PM',
-      amount: '₹250',
-      status: 'Completed',
-      statusCls: 'c-code'
-    },
-    {
-      id: 5,
-      title: 'Guitar basics',
-      participants: 'Sneha K. → Vikram N.',
-      dateTime: '10 May · 6PM',
-      amount: '₹150',
-      status: 'Reported',
-      statusCls: 'c-mus'
-    }
-  ]);
-
-  // 8. Admin Users list
-  const [adminUsers, setAdminUsers] = useState([
-    { name: 'Priya S.', init: 'PS', bg: '#E6F1FB', col: '#0C447C', meta: '3rd yr · CSE', sessions: 12, rating: '4.9', active: true },
-    { name: 'Rohan M.', init: 'RM', bg: '#FBEAF0', col: '#72243E', meta: '2nd yr · ECE', sessions: 8, rating: '4.7', active: true },
-    { name: 'Aisha T.', init: 'AT', bg: '#EAF3DE', col: '#27500A', meta: '4th yr · MBA', sessions: 5, rating: '5.0', active: true },
-    { name: 'Vikram N.', init: 'VN', bg: '#FAEEDA', col: '#633806', meta: '3rd yr · ECE', sessions: 15, rating: '4.8', active: true },
-    { name: 'Sneha K.', init: 'SK', bg: '#EEEDFE', col: '#3C3489', meta: '1st yr · ECE', sessions: 6, rating: '4.6', active: true },
-    { name: 'Dev R.', init: 'DR', bg: '#E6F1FB', col: '#0C447C', meta: '4th yr · CSE', sessions: 20, rating: '4.9', active: true }
-  ]);
 
   // ─── TOAST TRIGGER ───
   const triggerToast = (msg) => {
@@ -596,59 +574,6 @@ export const AppDataProvider = ({ children }) => {
     setBookedSessions(prev => [newSession, ...prev]);
   };
 
-  const adminRemoveSkill = (skillId) => {
-    setSkills((prev) => prev.filter((s) => s.id !== skillId));
-    setAdminSessions((prev) => prev.filter((s) => s.id !== skillId));
-    triggerToast('Skill removed from platform.');
-  };
-
-  const adminSuspendStudent = (studentName) => {
-    setAdminUsers((prev) =>
-      prev.map((u) => {
-        if (u.name === studentName) return { ...u, active: false };
-        return u;
-      })
-    );
-    triggerToast(`Student account suspended.`);
-  };
-
-  const adminWarnUser = (studentName) => {
-    triggerToast(`Warning sent to ${studentName}`);
-  };
-
-  const adminIssueRefund = (reportId, amount, reporter) => {
-    setAdminReports((prev) =>
-      prev.map((r) => {
-        if (r.id === reportId) return { ...r, status: 'refunded' };
-        return r;
-      })
-    );
-
-    // If report reporter is Arjun K., refund to user wallet
-    if (reporter === 'Arjun K.') {
-      updateProfile({ walletBalance: user.walletBalance + amount });
-      const newTx = {
-        id: Date.now(),
-        title: 'Refund received · Admin resolution',
-        desc: 'Wallet credited',
-        amount: `+₹${amount}`,
-        type: 'received',
-        date: 'Today'
-      };
-      setTransactions((prev) => [newTx, ...prev]);
-    }
-    triggerToast(`Refund of ₹${amount} issued.`);
-  };
-
-  const adminDismissReport = (reportId) => {
-    setAdminReports((prev) =>
-      prev.map((r) => {
-        if (r.id === reportId) return { ...r, status: 'dismissed' };
-        return r;
-      })
-    );
-    triggerToast('Report dismissed.');
-  };
 
   const unreadMessagesCount = conversations.reduce((acc, c) => acc + (c.unread || 0), 0);
   const pendingRequestsCount = requests.filter(r => r.status.toLowerCase() === 'pending').length;
@@ -662,8 +587,6 @@ export const AppDataProvider = ({ children }) => {
         requests,
         bookedSessions,
         adminReports,
-        adminSessions,
-        adminUsers,
         toastMessage,
         triggerToast,
         sendChatMessage,
@@ -674,11 +597,6 @@ export const AppDataProvider = ({ children }) => {
         acceptRequest,
         declineRequest,
         addSkillOffering,
-        adminRemoveSkill,
-        adminSuspendStudent,
-        adminWarnUser,
-        adminIssueRefund,
-        adminDismissReport,
         createSession,
         notifications,
         markAllAsRead,

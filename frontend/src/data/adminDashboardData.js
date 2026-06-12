@@ -61,17 +61,6 @@ export const pendingDisputes = [
   { id: 'D-043', parties: 'Raj S. vs Dev R.', reason: 'Late refund · Machine Learning Basics', date: 'Filed June 3, 2026', amount: 450, status: 'reviewing' },
 ];
 
-export const mockNotifications = [
-  { id: 1, type: 'user', title: 'New student registered', message: 'Ananya Sharma joined CampusSkills.', time: '2 min ago', unread: true },
-  { id: 2, type: 'session', title: 'Session booked', message: 'Rohan K. booked a React.js session with Priya.', time: '15 min ago', unread: true },
-  { id: 3, type: 'payment', title: 'Payment received', message: '₹300 received for DSA tutoring session.', time: '1 hr ago', unread: true },
-  { id: 4, type: 'dispute', title: 'New dispute raised', message: 'Dispute #D-041 filed by Meera Singh.', time: '2 hr ago', unread: true },
-  { id: 5, type: 'success', title: 'Dispute resolved', message: 'Dispute #D-038 closed successfully.', time: '5 hr ago', unread: false },
-  { id: 6, type: 'user', title: 'Profile updated', message: 'Arjun N. updated their tutor profile.', time: '1 day ago', unread: false },
-  { id: 7, type: 'payment', title: 'Payout processed', message: '₹1200 transferred to Dev Rao.', time: '2 days ago', unread: false },
-  { id: 8, type: 'success', title: 'System update', message: 'v1.4.2 deployed successfully.', time: '2 days ago', unread: false }
-];
-
 export const adminAnalyticsStats = {
   totalRegistrations: { value: '3,658', sub: '2024' },
   peakMonth: { value: 'Dec', sub: '468 students' },
@@ -94,41 +83,7 @@ export const adminAnalyticsChartData = [
   { month: 'Dec', value: 468 }
 ];
 
-export const adminSessionsList = [
-  { id: 1, title: 'React.js basics', status: 'LIVE', tutor: 'Priya S.', learner: 'Arjun K.', time: 'Today 4:00 PM', location: 'Online', price: '₹300', dot: '#10b981' },
-  { id: 2, title: 'Figma UI design', status: 'Upcoming', tutor: 'Rohan M.', learner: 'Deepa R.', time: 'Today 6:30 PM', location: 'In-person', price: '₹250', dot: '#3b82f6' },
-  { id: 3, title: 'Japanese N5', status: 'Upcoming', tutor: 'Aisha T.', learner: 'Siddharth M.', time: 'Tomorrow 10 AM', location: 'Online', price: 'Swap', dot: '#3b82f6' },
-  { id: 4, title: 'Guitar basics', status: 'Upcoming', tutor: 'Sneha K.', learner: 'Kavya P.', time: 'Tomorrow 3:00 PM', location: 'In-person', price: '₹150', dot: '#3b82f6' },
-  { id: 5, title: 'Data Structures', status: 'Upcoming', tutor: 'Dev R.', learner: 'Meera K.', time: 'Tomorrow 5:00 PM', location: 'Online', price: '₹400', dot: '#3b82f6' },
-  { id: 6, title: 'Machine Learning', status: 'Upcoming', tutor: 'Kiran D.', learner: 'Raj S.', time: 'Jun 12, 2:00 PM', location: 'Online', price: '₹500', dot: '#3b82f6' },
-  { id: 7, title: 'DSA — Graphs', status: 'Done', tutor: 'Priya S.', learner: 'Tanvi B.', time: 'Today 2:00 PM', location: 'Online', price: '₹350', dot: '#cbd5e1' },
-  { id: 8, title: 'Business Communication', status: 'Done', tutor: 'Aisha T.', learner: 'Arjun N.', time: 'Today 11:00 AM', location: 'In-person', price: 'Swap', dot: '#cbd5e1' },
-  { id: 9, title: 'Python Basics', status: 'Done', tutor: 'Dev R.', learner: 'Divya P.', time: 'Yesterday', location: 'Online', price: '₹200', dot: '#cbd5e1' },
-];
 
-export const adminDisputesDetailed = [
-  { 
-    id: 'D-041', 
-    status: 'open',
-    parties: 'Ankit P. vs Rohan M.', 
-    meta: 'No-show session · Amount: ₹300', 
-    description: 'I booked a React.js session with Rohan M. for June 5th at 4:00 PM. I paid ₹300 in advance via UPI. Rohan never joined the session and did not respond to my messages before or after the scheduled time. I waited for 30 minutes and then left. I have tried contacting him twice after but received no reply. I am requesting a full refund of ₹300 and appropriate action against the tutor.'
-  },
-  { 
-    id: 'D-042', 
-    status: 'open',
-    parties: 'Meera K. vs Vikram N.', 
-    meta: 'Incorrect skill level · Amount: ₹200', 
-    description: 'I requested a tutor for Advanced Data Structures (trees, graphs, dynamic programming). Vikram N. listed himself as proficient in this area. However during the session it became clear he only had basic knowledge — he could not explain Red-Black Trees or Dijkstra\'s algorithm and kept referring to external resources. The session was not useful for my exam preparation. I paid ₹200 and I believe I deserve at least a partial refund since the advertised skill level was misrepresented.'
-  },
-  { 
-    id: 'D-043', 
-    status: 'reviewing',
-    parties: 'Raj S. vs Dev R.', 
-    meta: 'Late refund · Amount: ₹450', 
-    description: 'I cancelled my session with Dev R. on May 27th (24 hours before the scheduled time) as per the platform\'s cancellation policy, which states a full refund should be issued within 3-5 business days. It has now been 7 business days and I have not received my refund of ₹450. Dev acknowledged the cancellation over chat but claims he already initiated the refund. I have checked with my bank and no such transaction has come through. I am requesting immediate resolution and the refund to be processed.'
-  }
-];
 
 export const adminPaymentStats = {
   totalRevenue: { value: '₹2,36,450', sub: '+₹18,200 this week' },

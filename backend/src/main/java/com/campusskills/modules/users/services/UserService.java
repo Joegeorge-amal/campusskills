@@ -43,6 +43,7 @@ public class UserService {
         private final com.campusskills.modules.users.repositories.PasswordResetTokenRepository passwordResetTokenRepository = new com.campusskills.modules.users.repositories.PasswordResetTokenRepository();
     private final JWTAuth jwtAuth;
     private final List<String> allowedDomains;
+    private final io.vertx.core.eventbus.EventBus eventBus;
 
     public UserService(UserRepository userRepository, 
                        UserProfileRepository profileRepository,
@@ -52,7 +53,8 @@ public class UserService {
                        com.campusskills.modules.users.repositories.OtpVerificationRepository otpRepository,
                        com.campusskills.shared.services.EmailService emailService,
                        JWTAuth jwtAuth,
-                       List<String> allowedDomains) {
+                       List<String> allowedDomains,
+                       io.vertx.core.eventbus.EventBus eventBus) {
         this.userRepository = userRepository;
         this.profileRepository = profileRepository;
         this.statsRepository = statsRepository;
@@ -62,6 +64,7 @@ public class UserService {
         this.emailService = emailService;
         this.jwtAuth = jwtAuth;
         this.allowedDomains = allowedDomains != null ? allowedDomains : new ArrayList<>();
+        this.eventBus = eventBus;
     }
     
     private String generateSecureToken() {
@@ -175,7 +178,20 @@ public class UserService {
                     });
 
                 return CompositeFuture.all(profileFut, statsFut, walletFut, otpFut)
-                    .compose(cf -> generateAuthResponse(user, true));
+                    .compose(cf -> {
+                        // Emit admin notification
+                        if (eventBus != null) {
+                            JsonObject notificationPayload = new JsonObject()
+                                .put("recipientType", "ADMIN")
+                                .put("title", "New student registered")
+                                .put("message", (name != null ? name : normalizedEmail.split("@")[0]) + " joined CampusSkills.")
+                                .put("type", "ADMIN_NEW_STUDENT")
+                                .put("sourceType", "USER")
+                                .put("sourceId", userId);
+                            eventBus.send("internal.notification.create", notificationPayload);
+                        }
+                        return generateAuthResponse(user, true);
+                    });
             });
         });
     }

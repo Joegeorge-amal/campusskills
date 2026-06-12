@@ -3,6 +3,7 @@ package com.campusskills.modules.notifications.repositories;
 import com.campusskills.core.database.MongoManager;
 import com.campusskills.modules.notifications.models.Notification;
 import com.campusskills.modules.notifications.models.NotificationType;
+import com.campusskills.modules.notifications.models.NotificationAudience;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.MongoClient;
@@ -140,5 +141,52 @@ public class NotificationRepository {
             .put("userId", userId)
             .put("isRead", false);
         return client.count(COLLECTION, query);
+    }
+
+    public Future<List<Notification>> fetchAdminNotifications(int skip, int limit) {
+        JsonObject query = new JsonObject().put("recipientType", NotificationAudience.ADMIN.name());
+        
+        io.vertx.ext.mongo.FindOptions options = new io.vertx.ext.mongo.FindOptions()
+                .setSort(new JsonObject().put("updatedAt", -1))
+                .setSkip(skip)
+                .setLimit(limit);
+
+        return client.findWithOptions(COLLECTION, query, options)
+                .map(list -> list.stream().map(doc -> {
+                    doc.put("id", doc.getString("_id"));
+                    doc.remove("_id");
+                    return doc.mapTo(Notification.class);
+                }).collect(Collectors.toList()));
+    }
+
+    public Future<Long> countUnreadAdminNotifications() {
+        JsonObject query = new JsonObject()
+            .put("recipientType", NotificationAudience.ADMIN.name())
+            .put("isRead", false);
+        return client.count(COLLECTION, query);
+    }
+
+    public Future<Boolean> markAdminNotificationAsRead(String id) {
+        JsonObject query = new JsonObject()
+            .put("_id", id)
+            .put("recipientType", NotificationAudience.ADMIN.name());
+            
+        JsonObject update = new JsonObject().put("$set", new JsonObject()
+            .put("isRead", true)
+            .put("updatedAt", System.currentTimeMillis()));
+
+        return client.updateCollection(COLLECTION, query, update).map(res -> res.getDocModified() > 0);
+    }
+    
+    public Future<Long> markAllAdminNotificationsAsRead() {
+        JsonObject query = new JsonObject()
+            .put("recipientType", NotificationAudience.ADMIN.name())
+            .put("isRead", false);
+            
+        JsonObject update = new JsonObject().put("$set", new JsonObject()
+            .put("isRead", true)
+            .put("updatedAt", System.currentTimeMillis()));
+
+        return client.updateCollection(COLLECTION, query, update).map(res -> res.getDocModified());
     }
 }

@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
-import { IconSearch } from '@tabler/icons-react';
-import { useAppData } from '../../context/AppDataContext';
-import { adminDisputesDetailed } from '../../data/adminDashboardData';
+import React, { useState, useEffect } from 'react';
+import { IconSearch, IconLoader2 } from '@tabler/icons-react';
+import adminService from '../../services/adminService';
 
 const AdminReports = () => {
-  const { adminDismissReport } = useAppData();
-  
-  // Use new detailed mock data, but preserve local state so we can 'resolve' them
-  const [localDisputes, setLocalDisputes] = useState(adminDisputesDetailed);
+  const [disputes, setDisputes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
   const [expandedIds, setExpandedIds] = useState(new Set());
@@ -21,34 +20,37 @@ const AdminReports = () => {
     });
   };
 
-  const filteredDisputes = localDisputes.filter(disp => {
-    if (activeFilter !== 'All' && disp.status.toLowerCase() !== activeFilter.toLowerCase()) return false;
-
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      if (
-        !disp.id.toLowerCase().includes(q) &&
-        !disp.parties.toLowerCase().includes(q) &&
-        !disp.meta.toLowerCase().includes(q) &&
-        !disp.description.toLowerCase().includes(q)
-      ) {
-        return false;
-      }
+  const fetchDisputes = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const res = await adminService.getDisputes({
+        q: searchQuery || undefined,
+        status: activeFilter !== 'All' ? activeFilter : undefined
+      });
+      setDisputes(res.data || []);
+    } catch (err) {
+      console.error('Failed to fetch disputes:', err);
+      setError('Failed to load disputes. Please try again later.');
+    } finally {
+      setLoading(false);
     }
-    return true;
-  });
+  };
 
-  const handleResolve = (id) => {
-    // 1. Remove from local detailed UI state
-    setLocalDisputes(prev => prev.filter(d => d.id !== id));
-    
-    // 2. Preserve existing moderation callback workflow
-    // If the ID format matches what the context expects, this will clean up the global state too.
-    // In our mock data, IDs are like 'D-041'. If context expects numeric, we can parse it, 
-    // but calling it guarantees we don't regress workflows.
-    const numericId = parseInt(id.replace('D-', ''), 10);
-    if (!isNaN(numericId)) {
-      adminDismissReport(numericId);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchDisputes();
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [searchQuery, activeFilter]);
+
+  const handleResolve = async (id) => {
+    try {
+      await adminService.updateDisputeStatus(id, { status: 'RESOLVED' });
+      fetchDisputes();
+    } catch (err) {
+      console.error('Failed to resolve dispute:', err);
+      alert('Failed to resolve dispute.');
     }
   };
 
@@ -90,37 +92,49 @@ const AdminReports = () => {
 
       {/* Disputes List */}
       <div className="admin-reports-list">
-        {filteredDisputes.length === 0 ? (
+        {loading ? (
+          <div className="ar-empty-state">
+            <IconLoader2 className="spinner" size={24} style={{ marginBottom: '8px', color: '#3b82f6' }} />
+            <div>Loading disputes...</div>
+          </div>
+        ) : error ? (
+          <div className="ar-empty-state" style={{ color: '#ef4444' }}>{error}</div>
+        ) : disputes.length === 0 ? (
           <div className="ar-empty-state">No disputes found matching your criteria.</div>
         ) : (
-          filteredDisputes.map(disp => (
-            <div key={disp.id} className="ar-card">
-              <div className="ar-card-header">
-                <div className="ar-badges">
-                  <span className="ar-id-pill">{disp.id}</span>
-                  <span className={`ar-status-pill ${disp.status}`}>{disp.status}</span>
-                </div>
-                <div className="ar-header-actions">
-                  {/* Keep resolve workflow via a subtle action or as part of details view */}
-                  <button onClick={() => handleResolve(disp.id)} className="ar-resolve-btn" style={{ marginRight: '16px', background: 'transparent', border: 'none', color: '#10b981', fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem' }}>Resolve</button>
-                  <button onClick={() => toggleExpand(disp.id)} className="ar-view-details" style={{ background: 'transparent', border: 'none', color: '#3b82f6', fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem' }}>
-                    {expandedIds.has(disp.id) ? 'Hide details \u2191' : 'View details \u2192'}
-                  </button>
-                </div>
-              </div>
-              
-              <div className="ar-card-body">
-                <h3 className="ar-parties">{disp.parties}</h3>
-                <p className="ar-meta">{disp.meta}</p>
-                {expandedIds.has(disp.id) && (
-                  <div className="ar-description-block" style={{ animation: 'adminSlideUpFade 0.3s ease forwards', color: '#475569' }}>
-                    <strong>Dispute Report:</strong><br/><br/>
-                    {disp.description}
+          disputes.map(disp => {
+            const displayParties = disp.participants || disp.parties || 'Unknown Parties';
+            const displayDesc = disp.reason || disp.description || 'No reason provided';
+            const displayMeta = disp.amount ? `${disp.currency || 'INR'} ${disp.amount}` : (disp.meta || '');
+            const displayId = disp.id ? disp.id.substring(0, 8) : 'Unknown';
+            return (
+              <div key={disp.id} className="ar-card">
+                <div className="ar-card-header">
+                  <div className="ar-badges">
+                    <span className="ar-id-pill">#{displayId}</span>
+                    <span className={`ar-status-pill ${disp.status?.toLowerCase() || 'open'}`}>{disp.status || 'open'}</span>
                   </div>
-                )}
+                  <div className="ar-header-actions">
+                    <button onClick={() => handleResolve(disp.id)} className="ar-resolve-btn" style={{ marginRight: '16px', background: 'transparent', border: 'none', color: '#10b981', fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem' }}>Resolve</button>
+                    <button onClick={() => toggleExpand(disp.id)} className="ar-view-details" style={{ background: 'transparent', border: 'none', color: '#3b82f6', fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem' }}>
+                      {expandedIds.has(disp.id) ? 'Hide details \u2191' : 'View details \u2192'}
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="ar-card-body">
+                  <h3 className="ar-parties">{displayParties}</h3>
+                  <p className="ar-meta">{displayMeta}</p>
+                  {expandedIds.has(disp.id) && (
+                    <div className="ar-description-block" style={{ animation: 'adminSlideUpFade 0.3s ease forwards', color: '#475569' }}>
+                      <strong>Dispute Report:</strong><br/><br/>
+                      {displayDesc}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
 

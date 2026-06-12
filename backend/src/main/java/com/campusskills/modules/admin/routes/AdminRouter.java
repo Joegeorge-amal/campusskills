@@ -19,7 +19,8 @@ public class AdminRouter {
         com.campusskills.modules.users.repositories.UserProfileRepository userProfileRepository = new com.campusskills.modules.users.repositories.UserProfileRepository();
         
         AdminService service = new AdminService(repository, sessionRepository, userRepository, userProfileRepository, vertx.eventBus());
-        AdminHandler handler = new AdminHandler(service);
+        com.campusskills.modules.notifications.repositories.NotificationRepository notificationRepository = new com.campusskills.modules.notifications.repositories.NotificationRepository();
+        AdminHandler handler = new AdminHandler(service, notificationRepository);
 
         router.route().handler(JwtAuthMiddleware.create(jwtAuth));
         
@@ -40,6 +41,9 @@ public class AdminRouter {
 
         router.get("/listings").handler(handler::getListings);
         router.patch("/listings/:id/status").handler(handler::updateListingStatus);
+
+        router.get("/notifications").handler(handler::getNotifications);
+        router.patch("/notifications/read").handler(handler::markNotificationsRead);
 
 
         return router;

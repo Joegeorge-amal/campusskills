@@ -9,10 +9,12 @@ import java.util.List;
 public class MessageService {
     private final MessageRepository repository;
     private final TypingIndicatorService typingService;
+    private final io.vertx.core.eventbus.EventBus eventBus;
 
-    public MessageService(MessageRepository repository, TypingIndicatorService typingService) {
+    public MessageService(MessageRepository repository, TypingIndicatorService typingService, io.vertx.core.eventbus.EventBus eventBus) {
         this.repository = repository;
         this.typingService = typingService;
+        this.eventBus = eventBus;
     }
 
     public Future<String> createMessage(Message message) {
@@ -49,6 +51,21 @@ public class MessageService {
             return repository.createMessage(message).onSuccess(id -> {
                 com.campusskills.web.websockets.MessageBroadcaster.broadcastNewMessage(message, participantList);
                 typingService.clearTypingState(message.getChatId(), message.getSenderId(), participantList);
+                
+                if (eventBus != null) {
+                    for (String participantId : participantList) {
+                        if (!participantId.equals(message.getSenderId())) {
+                            io.vertx.core.json.JsonObject payload = new io.vertx.core.json.JsonObject()
+                                .put("userId", participantId)
+                                .put("type", "NEW_MESSAGE")
+                                .put("title", "New Message")
+                                .put("message", "You have a new message.")
+                                .put("sourceType", "CHAT")
+                                .put("sourceId", message.getChatId());
+                            eventBus.send("internal.notification.create", payload);
+                        }
+                    }
+                }
             });
         });
     }

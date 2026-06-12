@@ -8,9 +8,11 @@ import io.vertx.core.json.JsonObject;
 public class AdminHandler {
 
     private final AdminService adminService;
+    private final com.campusskills.modules.notifications.repositories.NotificationRepository notificationRepository;
 
-    public AdminHandler(AdminService adminService) {
+    public AdminHandler(AdminService adminService, com.campusskills.modules.notifications.repositories.NotificationRepository notificationRepository) {
         this.adminService = adminService;
+        this.notificationRepository = notificationRepository;
     }
 
     public void getUsers(RoutingContext ctx) {
@@ -101,18 +103,59 @@ public class AdminHandler {
         adminService.updateUserRole(id, role)
             .onSuccess(updated -> {
                 if (updated) {
-                    ApiResponse.ok(ctx, new JsonObject().put("message", "User role updated to " + role.name()));
+                    ApiResponse.ok(ctx, new JsonObject().put("message", "User role updated"));
                 } else {
                     ApiResponse.notFound(ctx, "User not found");
                 }
             })
-            .onFailure(err -> {
-                if (err.getMessage().startsWith("Cannot")) {
-                    ApiResponse.sendError(ctx, 403, err.getMessage());
-                } else {
-                    ApiResponse.internalError(ctx, err.getMessage());
+            .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
+    }
+
+    public void getNotifications(RoutingContext ctx) {
+        int page = 1;
+        int limit = 20;
+        try {
+            if (ctx.request().getParam("page") != null) page = Integer.parseInt(ctx.request().getParam("page"));
+            if (ctx.request().getParam("limit") != null) limit = Integer.parseInt(ctx.request().getParam("limit"));
+        } catch (NumberFormatException ignored) {}
+
+        int skip = (page - 1) * limit;
+
+        io.vertx.core.CompositeFuture.all(
+            notificationRepository.fetchAdminNotifications(skip, limit),
+            notificationRepository.countUnreadAdminNotifications()
+        ).onSuccess(res -> {
+            java.util.List<com.campusskills.modules.notifications.models.Notification> notifs = res.resultAt(0);
+            Long unreadCount = res.resultAt(1);
+            
+            io.vertx.core.json.JsonArray data = new io.vertx.core.json.JsonArray();
+            if (notifs != null) {
+                for (com.campusskills.modules.notifications.models.Notification n : notifs) {
+                    data.add(io.vertx.core.json.JsonObject.mapFrom(n));
                 }
-            });
+            }
+            
+            ApiResponse.ok(ctx, new JsonObject()
+                .put("notifications", data)
+                .put("unreadCount", unreadCount != null ? unreadCount : 0)
+            );
+        }).onFailure(err -> {
+            ApiResponse.internalError(ctx, "Failed to fetch admin notifications");
+        });
+    }
+
+    public void markNotificationsRead(RoutingContext ctx) {
+        JsonObject body = ctx.body().asJsonObject();
+        if (body != null && body.containsKey("id")) {
+            String id = body.getString("id");
+            notificationRepository.markAdminNotificationAsRead(id)
+                .onSuccess(updated -> ApiResponse.ok(ctx, new JsonObject().put("success", updated)))
+                .onFailure(err -> ApiResponse.internalError(ctx, "Failed to mark read"));
+        } else {
+            notificationRepository.markAllAdminNotificationsAsRead()
+                .onSuccess(count -> ApiResponse.ok(ctx, new JsonObject().put("success", true).put("count", count)))
+                .onFailure(err -> ApiResponse.internalError(ctx, "Failed to mark all read"));
+        }
     }
 
     public void updateDisputeStatus(RoutingContext ctx) {

@@ -91,6 +91,17 @@ public class AdminService {
                     if (session != null) {
                         sendNotification(session.getTeacherId(), com.campusskills.shared.constants.NotificationType.DISPUTE_UPDATED, "Dispute Updated", "The dispute status for your session has been updated to: " + status, "SESSION", sessionId);
                         sendNotification(session.getStudentId(), com.campusskills.shared.constants.NotificationType.DISPUTE_UPDATED, "Dispute Updated", "The dispute status for your session has been updated to: " + status, "SESSION", sessionId);
+                        
+                        if ("RESOLVED".equalsIgnoreCase(status)) {
+                            JsonObject adminNotif = new JsonObject()
+                                .put("recipientType", "ADMIN")
+                                .put("type", "ADMIN_DISPUTE_RESOLVED")
+                                .put("title", "Dispute resolved")
+                                .put("message", "Dispute for session " + sessionId + " was resolved.")
+                                .put("sourceType", "SESSION")
+                                .put("sourceId", sessionId);
+                            eventBus.send("internal.notification.create", adminNotif);
+                        }
                     }
                     return Future.succeededFuture(true);
                 });
@@ -103,7 +114,35 @@ public class AdminService {
         if (sessionId == null || sessionId.trim().isEmpty()) {
             return Future.failedFuture("Session ID is required");
         }
-        return adminRepository.cancelSession(sessionId);
+        return adminRepository.cancelSession(sessionId).compose(cancelled -> {
+            if (cancelled) {
+                // Fetch the session to notify users
+                return new com.campusskills.modules.sessions.repositories.SessionRepository().getSessionById(sessionId).onSuccess(session -> {
+                    if (session != null && eventBus != null) {
+                        JsonObject notifTeacher = new JsonObject()
+                            .put("userId", session.getTeacherId())
+                            .put("type", "SESSION_CANCELLED")
+                            .put("title", "Session Cancelled")
+                            .put("message", "Your session has been cancelled by an admin.")
+                            .put("sourceType", "SESSION")
+                            .put("sourceId", sessionId);
+                        eventBus.send("internal.notification.create", notifTeacher);
+                        
+                        if (!session.getTeacherId().equals(session.getStudentId())) {
+                            JsonObject notifStudent = new JsonObject()
+                                .put("userId", session.getStudentId())
+                                .put("type", "SESSION_CANCELLED")
+                                .put("title", "Session Cancelled")
+                                .put("message", "Your session has been cancelled by an admin.")
+                                .put("sourceType", "SESSION")
+                                .put("sourceId", sessionId);
+                            eventBus.send("internal.notification.create", notifStudent);
+                        }
+                    }
+                }).map(session -> true);
+            }
+            return Future.succeededFuture(false);
+        });
     }
 
     public Future<JsonObject> searchListings(String q, String status, int page, int limit) {

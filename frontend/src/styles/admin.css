@@ -167,6 +167,44 @@
 }
 
 /* ─── NOTIFICATIONS DROPDOWN ─── */
+.admin-nav-notifications {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.admin-bell-btn {
+  background: transparent;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  position: relative;
+  padding: 8px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.admin-bell-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f3f4f6;
+}
+
+.admin-bell-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: #ef4444;
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 5px;
+  border-radius: 10px;
+  line-height: 1;
+}
+
 .admin-notif-dropdown {
   position: absolute;
   top: 48px;
@@ -217,6 +255,13 @@
 .admin-notif-list {
   max-height: 400px;
   overflow-y: auto;
+}
+
+.admin-notif-empty {
+  padding: 32px 16px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.9rem;
 }
 
 .admin-notif-item {
@@ -493,7 +538,8 @@
   background: #ffffff;
   border-radius: 16px;
   padding: 24px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  box-shadow: 0 10px 40px rgba(99, 102, 241, 0.12);
   display: flex;
   flex-direction: column;
   transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -508,7 +554,7 @@
 
 .admin-ostard:hover {
   transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(59, 130, 246, 0.1);
+  box-shadow: 0 24px 48px rgba(99, 102, 241, 0.2), 0 0 0 1px rgba(99, 102, 241, 0.3);
 }
 
 .ostard-icon {
@@ -563,7 +609,8 @@
 .admin-panel {
   background: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  box-shadow: 0 8px 30px rgba(99, 102, 241, 0.08);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -574,7 +621,7 @@
 }
 
 .admin-panel:hover {
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 16px 40px rgba(99, 102, 241, 0.15);
 }
 
 .admin-panel-header {
@@ -1484,6 +1531,23 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.ar-empty-state,
+.as-empty-state,
+.admin-users-empty {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 48px 24px;
+  text-align: center;
+  color: #64748b;
+  font-size: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .ar-card {

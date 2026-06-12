@@ -8,7 +8,9 @@ import java.time.Instant;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Notification {
     private String id;
-    private String userId; // The recipient of the notification
+    private String userId; // The recipient of the notification (if applicable)
+    
+    private NotificationAudience recipientType = NotificationAudience.USER; // defaults to USER
     
     private String title;
     private String message;
@@ -30,6 +32,9 @@ public class Notification {
 
     public String getUserId() { return userId; }
     public void setUserId(String userId) { this.userId = userId; }
+
+    public NotificationAudience getRecipientType() { return recipientType; }
+    public void setRecipientType(NotificationAudience recipientType) { this.recipientType = recipientType; }
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
