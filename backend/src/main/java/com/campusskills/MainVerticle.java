@@ -90,6 +90,10 @@ public class MainVerticle extends AbstractVerticle {
     }
 
     public static void main(String[] args) {
+        // Fix for Windows DNS resolution issues with Netty's async resolver
+        System.setProperty("vertx.disableDnsResolver", "true");
+        System.setProperty("java.net.preferIPv4Stack", "true");
+        
         Vertx vertx = Vertx.vertx();
         vertx.deployVerticle(new MainVerticle())
              .onFailure(err -> log.error("Failed to deploy MainVerticle", err));

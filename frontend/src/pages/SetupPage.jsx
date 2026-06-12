@@ -1,7 +1,44 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { IconArrowLeft, IconSchool } from '@tabler/icons-react';
+import { IconArrowLeft, IconSchool, IconChevronDown } from '@tabler/icons-react';
+
+const CustomSelect = ({ value, onChange, options, placeholder, style }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  return (
+    <div className="custom-select-wrapper" style={style} ref={ref} onClick={() => setIsOpen(!isOpen)}>
+      <div className={`custom-select-trigger ${isOpen ? 'open' : ''} ${!value ? 'placeholder' : ''}`}>
+        <span>{value ? options.find(o => o.value === value)?.label || value : placeholder}</span>
+        <IconChevronDown size={16} className={`custom-select-icon ${isOpen ? 'open' : ''}`} />
+      </div>
+      {isOpen && (
+        <div className="custom-select-dropdown">
+          {options.map(opt => (
+            <div 
+              key={opt.value} 
+              className={`custom-select-option ${value === opt.value ? 'selected' : ''}`}
+              onClick={() => onChange(opt.value)}
+            >
+              {opt.label}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 import { getTopics } from '../services/topicService';
 import AutocompleteInput from '../components/AutocompleteInput';
 import OtpVerificationModal from '../components/modals/OtpVerificationModal';
@@ -14,7 +51,7 @@ const SetupPage = () => {
       if (saved) {
         const data = JSON.parse(saved);
         if (data.avatarColor && data.avatarColor.bg === '#EEEDFE') {
-           data.avatarColor = { bg: '#1d4ed8', text: '#EEEDFE' };
+           data.avatarColor = { bg: '#0ea5e9', text: '#ffffff' };
         }
         return data;
       }
@@ -38,7 +75,7 @@ const SetupPage = () => {
   const [programme, setProgramme] = useState(initData.programme || '');
   const [bio, setBio] = useState(initData.bio || '');
   const [upi, setUpi] = useState(initData.upi || '');
-  const [avatarColor, setAvatarColor] = useState(initData.avatarColor || { bg: '#1d4ed8', text: '#EEEDFE' });
+  const [avatarColor, setAvatarColor] = useState(initData.avatarColor || { bg: '#0ea5e9', text: '#ffffff' });
   const [avatarImg, setAvatarImg] = useState(initData.avatarImg || null);
   const [avatarFile, setAvatarFile] = useState(null);
   const [isUploadingImage, setIsUploadingImage] = useState(false);
@@ -247,7 +284,7 @@ const SetupPage = () => {
   };
 
   const colors = [
-    { bg: '#1d4ed8', text: '#EEEDFE' },
+    { bg: '#0ea5e9', text: '#ffffff' },
     { bg: '#EEEDFE', text: '#3C3489' },
     { bg: '#E6F1FB', text: '#0C447C' },
     { bg: '#EAF3DE', text: '#27500A' },
@@ -452,15 +489,16 @@ const SetupPage = () => {
                 <div className="sfld" style={{ marginBottom: '20px' }}>
                   <label>Phone number *</label>
                   <div style={{ display: 'flex', gap: '12px' }}>
-                    <select 
+                    <CustomSelect 
                       value={countryCode} 
-                      onChange={e => setCountryCode(e.target.value)} 
-                      style={{ width: '120px', flexShrink: 0 }}
-                    >
-                      <option value="+91">IN +91</option>
-                      <option value="+1">US +1</option>
-                      <option value="+44">UK +44</option>
-                    </select>
+                      onChange={setCountryCode} 
+                      style={{ width: '110px' }}
+                      options={[
+                        {value: '+91', label: 'IN +91'},
+                        {value: '+1', label: 'US +1'},
+                        {value: '+44', label: 'UK +44'}
+                      ]}
+                    />
                     <input 
                       type="tel" 
                       placeholder="9876543210" 
@@ -475,13 +513,17 @@ const SetupPage = () => {
                 <div className="form-grid" style={{ marginBottom: '20px' }}>
                   <div className="sfld">
                     <label>Year *</label>
-                    <select value={year} onChange={e => setYear(e.target.value)} required>
-                      <option value="">Select year</option>
-                      <option>1st year</option>
-                      <option>2nd year</option>
-                      <option>3rd year</option>
-                      <option>4th year</option>
-                    </select>
+                    <CustomSelect 
+                      value={year} 
+                      onChange={setYear} 
+                      placeholder="Select year"
+                      options={[
+                        {value: '1st year', label: '1st year'},
+                        {value: '2nd year', label: '2nd year'},
+                        {value: '3rd year', label: '3rd year'},
+                        {value: '4th year', label: '4th year'}
+                      ]}
+                    />
                   </div>
                   <div className="sfld">
                     <label>Programme *</label>
