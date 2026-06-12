@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useAppData } from '../context/AppDataContext';
+import { motion, AnimatePresence } from 'framer-motion';
 import Avatar from '../components/common/Avatar';
 import { 
   IconCheck, 
@@ -23,7 +24,10 @@ import MarketplaceCard from '../components/common/MarketplaceCard/MarketplaceCar
 import { listingService } from '../services/listingService';
 import { getTopics } from '../services/topicService';
 import AutocompleteInput from '../components/AutocompleteInput';
-
+import ProfileHeader from '../components/profile/ProfileHeader';
+import StatsCards from '../components/profile/StatsCards';
+import TrustScore from '../components/profile/TrustScore';
+import VerifiedSkills from '../components/profile/VerifiedSkills';
 const Profile = () => {
   const { user, updateProfile } = useAuth();
   const { triggerToast } = useAppData();
@@ -147,6 +151,13 @@ const Profile = () => {
       setNewSkill('');
       setIsAddingSkill(false);
       triggerToast('Skill added to pending verification!');
+      
+      // Scroll to pending verification area
+      setTimeout(() => {
+        if (pendingVerificationRef.current) {
+          pendingVerificationRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 100);
     } catch (err) {
       triggerToast('Failed to add skill.');
     }
@@ -217,7 +228,7 @@ const Profile = () => {
 
   const handleQuizComplete = (skill, score, domain) => {
     updateProfile({
-      verifiedSkills: [...verifiedSkills, skill]
+      verifiedSkills: Array.from(new Set([...verifiedSkills, skill]))
     }).then(() => {
       setActiveQuizSkill(null);
       triggerToast(`${skill} has been verified successfully!`);
@@ -235,12 +246,18 @@ const Profile = () => {
   };
 
   const totalSkills = skillsOffered.length;
-  const verifiedCount = verifiedSkills.length;
-  const trustScorePercent = totalSkills > 0 ? Math.round((verifiedCount / totalSkills) * 100) : 0;
-  const isProfileVerified = totalSkills > 0 && verifiedCount === totalSkills;
+  
+  // Deduplicate for safe counting in case database already has duplicates
+  const uniqueVerified = Array.from(new Set(verifiedSkills));
+  const verifiedCount = uniqueVerified.length;
+  
+  const rawPercent = totalSkills > 0 ? Math.round((verifiedCount / totalSkills) * 100) : 0;
+  const trustScorePercent = Math.min(rawPercent, 100);
+  const isProfileVerified = totalSkills > 0 && verifiedCount >= totalSkills;
 
   const [isFlyingUp, setIsFlyingUp] = useState(false);
   const prevScoreRef = useRef(trustScorePercent);
+  const pendingVerificationRef = useRef(null);
 
   useEffect(() => {
     if (prevScoreRef.current < 100 && trustScorePercent === 100 && totalSkills > 0) {
@@ -283,111 +300,17 @@ const Profile = () => {
         }} 
       />
 
-      {/* Blue Banner */}
-      <div 
-        onMouseEnter={() => setIsBannerHovered(true)} 
-        onMouseLeave={() => setIsBannerHovered(false)}
-        style={{ 
-          height: '180px', 
-          backgroundImage: user?.bannerImg ? `linear-gradient(to right, rgba(0,0,0,0.4), rgba(0,0,0,0.6)), url(${user?.bannerImg})` : (bannerGradient || 'linear-gradient(105deg, #2563eb 0%, #312e81 100%)'), 
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          width: '100%', 
-          position: 'relative',
-          transition: 'background-image 0.5s ease'
-        }}
-      >
-      </div>
+      {/* Profile Header */}
+      <ProfileHeader 
+        user={user} 
+        isOwner={true} 
+        onEditProfile={() => navigate('/app/edit-profile')} 
+      />
 
-      <div style={{ margin: '-68px auto 0', padding: '0 24px', position: 'relative', pointerEvents: 'none' }}>
-        
-        {/* Mockup Heatmap moved here so it isn't blocked by this container's invisible bounds */}
-        {user?.showHeatmap !== false && (
-          <div 
-            onMouseEnter={() => setIsBannerHovered(true)} 
-            onMouseLeave={() => setIsBannerHovered(false)}
-            style={{ 
-              position: 'absolute', right: '24px', top: '-22px', transform: 'translateY(-50%)', 
-              display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px', zIndex: 10,
-              pointerEvents: 'auto',
-              opacity: isBannerHovered ? 1 : 0.15, transition: 'opacity 0.4s ease'
-            }}>
-            <div style={{ 
-              position: 'relative', display: 'flex', gap: '4px',
-              maskImage: 'linear-gradient(to right, transparent 0%, black 30%)',
-              WebkitMaskImage: 'linear-gradient(to right, transparent 0%, black 30%)'
-            }}>
-              {heatmapData.map((col, colIndex) => (
-                <div key={colIndex} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  {col.map((cell, rowIndex) => (
-                    <div 
-                      key={rowIndex} 
-                      onMouseEnter={() => setHoveredCell({ colIndex, rowIndex, level: cell.level })}
-                      onMouseLeave={() => setHoveredCell(null)}
-                      style={{ 
-                        position: 'relative',
-                        width: '12px', 
-                        height: '12px', 
-                        backgroundColor: '#ffffff', 
-                        opacity: hoveredCell?.colIndex === colIndex && hoveredCell?.rowIndex === rowIndex ? 1 : cell.opacity,
-                        borderRadius: '2px',
-                        cursor: 'pointer',
-                        transition: 'opacity 0.2s'
-                      }} 
-                    >
-                      {hoveredCell?.colIndex === colIndex && hoveredCell?.rowIndex === rowIndex && (
-                        <div style={{
-                          position: 'absolute',
-                          bottom: 'calc(100% + 8px)',
-                          left: '50%',
-                          transform: 'translateX(-50%)',
-                          background: '#111827',
-                          color: '#fff',
-                          padding: '6px 10px',
-                          borderRadius: '6px',
-                          fontSize: '11px',
-                          fontWeight: 600,
-                          whiteSpace: 'nowrap',
-                          zIndex: 100,
-                          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                          pointerEvents: 'none'
-                        }}>
-                          {cell.level === 0 ? 'No activity' : `${cell.level * 3} activities`} on this day
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-            
-            <div style={{ fontSize: '10px', fontWeight: 600, color: 'rgba(255,255,255,0.7)', letterSpacing: '0.5px' }}>
-              ACTIVITY (LAST 6 MONTHS)
-            </div>
-          </div>
-        )}
-
-          {/* Avatar, Buttons, and Info Wrapper - Re-enables pointer events */}
-          <div style={{ pointerEvents: 'auto' }}>
-            {/* Avatar and Buttons Row */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
-            <div 
-            style={{ 
-              width: '128px', height: '128px', borderRadius: '50%', background: '#fff', 
-              display: 'flex', alignItems: 'center', justifyContent: 'center', 
-              boxShadow: '0 12px 32px rgba(0,0,0,0.15)', position: 'relative' 
-            }}
-          >
-            <Avatar initials={initials} bg={user?.avatarColor?.bg || "#eef2ff"} color={user?.avatarColor?.text || "#1d4ed8"} backgroundImage={user?.avatarImg} size="120px" fontSize="44px" />
-          </div>
-          
-          <div style={{ display: 'flex', gap: '12px', marginTop: '80px' }}>
-            <button 
-              onClick={() => navigate('/app/edit-profile')} 
-              style={{ padding: '8px 16px', borderRadius: '12px', border: '1px solid #93c5fd', background: '#ffffff', color: '#2563eb', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
-            >
-              Edit Profile
-            </button>
+      <div style={{ maxWidth: '1000px', margin: '40px auto 0', padding: '0 24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+          <div></div>
+          <div style={{ display: 'flex', gap: '12px' }}>
             <button 
               onClick={() => setIsCreateSessionOpen(true)}
               style={{ padding: '8px 16px', borderRadius: '12px', border: 'none', background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)', color: '#ffffff', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
@@ -425,54 +348,16 @@ const Profile = () => {
           )}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
-          <div className="glossy-card" style={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 20px' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '14px', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
-              <IconCalendarMonth size={20} strokeWidth={2} style={{ color: '#3b82f6' }} />
-            </div>
-            <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>{user?.stats?.sessionsCompleted || 0}</div>
-            <div style={{ fontSize: '13px', color: '#6b7280', fontWeight: 500 }}>Sessions</div>
-          </div>
-          <div className="glossy-card" style={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 20px' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '14px', background: '#fefce8', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
-              <IconStar size={20} strokeWidth={2} style={{ color: '#eab308' }} />
-            </div>
-            <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>{user?.stats?.ratingAvg?.toFixed(1) || '0.0'}</div>
-            <div style={{ fontSize: '13px', color: '#6b7280', fontWeight: 500 }}>Rating</div>
-          </div>
-          <div className="glossy-card" style={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 20px' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '14px', background: '#faf5ff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
-              <IconSparkles size={20} strokeWidth={2} style={{ color: '#a855f7' }} />
-            </div>
-            <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>{(user?.stats?.sessionsCompleted || 0) * 2}</div>
-            <div style={{ fontSize: '13px', color: '#6b7280', fontWeight: 500 }}>Hours</div>
-          </div>
-          <div className="glossy-card" style={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 20px' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '14px', background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
-              <IconShieldCheck size={20} strokeWidth={2} style={{ color: '#22c55e' }} />
-            </div>
-            <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>{verifiedCount}</div>
-            <div style={{ fontSize: '13px', color: '#6b7280', fontWeight: 500 }}>Verified</div>
-          </div>
-        </div>
+        <StatsCards user={user} stats={user?.stats} />
 
         {/* Verification Trust Score Card */}
         {(!isProfileVerified || isFlyingUp) && (
-        <div className={isFlyingUp ? 'fly-up-away' : ''} style={{ background: 'linear-gradient(135deg, #2563eb 0%, #4338ca 100%)', borderRadius: '24px', padding: '24px', display: 'flex', alignItems: 'center', gap: '20px', marginBottom: '40px', color: '#fff', boxShadow: '0 8px 24px rgba(67, 56, 202, 0.25)' }}>
-          <div style={{ width: '64px', height: '64px', background: 'rgba(255, 255, 255, 0.15)', borderRadius: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <IconShieldCheck size={32} color="#fff" strokeWidth={2} />
-          </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: '16px', fontWeight: 400, opacity: 0.9, marginBottom: '4px' }}>Verification Trust Score</div>
-            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px', marginBottom: '12px' }}>
-              <span style={{ fontSize: '36px', fontWeight: 700 }}>{trustScorePercent}%</span>
-              <span style={{ fontSize: '14px', opacity: 0.9, fontWeight: 400 }}>{verifiedCount} / {totalSkills} verified</span>
-            </div>
-            <div style={{ width: '100%', height: '6px', background: 'rgba(255, 255, 255, 0.2)', borderRadius: '100px' }}>
-              <div style={{ width: `${trustScorePercent}%`, height: '100%', background: '#fff', borderRadius: '100px' }}></div>
-            </div>
-          </div>
-        </div>
+          <TrustScore 
+            trustScorePercent={trustScorePercent}
+            isProfileVerified={isProfileVerified}
+            totalSkills={totalSkills}
+            verifiedCount={verifiedCount}
+          />
         )}
 
         {/* My Skills Section */}
@@ -512,105 +397,14 @@ const Profile = () => {
 
         {/* Verified Skills Section */}
         <div style={{ marginBottom: '32px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-            <div style={{ background: '#ecfdf5', borderRadius: '50%', padding: '2px' }}>
-              <IconCheck size={14} strokeWidth={3} style={{ color: '#22c55e' }} />
-            </div>
-            <span style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>Verified Skills</span>
-            <span style={{ fontSize: '11px', color: '#6b7280', background: '#f3f4f6', padding: '2px 8px', borderRadius: '100px', fontWeight: 600 }}>{verifiedCount}</span>
-          </div>
-
-          {verifiedCount === 0 ? (
-            <div style={{ ...cardStyle, padding: '24px', textAlign: 'center', color: '#6b7280', fontSize: '12px' }}>
-              You haven't verified any skills yet.
-            </div>
-          ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
-              {verifiedSkills.map((skill, i) => {
-                const meta = { domain: topicMap[skill] || 'General', confidence: 100 };
-                return (
-                  <div key={i} className="glossy-card" style={{ ...cardStyle, border: '1px solid #e5e7eb' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e' }}></div>
-                        <div style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>{skill}</div>
-                      </div>
-                      <button onClick={() => setSkillToRemove(skill)} style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px' }}>
-                        <IconTrash size={16} />
-                      </button>
-                    </div>
-                    <div style={{ fontSize: '11px', color: '#1d4ed8', marginBottom: '20px', marginLeft: '14px', fontWeight: 600 }}>{meta.domain}</div>
-                    
-                    <div style={{ marginBottom: '20px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                        <span style={{ fontSize: '11px', color: '#6b7280', fontWeight: 500 }}>Confidence Score</span>
-                        <span style={{ fontSize: '11px', color: '#22c55e', fontWeight: 700 }}>{meta.confidence}%</span>
-                      </div>
-                      <div style={{ width: '100%', height: '4px', background: '#f3f4f6', borderRadius: '2px', overflow: 'hidden' }}>
-                        <div style={{ width: `${meta.confidence}%`, height: '100%', background: '#22c55e', borderRadius: '2px' }}></div>
-                      </div>
-                    </div>
-
-                    <div style={{ marginTop: 'auto' }}>
-                      <button 
-                        onClick={() => handleQuizStart(skill)}
-                        style={{ background: 'none', border: 'none', color: '#1d4ed8', fontSize: '11px', fontWeight: 700, cursor: 'pointer', padding: 0 }}
-                      >
-                        Retake Quiz →
-                      </button>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Pending Verification Section */}
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-            <div style={{ background: '#fef3c7', borderRadius: '50%', padding: '2px' }}>
-              <IconCircle size={14} strokeWidth={3} style={{ color: '#f59e0b' }} />
-            </div>
-            <span style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>Pending Verification</span>
-            <span style={{ fontSize: '11px', color: '#6b7280', background: '#f3f4f6', padding: '2px 8px', borderRadius: '100px', fontWeight: 600 }}>{pendingSkills.length}</span>
-          </div>
-
-          {pendingSkills.length === 0 ? (
-            <div style={{ ...cardStyle, padding: '24px', textAlign: 'center', color: '#6b7280', fontSize: '12px' }}>
-              No pending skills.
-            </div>
-          ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
-              {pendingSkills.map((skill, i) => (
-                <div key={i} className="glossy-card" style={{ ...cardStyle, border: '1px solid #fde047', background: '#fffbeb' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#f59e0b' }}></div>
-                      <div style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>{skill}</div>
-                    </div>
-                    <button onClick={() => setSkillToRemove(skill)} style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px' }}>
-                      <IconTrash size={16} />
-                    </button>
-                  </div>
-                  <div style={{ fontSize: '11px', color: '#1d4ed8', marginBottom: '16px', marginLeft: '14px', fontWeight: 600 }}>{topicMap[skill] || 'General'}</div>
-                  
-                  <div style={{ fontSize: '11px', color: '#d97706', marginBottom: '24px', marginLeft: '14px', fontWeight: 600 }}>Not Verified</div>
-
-                  <div style={{ marginTop: 'auto' }}>
-                    <button 
-                      onClick={() => handleQuizStart(skill)}
-                      style={{ width: '100%', padding: '12px', borderRadius: '100px', border: 'none', background: '#1d4ed8', color: '#ffffff', fontSize: '12px', fontWeight: 700, cursor: 'pointer', transition: 'background 0.2s' }}
-                      onMouseOver={(e) => { e.currentTarget.style.background = '#1e40af' }}
-                      onMouseOut={(e) => { e.currentTarget.style.background = '#1d4ed8' }}
-                    >
-                      Start Verification Quiz
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+          <VerifiedSkills 
+            verifiedSkills={uniqueVerified} 
+            pendingSkills={pendingSkills} 
+            topicMap={topicMap} 
+            isOwner={true}
+            onRemoveSkill={(skill) => setSkillToRemove(skill)}
+            onRetakeQuiz={(skill) => handleQuizStart(skill)}
+          />
         </div>
 
         {/* Active Listings Section */}
@@ -677,7 +471,6 @@ const Profile = () => {
             </div>
           )}
         </div>
-      </div>
       </div>
 
       {skillToRemove && (

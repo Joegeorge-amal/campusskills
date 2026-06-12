@@ -22,6 +22,7 @@ import AddMoney from '../pages/AddMoney';
 import SwapRequest from '../pages/SwapRequest';
 import AddBank from '../pages/AddBank';
 import Profile from '../pages/Profile';
+import PublicProfile from '../pages/PublicProfile';
 import EditProfile from '../pages/EditProfile';
 import BookSessionRequest from '../pages/BookSessionRequest';
 
@@ -87,6 +88,7 @@ const AppRoutes = () => {
         <Route path="swap-request" element={<SwapRequest />} />
         <Route path="add-bank" element={<AddBank />} />
         <Route path="profile" element={<Profile />} />
+        <Route path="user/:rollNo" element={<PublicProfile />} />
         <Route path="edit-profile" element={<EditProfile />} />
         <Route path="book-request" element={<BookSessionRequest />} />
       </Route>

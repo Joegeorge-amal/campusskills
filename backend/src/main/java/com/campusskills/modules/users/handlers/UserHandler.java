@@ -35,6 +35,28 @@ public class UserHandler {
         }
     }
 
+    public void getPublicProfile(RoutingContext ctx) {
+        try {
+            String rollNo = ctx.pathParam("rollNo");
+            if (rollNo == null || rollNo.trim().isEmpty()) {
+                ApiResponse.badRequest(ctx, "Roll number is required");
+                return;
+            }
+
+            userService.getPublicProfileByRollNo(rollNo)
+                .onSuccess(data -> ApiResponse.ok(ctx, data))
+                .onFailure(err -> {
+                    if ("User not found".equals(err.getMessage()) || "Profile not found".equals(err.getMessage())) {
+                        ApiResponse.sendError(ctx, 404, "Profile not found");
+                    } else {
+                        ApiResponse.sendError(ctx, 500, err.getMessage());
+                    }
+                });
+        } catch (Exception e) {
+            ApiResponse.sendError(ctx, 500, "Internal Server Error");
+        }
+    }
+
     public void verifyEmail(RoutingContext ctx) {
         String userId = ctx.get("authenticatedUserId");
         if (userId == null) {

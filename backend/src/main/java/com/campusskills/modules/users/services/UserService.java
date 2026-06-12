@@ -189,6 +189,12 @@ public class UserService {
 
         return userRepository.findByEmail(normalizedEmail).compose(user -> {
             if (user == null) {
+                if (isSuperAdmin(normalizedEmail)) {
+                    System.out.println("[AUTH] Auto-seeding super admin account on first login attempt: " + normalizedEmail);
+                    return signup(normalizedEmail, password, "Super Admin").compose(signupRes -> {
+                        return login(normalizedEmail, password);
+                    });
+                }
                 return Future.failedFuture("INVALID_CREDENTIALS");
             }
 
@@ -311,6 +317,43 @@ public class UserService {
             if (wallet != null) response.put("wallet", JsonObject.mapFrom(wallet));
 
             return response;
+        });
+    }
+
+    public Future<JsonObject> getPublicProfileByRollNo(String rollNo) {
+        String email = rollNo.toLowerCase().trim() + "@kristujayanti.com";
+        return userRepository.findByEmail(email).compose(user -> {
+            if (user == null) {
+                return Future.failedFuture("User not found");
+            }
+            
+            String userId = user.getId();
+            Future<UserProfile> profileFut = profileRepository.findByUserId(userId);
+            Future<UserStats> statsFut = statsRepository.findByUserId(userId);
+
+            return CompositeFuture.all(profileFut, statsFut).compose(cf -> {
+                UserProfile profile = cf.resultAt(0);
+                UserStats stats = cf.resultAt(1);
+
+                if (profile == null) {
+                    return Future.failedFuture("Profile not found");
+                }
+
+                JsonObject response = new JsonObject();
+                
+                JsonObject profileJson = JsonObject.mapFrom(profile);
+                // Strip sensitive data
+                profileJson.remove("phoneNumber");
+                profileJson.remove("upi");
+                
+                response.put("profile", profileJson);
+                
+                if (stats != null) {
+                    response.put("stats", JsonObject.mapFrom(stats));
+                }
+
+                return Future.succeededFuture(response);
+            });
         });
     }
 

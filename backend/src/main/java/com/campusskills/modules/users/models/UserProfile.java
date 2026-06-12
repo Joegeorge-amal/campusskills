@@ -30,6 +30,7 @@ public class UserProfile {
     private String sessionPreference;
     private String exchangePreference;
     private Boolean profileCompleted;
+    private Boolean heatmapVisibility = true;
     private Long createdAt;
     private Long updatedAt;
 
@@ -79,6 +80,9 @@ public class UserProfile {
 
     public Boolean getProfileCompleted() { return profileCompleted; }
     public void setProfileCompleted(Boolean profileCompleted) { this.profileCompleted = profileCompleted; }
+
+    public Boolean getHeatmapVisibility() { return heatmapVisibility != null ? heatmapVisibility : true; }
+    public void setHeatmapVisibility(Boolean heatmapVisibility) { this.heatmapVisibility = heatmapVisibility; }
 
     public Long getCreatedAt() { return createdAt; }
     public void setCreatedAt(Long createdAt) { this.createdAt = createdAt; }
