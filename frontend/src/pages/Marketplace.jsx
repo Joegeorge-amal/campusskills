@@ -50,7 +50,7 @@ const Marketplace = () => {
       }
       // Add mode mapping logic based on filter if needed, currently fetches all
       const res = await listingService.searchListings({ limit: 50 });
-      const fetchedSkills = res.data || [];
+      const fetchedSkills = res?.listings || res?.data || (Array.isArray(res) ? res : []);
       
       if (!isBackground) {
         setSkills(fetchedSkills);
