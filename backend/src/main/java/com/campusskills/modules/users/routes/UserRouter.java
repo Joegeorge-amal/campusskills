@@ -40,7 +40,7 @@ public class UserRouter {
         UserHandler handler = new UserHandler(service);
 
         router.get("/me").handler(handler::getMyProfile);
-        router.get("/public/:rollNo").handler(handler::getPublicProfile);
+        router.get("/public/:identifier").handler(handler::getPublicProfile);
         router.post("/me/verify-email").handler(handler::verifyEmail);
         router.post("/me/resend-otp").handler(handler::resendOtp);
         router.post("/me/verify-2fa").handler(handler::verifyTwoFactorOtp);

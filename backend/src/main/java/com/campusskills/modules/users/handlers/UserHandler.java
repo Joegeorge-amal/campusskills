@@ -37,13 +37,13 @@ public class UserHandler {
 
     public void getPublicProfile(RoutingContext ctx) {
         try {
-            String rollNo = ctx.pathParam("rollNo");
-            if (rollNo == null || rollNo.trim().isEmpty()) {
-                ApiResponse.badRequest(ctx, "Roll number is required");
+            String identifier = ctx.pathParam("identifier");
+            if (identifier == null || identifier.trim().isEmpty()) {
+                ApiResponse.badRequest(ctx, "Identifier is required");
                 return;
             }
 
-            userService.getPublicProfileByRollNo(rollNo)
+            userService.getPublicProfileByIdentifier(identifier)
                 .onSuccess(data -> ApiResponse.ok(ctx, data))
                 .onFailure(err -> {
                     if ("User not found".equals(err.getMessage()) || "Profile not found".equals(err.getMessage())) {

@@ -320,9 +320,27 @@ public class UserService {
         });
     }
 
-    public Future<JsonObject> getPublicProfileByRollNo(String rollNo) {
-        String email = rollNo.toLowerCase().trim() + "@kristujayanti.com";
-        return userRepository.findByEmail(email).compose(user -> {
+    public Future<JsonObject> getPublicProfileByIdentifier(String identifier) {
+        if (identifier == null || identifier.trim().isEmpty()) {
+            return Future.failedFuture("Identifier is required");
+        }
+        
+        final String cleanIdentifier = identifier.trim().toLowerCase();
+        
+        Future<User> userFuture;
+        if (cleanIdentifier.length() == 24 && cleanIdentifier.matches("^[0-9a-f]+$")) {
+            // First try as ObjectId
+            userFuture = userRepository.findById(cleanIdentifier).compose(user -> {
+                if (user != null) return Future.succeededFuture(user);
+                // Fallback to roll number logic if not found
+                return userRepository.findByEmail(cleanIdentifier + "@kristujayanti.com");
+            });
+        } else {
+            // Treat as roll number
+            userFuture = userRepository.findByEmail(cleanIdentifier + "@kristujayanti.com");
+        }
+
+        return userFuture.compose(user -> {
             if (user == null) {
                 return Future.failedFuture("User not found");
             }

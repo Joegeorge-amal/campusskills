@@ -4,7 +4,12 @@ export const userService = {
   getMe: async () => {
     return api.get('/users/me');
   },
-  getPublicProfile: async (rollNo) => {
-    return api.get(`/users/public/${rollNo}`);
+  getPublicProfile: async (identifier) => {
+    try {
+      const response = await api.get(`/users/public/${identifier}`);
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 };
