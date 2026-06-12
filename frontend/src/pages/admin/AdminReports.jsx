@@ -10,6 +10,16 @@ const AdminReports = () => {
   const [localDisputes, setLocalDisputes] = useState(adminDisputesDetailed);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
+  const [expandedIds, setExpandedIds] = useState(new Set());
+
+  const toggleExpand = (id) => {
+    setExpandedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   const filteredDisputes = localDisputes.filter(disp => {
     if (activeFilter !== 'All' && disp.status.toLowerCase() !== activeFilter.toLowerCase()) return false;
@@ -93,16 +103,21 @@ const AdminReports = () => {
                 <div className="ar-header-actions">
                   {/* Keep resolve workflow via a subtle action or as part of details view */}
                   <button onClick={() => handleResolve(disp.id)} className="ar-resolve-btn" style={{ marginRight: '16px', background: 'transparent', border: 'none', color: '#10b981', fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem' }}>Resolve</button>
-                  <button className="ar-view-details">View details &rarr;</button>
+                  <button onClick={() => toggleExpand(disp.id)} className="ar-view-details" style={{ background: 'transparent', border: 'none', color: '#3b82f6', fontWeight: 600, cursor: 'pointer', fontSize: '0.85rem' }}>
+                    {expandedIds.has(disp.id) ? 'Hide details \u2191' : 'View details \u2192'}
+                  </button>
                 </div>
               </div>
               
               <div className="ar-card-body">
                 <h3 className="ar-parties">{disp.parties}</h3>
                 <p className="ar-meta">{disp.meta}</p>
-                <div className="ar-description-block">
-                  {disp.description}
-                </div>
+                {expandedIds.has(disp.id) && (
+                  <div className="ar-description-block" style={{ animation: 'adminSlideUpFade 0.3s ease forwards', color: '#475569' }}>
+                    <strong>Dispute Report:</strong><br/><br/>
+                    {disp.description}
+                  </div>
+                )}
               </div>
             </div>
           ))
