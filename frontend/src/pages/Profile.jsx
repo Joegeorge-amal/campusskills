@@ -72,7 +72,7 @@ const Profile = () => {
 
   useEffect(() => {
     fetchMyListings();
-  }, [user?.id]);
+  }, [user?._id, user?.id]);
   const fileInputRef = useRef(null);
 
   useEffect(() => {
@@ -567,20 +567,16 @@ const Profile = () => {
         </div>
 
         {/* Pending Verification Section */}
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-            <div style={{ background: '#fef3c7', borderRadius: '50%', padding: '2px' }}>
-              <IconCircle size={14} strokeWidth={3} style={{ color: '#f59e0b' }} />
+        {pendingSkills.length > 0 && (
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+              <div style={{ background: '#fef3c7', borderRadius: '50%', padding: '2px' }}>
+                <IconCircle size={14} strokeWidth={3} style={{ color: '#f59e0b' }} />
+              </div>
+              <span style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>Pending Verification</span>
+              <span style={{ fontSize: '11px', color: '#6b7280', background: '#f3f4f6', padding: '2px 8px', borderRadius: '100px', fontWeight: 600 }}>{pendingSkills.length}</span>
             </div>
-            <span style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>Pending Verification</span>
-            <span style={{ fontSize: '11px', color: '#6b7280', background: '#f3f4f6', padding: '2px 8px', borderRadius: '100px', fontWeight: 600 }}>{pendingSkills.length}</span>
-          </div>
 
-          {pendingSkills.length === 0 ? (
-            <div style={{ ...cardStyle, padding: '24px', textAlign: 'center', color: '#6b7280', fontSize: '12px' }}>
-              No pending skills.
-            </div>
-          ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
               {pendingSkills.map((skill, i) => (
                 <div key={i} className="glossy-card" style={{ ...cardStyle, border: '1px solid #fde047', background: '#fffbeb' }}>
@@ -610,8 +606,8 @@ const Profile = () => {
                 </div>
               ))}
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Active Listings Section */}
         <div style={{ marginTop: '40px' }}>
