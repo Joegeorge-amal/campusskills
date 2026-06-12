@@ -1,6 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
+import { cleanupBrowserStorage } from './utils/cleanupStorage';
+
+// Run storage cleanup before app boots
+cleanupBrowserStorage();
 
 // Global CSS Imports - Order matters!
 import './styles/global.css';

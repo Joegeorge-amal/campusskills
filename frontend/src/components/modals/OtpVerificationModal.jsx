@@ -3,13 +3,13 @@ import ReactDOM from 'react-dom';
 import { authService } from '../../services/authService';
 import { useAuth } from '../../context/AuthContext';
 
-const OtpVerificationModal = ({ isOpen, onClose, onSuccess }) => {
+const OtpVerificationModal = ({ isOpen, onClose, onSuccess, type = 'email' }) => {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [timer, setTimer] = useState(60);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const inputRefs = useRef([]);
-  const { verifyEmail } = useAuth();
+  const { verifyEmail, verify2FA } = useAuth();
 
   useEffect(() => {
     let interval;
@@ -75,7 +75,11 @@ const OtpVerificationModal = ({ isOpen, onClose, onSuccess }) => {
     setIsLoading(true);
     setError('');
     try {
-      await verifyEmail(otpString);
+      if (type === '2fa') {
+        await verify2FA(otpString);
+      } else {
+        await verifyEmail(otpString);
+      }
       if (onSuccess) onSuccess();
     } catch (err) {
       setError(err.message || 'Verification failed. Please try again.');
@@ -89,7 +93,11 @@ const OtpVerificationModal = ({ isOpen, onClose, onSuccess }) => {
     setIsLoading(true);
     setError('');
     try {
-      await authService.resendOtp();
+      if (type === '2fa') {
+        await authService.resend2FA();
+      } else {
+        await authService.resendOtp();
+      }
       setTimer(60); // Reset timer
       setOtp(['', '', '', '', '', '']); // Clear OTP fields
       inputRefs.current[0].focus();
@@ -120,11 +128,13 @@ const OtpVerificationModal = ({ isOpen, onClose, onSuccess }) => {
         >×</button>
 
         <div style={{ fontSize: '20px', fontWeight: '600', color: '#1a1560', marginBottom: '8px' }}>
-          Verify Your Email
+          {type === '2fa' ? 'Two-Factor Authentication' : 'Verify Your Email'}
         </div>
 
         <p style={{ fontSize: '14px', color: '#666', margin: '16px 0 24px', lineHeight: 1.5 }}>
-          A verification code has been sent to your email address.<br/>
+          {type === '2fa' 
+            ? 'A verification code has been sent to your admin email address.' 
+            : 'A verification code has been sent to your email address.'}<br/>
           <span style={{ fontSize: '12px', color: '#888' }}>Please check your spam folder if you don't see it.</span>
         </p>
 
@@ -162,7 +172,7 @@ const OtpVerificationModal = ({ isOpen, onClose, onSuccess }) => {
           {error && <div style={{ color: '#E24B4A', fontSize: '13px', marginBottom: '16px' }}>{error}</div>}
 
           <button className="lbtn" type="submit" disabled={isLoading || otp.join('').length !== 6}>
-            {isLoading ? 'Verifying...' : 'Verify Email'}
+            {isLoading ? 'Verifying...' : (type === '2fa' ? 'Verify Login' : 'Verify Email')}
           </button>
         </form>
 

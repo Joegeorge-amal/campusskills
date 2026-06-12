@@ -94,44 +94,8 @@ const Marketplace = () => {
     ? skills 
     : skills.filter(s => s.category === filter);
 
-  const mockFeaturedSkills = [
-    {
-      _id: 'mock1',
-      title: 'Looking for a Python Tutor',
-      description: 'I need someone to help me learn Python basics. Willing to pay or swap.',
-      category: 'Programming & Tech',
-      listingType: 'LEARN',
-      price: 150,
-      availability: 'ONLINE',
-      owner: { name: 'Alex Johnson', reviewCount: 12, averageRating: 4.8 },
-      requestedSkills: [{ name: 'Python' }]
-    },
-    {
-      _id: 'mock2',
-      title: 'Need help with UI/UX Design',
-      description: 'Looking for someone to teach me Figma and basic design principles.',
-      category: 'Design & Creative',
-      listingType: 'LEARN',
-      price: 0,
-      availability: 'IN_PERSON',
-      owner: { name: 'Sarah Lee', reviewCount: 5, averageRating: 4.5 },
-      requestedSkills: [{ name: 'Figma' }]
-    },
-    {
-      _id: 'mock3',
-      title: 'Guitar lessons for beginners',
-      description: 'I want to learn acoustic guitar. I can offer coding lessons in exchange.',
-      category: 'Music & Audio',
-      listingType: 'LEARN_SWAP',
-      price: 100,
-      availability: 'ONLINE',
-      owner: { name: 'Michael Chen', reviewCount: 8, averageRating: 5.0 },
-      requestedSkills: [{ name: 'Guitar' }]
-    }
-  ];
-
-  const featuredSkills = filter === 'All' ? mockFeaturedSkills : mockFeaturedSkills.filter(s => s.category === filter);
-  const regularSkills = filteredSkills;
+  const featuredSkills = filter === 'All' ? filteredSkills.slice(0, 3) : filteredSkills.slice(0, 3);
+  const regularSkills = filter === 'All' ? filteredSkills.slice(3) : filteredSkills;
 
   const renderSkillCard = (skill, i) => (
     <motion.div layout initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ type: 'spring', bounce: 0, duration: 0.4, delay: selectedSkill ? 0 : 0.05 * Math.min(i, 10) }} key={skill._id || skill.id}>
@@ -514,7 +478,7 @@ const Marketplace = () => {
       {isBookModalOpen && (
         <BookSessionModal 
           selectedSkill={selectedSkill.title}
-          selectedTutor={selectedSkill.owner?.displayName || 'Unknown User'}
+          selectedTutor={selectedSkill.owner?.name || 'Unknown User'}
           slots={selectedSkill.availableSlots && selectedSkill.availableSlots.length > 0 ? selectedSkill.availableSlots.map((s, i) => ({
             id: String(i),
             date: s.dayOfWeek,
@@ -528,7 +492,7 @@ const Marketplace = () => {
             navigate('/app/book-request', {
               state: {
                 skillName: selectedSkill.title,
-                tutorName: selectedSkill.owner?.displayName || 'Unknown User',
+                tutorName: selectedSkill.owner?.name || 'Unknown User',
                 price: selectedSkill.price,
                 slot: `${slot.date} · ${slot.time}`
               }

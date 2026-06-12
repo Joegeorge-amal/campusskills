@@ -19,7 +19,15 @@ public class EmailVerifiedMiddleware {
             
             // Allow SUPER_ADMIN to bypass, just in case they don't have it set correctly
             com.campusskills.modules.users.models.UserRole role = user.getRole();
-            if (role != null && "SUPER_ADMIN".equals(role.name())) {
+            boolean isPrivileged = role != null && ("SUPER_ADMIN".equals(role.name()) || "ADMIN".equals(role.name()));
+
+            if (isPrivileged) {
+                Boolean twoFactorVerified = ctx.get("twoFactorVerified");
+                if (twoFactorVerified == null || !twoFactorVerified) {
+                    ApiResponse.sendError(ctx, 403, "Two-factor authentication required.");
+                    return;
+                }
+                // Allow privileged users to bypass email verification
                 ctx.next();
                 return;
             }

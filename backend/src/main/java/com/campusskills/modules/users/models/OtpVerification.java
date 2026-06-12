@@ -8,6 +8,7 @@ public class OtpVerification {
     
     public static final String TYPE_EMAIL_VERIFICATION = "EMAIL_VERIFICATION";
     public static final String TYPE_PASSWORD_RESET = "PASSWORD_RESET";
+    public static final String TYPE_TWO_FACTOR_LOGIN = "TWO_FACTOR_LOGIN";
 
     @JsonProperty("_id")
     private String id;

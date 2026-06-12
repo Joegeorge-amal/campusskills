@@ -99,15 +99,26 @@ const AppLayout = () => {
   ];
 
   const sections = ['Main', 'Me'];
-  const initials = user?.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'AK';
+  const initials = user?.name ? user.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'U';
+
+  const userNavigation = [
+    { name: 'Your Profile', href: '/profile' },
+    { name: 'Settings', href: '/settings' },
+  ];
+
+  const profileDisplay = {
+    name: user?.name || 'Anonymous',
+    meta: user ? `${user.year || 'Unknown'} · ${user.programme || 'Not specified'}` : '',
+    path: '/app/profile'
+  };
 
   const profileData = {
     initials,
     bg: avBg,
     color: avCol,
     backgroundImage: user?.avatarImg,
-    name: user?.name || 'Arjun Kumar',
-    meta: user ? `${user.year} · ${user.branch}` : '3rd yr · CSE',
+    name: user?.name || 'Anonymous',
+    meta: user ? `${user.year || 'Unknown'} · ${user.programme || 'Not specified'}` : '',
     path: '/app/profile'
   };
 

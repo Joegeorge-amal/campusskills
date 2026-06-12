@@ -115,7 +115,6 @@ public class ProfileHandler {
         // Explicitly whitelist fields to prevent pollution of user_profiles collection
         JsonObject safeUpdates = new JsonObject();
         
-        if (body.containsKey("displayName")) safeUpdates.put("displayName", body.getString("displayName"));
         if (body.containsKey("name")) safeUpdates.put("name", body.getString("name"));
         if (body.containsKey("programme")) safeUpdates.put("programme", body.getString("programme"));
         if (body.containsKey("phoneNumber")) safeUpdates.put("phoneNumber", body.getString("phoneNumber"));

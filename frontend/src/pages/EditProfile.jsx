@@ -12,8 +12,8 @@ const EditProfile = () => {
 
   const [firstName, setFirstName] = useState(user?.name?.split(' ')[0] || '');
   const [lastName, setLastName] = useState(user?.name?.split(' ')[1] || '');
-  const [year, setYear] = useState(user?.year || '3rd year');
-  const [programme, setProgramme] = useState(user?.programme || 'BSc CSPHEL');
+  const [year, setYear] = useState(user?.year || '');
+  const [programme, setProgramme] = useState(user?.programme || '');
   const [bio, setBio] = useState(user?.bio || '');
   
   // Parse existing phone number (e.g. "+91 9876543210")
@@ -24,7 +24,7 @@ const EditProfile = () => {
   const [countryCode, setCountryCode] = useState(parsedCountryCode);
   const [phoneNumber, setPhoneNumber] = useState(parsedPhone);
   
-  const [upi, setUpi] = useState(user?.upi || 'arjunkumar@upi');
+  const [upi, setUpi] = useState(user?.upi || '');
   const [avatarImg, setAvatarImg] = useState(user?.avatarImg || null);
   const fileInputRef = useRef(null);
   const [bannerImg, setBannerImg] = useState(user?.bannerImg || null);
@@ -42,6 +42,8 @@ const EditProfile = () => {
   const [avatarColor, setAvatarColor] = useState(user?.avatarColor || { bg: '#EEEDFE', text: '#3C3489' });
   const [showSavePrompt, setShowSavePrompt] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
+  const [isUploadingBanner, setIsUploadingBanner] = useState(false);
 
   useEffect(() => {
     const mainContent = document.querySelector('.main');
@@ -56,12 +58,12 @@ const EditProfile = () => {
     const hasChanges = 
       firstName !== (user?.name?.split(' ')[0] || '') ||
       lastName !== (user?.name?.split(' ')[1] || '') ||
-      year !== (user?.year || '3rd year') ||
-      programme !== (user?.programme || 'BSc CSPHEL') ||
+      year !== (user?.year || '') ||
+      programme !== (user?.programme || '') ||
       bio !== (user?.bio || '') ||
       countryCode !== parsedCountryCode ||
       phoneNumber !== parsedPhone ||
-      upi !== (user?.upi || 'arjunkumar@upi') ||
+      upi !== (user?.upi || '') ||
       avatarImg !== (user?.avatarImg || null) ||
       bannerImg !== (user?.bannerImg || null) ||
       showHeatmap !== (user?.showHeatmap !== false) ||
@@ -151,7 +153,7 @@ const EditProfile = () => {
     }
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
@@ -160,11 +162,23 @@ const EditProfile = () => {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setAvatarImg(reader.result);
-    };
-    reader.readAsDataURL(file);
+    try {
+      setIsUploadingAvatar(true);
+      const { compressImage } = await import('../utils/imageUtils');
+      const { imageService } = await import('../services/imageService');
+
+      const compressedFile = await compressImage(file, 512, 512, 0.8);
+      const signatureData = await imageService.getSignature('avatar');
+      const url = await imageService.uploadToCloudinary(compressedFile, signatureData);
+      
+      setAvatarImg(url);
+      triggerToast('Profile picture uploaded successfully');
+    } catch (err) {
+      console.error('Image upload failed:', err);
+      triggerToast(err.message || 'Failed to upload image');
+    } finally {
+      setIsUploadingAvatar(false);
+    }
   };
 
   const handleRemovePhoto = (e) => {
@@ -172,7 +186,7 @@ const EditProfile = () => {
     setAvatarImg(null);
   };
 
-  const handleBannerChange = (e) => {
+  const handleBannerChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
@@ -181,11 +195,23 @@ const EditProfile = () => {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setBannerImg(reader.result);
-    };
-    reader.readAsDataURL(file);
+    try {
+      setIsUploadingBanner(true);
+      const { compressImage } = await import('../utils/imageUtils');
+      const { imageService } = await import('../services/imageService');
+
+      const compressedFile = await compressImage(file, 1200, 400, 0.8);
+      const signatureData = await imageService.getSignature('banner');
+      const url = await imageService.uploadToCloudinary(compressedFile, signatureData);
+      
+      setBannerImg(url);
+      triggerToast('Banner uploaded successfully');
+    } catch (err) {
+      console.error('Banner upload failed:', err);
+      triggerToast(err.message || 'Failed to upload banner');
+    } finally {
+      setIsUploadingBanner(false);
+    }
   };
 
   const handleRemoveBanner = (e) => {
@@ -250,8 +276,8 @@ const EditProfile = () => {
           </div>
           <div onClick={() => bannerInputRef.current?.click()} style={{ width: '100%', height: '120px', borderRadius: 'var(--cs-radius-md)', border: '2px dashed var(--cs-border)', background: bannerImg ? `url(${bannerImg}) center/cover` : 'var(--cs-bg-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', position: 'relative', overflow: 'hidden' }}>
              <input type="file" ref={bannerInputRef} style={{ display: 'none' }} accept="image/*" onChange={handleBannerChange} />
-             {!bannerImg && <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--cs-primary)' }}>+ Upload Banner</span>}
-             {bannerImg && <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transition: 'opacity 0.2s' }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0}><span style={{ color: '#fff', fontSize: '13px', fontWeight: 600 }}>Change Banner</span></div>}
+             {!bannerImg && <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--cs-primary)' }}>{isUploadingBanner ? 'Uploading...' : '+ Upload Banner'}</span>}
+             {bannerImg && <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transition: 'opacity 0.2s' }} onMouseEnter={e => e.currentTarget.style.opacity = 1} onMouseLeave={e => e.currentTarget.style.opacity = 0}><span style={{ color: '#fff', fontSize: '13px', fontWeight: 600 }}>{isUploadingBanner ? 'Uploading...' : 'Change Banner'}</span></div>}
           </div>
         </div>
 
@@ -280,6 +306,11 @@ const EditProfile = () => {
                 ...(avatarImg ? { backgroundImage: `url(${avatarImg})`, backgroundSize: 'cover', backgroundPosition: 'center', color: 'transparent' } : {})
               }}>
                 {!avatarImg && getInitials()}
+              </div>
+              <div style={{ position: 'absolute', inset: 0, background: 'rgba(0,0,0,0.4)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', opacity: 0, transition: 'opacity 0.2s', ...(isUploadingAvatar ? { opacity: 1 } : {}) }} className="ep-av-overlay">
+                <span style={{ color: '#fff', fontSize: '11px', fontWeight: 600, textAlign: 'center' }}>
+                  {isUploadingAvatar ? 'Wait...' : 'Change'}
+                </span>
               </div>
               <div style={{ position: 'absolute', bottom: '0', right: '0', width: '24px', height: '24px', background: 'var(--cs-primary)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: '2px solid var(--cs-bg-white)' }}>
                 <svg viewBox="0 0 24 24" width="12" height="12" xmlns="http://www.w3.org/2000/svg"><path d="M12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7zm7-13h-1.5l-1.7-2H8.2L6.5 2.5H5A3 3 0 0 0 2 5.5v13A3 3 0 0 0 5 21.5h14a3 3 0 0 0 3-3v-13A3 3 0 0 0 19 2.5z" fill="#fff"/></svg>

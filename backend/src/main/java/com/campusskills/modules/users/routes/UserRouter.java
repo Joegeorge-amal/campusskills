@@ -42,6 +42,8 @@ public class UserRouter {
         router.get("/me").handler(handler::getMyProfile);
         router.post("/me/verify-email").handler(handler::verifyEmail);
         router.post("/me/resend-otp").handler(handler::resendOtp);
+        router.post("/me/verify-2fa").handler(handler::verifyTwoFactorOtp);
+        router.post("/me/resend-2fa-otp").handler(handler::resendTwoFactorOtp);
 
         return router;
     }

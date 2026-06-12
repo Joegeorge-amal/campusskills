@@ -11,7 +11,14 @@ const SetupPage = () => {
   const [initData] = useState(() => {
     try {
       const saved = localStorage.getItem('setup_form_data');
-      return saved ? JSON.parse(saved) : {};
+      if (saved) {
+        const data = JSON.parse(saved);
+        if (data.avatarColor && data.avatarColor.bg === '#EEEDFE') {
+           data.avatarColor = { bg: '#1d4ed8', text: '#EEEDFE' };
+        }
+        return data;
+      }
+      return {};
     } catch(e) { return {}; }
   });
 
@@ -27,12 +34,14 @@ const SetupPage = () => {
   const [lastName, setLastName] = useState(initData.lastName || '');
   const [countryCode, setCountryCode] = useState(initData.countryCode || '+91');
   const [phoneNumber, setPhoneNumber] = useState(initData.phoneNumber || '');
-  const [year, setYear] = useState(initData.year || '3rd year');
+  const [year, setYear] = useState(initData.year || '');
   const [programme, setProgramme] = useState(initData.programme || '');
   const [bio, setBio] = useState(initData.bio || '');
   const [upi, setUpi] = useState(initData.upi || '');
-  const [avatarColor, setAvatarColor] = useState(initData.avatarColor || { bg: '#EEEDFE', text: '#3C3489' });
+  const [avatarColor, setAvatarColor] = useState(initData.avatarColor || { bg: '#1d4ed8', text: '#EEEDFE' });
   const [avatarImg, setAvatarImg] = useState(initData.avatarImg || null);
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [error, setError] = useState('');
   const [isFinishing, setIsFinishing] = useState(false);
   const fileInputRef = useRef(null);
@@ -72,10 +81,10 @@ const SetupPage = () => {
 
   useEffect(() => {
     const data = {
-      step, highestStep, email, password, firstName, lastName, countryCode, phoneNumber, year, programme, bio, upi, avatarColor, avatarImg, teachSkills, learnSkills, experience, category, interests, availability, prefTime, sessionPref, exchangePref
+      step, highestStep, email, password, firstName, lastName, countryCode, phoneNumber, year, programme, bio, upi, avatarColor, teachSkills, learnSkills, experience, category, interests, availability, prefTime, sessionPref, exchangePref
     };
     localStorage.setItem('setup_form_data', JSON.stringify(data));
-  }, [step, highestStep, email, password, firstName, lastName, countryCode, phoneNumber, year, programme, bio, upi, avatarColor, avatarImg, teachSkills, learnSkills, experience, category, interests, availability, prefTime, sessionPref, exchangePref]);
+  }, [step, highestStep, email, password, firstName, lastName, countryCode, phoneNumber, year, programme, bio, upi, avatarColor, teachSkills, learnSkills, experience, category, interests, availability, prefTime, sessionPref, exchangePref]);
 
   const handleOtpSuccess = () => {
     localStorage.removeItem('setup_form_data');
@@ -124,12 +133,12 @@ const SetupPage = () => {
     try {
       setIsFinishing(true);
       setError('');
-      const displayName = `${firstName} ${lastName}`.trim();
+      const name = `${firstName} ${lastName}`.trim();
       const fullEmail = `${email.trim()}${APP_CONFIG.DEFAULT_DOMAIN}`;
       
       let userData;
       try {
-        userData = await register(fullEmail, password, displayName);
+        userData = await register(fullEmail, password, name);
       } catch (regErr) {
         if (regErr.message && regErr.message.includes('Email already exists')) {
           try {
@@ -142,6 +151,17 @@ const SetupPage = () => {
         }
       }
       
+      let finalAvatarUrl = avatarImg;
+      if (avatarFile) {
+        try {
+          const { imageService } = await import('../services/imageService');
+          const signatureData = await imageService.getSignature('avatar');
+          finalAvatarUrl = await imageService.uploadToCloudinary(avatarFile, signatureData);
+        } catch (uploadErr) {
+          console.error("Failed to upload avatar to Cloudinary during setup", uploadErr);
+        }
+      }
+      
       await updateProfile({
         phoneNumber: `${countryCode} ${phoneNumber}`.trim(),
         year, 
@@ -150,7 +170,11 @@ const SetupPage = () => {
         upi,
         skillsOffered: teachSkills.map(s => ({ name: s, level: 'BEGINNER' })), 
         skillsWanted: learnSkills,
-        avatarImg: avatarImg
+        avatarImg: finalAvatarUrl,
+        avatarColor: avatarColor,
+        preferredTimes: availability,
+        sessionPreference: sessionPref,
+        exchangePreference: exchangePref
       });
       
       if (userData && userData.emailVerified === false) {
@@ -175,15 +199,30 @@ const SetupPage = () => {
     setTeachInput('');
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    if (!file.type.startsWith('image/')) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setAvatarImg(reader.result);
-    };
-    reader.readAsDataURL(file);
+    if (!file.type.startsWith('image/')) {
+      setError('Please select a valid image file');
+      return;
+    }
+
+    try {
+      setIsUploadingImage(true);
+      setError('');
+      
+      const { compressImage } = await import('../utils/imageUtils');
+
+      const compressedFile = await compressImage(file, 512, 512, 0.8);
+      
+      setAvatarFile(compressedFile);
+      setAvatarImg(URL.createObjectURL(compressedFile));
+    } catch (err) {
+      console.error('Image processing failed:', err);
+      setError(err.message || 'Failed to process image. Please try again.');
+    } finally {
+      setIsUploadingImage(false);
+    }
   };
 
   const removeTeachSkill = (skill) => {
@@ -208,12 +247,12 @@ const SetupPage = () => {
   };
 
   const colors = [
+    { bg: '#1d4ed8', text: '#EEEDFE' },
     { bg: '#EEEDFE', text: '#3C3489' },
     { bg: '#E6F1FB', text: '#0C447C' },
     { bg: '#EAF3DE', text: '#27500A' },
     { bg: '#FAEEDA', text: '#633806' },
     { bg: '#FBEAF0', text: '#72243E' },
-    { bg: '#1d4ed8', text: '#EEEDFE' },
   ];
 
   const availOptions = [
@@ -369,7 +408,9 @@ const SetupPage = () => {
                     </div>
                   </div>
                   <div style={{ marginLeft: '12px' }}>
-                    {avatarImg ? (
+                    {isUploadingImage ? (
+                      <span style={{ fontSize: '14px', fontWeight: '500', color: 'var(--cs-primary)' }}>Uploading...</span>
+                    ) : avatarImg ? (
                       <div style={{ fontSize: '13px', color: '#4b5563', fontWeight: 500 }}>
                         <button type="button" onClick={(e) => { 
                           e.stopPropagation(); 

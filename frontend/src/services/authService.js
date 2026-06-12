@@ -5,8 +5,8 @@ export const authService = {
     return api.post('/auth/login', { email, password });
   },
 
-  register: async (email, password, displayName) => {
-    return api.post('/auth/signup', { email, password, displayName });
+  register: async (email, password, name) => {
+    return api.post('/auth/signup', { email, password, name });
   },
 
   refresh: async (refreshToken) => {
@@ -27,6 +27,14 @@ export const authService = {
 
   resendOtp: async () => {
     return api.post('/users/me/resend-otp');
+  },
+
+  verify2FA: async (otp) => {
+    return api.post('/users/me/verify-2fa', { otp });
+  },
+
+  resend2FA: async () => {
+    return api.post('/users/me/resend-2fa-otp');
   },
 
   forgotPassword: async (email) => {

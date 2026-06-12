@@ -64,4 +64,34 @@ public class UserHandler {
             .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("success", true).put("message", "OTP sent successfully")))
             .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
     }
+
+    public void verifyTwoFactorOtp(RoutingContext ctx) {
+        String userId = ctx.get("authenticatedUserId");
+        if (userId == null) {
+            ApiResponse.sendError(ctx, 401, "Unauthorized");
+            return;
+        }
+
+        JsonObject body = ctx.body().asJsonObject();
+        if (body == null || !body.containsKey("otp")) {
+            ApiResponse.badRequest(ctx, "Missing OTP");
+            return;
+        }
+
+        userService.verifyTwoFactorOtp(userId, body.getString("otp"))
+            .onSuccess(data -> ApiResponse.ok(ctx, data))
+            .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
+    }
+
+    public void resendTwoFactorOtp(RoutingContext ctx) {
+        String userId = ctx.get("authenticatedUserId");
+        if (userId == null) {
+            ApiResponse.sendError(ctx, 401, "Unauthorized");
+            return;
+        }
+
+        userService.resendTwoFactorOtp(userId)
+            .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("success", true).put("message", "2FA OTP sent successfully")))
+            .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
+    }
 }

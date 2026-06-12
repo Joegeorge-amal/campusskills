@@ -17,6 +17,7 @@ const LoginPage = () => {
   const [isForgotOpen, setIsForgotOpen] = useState(false);
   const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
   const [unverifiedEmail, setUnverifiedEmail] = useState('');
+  const [otpType, setOtpType] = useState('email');
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -52,8 +53,16 @@ const LoginPage = () => {
       const fullEmail = tab === 'student' ? `${email.trim()}${APP_CONFIG.DEFAULT_DOMAIN}` : email.trim();
       const userData = await login(fullEmail, password, tab);
 
+      if (userData && userData.requiresOtp) {
+        setUnverifiedEmail(fullEmail);
+        setOtpType('2fa');
+        setIsOtpModalOpen(true);
+        return;
+      }
+
       if (userData && userData.emailVerified === false) {
         setUnverifiedEmail(fullEmail);
+        setOtpType('email');
         setIsOtpModalOpen(true);
         return;
       }
@@ -221,6 +230,7 @@ const LoginPage = () => {
         onClose={() => setIsOtpModalOpen(false)}
         onSuccess={handleOtpSuccess}
         email={unverifiedEmail}
+        type={otpType}
       />
     </div>
   );

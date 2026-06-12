@@ -85,7 +85,7 @@ public class ChatRequestService {
                         );
                     }).compose(result -> {
                         return userProfileRepository.findByUserId(authId).map(sender -> {
-                            String senderName = (sender != null && sender.getDisplayName() != null) ? sender.getDisplayName() : "Someone";
+                            String senderName = (sender != null && sender.getName() != null) ? sender.getName() : "Unknown User";
                             publishNotification(
                                 request.getReceiverId(),
                                 "CHAT_REQUEST_RECEIVED",
@@ -114,7 +114,7 @@ public class ChatRequestService {
                 publishSystemMessage(req.getChatId(), "The chat request has been accepted.");
                 
                 return userProfileRepository.findByUserId(authId).map(receiver -> {
-                    String receiverName = (receiver != null && receiver.getDisplayName() != null) ? receiver.getDisplayName() : "Someone";
+                    String receiverName = (receiver != null && receiver.getName() != null) ? receiver.getName() : "Someone";
                     publishNotification(
                         req.getSenderId(),
                         "CHAT_REQUEST_ACCEPTED",

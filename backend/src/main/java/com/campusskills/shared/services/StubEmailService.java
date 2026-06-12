@@ -21,4 +21,10 @@ public class StubEmailService implements EmailService {
         System.out.println("STUB: Sending Password Change Confirmation to " + email);
         return Future.succeededFuture();
     }
+
+    @Override
+    public Future<Void> sendTwoFactorOtpEmail(String email, String otp) {
+        System.out.println("STUB: Sending 2FA OTP " + otp + " to " + email);
+        return Future.succeededFuture();
+    }
 }

@@ -27,9 +27,9 @@ const Dashboard = () => {
 
   // Mock stats
   const stats = {
-    trustScore: user?.trustScore || '4.8',
-    skillsOffered: user?.skillsOffered?.length || 2,
-    sessionsDone: 11
+    trustScore: user?.stats?.ratingAvg?.toFixed(1) || '0.0',
+    skillsOffered: user?.skillsOffered?.length || 0,
+    sessionsDone: user?.stats?.sessionsCompleted || 0
   };
 
   // Get upcoming sessions for the dashboard (limit to 2)
@@ -73,8 +73,8 @@ const Dashboard = () => {
         }}>
           <div>
             <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.8)', marginBottom: '4px', fontWeight: 500 }}>Welcome back</div>
-            <div style={{ fontSize: '22px', fontWeight: 700, marginBottom: '4px', letterSpacing: '-0.3px' }}>{user?.name || 'Arjun Kumar'}</div>
-            <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.8)', fontWeight: 400 }}>{user?.meta || '3rd year · CSE · PESU Bengaluru'}</div>
+            <div style={{ fontSize: '22px', fontWeight: 700, marginBottom: '4px', letterSpacing: '-0.3px' }}>{user?.name || 'User'}</div>
+            <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.8)', fontWeight: 400 }}>{user?.year ? `${user.year} · ${user.programme || ''}` : ''}</div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
             <div style={{ 

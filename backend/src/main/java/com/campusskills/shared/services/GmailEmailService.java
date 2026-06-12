@@ -11,6 +11,7 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.ext.mail.StartTLSOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.campusskills.core.config.Env;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -22,14 +23,18 @@ public class GmailEmailService implements EmailService {
     private final String fromAddress;
 
     public GmailEmailService(Vertx vertx) {
-        String host = System.getenv().getOrDefault("SMTP_HOST", "smtp.gmail.com");
-        int port = Integer.parseInt(System.getenv().getOrDefault("SMTP_PORT", "587"));
+        String host = Env.getOrDefault("SMTP_HOST", "smtp.gmail.com");
+        int port = Integer.parseInt(Env.getOrDefault("SMTP_PORT", "587"));
         
-        String username = System.getenv("SMTP_USERNAME");
-        String password = System.getenv("SMTP_PASSWORD");
+        String username = Env.get("SMTP_USERNAME");
+        String password = Env.get("SMTP_PASSWORD");
         
-        this.fromName = System.getenv().getOrDefault("MAIL_FROM_NAME", "CampusSkills");
-        this.fromAddress = System.getenv().getOrDefault("MAIL_FROM_ADDRESS", username);
+        if (username == null || password == null) {
+            log.error("CRITICAL: SMTP_USERNAME or SMTP_PASSWORD environment variables are not set.");
+        }
+        
+        this.fromName = Env.getOrDefault("MAIL_FROM_NAME", "CampusSkills");
+        this.fromAddress = Env.getOrDefault("MAIL_FROM_ADDRESS", username);
 
         MailConfig config = new MailConfig()
             .setHostname(host)
@@ -304,6 +309,96 @@ public class GmailEmailService implements EmailService {
             + "</html>";
 
         return sendMailInternal(email, "Your CampusSkills Password Was Changed", textBody, htmlBody);
+    }
+
+    @Override
+    public Future<Void> sendTwoFactorOtpEmail(String email, String otp) {
+        String textBody = "CampusSkills\n\nAdmin Two-Factor Authentication\n\n"
+            + "Please use the verification code below to log in to your admin account.\n\n"
+            + "Verification Code: " + otp + "\n\n"
+            + "Expires in 15 minutes.\n\n"
+            + "Security Notice: Never share this verification code with anyone.\n\n"
+            + "CampusSkills\nKristu Jayanti (Deemed to be University)\nThis is an automated message.\nPlease do not reply to this email.";
+
+        String htmlBody = "<!DOCTYPE html>"
+            + "<html>"
+            + "<head>"
+            + "<meta charset=\"utf-8\">"
+            + "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
+            + "<meta name=\"color-scheme\" content=\"light dark\">"
+            + "<meta name=\"supported-color-schemes\" content=\"light dark\">"
+            + "<style>"
+            + "  :root { color-scheme: light dark; }"
+            + "  body { font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f6; margin: 0; padding: 25px 0; color: #333; }"
+            + "  .container { max-width: 500px; margin: 0 auto; background-color: #ffffff; border-radius: 10px; overflow: hidden; box-shadow: 0 8px 24px rgba(99, 102, 241, 0.2); border: 1px solid #e0e5e9; }"
+            + "  .header { background-color: #f8fafc; background-image: linear-gradient(135deg, rgba(33, 59, 138, 0.04) 0%, rgba(99, 102, 241, 0.08) 100%); padding: 25px 20px; text-align: center; border-bottom: 1px solid rgba(99, 102, 241, 0.1); }"
+            + "  .header-table { margin: 0 auto; }"
+            + "  .header img { max-height: 44px; display: block; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.05)); }"
+            + "  .brand-name { font-weight: 800; font-size: 24px; color: #213B8A; letter-spacing: -0.5px; margin: 0; }"
+            + "  .brand-accent { color: #6366f1; }"
+            + "  .content { padding: 30px 25px; text-align: center; }"
+            + "  .title { color: #1a1a1a; font-size: 20px; font-weight: 700; margin-top: 0; margin-bottom: 12px; }"
+            + "  .message { font-size: 15px; line-height: 1.5; color: #4a5568; margin-bottom: 25px; }"
+            + "  .otp-card { background-color: #f3f4f6; background-image: linear-gradient(135deg, #ebf4ff 0%, #faf5ff 100%); border: 1px dashed #6b46c1; padding: 25px; border-radius: 10px; margin: 0 auto; display: inline-block; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.1); }"
+            + "  .otp-code { font-size: 38px; font-weight: 800; letter-spacing: 6px; color: #213B8A; margin: 0; }"
+            + "  .otp-expiry { font-size: 13px; color: #6366f1; margin-top: 10px; font-weight: 600; }"
+            + "  .security-notice { background-color: #fffaf0; border-left: 4px solid #dd6b20; padding: 12px; margin-top: 35px; text-align: left; font-size: 12px; color: #652b19; line-height: 1.5; border-radius: 0 8px 8px 0; }"
+            + "  .security-notice strong { color: #dd6b20; }"
+            + "  .footer { background-color: #f8fafc; padding: 15px; text-align: center; font-size: 12px; color: #718096; border-top: 1px solid #e2e8f0; }"
+            + "  @media (prefers-color-scheme: dark) {"
+            + "    body { background-color: #121212 !important; color: #e2e8f0 !important; }"
+            + "    .container { background-color: #1e1e1e !important; border-color: #333333 !important; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important; }"
+            + "    .header { background-color: #18181b !important; background-image: linear-gradient(135deg, rgba(33, 59, 138, 0.2) 0%, rgba(99, 102, 241, 0.15) 100%) !important; border-bottom-color: #333333 !important; }"
+            + "    .header img { filter: drop-shadow(0 0 8px rgba(255,255,255,0.8)) !important; }"
+            + "    .brand-name { color: #f8fafc !important; }"
+            + "    .brand-accent { color: #818cf8 !important; }"
+            + "    .title { color: #f8fafc !important; }"
+            + "    .message { color: #cbd5e1 !important; }"
+            + "    .otp-card { background-color: #1e1b4b !important; background-image: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%) !important; border-color: #6366f1 !important; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important; }"
+            + "    .otp-code { color: #e0e7ff !important; }"
+            + "    .otp-expiry { color: #a5b4fc !important; }"
+            + "    .security-notice { background-color: rgba(221, 107, 32, 0.1) !important; color: #fed7aa !important; border-left-color: #ea580c !important; }"
+            + "    .security-notice strong { color: #fdba74 !important; }"
+            + "    .footer { background-color: #18181b !important; border-top-color: #333333 !important; color: #94a3b8 !important; }"
+            + "  }"
+            + "  [data-ogsc] .container { background-color: #1e1e1e !important; }"
+            + "</style>"
+            + "</head>"
+            + "<body>"
+            + "  <div class='container'>"
+            + "    <div class='header'>"
+            + "      <table class='header-table' role='presentation' border='0' cellpadding='0' cellspacing='0'>"
+            + "        <tr>"
+            + "          <td style='padding-right: 10px; vertical-align: middle;'>"
+            + "            <img src='cid:campus_logo' alt='Logo' />"
+            + "          </td>"
+            + "          <td style='vertical-align: middle;'>"
+            + "            <span class='brand-name'>Campus<span class='brand-accent'>Skills</span></span>"
+            + "          </td>"
+            + "        </tr>"
+            + "      </table>"
+            + "    </div>"
+            + "    <div class='content'>"
+            + "      <h2 class='title'>Admin Login Verification</h2>"
+            + "      <p class='message'>Please use the verification code below to log in to your admin account.</p>"
+            + "      <div class='otp-card'>"
+            + "        <p class='otp-code'>" + otp + "</p>"
+            + "        <p class='otp-expiry'>Expires in 15 minutes</p>"
+            + "      </div>"
+            + "      <div class='security-notice'>"
+            + "        <strong>Security Notice</strong><br><br>"
+            + "        Never share this verification code with anyone.<br>"
+            + "      </div>"
+            + "    </div>"
+            + "    <div class='footer'>"
+            + "      CampusSkills<br>Kristu Jayanti (Deemed to be University)<br><br>"
+            + "      This is an automated message.<br>Please do not reply to this email."
+            + "    </div>"
+            + "  </div>"
+            + "</body>"
+            + "</html>";
+
+        return sendMailInternal(email, "Your Admin Login Code", textBody, htmlBody);
     }
 
     private Future<Void> sendMailInternal(String email, String subject, String textBody, String htmlBody) {

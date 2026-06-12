@@ -43,6 +43,9 @@ public class JwtAuthMiddleware {
                             if (role != null) {
                                 ctx.put("authenticatedUserRole", role);
                             }
+                            if (principal.containsKey("twoFactorVerified")) {
+                                ctx.put("twoFactorVerified", principal.getBoolean("twoFactorVerified"));
+                            }
                             ctx.put("user", foundUser);
                             
                             ctx.next();

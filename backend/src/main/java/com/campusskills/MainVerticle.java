@@ -14,6 +14,7 @@ import io.vertx.ext.auth.jwt.JWTAuthOptions;
 import io.vertx.ext.auth.PubSecKeyOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.campusskills.core.config.Env;
 
 public class MainVerticle extends AbstractVerticle {
 
@@ -22,12 +23,16 @@ public class MainVerticle extends AbstractVerticle {
     @Override
     public void start(Promise<Void> startPromise) {
         // 1. Load Configuration from Environment Variables (with fallbacks)
-        int port = Integer.parseInt(System.getenv().getOrDefault("PORT", "8080"));
-        String host = System.getenv().getOrDefault("HOST", "0.0.0.0");
-        String mongoUri = System.getenv().getOrDefault("MONGO_URI", "mongodb://localhost:27017");
-        String mongoDbName = System.getenv().getOrDefault("MONGO_DB_NAME", "campusskills");
-        String jwtSecret = System.getenv().getOrDefault("JWT_SECRET", "super-secret-development-key-change-in-production");
-        String frontendOrigin = System.getenv().getOrDefault("FRONTEND_ORIGIN", "http://localhost:5500");
+        int port = Integer.parseInt(Env.getOrDefault("PORT", "8080"));
+        String host = Env.getOrDefault("HOST", "0.0.0.0");
+        String mongoUri = Env.getOrDefault("MONGO_URI", "mongodb://localhost:27017");
+        String mongoDbName = Env.getOrDefault("MONGO_DB_NAME", "campusskills");
+        String frontendOrigin = Env.getOrDefault("FRONTEND_ORIGIN", "http://localhost:5500");
+        
+        String jwtSecret = Env.get("JWT_SECRET");
+        if (jwtSecret == null || jwtSecret.trim().isEmpty()) {
+            throw new IllegalStateException("JWT_SECRET environment variable is required.");
+        }
 
         JsonObject dbConfig = new JsonObject()
                 .put("connection_string", mongoUri)

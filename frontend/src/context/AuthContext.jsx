@@ -57,48 +57,75 @@ export const AuthProvider = ({ children }) => {
 
       if (!token) throw new Error('Invalid response from server');
 
-      setUser(userData);
-      setRole(userData.role?.toLowerCase() || 'student');
-      setIsAuthenticated(true);
-      
-      localStorage.setItem('cs_user', JSON.stringify(userData));
-      localStorage.setItem('cs_role', userData.role?.toLowerCase() || 'student');
+      // Set tokens immediately so subsequent getMe() works
       localStorage.setItem('cs_token', token);
       if (refreshToken) {
         localStorage.setItem('cs_refresh_token', refreshToken);
       }
-      localStorage.setItem('cs_av_bg', avBg);
-      localStorage.setItem('cs_av_col', avCol);
+
+      // Fetch full profile mapping
+      const profileRes = await userService.getMe();
+      const fullData = profileRes.data || profileRes;
+      const fullUser = {
+        ...userData,
+        ...(fullData.user || {}),
+        ...(fullData.profile || {}),
+        stats: fullData.stats,
+        wallet: fullData.wallet
+      };
+
+      if (!userData.requiresOtp) {
+        setUser(fullUser);
+        setRole(fullUser.role?.toLowerCase() || 'student');
+        setIsAuthenticated(true);
+        
+        localStorage.setItem('cs_user', JSON.stringify(fullUser));
+        localStorage.setItem('cs_role', fullUser.role?.toLowerCase() || 'student');
+        localStorage.setItem('cs_av_bg', avBg);
+        localStorage.setItem('cs_av_col', avCol);
+      }
       
-      return userData;
+      return fullUser;
     } catch (error) {
       const msg = error.response?.data?.error || error.response?.data?.message || error.message || 'Login failed';
       throw new Error(msg);
     }
   };
 
-  const register = async (email, password, displayName) => {
+  const register = async (email, password, name) => {
     try {
-      const response = await authService.register(email, password, displayName);
+      const response = await authService.register(email, password, name);
       const data = response.data || response;
       const { token, refreshToken, user: userData } = data;
 
       if (!token) throw new Error('Invalid response from server');
 
-      setUser(userData);
-      setRole(userData.role?.toLowerCase() || 'student');
-      setIsAuthenticated(true);
-      
-      localStorage.setItem('cs_user', JSON.stringify(userData));
-      localStorage.setItem('cs_role', userData.role?.toLowerCase() || 'student');
       localStorage.setItem('cs_token', token);
       if (refreshToken) {
         localStorage.setItem('cs_refresh_token', refreshToken);
       }
+
+      // Fetch full profile mapping
+      const profileRes = await userService.getMe();
+      const fullData = profileRes.data || profileRes;
+      const fullUser = {
+        ...userData,
+        ...(fullData.user || {}),
+        ...(fullData.profile || {}),
+        stats: fullData.stats,
+        wallet: fullData.wallet
+      };
+
+      setUser(fullUser);
+      setRole(fullUser.role?.toLowerCase() || 'student');
+      setIsAuthenticated(true);
+      
+      localStorage.setItem('cs_user', JSON.stringify(fullUser));
+      localStorage.setItem('cs_role', fullUser.role?.toLowerCase() || 'student');
       localStorage.setItem('cs_av_bg', avBg);
       localStorage.setItem('cs_av_col', avCol);
       
-      return userData;
+      return fullUser;
     } catch (error) {
       const msg = error.response?.data?.error || error.response?.data?.message || error.message || 'Registration failed';
       throw new Error(msg);
@@ -113,20 +140,80 @@ export const AuthProvider = ({ children }) => {
 
       if (!token) throw new Error('Invalid response from server');
 
-      setUser(userData);
-      setRole(userData.role?.toLowerCase() || 'student');
-      setIsAuthenticated(true);
-      
-      localStorage.setItem('cs_user', JSON.stringify(userData));
-      localStorage.setItem('cs_role', userData.role?.toLowerCase() || 'student');
       localStorage.setItem('cs_token', token);
       if (refreshToken) {
         localStorage.setItem('cs_refresh_token', refreshToken);
       }
+
+      // Fetch full profile mapping
+      const profileRes = await userService.getMe();
+      const fullData = profileRes.data || profileRes;
+      const fullUser = {
+        ...userData,
+        ...(fullData.user || {}),
+        ...(fullData.profile || {}),
+        stats: fullData.stats,
+        wallet: fullData.wallet
+      };
+
+      setUser(fullUser);
+      setRole(fullUser.role?.toLowerCase() || 'student');
+      setIsAuthenticated(true);
       
-      return userData;
+      localStorage.setItem('cs_user', JSON.stringify(fullUser));
+      localStorage.setItem('cs_role', fullUser.role?.toLowerCase() || 'student');
+      
+      return fullUser;
     } catch (error) {
       const msg = error.response?.data?.error || error.response?.data?.message || error.message || 'Verification failed';
+      throw new Error(msg);
+    }
+  };
+
+  const verify2FA = async (otp) => {
+    try {
+      const response = await authService.verify2FA(otp);
+      const data = response.data || response;
+      const { token, refreshToken, user: userData } = data;
+
+      if (!token) throw new Error('Invalid response from server');
+
+      localStorage.setItem('cs_token', token);
+      if (refreshToken) {
+        localStorage.setItem('cs_refresh_token', refreshToken);
+      }
+
+      // Fetch full profile mapping
+      const profileRes = await userService.getMe();
+      const fullData = profileRes.data || profileRes;
+      const fullUser = {
+        ...userData,
+        ...(fullData.user || {}),
+        ...(fullData.profile || {}),
+        stats: fullData.stats,
+        wallet: fullData.wallet
+      };
+
+      setUser(fullUser);
+      setRole(fullUser.role?.toLowerCase() || 'student');
+      setIsAuthenticated(true);
+      
+      localStorage.setItem('cs_user', JSON.stringify(fullUser));
+      localStorage.setItem('cs_role', fullUser.role?.toLowerCase() || 'student');
+      
+      return fullUser;
+    } catch (error) {
+      const msg = error.response?.data?.error || error.response?.data?.message || error.message || '2FA Verification failed';
+      throw new Error(msg);
+    }
+  };
+
+  const resend2FA = async () => {
+    try {
+      await authService.resend2FA();
+      return true;
+    } catch (error) {
+      const msg = error.response?.data?.error || error.response?.data?.message || error.message || 'Failed to resend 2FA OTP';
       throw new Error(msg);
     }
   };
@@ -185,6 +272,8 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         verifyEmail,
+        verify2FA,
+        resend2FA,
         updateProfile,
         fetchProfile,
         logout,

@@ -18,9 +18,9 @@ public class AuthHandler {
             JsonObject body = ctx.body().asJsonObject();
             String email = body.getString("email");
             String password = body.getString("password");
-            String displayName = body.getString("displayName");
+            String name = body.getString("name");
 
-            userService.signup(email, password, displayName)
+            userService.signup(email, password, name)
                 .onSuccess(data -> ApiResponse.created(ctx, data))
                 .onFailure(err -> {
                     if ("EMAIL_EXISTS".equals(err.getMessage())) {

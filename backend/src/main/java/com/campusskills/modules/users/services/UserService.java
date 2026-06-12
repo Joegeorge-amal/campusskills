@@ -28,6 +28,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
+import java.util.UUID;
+import com.campusskills.core.config.Env;
 
 public class UserService {
     
@@ -86,7 +88,7 @@ public class UserService {
 
     public static boolean isSuperAdmin(String email) {
         if (email == null) return false;
-        String env = System.getenv("SUPER_ADMIN_EMAILS");
+        String env = Env.get("SUPER_ADMIN_EMAILS");
         if (env == null || env.trim().isEmpty()) {
             env = "amaljogeorge@gmail.com";
         }
@@ -97,7 +99,7 @@ public class UserService {
         return false;
     }
 
-    public Future<JsonObject> signup(String email, String password, String displayName) {
+    public Future<JsonObject> signup(String email, String password, String name) {
         if (email == null || password == null) {
             return Future.failedFuture("email and password are required");
         }
@@ -133,7 +135,7 @@ public class UserService {
                 
                 UserProfile profile = new UserProfile();
                 profile.setUserId(userId);
-                profile.setDisplayName(displayName != null ? displayName : normalizedEmail.split("@")[0]);
+                profile.setName(name != null ? name : normalizedEmail.split("@")[0]);
                 profile.setSkillsOffered(new ArrayList<>());
                 profile.setSkillsWanted(new ArrayList<>());
                 profile.setProfileCompleted(false);
@@ -173,7 +175,7 @@ public class UserService {
                     });
 
                 return CompositeFuture.all(profileFut, statsFut, walletFut, otpFut)
-                    .compose(cf -> generateAuthResponse(user));
+                    .compose(cf -> generateAuthResponse(user, true));
             });
         });
     }
@@ -198,17 +200,27 @@ public class UserService {
                 user.setRole(UserRole.SUPER_ADMIN);
                 return userRepository.updateUserRole(user.getId(), UserRole.SUPER_ADMIN)
                     .compose(v -> {
-                        triggerAutoOtpIfNeeded(user);
-                        return generateAuthResponse(user);
+                        boolean isPrivileged = user.getRole() == UserRole.ADMIN || user.getRole() == UserRole.SUPER_ADMIN;
+                        triggerAutoOtpIfNeeded(user, isPrivileged);
+                        return generateAuthResponse(user, !isPrivileged);
                     });
             }
 
-            triggerAutoOtpIfNeeded(user);
-            return generateAuthResponse(user);
+            boolean isPrivileged = user.getRole() == UserRole.ADMIN || user.getRole() == UserRole.SUPER_ADMIN;
+            triggerAutoOtpIfNeeded(user, isPrivileged);
+            return generateAuthResponse(user, !isPrivileged);
         });
     }
 
-    private void triggerAutoOtpIfNeeded(User user) {
+    private void triggerAutoOtpIfNeeded(User user, boolean isPrivileged) {
+        if (isPrivileged) {
+            // Send 2FA login OTP
+            resendTwoFactorOtp(user.getId()).onFailure(err -> {
+                System.out.println("[AUTH] Auto-send 2FA OTP during login skipped/failed: " + err.getMessage());
+            });
+            return;
+        }
+
         if (!user.getEmailVerified()) {
             otpRepository.findByUserIdAndType(user.getId(), com.campusskills.modules.users.models.OtpVerification.TYPE_EMAIL_VERIFICATION).onSuccess(verification -> {
                 long now = System.currentTimeMillis();
@@ -249,7 +261,8 @@ public class UserService {
                         .put("userId", user.getId())
                         .put("role", user.getRole().name())
                         .put("emailVerified", user.getEmailVerified())
-                        .put("requiresEmailVerification", !user.getEmailVerified()),
+                        .put("requiresEmailVerification", !user.getEmailVerified())
+                        .put("twoFactorVerified", true), // Assume true on refresh
                     new JWTOptions().setExpiresInMinutes(15) // 15 mins
                 );
                 
@@ -329,7 +342,7 @@ public class UserService {
                 user.setEmailVerified(true);
                 return userRepository.updateUser(user).compose(v -> {
                     return otpRepository.deleteByUserIdAndType(userId, com.campusskills.modules.users.models.OtpVerification.TYPE_EMAIL_VERIFICATION).compose(v2 -> {
-                        return generateAuthResponse(user);
+                        return generateAuthResponse(user, true);
                     });
                 });
             });
@@ -384,16 +397,104 @@ public class UserService {
         });
     }
 
-    private Future<JsonObject> generateAuthResponse(User user) {
+    public Future<JsonObject> verifyTwoFactorOtp(String userId, String otp) {
+        if (otp == null || otp.trim().isEmpty()) {
+            return Future.failedFuture("OTP is required");
+        }
+
+        return otpRepository.findByUserIdAndType(userId, com.campusskills.modules.users.models.OtpVerification.TYPE_TWO_FACTOR_LOGIN).compose(verification -> {
+            if (verification == null) {
+                return Future.failedFuture("No pending verification found or OTP has expired");
+            }
+
+            if (verification.getAttempts() >= 5) {
+                return otpRepository.deleteByUserIdAndType(userId, com.campusskills.modules.users.models.OtpVerification.TYPE_TWO_FACTOR_LOGIN)
+                    .compose(v -> Future.failedFuture("Too many incorrect attempts. Please request a new OTP."));
+            }
+
+            if (!BCrypt.checkpw(otp.trim(), verification.getOtpHash())) {
+                return otpRepository.incrementAttempts(verification.getId())
+                    .compose(v -> Future.failedFuture("Invalid OTP"));
+            }
+
+            // OTP is valid
+            return userRepository.findById(userId).compose(user -> {
+                if (user == null) {
+                    return Future.failedFuture("User not found");
+                }
+                return otpRepository.deleteByUserIdAndType(userId, com.campusskills.modules.users.models.OtpVerification.TYPE_TWO_FACTOR_LOGIN).compose(v2 -> {
+                    return generateAuthResponse(user, true);
+                });
+            });
+        });
+    }
+
+    public Future<Void> resendTwoFactorOtp(String userId) {
+        return userRepository.findById(userId).compose(user -> {
+            if (user == null) {
+                return Future.failedFuture("User not found");
+            }
+
+            return otpRepository.findByUserIdAndType(userId, com.campusskills.modules.users.models.OtpVerification.TYPE_TWO_FACTOR_LOGIN).compose(verification -> {
+                long now = System.currentTimeMillis();
+                String newOtp = generateOtp();
+                String newHash = BCrypt.hashpw(newOtp, BCrypt.gensalt());
+                Long newExpiry = now + 15 * 60 * 1000L;
+
+                if (verification != null) {
+                    // Check cooldown (1 minute)
+                    if (now - verification.getLastResentAt() < 60000) {
+                        return Future.failedFuture("Please wait at least 1 minute before requesting a new OTP.");
+                    }
+                    return otpRepository.updateOtp(verification.getId(), newHash, newExpiry, now)
+                        .compose(v -> {
+                            emailService.sendTwoFactorOtpEmail(user.getEmail(), newOtp)
+                                .onFailure(err -> System.out.println("[AUTH] Failed to resend 2FA OTP email: " + err.getMessage()));
+                            return Future.succeededFuture();
+                        });
+                } else {
+                    // Create new
+                    com.campusskills.modules.users.models.OtpVerification newVerification = new com.campusskills.modules.users.models.OtpVerification();
+                    newVerification.setUserId(userId);
+                    newVerification.setEmail(user.getEmail());
+                    newVerification.setType(com.campusskills.modules.users.models.OtpVerification.TYPE_TWO_FACTOR_LOGIN);
+                    newVerification.setOtpHash(newHash);
+                    newVerification.setAttempts(0);
+                    newVerification.setExpiresAt(newExpiry);
+                    newVerification.setLastResentAt(now);
+
+                    return otpRepository.create(newVerification)
+                        .compose(v -> {
+                            emailService.sendTwoFactorOtpEmail(user.getEmail(), newOtp)
+                                .onFailure(err -> System.out.println("[AUTH] Failed to send 2FA OTP email: " + err.getMessage()));
+                            return Future.succeededFuture();
+                        });
+                }
+            });
+        });
+    }
+
+    private Future<JsonObject> generateAuthResponse(User user, boolean twoFactorVerified) {
         String accessToken = jwtAuth.generateToken(
             new JsonObject()
                 .put("userId", user.getId())
                 .put("role", user.getRole().name())
                 .put("emailVerified", user.getEmailVerified())
-                .put("requiresEmailVerification", !user.getEmailVerified()),
+                .put("requiresEmailVerification", !user.getEmailVerified())
+                .put("twoFactorVerified", twoFactorVerified),
             new JWTOptions().setExpiresInMinutes(15) // 15 minutes access token
         );
         
+        if (!twoFactorVerified) {
+            JsonObject userJson = JsonObject.mapFrom(user);
+            userJson.remove("passwordHash"); 
+            userJson.put("requiresOtp", true);
+            
+            return Future.succeededFuture(new JsonObject()
+                .put("token", accessToken)
+                .put("user", userJson));
+        }
+
         String rawRefreshToken = generateSecureToken();
         String tokenHash = hashToken(rawRefreshToken);
         
@@ -405,6 +506,7 @@ public class UserService {
         return refreshTokenRepository.create(rToken).map(v -> {
             JsonObject userJson = JsonObject.mapFrom(user);
             userJson.remove("passwordHash"); 
+            userJson.put("requiresOtp", false);
             
             return new JsonObject()
                 .put("token", accessToken)

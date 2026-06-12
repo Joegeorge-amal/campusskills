@@ -87,12 +87,7 @@ const Profile = () => {
   const heatmapData = React.useMemo(() => {
     return [...Array(24)].map(() => 
       [...Array(7)].map(() => {
-        const activityLevel = Math.random() > 0.6 ? Math.floor(Math.random() * 3) + 1 : 0;
-        let bgOpacity = 0.1;
-        if (activityLevel === 1) bgOpacity = 0.3;
-        if (activityLevel === 2) bgOpacity = 0.6;
-        if (activityLevel === 3) bgOpacity = 0.9;
-        return { level: activityLevel, opacity: bgOpacity };
+        return { level: 0, opacity: 0.1 };
       })
     );
   }, []);
@@ -135,7 +130,7 @@ const Profile = () => {
   const verifiedSkills = user?.verifiedSkills || [];
   const pendingSkills = skillsOffered.filter(skill => !verifiedSkills.includes(skill));
 
-  const initials = user?.name ? user.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'AK';
+  const initials = user?.name ? user.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : 'U';
 
   const handleAddSkill = async (skillNameInput) => {
     const finalSkill = typeof skillNameInput === 'string' ? skillNameInput : newSkill;
@@ -405,7 +400,7 @@ const Profile = () => {
         {/* User Info */}
         <div style={{ marginBottom: '24px', marginLeft: '2px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
-            <div style={{ fontSize: '22px', fontWeight: 700, color: '#111827' }}>{user?.name || "Student"}</div>
+            <div style={{ fontSize: '22px', fontWeight: 700, color: '#111827' }}>{user?.name || "Anonymous"}</div>
             {isProfileVerified && (
               <div className={isFlyingUp ? 'badge-pop-in' : ''} style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#ecfdf5', border: '1px solid #a7f3d0', padding: '2px 8px', borderRadius: '100px', color: '#059669', fontSize: '11px', fontWeight: 600 }}>
                 <IconCheck size={12} strokeWidth={3} /> Verified
@@ -415,12 +410,12 @@ const Profile = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', color: '#6b7280', fontSize: '14px', fontWeight: 500, marginBottom: '8px' }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <IconMapPin size={16} strokeWidth={2.5} style={{ color: '#9ca3af' }} />
-                {user?.programme || 'BSc CSPHEL'} Student • {user?.year || '1st yr'}
+                {user?.programme || 'Not specified'} • {user?.year || 'Unknown year'}
               </span>
               <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#d1d5db' }}></span>
               <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <IconCalendarMonth size={16} strokeWidth={2.5} style={{ color: '#9ca3af' }} />
-                Joined {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'June 2026'}
+                Joined {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Recently'}
               </span>
             </div>
           {user?.bio && (
@@ -649,7 +644,7 @@ const Profile = () => {
                         title={listing.title}
                         category={listing.category}
                         price={listing.listingType === 'SWAP' ? 'Skill Swap' : (listing.price ? `₹${listing.price}/hr` : 'Free')}
-                        user={{ name: user?.displayName || 'You', year: user?.year || '1st yr', branch: user?.programme || 'BSc CSPHEL' }}
+                        user={{ name: user?.name || 'You', year: user?.year || 'Unknown', branch: user?.programme || 'Not specified' }}
                         rating={user?.stats?.ratingAvg?.toFixed(1) || '5.0'}
                         sessionsCount={user?.stats?.sessionsCompleted || 0}
                         mode={listing.availability === 'ONLINE' ? 'Online' : 'In-person'}

@@ -10,6 +10,8 @@ import com.campusskills.modules.sessions.routes.SessionRouter;
 import com.campusskills.modules.users.routes.AuthRouter;
 import com.campusskills.modules.users.routes.UserRouter;
 import com.campusskills.modules.listings.routes.ListingRouter;
+import com.campusskills.core.config.Env;
+import com.campusskills.shared.services.EmailService;
 
 import com.campusskills.web.middleware.RequestIdMiddleware;
 import com.campusskills.web.middleware.GlobalErrorHandler;
@@ -43,8 +45,8 @@ public class ApiRouter {
         
         // 3.5 Email Service
         // Changed default to "gmail" so you don't need to pass the environment variable every time!
-        String emailProvider = System.getenv().getOrDefault("EMAIL_PROVIDER", "gmail");
-        com.campusskills.shared.services.EmailService emailService;
+        String emailProvider = Env.getOrDefault("EMAIL_PROVIDER", "gmail");
+        EmailService emailService;
         if ("gmail".equalsIgnoreCase(emailProvider)) {
             emailService = new com.campusskills.shared.services.GmailEmailService(vertx);
         } else {
@@ -66,6 +68,7 @@ public class ApiRouter {
         router.route("/profiles/*").handler(JwtAuthMiddleware.create(jwtAuth));
         router.route("/availability/*").handler(JwtAuthMiddleware.create(jwtAuth));
         router.route("/verifications/*").handler(JwtAuthMiddleware.create(jwtAuth));
+        router.route("/images/*").handler(JwtAuthMiddleware.create(jwtAuth));
 
         // 6. Restrict Marketplace Actions for Unverified Users
         io.vertx.core.Handler<io.vertx.ext.web.RoutingContext> verifiedHandler = com.campusskills.web.middleware.EmailVerifiedMiddleware.create();
@@ -91,6 +94,7 @@ public class ApiRouter {
         router.mountSubRouter("/availability", com.campusskills.modules.availability.routes.AvailabilityRouter.create(vertx));
         router.mountSubRouter("/admin", com.campusskills.modules.admin.routes.AdminRouter.create(vertx, jwtAuth));
         router.mountSubRouter("/verifications", com.campusskills.modules.users.routes.VerificationRouter.create(vertx, jwtAuth));
+        router.mountSubRouter("/images", com.campusskills.modules.images.routes.ImageRouter.create(vertx));
         
         // Global Error Handling
         router.route().failureHandler(GlobalErrorHandler.create());

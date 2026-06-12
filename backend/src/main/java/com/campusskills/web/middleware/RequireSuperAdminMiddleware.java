@@ -8,6 +8,11 @@ public class RequireSuperAdminMiddleware {
         return ctx -> {
             String role = ctx.get("authenticatedUserRole");
             if ("SUPER_ADMIN".equals(role)) {
+                Boolean twoFactorVerified = ctx.get("twoFactorVerified");
+                if (twoFactorVerified == null || !twoFactorVerified) {
+                    ctx.response().setStatusCode(403).putHeader("content-type", "application/json").end("{\"error\": \"Forbidden: Two-factor authentication required\"}");
+                    return;
+                }
                 ctx.next();
             } else {
                 ctx.response().setStatusCode(403)
