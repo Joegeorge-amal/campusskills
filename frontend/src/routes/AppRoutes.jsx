@@ -28,7 +28,7 @@ import BookSessionRequest from '../pages/BookSessionRequest';
 
 // Admin Pages
 import AdminOverview from '../pages/admin/AdminOverview';
-import AdminSkills from '../pages/admin/AdminSkills';
+import AdminListings from '../pages/admin/AdminListings';
 import AdminUsers from '../pages/admin/AdminUsers';
 import AdminReports from '../pages/admin/AdminReports';
 import AdminSessions from '../pages/admin/AdminSessions';
@@ -102,7 +102,7 @@ const AppRoutes = () => {
         <Route index element={<Navigate to="dashboard" replace />} />
         
         <Route path="dashboard" element={<AdminOverview />} />
-        <Route path="skills" element={<AdminSkills />} />
+        <Route path="listings" element={<AdminListings />} />
         <Route path="users" element={<AdminUsers />} />
         <Route path="reports" element={<AdminReports />} />
         <Route path="sessions" element={<AdminSessions />} />

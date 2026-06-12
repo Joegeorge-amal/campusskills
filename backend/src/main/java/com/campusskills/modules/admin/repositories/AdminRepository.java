@@ -384,7 +384,19 @@ public class AdminRepository {
         // 1. Initial Match
         JsonObject matchStage = new JsonObject();
         if (status != null && !status.trim().isEmpty()) {
-            matchStage.put("status", status.trim());
+            String s = status.trim().toUpperCase();
+            if (s.equals("ACTIVE")) {
+                matchStage.put("$or", new JsonArray()
+                    .add(new JsonObject().put("status", "ACTIVE"))
+                    .add(new JsonObject().put("status", new JsonObject().put("$exists", false))));
+                matchStage.put("active", new JsonObject().put("$ne", false));
+            } else if (s.equals("ADMIN_DISABLED")) {
+                matchStage.put("$or", new JsonArray()
+                    .add(new JsonObject().put("status", "ADMIN_DISABLED"))
+                    .add(new JsonObject().put("active", false)));
+            } else {
+                matchStage.put("status", s);
+            }
         }
         if (!matchStage.isEmpty()) {
             pipeline.add(new JsonObject().put("$match", matchStage));
@@ -393,7 +405,7 @@ public class AdminRepository {
         // 2. Lookup owner details
         pipeline.add(new JsonObject().put("$lookup", new JsonObject()
             .put("from", "user_profiles")
-            .put("localField", "teacherId")
+            .put("localField", "ownerId")
             .put("foreignField", "userId")
             .put("as", "owner")
         ));
@@ -445,7 +457,10 @@ public class AdminRepository {
                 JsonArray formattedData = new JsonArray();
                 for (int i = 0; i < data.size(); i++) {
                     JsonObject listing = data.getJsonObject(i);
-                    JsonObject owner = listing.getJsonObject("owner", new JsonObject());
+                    JsonObject owner = listing.getJsonObject("owner");
+                    if (owner == null) {
+                        owner = new JsonObject();
+                    }
 
                     formattedData.add(new JsonObject()
                         .put("id", listing.getString("_id"))
@@ -455,7 +470,7 @@ public class AdminRepository {
                         .put("active", listing.getBoolean("active", true))
                         .put("createdAt", listing.getLong("createdAt"))
                         .put("ownerName", owner.getString("name", "Unknown"))
-                        .put("ownerId", listing.getString("teacherId"))
+                        .put("ownerId", listing.getString("ownerId"))
                     );
                 }
 

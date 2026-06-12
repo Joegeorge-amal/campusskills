@@ -210,11 +210,8 @@ public class AdminHandler {
         }
 
         adminService.searchListings(q, status, page, limit)
-            .onSuccess(result -> ctx.response().setStatusCode(200).end(result.encode()))
-            .onFailure(err -> {
-                System.err.println("Failed to fetch listings: " + err.getMessage());
-                ctx.response().setStatusCode(500).end(new JsonObject().put("error", "Internal server error").encode());
-            });
+            .onSuccess(data -> ApiResponse.ok(ctx, data))
+            .onFailure(err -> ApiResponse.internalError(ctx, "Failed to fetch listings: " + err.getMessage()));
     }
 
     public void updateListingStatus(RoutingContext ctx) {
@@ -236,14 +233,12 @@ public class AdminHandler {
         adminService.updateListingStatus(id, status)
             .onSuccess(success -> {
                 if (success) {
-                    ctx.response().setStatusCode(200).end(new JsonObject().put("message", "Listing status updated to " + status).encode());
+                    ApiResponse.ok(ctx, new JsonObject().put("message", "Listing status updated to " + status));
                 } else {
-                    ctx.response().setStatusCode(404).end(new JsonObject().put("error", "Listing not found").encode());
+                    ApiResponse.notFound(ctx, "Listing not found");
                 }
             })
-            .onFailure(err -> {
-                ctx.response().setStatusCode(500).end(new JsonObject().put("error", "Internal server error").encode());
-            });
+            .onFailure(err -> ApiResponse.internalError(ctx, "Failed to update listing: " + err.getMessage()));
     }
 
 
