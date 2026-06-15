@@ -53,6 +53,9 @@ public class ListingRepository {
             ))
             .add(new JsonObject().put("$addFields", new JsonObject()
                 .put("owner", "$owner_arr")
+            ))
+            .add(new JsonObject().put("$project", new JsonObject()
+                .put("owner.upi", 0)
             ));
             
         io.vertx.ext.mongo.AggregateOptions options = new io.vertx.ext.mongo.AggregateOptions();
@@ -213,6 +216,9 @@ public class ListingRepository {
             ))
             .add(new JsonObject().put("$addFields", new JsonObject()
                 .put("owner", "$owner_arr")
+            ))
+            .add(new JsonObject().put("$project", new JsonObject()
+                .put("owner.upi", 0)
             ))
             .add(new JsonObject().put("$sort", sortQuery))
             .add(new JsonObject().put("$skip", skip))

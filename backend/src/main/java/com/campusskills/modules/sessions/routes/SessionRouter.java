@@ -15,8 +15,11 @@ public class SessionRouter {
 
         router.get("/me").handler(handler::getSessionsForAuthUser);
         router.get("/:sessionId").handler(handler::getSessionById);
-        router.post("/:sessionId/confirm").handler(handler::confirmSession);
-        router.post("/:sessionId/dispute").handler(handler::disputeSession);
+        router.post("/:sessionId/complete").handler(handler::markCompletion);
+        router.post("/:sessionId/reschedule/propose").handler(handler::proposeReschedule);
+        router.post("/:sessionId/reschedule/respond").handler(handler::respondToReschedule);
+        router.post("/:sessionId/pay").handler(handler::markPaid);
+        router.get("/:sessionId/payment-info").handler(handler::getPaymentInfo);
 
         return router;
     }

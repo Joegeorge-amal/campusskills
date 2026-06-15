@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { IconX, IconCheck } from '@tabler/icons-react';
+import { IconX, IconCheck, IconTrash } from '@tabler/icons-react';
 
 const BookSessionModal = ({
   slots = [
@@ -22,11 +22,30 @@ const BookSessionModal = ({
   
   const dropdownOptions = listingRequestedSkills.length > 0 ? listingRequestedSkills : userOfferedSkills;
   const [selectedOfferedSkill, setSelectedOfferedSkill] = useState(dropdownOptions.length > 0 ? (dropdownOptions[0].name || dropdownOptions[0]) : '');
+  const [availableTimes, setAvailableTimes] = useState([]);
+  const [newSlotDay, setNewSlotDay] = useState('Monday');
+  const [newSlotTime, setNewSlotTime] = useState('');
+  const [preferredDuration, setPreferredDuration] = useState('60');
+
+  const handleAddSlot = () => {
+    if (newSlotDay && newSlotTime) {
+      setAvailableTimes([...availableTimes, `${newSlotDay} at ${newSlotTime}`]);
+      setNewSlotTime('');
+    }
+  };
+
+  const handleRemoveSlot = (index) => {
+    setAvailableTimes(availableTimes.filter((_, i) => i !== index));
+  };
 
   const handleContinue = () => {
     if (onContinue) {
       const selectedSlot = slots.find(s => s.id === selectedSlotId);
-      onContinue(selectedSlot, message, selectedOfferedSkill);
+      if (isSwapRequest) {
+        onContinue(selectedSlot, message, selectedOfferedSkill, availableTimes, parseInt(preferredDuration, 10));
+      } else {
+        onContinue(selectedSlot, message, selectedOfferedSkill);
+      }
     }
   };
 
@@ -201,7 +220,9 @@ const BookSessionModal = ({
           color: '#ffffff'
         }}>
           <div>
-            <div style={{ fontSize: '16px', fontWeight: 600, marginBottom: '4px' }}>Request a Session</div>
+            <div style={{ fontSize: '16px', fontWeight: 600, marginBottom: '4px' }}>
+              {isSwapRequest ? 'Request a Skill Swap' : 'Request a Session'}
+            </div>
             <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)' }}>
               {selectedSkill} &middot; {selectedTutor}
             </div>
@@ -259,7 +280,7 @@ const BookSessionModal = ({
 
           {isSwapRequest && (
             <>
-              <div className="bsm-section-title" style={{ marginTop: '24px' }}>Which skill are you offering to teach?</div>
+              <div className="bsm-section-title" style={{ marginTop: 0 }}>Which skill are you offering to teach?</div>
               <select 
                 className="bsm-select"
                 value={selectedOfferedSkill}
@@ -271,6 +292,38 @@ const BookSessionModal = ({
                     {skill.name || skill}
                   </option>
                 ))}
+              </select>
+
+              <div className="bsm-section-title" style={{ marginTop: '16px' }}>Your Available Teaching Times</div>
+              <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+                <select className="bsm-select" style={{ marginBottom: 0 }} value={newSlotDay} onChange={e => setNewSlotDay(e.target.value)}>
+                  {['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map(d => <option key={d}>{d}</option>)}
+                </select>
+                <input type="time" className="bsm-select" style={{ marginBottom: 0 }} value={newSlotTime} onChange={e => setNewSlotTime(e.target.value)} />
+                <button type="button" onClick={handleAddSlot} style={{padding: '0 16px', background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: 600, fontSize: '14px'}}>Add</button>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {availableTimes.map((s, i) => (
+                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', background: i === 0 ? '#eff6ff' : '#fff', padding: '10px 12px', border: i === 0 ? '1px solid #bfdbfe' : '1px solid #e5e7eb', borderRadius: '10px', fontSize: '14px' }}>
+                    <span>
+                      <strong style={{ color: i === 0 ? '#1d4ed8' : '#6b7280', marginRight: '6px' }}>{i === 0 ? 'Primary:' : 'Alternate:'}</strong>
+                      {s}
+                    </span>
+                    <button type="button" onClick={() => handleRemoveSlot(i)} style={{background:'none', border:'none', color:'#ef4444', cursor:'pointer', display: 'flex', alignItems: 'center'}}><IconTrash size={16}/></button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="bsm-section-title" style={{ marginTop: '16px' }}>Preferred Duration</div>
+              <select 
+                className="bsm-select"
+                value={preferredDuration}
+                onChange={(e) => setPreferredDuration(e.target.value)}
+              >
+                <option value="30">30 minutes</option>
+                <option value="60">1 hour</option>
+                <option value="90">1.5 hours</option>
+                <option value="120">2 hours</option>
               </select>
             </>
           )}
@@ -285,9 +338,9 @@ const BookSessionModal = ({
           ></textarea>
 
           <button 
-            className={`bsm-btn ${selectedSlotId ? 'active-state' : ''}`}
+            className={`bsm-btn ${(!isSwapRequest && selectedSlotId) || (isSwapRequest && availableTimes.length > 0 && selectedSlotId) ? 'active-state' : ''}`}
             onClick={handleContinue}
-            disabled={!selectedSlotId}
+            disabled={isSwapRequest ? (availableTimes.length === 0 || !selectedSlotId) : !selectedSlotId}
           >
             Send Request
           </button>

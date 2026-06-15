@@ -26,13 +26,13 @@ const Requests = () => {
 
   
 
-  const handleAccept = async (reqId, hideToast = false) => {
+  const handleAccept = async (reqId, hideToast = false, payload = {}) => {
     try {
       const req = requestsData.find(r => r.id === reqId);
       if (req.type === 'Chat request') {
         await chatRequestService.acceptRequest(reqId);
       } else {
-        await exchangeService.acceptExchange(reqId);
+        await exchangeService.acceptExchange(reqId, payload);
       }
       if (!hideToast) triggerToast('Request accepted successfully!');
       fetchInitialData();
@@ -69,6 +69,17 @@ const Requests = () => {
       fetchInitialData();
     } catch (err) {
       triggerToast('Failed to cancel request');
+    }
+  };
+
+  const handleSwapConfirm = async (requestId, swapData) => {
+    try {
+      await exchangeService.acceptExchange(requestId, swapData);
+      triggerToast('Skill swap accepted! Sessions have been scheduled.');
+    } catch (e) {
+      console.error(e);
+      triggerToast('Failed to accept swap');
+      throw e;
     }
   };
 
@@ -218,6 +229,7 @@ const Requests = () => {
           onClose={() => setSwapModalRequest(null)} 
           request={{
             id: swapModalRequest.id,
+            name: swapModalRequest.name,
             title: swapModalRequest.title,
             sub: swapModalRequest.sub,
             status: swapModalRequest.status,
@@ -225,10 +237,14 @@ const Requests = () => {
             typeCls: swapModalRequest.typeCls,
             init: swapModalRequest.init,
             bg: swapModalRequest.bg,
-            col: swapModalRequest.col
+            col: swapModalRequest.col,
+            rawReq: swapModalRequest.rawReq,
+            otherUserExtras: swapModalRequest.otherUserExtras,
+            otherUser: swapModalRequest.otherUser
           }}
-          onConfirm={(reqId, schedule) => {
-            handleAccept(reqId, true);
+          user={user}
+          onConfirm={(reqId, payload) => {
+            handleAccept(reqId, true, payload);
           }}
         />
       )}

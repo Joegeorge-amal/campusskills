@@ -70,40 +70,4 @@ public class SessionRepository {
                 .map(res -> res.getDocModified() > 0);
     }
 
-    public Future<Boolean> addConfirmation(String sessionId, String userId) {
-        JsonObject query = new JsonObject().put("_id", sessionId);
-        JsonObject update = new JsonObject().put("$addToSet", new JsonObject().put("confirmedBy", userId))
-                                        .put("$set", new JsonObject().put("updatedAt", System.currentTimeMillis()));
-
-        return client.updateCollection(COLLECTION, query, update)
-                .map(res -> res.getDocModified() > 0);
-    }
-
-    public Future<java.util.List<Session>> autoResolveExpiredSessions() {
-        long now = System.currentTimeMillis();
-        JsonObject query = new JsonObject()
-            .put("status", com.campusskills.shared.constants.SessionStatus.PENDING_CONFIRMATION.name())
-            .put("confirmationDeadline", new JsonObject().put("$lt", now));
-
-        return client.find(COLLECTION, query).compose(docs -> {
-            if (docs == null || docs.isEmpty()) {
-                return Future.succeededFuture(java.util.Collections.emptyList());
-            }
-
-            JsonObject update = new JsonObject().put("$set", new JsonObject()
-                .put("status", com.campusskills.shared.constants.SessionStatus.CLOSED_UNCONFIRMED.name())
-                .put("updatedAt", now)
-            );
-
-            return client.updateCollectionWithOptions(COLLECTION, query, update, new io.vertx.ext.mongo.UpdateOptions().setMulti(true))
-                .map(res -> docs.stream().map(d -> {
-                    Session s = new Session();
-                    s.setId(d.getString("_id"));
-                    s.setTeacherId(d.getString("teacherId"));
-                    s.setStudentId(d.getString("studentId"));
-                    s.setStatus(com.campusskills.shared.constants.SessionStatus.CLOSED_UNCONFIRMED);
-                    return s;
-                }).collect(java.util.stream.Collectors.toList()));
-        });
-    }
 }

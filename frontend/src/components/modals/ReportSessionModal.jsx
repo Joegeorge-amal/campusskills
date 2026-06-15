@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { IconCheck } from '@tabler/icons-react';
+import { reportService } from '../../services/reportService';
+import { useAppData } from '../../context/AppDataContext';
 
 const ReportSessionModal = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -8,6 +10,8 @@ const ReportSessionModal = () => {
   const [context, setContext] = useState('');
   const [step, setStep] = useState('form'); // 'form', 'success'
   const [description, setDescription] = useState('');
+  const [loading, setLoading] = useState(false);
+  const { triggerToast } = useAppData();
 
   useEffect(() => {
     const handleOpen = (e) => {
@@ -24,9 +28,23 @@ const ReportSessionModal = () => {
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setStep('success');
+    if (!description.trim()) return;
+
+    try {
+      setLoading(true);
+      await reportService.createReport({
+        targetUser: target,
+        context: context,
+        description: description
+      });
+      setStep('success');
+    } catch (err) {
+      triggerToast('Failed to submit report. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleClose = () => {
@@ -99,6 +117,7 @@ const ReportSessionModal = () => {
 
               <button 
                 type="submit" 
+                disabled={loading}
                 style={{ 
                   width: '100%', 
                   padding: '12px', 
@@ -108,10 +127,11 @@ const ReportSessionModal = () => {
                   borderRadius: '24px', 
                   fontSize: '14px', 
                   fontWeight: 600, 
-                  cursor: 'pointer' 
+                  cursor: loading ? 'not-allowed' : 'pointer',
+                  opacity: loading ? 0.7 : 1
                 }}
               >
-                Submit Report
+                {loading ? 'Submitting...' : 'Submit Report'}
               </button>
             </form>
           ) : (

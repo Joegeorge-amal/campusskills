@@ -158,33 +158,23 @@ public class AdminService {
             if (session == null) {
                 return Future.failedFuture("Session not found");
             }
-            java.util.Set<String> confirmedBy = session.getConfirmedBy() == null ? new java.util.HashSet<>() : session.getConfirmedBy();
-            String missingUserId = null;
-            
-            if (!confirmedBy.contains(session.getStudentId())) {
-                missingUserId = session.getStudentId();
-            } else if (!confirmedBy.contains(session.getTeacherId())) {
-                missingUserId = session.getTeacherId();
-            }
-            
-            if (missingUserId == null) {
-                return Future.failedFuture("Session is already fully confirmed");
+            if (session.getStatus() == com.campusskills.shared.constants.SessionStatus.COMPLETED) {
+                return Future.failedFuture("Session is already completed");
             }
 
-            final String missingId = missingUserId;
-            return sessionRepository.addConfirmation(sessionId, missingId).compose(v -> {
-                JsonObject update = new JsonObject().put("status", com.campusskills.shared.constants.SessionStatus.COMPLETED.name());
-                return sessionRepository.updateSessionFields(sessionId, update).compose(v2 -> {
-                    
-                    // Emit notifications
-                    sendNotification(session.getTeacherId(), com.campusskills.shared.constants.NotificationType.ADMIN_DISPUTE_RESOLVED, "Dispute Resolved", "Admin has forced completed the session.", "SESSION", sessionId);
-                    sendNotification(session.getStudentId(), com.campusskills.shared.constants.NotificationType.ADMIN_DISPUTE_RESOLVED, "Dispute Resolved", "Admin has forced completed the session.", "SESSION", sessionId);
-                    
-                    sendNotification(session.getTeacherId(), com.campusskills.shared.constants.NotificationType.SESSION_COMPLETED, "Session Completed", "The session has been marked as completed.", "SESSION", sessionId);
-                    sendNotification(session.getStudentId(), com.campusskills.shared.constants.NotificationType.SESSION_COMPLETED, "Session Completed", "The session has been marked as completed.", "SESSION", sessionId);
-                    
-                    return Future.succeededFuture(true);
-                });
+            JsonObject update = new JsonObject()
+                .put("status", com.campusskills.shared.constants.SessionStatus.COMPLETED.name())
+                .put("teacherCompleted", true)
+                .put("studentCompleted", true);
+                
+            return sessionRepository.updateSessionFields(sessionId, update).compose(v2 -> {
+                sendNotification(session.getTeacherId(), com.campusskills.shared.constants.NotificationType.ADMIN_DISPUTE_RESOLVED, "Dispute Resolved", "Admin has forced completed the session.", "SESSION", sessionId);
+                sendNotification(session.getStudentId(), com.campusskills.shared.constants.NotificationType.ADMIN_DISPUTE_RESOLVED, "Dispute Resolved", "Admin has forced completed the session.", "SESSION", sessionId);
+                
+                sendNotification(session.getTeacherId(), com.campusskills.shared.constants.NotificationType.SESSION_COMPLETED, "Session Completed", "The session has been marked as completed.", "SESSION", sessionId);
+                sendNotification(session.getStudentId(), com.campusskills.shared.constants.NotificationType.SESSION_COMPLETED, "Session Completed", "The session has been marked as completed.", "SESSION", sessionId);
+                
+                return Future.succeededFuture(true);
             });
         });
     }

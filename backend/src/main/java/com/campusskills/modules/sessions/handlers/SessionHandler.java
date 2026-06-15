@@ -44,21 +44,65 @@ public class SessionHandler {
             .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
     }
 
-    public void confirmSession(RoutingContext ctx) {
+    public void markCompletion(RoutingContext ctx) {
         String sessionId = ctx.pathParam("sessionId");
         String authId = ctx.get("authenticatedUserId");
         
-        sessionService.confirmSession(sessionId, authId)
-            .onSuccess(msg -> ApiResponse.ok(ctx, new JsonObject().put("message", "Session confirmed")))
+        sessionService.markCompletion(sessionId, authId)
+            .onSuccess(msg -> ApiResponse.ok(ctx, new JsonObject().put("message", "Completion marked")))
             .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
     }
 
-    public void disputeSession(RoutingContext ctx) {
+    public void proposeReschedule(RoutingContext ctx) {
         String sessionId = ctx.pathParam("sessionId");
         String authId = ctx.get("authenticatedUserId");
         
-        sessionService.disputeSession(sessionId, authId)
-            .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("message", "Session DISPUTED")))
+        JsonObject body = ctx.body().asJsonObject();
+        Long newStart = body.getLong("newStart");
+        Long newEnd = body.getLong("newEnd");
+
+        if (newStart == null || newEnd == null) {
+            ApiResponse.badRequest(ctx, "newStart and newEnd are required");
+            return;
+        }
+
+        sessionService.proposeReschedule(sessionId, authId, newStart, newEnd)
+            .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("message", "Reschedule proposed")))
+            .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
+    }
+
+    public void respondToReschedule(RoutingContext ctx) {
+        String sessionId = ctx.pathParam("sessionId");
+        String authId = ctx.get("authenticatedUserId");
+        
+        JsonObject body = ctx.body().asJsonObject();
+        Boolean accept = body.getBoolean("accept");
+
+        if (accept == null) {
+            ApiResponse.badRequest(ctx, "accept boolean is required");
+            return;
+        }
+
+        sessionService.respondToReschedule(sessionId, authId, accept)
+            .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("message", accept ? "Reschedule accepted" : "Reschedule rejected")))
+            .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
+    }
+
+    public void markPaid(RoutingContext ctx) {
+        String sessionId = ctx.pathParam("sessionId");
+        String authId = ctx.get("authenticatedUserId");
+        
+        sessionService.markPaid(sessionId, authId)
+            .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("message", "Session marked as paid")))
+            .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
+    }
+
+    public void getPaymentInfo(RoutingContext ctx) {
+        String sessionId = ctx.pathParam("sessionId");
+        String authId = ctx.get("authenticatedUserId");
+        
+        sessionService.getPaymentInfo(sessionId, authId)
+            .onSuccess(info -> ApiResponse.ok(ctx, info))
             .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
     }
 }

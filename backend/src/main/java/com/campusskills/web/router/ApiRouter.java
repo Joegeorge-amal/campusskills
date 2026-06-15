@@ -10,6 +10,7 @@ import com.campusskills.modules.sessions.routes.SessionRouter;
 import com.campusskills.modules.users.routes.AuthRouter;
 import com.campusskills.modules.users.routes.UserRouter;
 import com.campusskills.modules.listings.routes.ListingRouter;
+import com.campusskills.modules.reports.routes.ReportRouter;
 import com.campusskills.core.config.Env;
 import com.campusskills.shared.services.EmailService;
 
@@ -69,6 +70,7 @@ public class ApiRouter {
         router.route("/availability/*").handler(JwtAuthMiddleware.create(jwtAuth));
         router.route("/verifications/*").handler(JwtAuthMiddleware.create(jwtAuth));
         router.route("/images/*").handler(JwtAuthMiddleware.create(jwtAuth));
+        router.route("/reports/*").handler(JwtAuthMiddleware.create(jwtAuth));
 
         // 6. Restrict Marketplace Actions for Unverified Users
         io.vertx.core.Handler<io.vertx.ext.web.RoutingContext> verifiedHandler = com.campusskills.web.middleware.EmailVerifiedMiddleware.create();
@@ -78,6 +80,7 @@ public class ApiRouter {
         router.patch("/exchanges/*").handler(verifiedHandler);
         router.post("/reviews/*").handler(verifiedHandler);
         router.post("/verifications/*").handler(verifiedHandler);
+        router.post("/reports/*").handler(verifiedHandler);
 
         // 7. Modules Routing
         router.mountSubRouter("/users", UserRouter.create(vertx, jwtAuth, emailService));
@@ -95,7 +98,7 @@ public class ApiRouter {
         router.mountSubRouter("/admin", com.campusskills.modules.admin.routes.AdminRouter.create(vertx, jwtAuth));
         router.mountSubRouter("/verifications", com.campusskills.modules.users.routes.VerificationRouter.create(vertx, jwtAuth));
         router.mountSubRouter("/images", com.campusskills.modules.images.routes.ImageRouter.create(vertx));
-        router.mountSubRouter("/disputes", com.campusskills.modules.disputes.routes.DisputeRouter.create(vertx, jwtAuth));
+        router.mountSubRouter("/reports", ReportRouter.create(vertx));
         
         // Global Error Handling
         router.route().failureHandler(GlobalErrorHandler.create());

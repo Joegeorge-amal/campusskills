@@ -34,11 +34,24 @@ public class ExchangeHandler {
 
     public void acceptExchange(RoutingContext ctx) {
         String id = ctx.pathParam("id");
-        // String authId = ctx.user().principal().getString("sub");
+        JsonObject payload;
+        try {
+            payload = ctx.body().asJsonObject();
+            log.info("acceptExchange payload: {}", payload.encodePrettily());
+            if (payload == null) {
+                payload = new JsonObject();
+            }
+        } catch (Exception e) {
+            log.error("Failed to parse acceptExchange payload", e);
+            payload = new JsonObject();
+        }
 
-        service.acceptExchange(id)
+        service.acceptExchange(id, payload)
             .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("message", "Exchange accepted")))
-            .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
+            .onFailure(err -> {
+                log.error("acceptExchange failed", err);
+                ApiResponse.badRequest(ctx, err.getMessage());
+            });
     }
 
     public void rejectExchange(RoutingContext ctx) {

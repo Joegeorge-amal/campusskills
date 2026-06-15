@@ -88,6 +88,20 @@ const RequestsCardV2 = ({
     return <span style={{ padding: '2px 8px', background: '#fefce8', color: '#b45309', fontSize: '11px', display: 'flex', alignItems: 'center', borderRadius: '100px', fontWeight: 700, border: '1px solid #fde047' }}>⚠️ Unverified</span>;
   };
 
+  let actualMessage = subtitle || '';
+  let preferredSlot = null;
+  const match = actualMessage.match(/\[Prefers your slot: (.*?)\]\n\n?/);
+  if (match) {
+    preferredSlot = match[1];
+    actualMessage = actualMessage.replace(match[0], '').trim();
+  } else {
+    const fallbackMatch = actualMessage.match(/\[Prefers your slot: (.*?)\]/);
+    if (fallbackMatch) {
+      preferredSlot = fallbackMatch[1];
+      actualMessage = actualMessage.replace(fallbackMatch[0], '').trim();
+    }
+  }
+
   return (
     <div 
       style={{
@@ -114,8 +128,8 @@ const RequestsCardV2 = ({
           <div style={{ marginTop: '2px' }}>
             <Avatar {...avatarProps} />
           </div>
-          <div style={{ flex: 1 }}>
-            <div style={{ fontSize: '14px', fontWeight: 600, color: '#111827', marginBottom: '4px' }}>
+          <div style={{ flex: 1, minWidth: '200px' }}>
+            <div style={{ fontSize: '15px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>
               {title}
             </div>
             
@@ -132,7 +146,7 @@ const RequestsCardV2 = ({
               height: isExpanded ? 0 : 'auto',
               transition: 'opacity 0.2s ease-in-out'
             }}>
-              {subtitle}
+              {actualMessage}
             </div>
 
             {tagText && (
@@ -343,22 +357,54 @@ const RequestsCardV2 = ({
                   </div>
                 )}
 
-                <div>
-                  <div style={{ fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Message</div>
-                  <div style={{ 
-                    background: '#f3f4f6', 
-                    padding: '16px', 
-                    borderRadius: '12px', 
-                    borderTopLeftRadius: type === 'incoming' ? '4px' : '12px',
-                    borderTopRightRadius: type === 'outgoing' ? '4px' : '12px',
-                    fontSize: '14px', 
-                    color: '#374151',
-                    lineHeight: '1.5',
-                    whiteSpace: 'pre-wrap'
-                  }}>
-                    {subtitle || 'No message provided.'}
+                {isSwap && preferredSlot && (
+                  <div>
+                    <div style={{ fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{otherName}'s Preferred Timing from your Listing</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#eff6ff', border: '1px solid #bfdbfe', padding: '12px', borderRadius: '8px' }}>
+                      <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: '#dbeafe', color: '#1d4ed8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <IconClock size={20} />
+                      </div>
+                      <div style={{ fontSize: '14px', fontWeight: 600, color: '#1e3a8a' }}>{preferredSlot}</div>
+                    </div>
                   </div>
-                </div>
+                )}
+                
+                {isSwap && reqDetails.requesterAvailableTimes && reqDetails.requesterAvailableTimes.length > 0 && (
+                  <div>
+                    <div style={{ fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{otherName}'s Available Timings</div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {reqDetails.requesterAvailableTimes.map((time, idx) => (
+                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#ffffff', border: '1px solid #e5e7eb', padding: '12px', borderRadius: '8px' }}>
+                          <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: '#f8fafc', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <IconClock size={20} />
+                          </div>
+                          <div>
+                            <div style={{ fontSize: '14px', fontWeight: 600, color: '#111827' }}>{time}</div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {actualMessage && (
+                  <div>
+                    <div style={{ fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Message</div>
+                    <div style={{ 
+                      background: '#f3f4f6', 
+                      padding: '16px', 
+                      borderRadius: '12px', 
+                      borderTopLeftRadius: type === 'incoming' ? '4px' : '12px',
+                      borderTopRightRadius: type === 'outgoing' ? '4px' : '12px',
+                      fontSize: '14px', 
+                      color: '#374151',
+                      lineHeight: '1.5',
+                      whiteSpace: 'pre-wrap'
+                    }}>
+                      {actualMessage}
+                    </div>
+                  </div>
+                )}
 
                 {reqDetails.proposedSessions && reqDetails.proposedSessions.length > 0 && (
                   <div>

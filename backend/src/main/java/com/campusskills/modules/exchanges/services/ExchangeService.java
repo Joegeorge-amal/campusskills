@@ -93,7 +93,7 @@ public class ExchangeService {
 
                     sendNotification(
                         request.getReceiverId(),
-                        "NEW_REQUEST",
+                        "EXCHANGE_REQUEST_RECEIVED",
                         "New Exchange Request",
                         "You have received a new exchange request.",
                         "EXCHANGE",
@@ -139,7 +139,7 @@ public class ExchangeService {
         });
     }
 
-    public Future<Void> acceptExchange(String exchangeId) {
+    public Future<Void> acceptExchange(String exchangeId, JsonObject payload) {
         return repository.findById(exchangeId).compose(exchange -> {
             if (exchange == null) {
                 return Future.failedFuture("Exchange not found");
@@ -152,20 +152,13 @@ public class ExchangeService {
             return repository.updateStatus(exchangeId, ExchangeStatus.ACCEPTED).compose(updated -> {
                 sendNotification(
                     exchange.getInitiatorId(),
-                    "REQUEST_ACCEPTED",
+                    "EXCHANGE_REQUEST_ACCEPTED",
                     "Exchange Accepted",
                     "Your exchange request was accepted.",
                     "EXCHANGE",
                     exchangeId
                 );
-                
-                JsonObject wsPayload = JsonObject.mapFrom(exchange);
-                wsPayload.put("id", exchangeId);
-                wsPayload.put("status", ExchangeStatus.ACCEPTED.name());
-                broadcastWebSocketEvent(exchange.getInitiatorId(), WebSocketEventType.REQUEST_ACCEPTED, wsPayload);
-                if (!exchange.getInitiatorId().equals(exchange.getReceiverId())) {
-                    broadcastWebSocketEvent(exchange.getReceiverId(), WebSocketEventType.REQUEST_ACCEPTED, wsPayload);
-                }
+
 
                 // Create a chat for the exchange if it doesn't exist
                 com.campusskills.modules.chats.models.Chat newChat = new com.campusskills.modules.chats.models.Chat();
@@ -181,62 +174,98 @@ public class ExchangeService {
                         }
                     });
 
-                if (exchange.getProposedSessions() != null) {
-                    return listingRepository.findById(exchange.getListingId()).compose(listing -> {
-                        List<Future<String>> sessionFutures = new ArrayList<>();
-                        for (java.util.Map<String, Object> proposedMap : exchange.getProposedSessions()) {
-                            JsonObject proposed = new JsonObject(proposedMap);
-                            Session session = new Session();
-                            session.setExchangeId(exchangeId);
+                return listingRepository.findById(exchange.getListingId()).compose(listing -> {
+                    List<Future<String>> sessionFutures = new ArrayList<>();
+                    
+                    long durationMs = (exchange.getPreferredDurationMinutes() != null ? exchange.getPreferredDurationMinutes() : 60) * 60 * 1000L;
+                    
+                    if (exchange.getType() == com.campusskills.shared.constants.ExchangeType.SWAP) {
+                        Number firstStartNum = payload.getNumber("firstSessionStart");
+                        Number secondStartNum = payload.getNumber("secondSessionStart");
+                        Long firstSessionStart = firstStartNum != null ? firstStartNum.longValue() : null;
+                        Long secondSessionStart = secondStartNum != null ? secondStartNum.longValue() : null;
+                        Boolean iGoFirst = payload.getBoolean("iGoFirst", true);
+                        
+                        if (firstSessionStart != null && secondSessionStart != null) {
+                            String firstTeacherId = iGoFirst ? exchange.getReceiverId() : exchange.getInitiatorId();
+                            String firstStudentId = iGoFirst ? exchange.getInitiatorId() : exchange.getReceiverId();
                             
-                            // Determine roles based on listing type
-                            String defaultTeacherId = exchange.getReceiverId();
-                            String defaultStudentId = exchange.getInitiatorId();
+                            // Session A
+                            Session sessionA = new Session();
+                            sessionA.setExchangeId(exchangeId);
+                            sessionA.setTeacherId(firstTeacherId);
+                            sessionA.setStudentId(firstStudentId);
+                            sessionA.setStatus(SessionStatus.SCHEDULED);
+                            sessionA.setScheduledStart(firstSessionStart);
+                            sessionA.setScheduledEnd(firstSessionStart + durationMs);
+                            sessionA.setListingId(exchange.getListingId());
+                            
+                            // Session B
+                            Session sessionB = new Session();
+                            sessionB.setExchangeId(exchangeId);
+                            sessionB.setTeacherId(firstStudentId);
+                            sessionB.setStudentId(firstTeacherId);
+                            sessionB.setStatus(SessionStatus.SCHEDULED);
+                            sessionB.setScheduledStart(secondSessionStart);
+                            sessionB.setScheduledEnd(secondSessionStart + durationMs);
+                            sessionB.setListingId(exchange.getListingId());
+                            
+                            sessionFutures.add(sessionRepository.createSession(sessionA).onSuccess(sessId -> {
+                                sendNotification(sessionA.getTeacherId(), "SESSION_ACCEPTED", "Session Accepted", "A new session has been scheduled.", "SESSION", sessId);
+                                sendNotification(sessionA.getStudentId(), "SESSION_ACCEPTED", "Session Accepted", "A new session has been scheduled.", "SESSION", sessId);
+                            }));
+                            sessionFutures.add(sessionRepository.createSession(sessionB).onSuccess(sessId -> {
+                                sendNotification(sessionB.getTeacherId(), "SESSION_ACCEPTED", "Session Accepted", "A new session has been scheduled.", "SESSION", sessId);
+                                sendNotification(sessionB.getStudentId(), "SESSION_ACCEPTED", "Session Accepted", "A new session has been scheduled.", "SESSION", sessId);
+                            }));
+                        }
+                    } else {
+                        // Tutoring
+                        Number sessionStartNum = payload.getNumber("firstSessionStart");
+                        Long sessionStart = sessionStartNum != null ? sessionStartNum.longValue() : null;
+                        if (sessionStart != null) {
+                            String teacherId = exchange.getReceiverId();
+                            String studentId = exchange.getInitiatorId();
                             
                             if (listing != null && listing.getListingType() == com.campusskills.modules.listings.models.ListingType.LEARN) {
-                                // Invert roles for LEARN listings: Initiator is the Teacher, Receiver (Owner) is the Student
-                                defaultTeacherId = exchange.getInitiatorId();
-                                defaultStudentId = exchange.getReceiverId();
+                                teacherId = exchange.getInitiatorId();
+                                studentId = exchange.getReceiverId();
                             }
                             
-                            // Parse proposed roles (override if explicitly provided in proposal)
-                            String tempTeacherId = proposed.getString("teacherId");
-                            String tempStudentId = proposed.getString("studentId");
-                            final String teacherId = tempTeacherId == null ? defaultTeacherId : tempTeacherId;
-                            final String studentId = tempStudentId == null ? defaultStudentId : tempStudentId;
-                            
+                            Session session = new Session();
+                            session.setExchangeId(exchangeId);
                             session.setTeacherId(teacherId);
                             session.setStudentId(studentId);
                             session.setStatus(SessionStatus.SCHEDULED);
-                            session.setScheduledStart(proposed.getLong("scheduledStart"));
-                            session.setScheduledEnd(proposed.getLong("scheduledEnd"));
-                            session.setTopic(proposed.getString("topic"));
+                            session.setScheduledStart(sessionStart);
+                            session.setScheduledEnd(sessionStart + durationMs);
                             session.setListingId(exchange.getListingId());
                             
+                            final String fTeacherId = teacherId;
+                            final String fStudentId = studentId;
+                            
                             sessionFutures.add(sessionRepository.createSession(session).onSuccess(sessId -> {
-                                // Notify both student and teacher
-                                sendNotification(teacherId, "SESSION_ACCEPTED", "Session Accepted", "A new session has been accepted and scheduled.", "SESSION", sessId);
-                                if (!teacherId.equals(studentId)) {
-                                    sendNotification(studentId, "SESSION_ACCEPTED", "Session Accepted", "A new session has been accepted and scheduled.", "SESSION", sessId);
-                                }
-                                
-                                // Notify Admin
-                                if (eventBus != null) {
-                                    JsonObject adminNotif = new JsonObject()
-                                        .put("recipientType", "ADMIN")
-                                        .put("type", "ADMIN_SESSION_BOOKED")
-                                        .put("title", "Session booked")
-                                        .put("message", "A new session has been booked.")
-                                        .put("sourceType", "SESSION")
-                                        .put("sourceId", sessId);
-                                    eventBus.send("internal.notification.create", adminNotif);
+                                sendNotification(fTeacherId, "SESSION_ACCEPTED", "Session Accepted", "A new session has been scheduled.", "SESSION", sessId);
+                                if (!fTeacherId.equals(fStudentId)) {
+                                    sendNotification(fStudentId, "SESSION_ACCEPTED", "Session Accepted", "A new session has been scheduled.", "SESSION", sessId);
                                 }
                             }));
                         }
-                        return Future.all(sessionFutures).mapEmpty();
-                    });
-                }
-                return Future.succeededFuture();
+                    }
+                    
+                    if (sessionFutures.isEmpty()) {
+                        return Future.succeededFuture((Void) null);
+                    }
+                    return Future.all(sessionFutures).mapEmpty();
+                }).onSuccess(v -> {
+                    JsonObject wsPayload = JsonObject.mapFrom(exchange);
+                    wsPayload.put("id", exchangeId);
+                    wsPayload.put("status", ExchangeStatus.ACCEPTED.name());
+                    broadcastWebSocketEvent(exchange.getInitiatorId(), WebSocketEventType.REQUEST_ACCEPTED, wsPayload);
+                    if (!exchange.getInitiatorId().equals(exchange.getReceiverId())) {
+                        broadcastWebSocketEvent(exchange.getReceiverId(), WebSocketEventType.REQUEST_ACCEPTED, wsPayload);
+                    }
+                });
             });
             // TODO: Auto-reject/reschedule overlapping competing requests for First-to-Accept queue
         });

@@ -20,7 +20,9 @@ public class Exchange {
     private ExchangeStatus status;
     private String message;
     private String chatId;
-    private java.util.List<java.util.Map<String, Object>> proposedSessions; // array of { startTime, endTime, topic }
+    private java.util.List<String> requesterAvailableTimes;
+    private Integer preferredDurationMinutes;
+    private String preferredFirstTeacher;
     private String offeredSkillName;
     private Long createdAt;
     private Long updatedAt;
@@ -51,8 +53,14 @@ public class Exchange {
     public String getChatId() { return chatId; }
     public void setChatId(String chatId) { this.chatId = chatId; }
 
-    public java.util.List<java.util.Map<String, Object>> getProposedSessions() { return proposedSessions; }
-    public void setProposedSessions(java.util.List<java.util.Map<String, Object>> proposedSessions) { this.proposedSessions = proposedSessions; }
+    public java.util.List<String> getRequesterAvailableTimes() { return requesterAvailableTimes; }
+    public void setRequesterAvailableTimes(java.util.List<String> requesterAvailableTimes) { this.requesterAvailableTimes = requesterAvailableTimes; }
+
+    public Integer getPreferredDurationMinutes() { return preferredDurationMinutes; }
+    public void setPreferredDurationMinutes(Integer preferredDurationMinutes) { this.preferredDurationMinutes = preferredDurationMinutes; }
+
+    public String getPreferredFirstTeacher() { return preferredFirstTeacher; }
+    public void setPreferredFirstTeacher(String preferredFirstTeacher) { this.preferredFirstTeacher = preferredFirstTeacher; }
 
     public String getOfferedSkillName() { return offeredSkillName; }
     public void setOfferedSkillName(String offeredSkillName) { this.offeredSkillName = offeredSkillName; }

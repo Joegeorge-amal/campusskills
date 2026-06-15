@@ -27,6 +27,7 @@ const Marketplace = () => {
   const [filter, setFilter] = useState('All');
   const [selectedSkill, setSelectedSkill] = useState(null);
   const [isBookModalOpen, setIsBookModalOpen] = useState(false);
+  const [requestMode, setRequestMode] = useState('TUTORING'); // 'TUTORING' or 'SWAP'
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -416,7 +417,7 @@ const Marketplace = () => {
                 {selectedSkill.listingType === 'TEACH' || selectedSkill.listingType === 'TEACH_SWAP' ? (
                   <button 
                     style={{ flex: 1, padding: '12px 20px', borderRadius: '100px', border: 'none', background: '#1d4ed8', color: '#fff', fontSize: '14px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(29, 78, 216, 0.2)' }}
-                    onClick={() => setIsBookModalOpen(true)}
+                    onClick={() => { setRequestMode('TUTORING'); setIsBookModalOpen(true); }}
                     onMouseOver={(e) => { e.currentTarget.style.background = '#1e40af'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
                     onMouseOut={(e) => { e.currentTarget.style.background = '#1d4ed8'; e.currentTarget.style.transform = 'translateY(0)'; }}
                   >
@@ -438,7 +439,7 @@ const Marketplace = () => {
                 {selectedSkill.listingType === 'SWAP' || selectedSkill.listingType === 'TEACH_SWAP' || selectedSkill.listingType === 'LEARN_SWAP' ? (
                   <button 
                     style={{ flex: 1, padding: '12px 20px', borderRadius: '100px', border: selectedSkill.listingType === 'SWAP' ? 'none' : '1px solid #1d4ed8', background: selectedSkill.listingType === 'SWAP' ? '#1d4ed8' : '#fff', color: selectedSkill.listingType === 'SWAP' ? '#fff' : '#1d4ed8', fontSize: '14px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', boxShadow: selectedSkill.listingType === 'SWAP' ? '0 4px 12px rgba(29, 78, 216, 0.2)' : 'none' }}
-                    onClick={() => setIsBookModalOpen(true)}
+                    onClick={() => { setRequestMode('SWAP'); setIsBookModalOpen(true); }}
                     onMouseOver={(e) => { e.currentTarget.style.background = selectedSkill.listingType === 'SWAP' ? '#1e40af' : '#eff6ff'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
                     onMouseOut={(e) => { e.currentTarget.style.background = selectedSkill.listingType === 'SWAP' ? '#1d4ed8' : '#fff'; e.currentTarget.style.transform = 'translateY(0)'; }}
                   >
@@ -504,11 +505,11 @@ const Marketplace = () => {
     </div>
 
       {/* Book Session Modal Overlay */}
-      {isBookModalOpen && (
+      {isBookModalOpen && selectedSkill && (
         <BookSessionModal 
           selectedSkill={selectedSkill.title}
           selectedTutor={selectedSkill.owner?.name || 'Unknown User'}
-          isSwapRequest={selectedSkill.listingType === 'SWAP' || selectedSkill.listingType === 'TEACH_SWAP' || selectedSkill.listingType === 'LEARN_SWAP'}
+          isSwapRequest={requestMode === 'SWAP'}
           listingRequestedSkills={selectedSkill.requestedSkills}
           userOfferedSkills={user?.skillsOffered || []}
           slots={selectedSkill.availableSlots && selectedSkill.availableSlots.length > 0 ? selectedSkill.availableSlots.map((s, i) => ({
@@ -519,17 +520,19 @@ const Marketplace = () => {
             isPrimary: i === 0
           })) : undefined}
           onClose={() => setIsBookModalOpen(false)}
-          onContinue={async (slot, message, offeredSkillName) => {
+          onContinue={async (slot, message, offeredSkillName, availableTimes, preferredDuration) => {
             try {
               setIsBookModalOpen(false);
-              const isSwap = selectedSkill.listingType === 'SWAP' || selectedSkill.listingType === 'TEACH_SWAP' || selectedSkill.listingType === 'LEARN_SWAP';
+              const isSwap = requestMode === 'SWAP';
               await exchangeService.createExchange({
                 listingId: selectedSkill._id || selectedSkill.id,
                 receiverId: selectedSkill.owner?.userId || selectedSkill.ownerId,
                 type: isSwap ? 'SWAP' : 'TUTORING',
-                proposedSessions: [{ startTime: slot.date + ' ' + slot.time, endTime: '', topic: selectedSkill.title }],
-                message: message,
-                offeredSkillName: isSwap ? offeredSkillName : undefined
+                proposedSessions: isSwap ? undefined : [{ startTime: slot.date + ' ' + slot.time, endTime: '', topic: selectedSkill.title }],
+                message: isSwap && slot ? `[Prefers your slot: ${slot.date} ${slot.time}]\n\n${message}` : message,
+                offeredSkillName: isSwap ? offeredSkillName : undefined,
+                requesterAvailableTimes: isSwap ? availableTimes : undefined,
+                preferredDurationMinutes: isSwap ? preferredDuration : undefined
               });
               triggerToast('Session request sent successfully!');
             } catch (err) {

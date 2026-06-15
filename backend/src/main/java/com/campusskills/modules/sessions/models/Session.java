@@ -12,6 +12,7 @@ public class Session {
     @JsonProperty("_id")
     private String id;
     private String exchangeId;
+    private String swapGroupId;
     private String teacherId;
     private String studentId;
     private String topic;
@@ -22,13 +23,14 @@ public class Session {
     private String meetingPlatform;
     private String meetingLink;
     private SessionStatus status;
-    private Long confirmationDeadline;
-    private java.util.Set<String> confirmedBy;
+    private Boolean teacherConfirmedCompletion;
+    private Boolean studentConfirmedCompletion;
+    private Boolean studentMarkedPaid;
+    private RescheduleProposal rescheduleProposal;
     private Long createdAt;
     private Long updatedAt;
 
     public Session() {
-        this.confirmedBy = new java.util.HashSet<>();
     }
 
     public String getId() { return id; }
@@ -36,6 +38,9 @@ public class Session {
 
     public String getExchangeId() { return exchangeId; }
     public void setExchangeId(String exchangeId) { this.exchangeId = exchangeId; }
+
+    public String getSwapGroupId() { return swapGroupId; }
+    public void setSwapGroupId(String swapGroupId) { this.swapGroupId = swapGroupId; }
 
     public String getTeacherId() { return teacherId; }
     public void setTeacherId(String teacherId) { this.teacherId = teacherId; }
@@ -67,11 +72,17 @@ public class Session {
     public SessionStatus getStatus() { return status; }
     public void setStatus(SessionStatus status) { this.status = status; }
 
-    public Long getConfirmationDeadline() { return confirmationDeadline; }
-    public void setConfirmationDeadline(Long confirmationDeadline) { this.confirmationDeadline = confirmationDeadline; }
+    public Boolean getTeacherConfirmedCompletion() { return teacherConfirmedCompletion; }
+    public void setTeacherConfirmedCompletion(Boolean teacherConfirmedCompletion) { this.teacherConfirmedCompletion = teacherConfirmedCompletion; }
 
-    public java.util.Set<String> getConfirmedBy() { return confirmedBy; }
-    public void setConfirmedBy(java.util.Set<String> confirmedBy) { this.confirmedBy = confirmedBy; }
+    public Boolean getStudentConfirmedCompletion() { return studentConfirmedCompletion; }
+    public void setStudentConfirmedCompletion(Boolean studentConfirmedCompletion) { this.studentConfirmedCompletion = studentConfirmedCompletion; }
+
+    public Boolean getStudentMarkedPaid() { return studentMarkedPaid; }
+    public void setStudentMarkedPaid(Boolean studentMarkedPaid) { this.studentMarkedPaid = studentMarkedPaid; }
+
+    public RescheduleProposal getRescheduleProposal() { return rescheduleProposal; }
+    public void setRescheduleProposal(RescheduleProposal rescheduleProposal) { this.rescheduleProposal = rescheduleProposal; }
 
     public Long getCreatedAt() { return createdAt; }
     public void setCreatedAt(Long createdAt) { this.createdAt = createdAt; }

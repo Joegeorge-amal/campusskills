@@ -36,6 +36,7 @@ public class ProfileHandler {
 
             JsonObject profileJson = JsonObject.mapFrom(profile);
             profileJson.remove("_id");
+            profileJson.remove("upi"); // Protect UPI privacy
 
             Future<JsonObject> statsFuture = userStatsRepository.findByUserId(userId)
                 .map(stats -> {

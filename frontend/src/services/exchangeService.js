@@ -12,8 +12,8 @@ export const exchangeService = {
     return response.data;
   },
 
-  acceptExchange: async (id) => {
-    const response = await api.post(`/exchanges/${id}/accept`);
+  acceptExchange: async (id, payload = {}) => {
+    const response = await api.post(`/exchanges/${id}/accept`, payload);
     return response.data;
   },
 

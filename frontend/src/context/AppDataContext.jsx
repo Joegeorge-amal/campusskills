@@ -192,6 +192,7 @@ export const AppDataProvider = ({ children }) => {
             requestedSkill: requestedSkillName,
             listingRequestedSkill: requestedSkillName,
             offeredSkillName: offeredSkillName,
+            listingAvailableSlots: listing?.availableSlots || [],
           };
 
           return {
@@ -310,8 +311,14 @@ export const AppDataProvider = ({ children }) => {
       setNotifications(prev => [newNotif, ...prev]);
 
       if (
+        notifType === 'SESSION_ACCEPTED' ||
         notifType === 'SESSION_BOOKED' ||
-        notifType === 'SESSION_COMPLETED'
+        notifType === 'SESSION_COMPLETED' ||
+        notifType === 'COMPLETION_REQUESTED' ||
+        notifType === 'RESCHEDULE_PROPOSED' ||
+        notifType === 'RESCHEDULE_ACCEPTED' ||
+        notifType === 'RESCHEDULE_REJECTED' ||
+        notifType === 'MARKED_PAID'
       ) {
         fetchInitialData();
       }
@@ -389,9 +396,11 @@ export const AppDataProvider = ({ children }) => {
         const newStatus = msg.status ? msg.status.toLowerCase() : 'pending';
         
         setRequestsData(prev => prev.map(r => r.id === idToUpdate ? { ...r, status: newStatus } : r));
-        
         if (newStatus !== 'pending') {
           setChatRequests(prev => prev.filter(r => r.id !== idToUpdate));
+        }
+        if (newStatus === 'accepted') {
+          fetchInitialData();
         }
       }
     } else if (lastMessage.type === 'NEW_MESSAGE') {
