@@ -69,7 +69,7 @@ const AdminListings = () => {
       
       {/* Top Toolbar */}
       <div className="admin-sessions-toolbar">
-        <div className="as-search-wrapper">
+        <div className="admin-u-search">
           <IconSearch size={18} color="#9ca3af" />
           <input 
             type="text" 
@@ -107,23 +107,36 @@ const AdminListings = () => {
       </div>
 
       {/* Top Stat Cards */}
-      <div className="admin-sessions-stats">
-        <div className="as-stat-card live">
-          <div className="as-stat-val">{activeCount}</div>
-          <div className="as-stat-lbl">ACTIVE LISTINGS</div>
+      <div className="admin-sessions-stats" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
+        
+        {/* Active / Pending Flip Card */}
+        <div className="al-flip-container">
+          <div className="al-flipper">
+            <div className="al-front as-stat-card live" style={{ margin: 0, height: '100%' }}>
+              <div className="as-stat-val">{activeCount}</div>
+              <div className="as-stat-lbl">ACTIVE LISTINGS</div>
+            </div>
+            <div className="al-back as-stat-card upcoming" style={{ margin: 0, height: '100%' }}>
+              <div className="as-stat-val">{pendingCount}</div>
+              <div className="as-stat-lbl">PENDING LISTINGS</div>
+            </div>
+          </div>
         </div>
-        <div className="as-stat-card upcoming">
-          <div className="as-stat-val">{pendingCount}</div>
-          <div className="as-stat-lbl">PENDING</div>
+
+        {/* Total / Disabled Flip Card */}
+        <div className="al-flip-container">
+          <div className="al-flipper">
+            <div className="al-front as-stat-card today" style={{ margin: 0, height: '100%' }}>
+              <div className="as-stat-val">{totalCount}</div>
+              <div className="as-stat-lbl">TOTAL LISTINGS</div>
+            </div>
+            <div className="al-back as-stat-card completed" style={{ margin: 0, height: '100%' }}>
+              <div className="as-stat-val">{disabledCount}</div>
+              <div className="as-stat-lbl">DISABLED LISTINGS</div>
+            </div>
+          </div>
         </div>
-        <div className="as-stat-card completed">
-          <div className="as-stat-val">{disabledCount}</div>
-          <div className="as-stat-lbl">DISABLED</div>
-        </div>
-        <div className="as-stat-card today">
-          <div className="as-stat-val">{totalCount}</div>
-          <div className="as-stat-lbl">TOTAL LISTINGS</div>
-        </div>
+
       </div>
 
       {/* Listings List */}

@@ -126,7 +126,7 @@ const AdminDisputes = () => {
       
       {/* Top Toolbar */}
       <div className="admin-reports-toolbar">
-        <div className="ar-search-wrapper">
+        <div className="admin-u-search">
           <IconSearch size={18} color="#9ca3af" />
           <input 
             type="text" 

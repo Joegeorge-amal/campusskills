@@ -57,7 +57,7 @@ const AdminSessions = () => {
       
       {/* Top Toolbar */}
       <div className="admin-sessions-toolbar">
-        <div className="as-search-wrapper">
+        <div className="admin-u-search">
           <IconSearch size={18} color="#9ca3af" />
           <input 
             type="text" 
@@ -95,23 +95,36 @@ const AdminSessions = () => {
       </div>
 
       {/* Top Stat Cards */}
-      <div className="admin-sessions-stats">
-        <div className="as-stat-card live">
-          <div className="as-stat-val">{liveCount}</div>
-          <div className="as-stat-lbl">LIVE NOW</div>
+      <div className="admin-sessions-stats" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
+        
+        {/* Active / Upcoming Flip Card */}
+        <div className="al-flip-container">
+          <div className="al-flipper">
+            <div className="al-front as-stat-card live" style={{ margin: 0, height: '100%' }}>
+              <div className="as-stat-val">{liveCount}</div>
+              <div className="as-stat-lbl">LIVE NOW</div>
+            </div>
+            <div className="al-back as-stat-card upcoming" style={{ margin: 0, height: '100%' }}>
+              <div className="as-stat-val">{upcomingCount}</div>
+              <div className="as-stat-lbl">UPCOMING</div>
+            </div>
+          </div>
         </div>
-        <div className="as-stat-card upcoming">
-          <div className="as-stat-val">{upcomingCount}</div>
-          <div className="as-stat-lbl">UPCOMING</div>
+
+        {/* Today / Completed Flip Card */}
+        <div className="al-flip-container">
+          <div className="al-flipper">
+            <div className="al-front as-stat-card today" style={{ margin: 0, height: '100%' }}>
+              <div className="as-stat-val">{todayCount}</div>
+              <div className="as-stat-lbl">TODAY TOTAL</div>
+            </div>
+            <div className="al-back as-stat-card completed" style={{ margin: 0, height: '100%' }}>
+              <div className="as-stat-val">{completedCount}</div>
+              <div className="as-stat-lbl">COMPLETED</div>
+            </div>
+          </div>
         </div>
-        <div className="as-stat-card today">
-          <div className="as-stat-val">{todayCount}</div>
-          <div className="as-stat-lbl">TODAY TOTAL</div>
-        </div>
-        <div className="as-stat-card completed">
-          <div className="as-stat-val">{completedCount}</div>
-          <div className="as-stat-lbl">COMPLETED</div>
-        </div>
+
       </div>
 
       {/* Sessions List */}

@@ -1149,8 +1149,8 @@
 .admin-u-search:focus-within {
   width: 400px;
   background: #ffffff;
-  border-color: #2563eb;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .admin-u-search input {
@@ -1407,6 +1407,41 @@
   grid-template-columns: repeat(4, 1fr);
   gap: 24px;
   margin-bottom: 24px;
+}
+
+.al-flip-container {
+  perspective: 1000px;
+  cursor: pointer;
+  height: 105px;
+}
+
+.al-flipper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.al-flip-container:hover .al-flipper {
+  transform: rotateX(180deg);
+}
+
+.al-front, .al-back {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: rotateX(0deg); /* Explicit for hardware accel */
+}
+
+.al-back {
+  transform: rotateX(180deg);
+}
+
+/* Fix click issues on flipped 3D elements */
+.al-flipper, .al-front, .al-back {
+  pointer-events: none;
 }
 
 .as-stat-card {
