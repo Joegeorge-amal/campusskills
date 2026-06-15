@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { IconSearch, IconLoader2, IconAlertTriangle, IconChevronDown, IconChevronUp } from '@tabler/icons-react';
+import { IconSearch, IconLoader2, IconAlertTriangle, IconChevronDown, IconChevronUp, IconShieldCheck } from '@tabler/icons-react';
 import adminService from '../../services/adminService';
 
 const AdminDisputes = () => {
@@ -167,7 +167,15 @@ const AdminDisputes = () => {
         ) : error ? (
           <div className="ar-empty-state" style={{ color: '#ef4444' }}>{error}</div>
         ) : disputes.length === 0 ? (
-          <div className="ar-empty-state">No disputes found matching your criteria.</div>
+          <div className="ar-empty-state">
+            <div className="ar-empty-illustration">
+              <div className="ar-empty-icon-ring">
+                <IconShieldCheck size={48} strokeWidth={1.5} />
+              </div>
+            </div>
+            <h3 className="ar-empty-title">All Clear!</h3>
+            <p className="ar-empty-desc">No disputes found matching your criteria.<br/>When users report issues, they'll appear here for review.</p>
+          </div>
         ) : (
           disputes.map(disp => {
             const isExpanded = expandedIds.has(disp._id);
