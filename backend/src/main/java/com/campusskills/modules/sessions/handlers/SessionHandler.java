@@ -105,4 +105,15 @@ public class SessionHandler {
             .onSuccess(info -> ApiResponse.ok(ctx, info))
             .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
     }
+
+    public void cancelSession(RoutingContext ctx) {
+        String sessionId = ctx.pathParam("sessionId");
+        String authId = ctx.get("authenticatedUserId");
+        JsonObject body = ctx.body().asJsonObject();
+        String reason = body != null ? body.getString("reason") : "No reason provided";
+
+        sessionService.cancelSession(sessionId, authId, reason)
+            .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("message", "Session cancelled successfully")))
+            .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
+    }
 }

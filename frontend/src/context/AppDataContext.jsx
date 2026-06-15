@@ -269,7 +269,7 @@ export const AppDataProvider = ({ children }) => {
           time: timeStr,
           day: dayStr,
           month: monthStr,
-          mode: s.meetingLink ? 'Online' : 'In-person'
+          mode: s.mode === 'IN_PERSON' ? 'In-person' : 'Online'
         };
       });
 

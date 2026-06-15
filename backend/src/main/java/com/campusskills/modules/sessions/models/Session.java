@@ -23,6 +23,7 @@ public class Session {
     private String meetingPlatform;
     private String meetingLink;
     private SessionStatus status;
+    private String mode;
     private Boolean teacherConfirmedCompletion;
     private Boolean studentConfirmedCompletion;
     private Boolean studentMarkedPaid;
@@ -89,4 +90,7 @@ public class Session {
 
     public Long getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(Long updatedAt) { this.updatedAt = updatedAt; }
+
+    public String getMode() { return mode; }
+    public void setMode(String mode) { this.mode = mode; }
 }

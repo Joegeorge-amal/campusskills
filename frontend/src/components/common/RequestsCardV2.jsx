@@ -17,7 +17,8 @@ const RequestsCardV2 = ({
   reqDetails = {},
   otherUser = {},
   otherUserStats = {},
-  otherUserExtras = {}
+  otherUserExtras = {},
+  actionLoading = null
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const { user } = useAuth();
@@ -173,19 +174,21 @@ const RequestsCardV2 = ({
             <div style={{ display: 'flex', gap: '8px' }}>
               <button 
                 onClick={(e) => { e.stopPropagation(); onAccept(); }}
-                style={{ padding: '6px 16px', background: '#1d4ed8', color: '#ffffff', border: 'none', borderRadius: '100px', fontWeight: 700, fontSize: '12px', cursor: 'pointer', transition: 'background 0.2s' }}
-                onMouseOver={(e) => { e.currentTarget.style.background = '#1e40af' }}
-                onMouseOut={(e) => { e.currentTarget.style.background = '#1d4ed8' }}
+                disabled={!!actionLoading}
+                style={{ padding: '6px 16px', background: '#1d4ed8', color: '#ffffff', border: 'none', borderRadius: '8px', fontWeight: 700, fontSize: '12px', cursor: actionLoading ? 'not-allowed' : 'pointer', transition: 'background 0.2s', opacity: actionLoading ? 0.6 : 1 }}
+                onMouseOver={(e) => { if (!actionLoading) e.currentTarget.style.background = '#1e40af' }}
+                onMouseOut={(e) => { if (!actionLoading) e.currentTarget.style.background = '#1d4ed8' }}
               >
-                Accept
+                {actionLoading === 'accept' ? 'Accepting...' : 'Accept'}
               </button>
               <button 
                 onClick={(e) => { e.stopPropagation(); onDecline(); }}
-                style={{ padding: '6px 16px', background: '#ffffff', color: '#1e40af', border: '1px solid #93c5fd', borderRadius: '100px', fontWeight: 700, fontSize: '12px', cursor: 'pointer', transition: 'background 0.2s' }}
-                onMouseOver={(e) => { e.currentTarget.style.background = '#eff6ff' }}
-                onMouseOut={(e) => { e.currentTarget.style.background = '#ffffff' }}
+                disabled={!!actionLoading}
+                style={{ padding: '6px 16px', background: '#ffffff', color: '#1e40af', border: '1px solid #93c5fd', borderRadius: '8px', fontWeight: 700, fontSize: '12px', cursor: actionLoading ? 'not-allowed' : 'pointer', transition: 'background 0.2s', opacity: actionLoading ? 0.6 : 1 }}
+                onMouseOver={(e) => { if (!actionLoading) e.currentTarget.style.background = '#eff6ff' }}
+                onMouseOut={(e) => { if (!actionLoading) e.currentTarget.style.background = '#ffffff' }}
               >
-                Decline
+                {actionLoading === 'decline' ? 'Declining...' : 'Decline'}
               </button>
             </div>
           )}
@@ -193,11 +196,12 @@ const RequestsCardV2 = ({
           {type === 'outgoing' && isPending && (
             <button 
               onClick={(e) => { e.stopPropagation(); if (onCancel) onCancel(); }}
-              style={{ padding: '6px 16px', background: '#ffffff', color: '#b91c1c', border: '1px solid #fecaca', borderRadius: '100px', fontWeight: 700, fontSize: '12px', cursor: 'pointer', transition: 'background 0.2s' }}
-              onMouseOver={(e) => { e.currentTarget.style.background = '#fee2e2' }}
-              onMouseOut={(e) => { e.currentTarget.style.background = '#ffffff' }}
+              disabled={!!actionLoading}
+              style={{ padding: '6px 16px', background: '#ffffff', color: '#b91c1c', border: '1px solid #fecaca', borderRadius: '8px', fontWeight: 700, fontSize: '12px', cursor: actionLoading ? 'not-allowed' : 'pointer', transition: 'background 0.2s', opacity: actionLoading ? 0.6 : 1 }}
+              onMouseOver={(e) => { if (!actionLoading) e.currentTarget.style.background = '#fee2e2' }}
+              onMouseOut={(e) => { if (!actionLoading) e.currentTarget.style.background = '#ffffff' }}
             >
-              Cancel Request
+              {actionLoading === 'cancel' ? 'Cancelling...' : 'Cancel Request'}
             </button>
           )}
 

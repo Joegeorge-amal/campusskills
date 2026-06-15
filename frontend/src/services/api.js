@@ -95,6 +95,8 @@ api.interceptors.response.use(
                   localStorage.setItem('cs_refresh_token', newRefresh);
                 }
                 
+                window.dispatchEvent(new CustomEvent('tokenRefreshed', { detail: newToken }));
+                
                 originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
                 processQueue(null, newToken);
                 resolve(api(originalRequest));

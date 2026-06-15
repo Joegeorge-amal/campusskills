@@ -44,5 +44,10 @@ export const sessionService = {
   getPaymentInfo: async (sessionId) => {
     const response = await api.get(`/sessions/${sessionId}/payment-info`);
     return response.data;
+  },
+
+  cancelSession: async (sessionId, reason) => {
+    const response = await api.post(`/sessions/${sessionId}/cancel`, { reason });
+    return response.data;
   }
 };

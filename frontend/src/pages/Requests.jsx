@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useAppData } from '../context/AppDataContext';
 import RequestsCardV2 from '../components/common/RequestsCardV2';
 import SkillSwapModal from '../components/modals/SkillSwapModal';
+import ConfirmModal from '../components/modals/ConfirmModal';
 import { exchangeService } from '../services/exchangeService';
 import { chatRequestService } from '../services/chatRequestService';
 
@@ -18,16 +19,20 @@ const Requests = () => {
   const { user } = useAuth();
   const { triggerToast, requestsData, isRequestsLoading: loading, fetchInitialData } = useAppData();
   
-      const [swapModalRequest, setSwapModalRequest] = useState(null);
+  const [swapModalRequest, setSwapModalRequest] = useState(null);
+  const [declineConfirmReq, setDeclineConfirmReq] = useState(null);
+  const [processingId, setProcessingId] = useState(null);
+  const [processingAction, setProcessingAction] = useState(null); // 'accept', 'decline', 'cancel'
   
   const [isIncomingOpen, setIsIncomingOpen] = useState(true);
   const [isSentOpen, setIsSentOpen] = useState(true);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
-  
-
   const handleAccept = async (reqId, hideToast = false, payload = {}) => {
+    if (processingId) return;
     try {
+      setProcessingId(reqId);
+      setProcessingAction('accept');
       const req = requestsData.find(r => r.id === reqId);
       if (req.type === 'Chat request') {
         await chatRequestService.acceptRequest(reqId);
@@ -38,11 +43,23 @@ const Requests = () => {
       fetchInitialData();
     } catch (err) {
       triggerToast('Failed to accept request');
+      throw err;
+    } finally {
+      setProcessingId(null);
+      setProcessingAction(null);
     }
   };
 
-  const handleDecline = async (reqId) => {
+  const handleDeclineClick = (reqId) => {
+    const req = requestsData.find(r => r.id === reqId);
+    setDeclineConfirmReq(req);
+  };
+
+  const executeDecline = async (reqId) => {
+    if (processingId) return;
     try {
+      setProcessingId(reqId);
+      setProcessingAction('decline');
       const req = requestsData.find(r => r.id === reqId);
       if (req.type === 'Chat request') {
         await chatRequestService.rejectRequest(reqId);
@@ -53,15 +70,20 @@ const Requests = () => {
       fetchInitialData();
     } catch (err) {
       triggerToast('Failed to decline request');
+    } finally {
+      setProcessingId(null);
+      setProcessingAction(null);
     }
   };
 
   const handleCancel = async (reqId) => {
+    if (processingId) return;
     try {
+      setProcessingId(reqId);
+      setProcessingAction('cancel');
       const req = requestsData.find(r => r.id === reqId);
       if (req.type === 'Chat request') {
-        // chatRequestService doesn't have cancel yet, so fallback to reject if needed or ignore
-        // Actually, we should just use cancelExchange for exchanges
+        // chatRequestService doesn't have cancel yet
       } else {
         await exchangeService.cancelExchange(reqId);
       }
@@ -69,6 +91,9 @@ const Requests = () => {
       fetchInitialData();
     } catch (err) {
       triggerToast('Failed to cancel request');
+    } finally {
+      setProcessingId(null);
+      setProcessingAction(null);
     }
   };
 
@@ -131,11 +156,12 @@ const Requests = () => {
                         handleAccept(req.id);
                       }
                     }}
-                    onDecline={() => handleDecline(req.id)}
+                    onDecline={() => handleDeclineClick(req.id)}
                     reqDetails={req.rawReq}
                     otherUser={req.otherUser}
                     otherUserStats={req.otherUserStats}
                     otherUserExtras={req.otherUserExtras}
+                    actionLoading={processingId === req.id ? processingAction : null}
                   />
                 ))}
                 
@@ -171,6 +197,7 @@ const Requests = () => {
                     otherUserStats={req.otherUserStats}
                     otherUserExtras={req.otherUserExtras}
                     onCancel={() => handleCancel(req.id)}
+                    actionLoading={processingId === req.id ? processingAction : null}
                   />
                 ))}
 
@@ -244,10 +271,24 @@ const Requests = () => {
           }}
           user={user}
           onConfirm={(reqId, payload) => {
-            handleAccept(reqId, true, payload);
+            return handleAccept(reqId, true, payload);
           }}
         />
       )}
+
+      <ConfirmModal
+        isOpen={!!declineConfirmReq}
+        onClose={() => setDeclineConfirmReq(null)}
+        onConfirm={() => {
+          const id = declineConfirmReq.id;
+          setDeclineConfirmReq(null);
+          executeDecline(id);
+        }}
+        title={declineConfirmReq?.type === 'Skill swap request' ? 'Decline Swap Request' : 'Decline Request'}
+        message={`Are you sure you want to decline this ${declineConfirmReq?.type === 'Skill swap request' ? 'swap' : ''} request from ${declineConfirmReq?.name}?`}
+        confirmText="Decline"
+        isDanger={true}
+      />
     </>
   );
 };

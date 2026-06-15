@@ -195,4 +195,26 @@ public class SessionService {
             });
         });
     }
+
+    public Future<Void> cancelSession(String sessionId, String userId, String reason) {
+        return repository.getSessionById(sessionId).compose(session -> {
+            if (session == null) return Future.failedFuture("Session not found");
+            if (!userId.equals(session.getTeacherId()) && !userId.equals(session.getStudentId())) {
+                return Future.failedFuture("Not authorized to cancel this session");
+            }
+            if (session.getStatus() != SessionStatus.SCHEDULED) {
+                return Future.failedFuture("Only SCHEDULED sessions can be cancelled");
+            }
+            if (Boolean.TRUE.equals(session.getTeacherConfirmedCompletion()) || Boolean.TRUE.equals(session.getStudentConfirmedCompletion())) {
+                return Future.failedFuture("Cannot cancel a session once completion confirmation has been started");
+            }
+
+            JsonObject updates = new JsonObject().put("status", SessionStatus.CANCELLED.name());
+            return repository.updateSessionFields(sessionId, updates).onSuccess(v -> {
+                sendNotification(session.getTeacherId(), com.campusskills.shared.constants.NotificationType.SESSION_CANCELLED, "Session Cancelled", "The session has been cancelled. Reason: " + reason, "SESSION", sessionId);
+                sendNotification(session.getStudentId(), com.campusskills.shared.constants.NotificationType.SESSION_CANCELLED, "Session Cancelled", "The session has been cancelled. Reason: " + reason, "SESSION", sessionId);
+                emitSessionEvent(sessionId, "SESSION_CANCELLED", new JsonObject().put("reason", reason));
+            }).mapEmpty();
+        });
+    }
 }

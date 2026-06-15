@@ -27,15 +27,26 @@ export const WebSocketProvider = ({ children }) => {
   }, []);
 
   useEffect(() => {
+    const handleTokenRefreshed = (e) => {
+      if (isAuthenticated) {
+        console.log('[WebSocketContext] Token refreshed, reconnecting WebSocket immediately...');
+        const getNewToken = () => e.detail || localStorage.getItem(APP_CONFIG.TOKEN_KEY) || localStorage.getItem('cs_token');
+        socketService.disconnect();
+        socketService.connect(getNewToken, handleMessage, handleStatusChange);
+      }
+    };
+
+    window.addEventListener('tokenRefreshed', handleTokenRefreshed);
+
     if (isAuthenticated) {
       const getToken = () => localStorage.getItem(APP_CONFIG.TOKEN_KEY) || localStorage.getItem('cs_token');
       socketService.connect(getToken, handleMessage, handleStatusChange);
-
     } else {
       socketService.disconnect();
     }
 
     return () => {
+      window.removeEventListener('tokenRefreshed', handleTokenRefreshed);
       socketService.disconnect();
     };
   }, [isAuthenticated, handleMessage, handleStatusChange]);

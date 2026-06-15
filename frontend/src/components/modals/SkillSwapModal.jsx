@@ -74,6 +74,7 @@ const SkillSwapModal = ({ isOpen, onClose, request, user, onConfirm }) => {
   const [iGoFirst, setIGoFirst] = useState(true);
   const [selectedTheirSlotIdx, setSelectedTheirSlotIdx] = useState(null);
   const [step, setStep] = useState('form');
+  const [isConfirming, setIsConfirming] = useState(false);
 
   if (!isOpen || !request) return null;
 
@@ -174,11 +175,14 @@ const SkillSwapModal = ({ isOpen, onClose, request, user, onConfirm }) => {
     const secondSessionStart = sessionInfo.secondDate.getTime();
 
     try {
+      setIsConfirming(true);
       await onConfirm(request.id, { firstSessionStart, secondSessionStart, iGoFirst });
       setStep('success');
     } catch (e) {
       console.error(e);
       alert("Failed to accept swap. Please try again.");
+    } finally {
+      setIsConfirming(false);
     }
   };
 
@@ -189,7 +193,7 @@ const SkillSwapModal = ({ isOpen, onClose, request, user, onConfirm }) => {
   };
 
   return ReactDOM.createPortal(
-    <div className="modal-overlay" onClick={onClose} style={{
+    <div className="modal-overlay" onClick={() => { if (!isConfirming) onClose(); }} style={{
       position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
       background: 'rgba(0,0,0,0.5)', zIndex: 1000,
       display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px'
@@ -265,7 +269,7 @@ const SkillSwapModal = ({ isOpen, onClose, request, user, onConfirm }) => {
                 <div className="ssm-title">Skill Swap Request</div>
                 <div style={{ fontSize: '12px', color: '#bfdbfe' }}>{otherName} wants to swap skills</div>
               </div>
-              <button className="ssm-close" onClick={onClose}>
+              <button className="ssm-close" onClick={() => { if (!isConfirming) onClose(); }}>
                 <IconX size={18} />
               </button>
             </div>
@@ -469,23 +473,24 @@ const SkillSwapModal = ({ isOpen, onClose, request, user, onConfirm }) => {
               {/* Confirm button */}
               <button 
                 onClick={handleConfirm}
-                disabled={selectedTheirSlotIdx === null || !chosenMySlot}
+                disabled={selectedTheirSlotIdx === null || !chosenMySlot || isConfirming}
                 style={{
                   width: '100%',
-                  background: (selectedTheirSlotIdx !== null && chosenMySlot) ? '#1d4ed8' : '#94a3b8',
+                  background: (selectedTheirSlotIdx !== null && chosenMySlot && !isConfirming) ? '#1d4ed8' : '#94a3b8',
                   color: '#ffffff',
                   border: 'none',
                   padding: '14px',
-                  borderRadius: '10px',
+                  borderRadius: '8px',
                   fontSize: '14px',
                   fontWeight: 600,
-                  cursor: (selectedTheirSlotIdx !== null && chosenMySlot) ? 'pointer' : 'not-allowed',
-                  transition: 'background 0.2s'
+                  cursor: (selectedTheirSlotIdx !== null && chosenMySlot && !isConfirming) ? 'pointer' : 'not-allowed',
+                  transition: 'background 0.2s',
+                  opacity: isConfirming ? 0.6 : 1
                 }}
-                onMouseOver={(e) => { if (selectedTheirSlotIdx !== null && chosenMySlot) e.currentTarget.style.background = '#1e40af' }}
-                onMouseOut={(e) => { if (selectedTheirSlotIdx !== null && chosenMySlot) e.currentTarget.style.background = '#1d4ed8' }}
+                onMouseOver={(e) => { if (selectedTheirSlotIdx !== null && chosenMySlot && !isConfirming) e.currentTarget.style.background = '#1e40af' }}
+                onMouseOut={(e) => { if (selectedTheirSlotIdx !== null && chosenMySlot && !isConfirming) e.currentTarget.style.background = '#1d4ed8' }}
               >
-                Confirm Swap
+                {isConfirming ? 'Accepting...' : 'Confirm Swap'}
               </button>
             </div>
           </>
@@ -507,7 +512,7 @@ const SkillSwapModal = ({ isOpen, onClose, request, user, onConfirm }) => {
               onClick={handleDone}
               style={{
                 width: '100%', background: '#1d4ed8', color: '#ffffff', border: 'none',
-                padding: '12px', borderRadius: '10px', fontSize: '14px', fontWeight: 600,
+                padding: '12px', borderRadius: '8px', fontSize: '14px', fontWeight: 600,
                 cursor: 'pointer', transition: 'background 0.2s'
               }}
               onMouseOver={(e) => { e.currentTarget.style.background = '#1e40af' }}

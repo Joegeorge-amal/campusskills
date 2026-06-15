@@ -179,6 +179,13 @@ public class ExchangeService {
                     
                     long durationMs = (exchange.getPreferredDurationMinutes() != null ? exchange.getPreferredDurationMinutes() : 60) * 60 * 1000L;
                     
+                    String sessionMode = "ONLINE";
+                    if (listing != null && listing.getAvailability() != null) {
+                        if (listing.getAvailability() == com.campusskills.modules.listings.models.Availability.OFFLINE) {
+                            sessionMode = "IN_PERSON";
+                        }
+                    }
+
                     if (exchange.getType() == com.campusskills.shared.constants.ExchangeType.SWAP) {
                         Number firstStartNum = payload.getNumber("firstSessionStart");
                         Number secondStartNum = payload.getNumber("secondSessionStart");
@@ -199,6 +206,7 @@ public class ExchangeService {
                             sessionA.setScheduledStart(firstSessionStart);
                             sessionA.setScheduledEnd(firstSessionStart + durationMs);
                             sessionA.setListingId(exchange.getListingId());
+                            sessionA.setMode(sessionMode);
                             
                             // Session B
                             Session sessionB = new Session();
@@ -209,6 +217,7 @@ public class ExchangeService {
                             sessionB.setScheduledStart(secondSessionStart);
                             sessionB.setScheduledEnd(secondSessionStart + durationMs);
                             sessionB.setListingId(exchange.getListingId());
+                            sessionB.setMode(sessionMode);
                             
                             sessionFutures.add(sessionRepository.createSession(sessionA).onSuccess(sessId -> {
                                 sendNotification(sessionA.getTeacherId(), "SESSION_ACCEPTED", "Session Accepted", "A new session has been scheduled.", "SESSION", sessId);
@@ -240,6 +249,7 @@ public class ExchangeService {
                             session.setScheduledStart(sessionStart);
                             session.setScheduledEnd(sessionStart + durationMs);
                             session.setListingId(exchange.getListingId());
+                            session.setMode(sessionMode);
                             
                             final String fTeacherId = teacherId;
                             final String fStudentId = studentId;
