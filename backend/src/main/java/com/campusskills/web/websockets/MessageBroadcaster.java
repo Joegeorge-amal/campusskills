@@ -4,18 +4,29 @@ import com.campusskills.modules.messages.models.Message;
 import com.campusskills.modules.sessions.models.Session;
 import io.vertx.core.json.JsonObject;
 import com.campusskills.shared.constants.WebSocketEventType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MessageBroadcaster {
+    private static final Logger log = LoggerFactory.getLogger(MessageBroadcaster.class);
 
     public static void broadcastNewMessage(Message message, java.util.List<String> participants) {
         try {
             JsonObject eventPayload = new JsonObject()
+                    .put("_id", message.getId())
                     .put("chatId", message.getChatId())
                     .put("senderId", message.getSenderId())
                     .put("message", message.getMessage())
                     .put("messageType", message.getType() != null ? message.getType() : "USER")
                     .put("sessionId", message.getSessionId())
+                    .put("replyToMessageId", message.getReplyToMessageId())
+                    .put("isRead", false)
+                    .put("isDelivered", false)
                     .put("createdAt", message.getCreatedAt());
+
+            if (message.getTempId() != null) {
+                eventPayload.put("tempId", message.getTempId());
+            }
 
             JsonObject event = new WebSocketMessageBuilder()
                     .type(WebSocketEventType.NEW_MESSAGE)
@@ -26,10 +37,52 @@ public class MessageBroadcaster {
                 ConnectionManager.sendMessage(participant, event);
             }
         } catch (Exception e) {
-            System.err.println("[BROADCAST WARN] Failed to broadcast NEW_MESSAGE: " + e.getMessage());
+            log.error("[BROADCAST WARN] Failed to broadcast NEW_MESSAGE", e);
         }
     }
 
+    public static void broadcastMessageEdited(Message message, java.util.List<String> participants) {
+        try {
+            JsonObject eventPayload = new JsonObject()
+                    .put("messageId", message.getId())
+                    .put("chatId", message.getChatId())
+                    .put("message", message.getMessage())
+                    .put("editedAt", message.getEditedAt());
+
+            JsonObject event = new WebSocketMessageBuilder()
+                    .type(WebSocketEventType.MESSAGE_EDITED)
+                    .payload(eventPayload)
+                    .build();
+
+            for (String participant : participants) {
+                ConnectionManager.sendMessage(participant, event);
+            }
+        } catch (Exception e) {
+            log.error("[BROADCAST WARN] Failed to broadcast MESSAGE_EDITED", e);
+        }
+    }
+
+    public static void broadcastMessageDeleted(Message message, java.util.List<String> participants) {
+        try {
+            JsonObject eventPayload = new JsonObject()
+                    .put("messageId", message.getId())
+                    .put("chatId", message.getChatId())
+                    .put("isDeleted", true)
+                    .put("message", message.getMessage())
+                    .put("deletedAt", message.getDeletedAt());
+
+            JsonObject event = new WebSocketMessageBuilder()
+                    .type(WebSocketEventType.MESSAGE_DELETED)
+                    .payload(eventPayload)
+                    .build();
+
+            for (String participant : participants) {
+                ConnectionManager.sendMessage(participant, event);
+            }
+        } catch (Exception e) {
+            log.error("[BROADCAST WARN] Failed to broadcast MESSAGE_DELETED", e);
+        }
+    }
     public static void broadcastMessageRead(String messageId, String chatId, String readBy, Long readAt, java.util.List<String> participants) {
         try {
             JsonObject eventPayload = new JsonObject()
@@ -47,7 +100,28 @@ public class MessageBroadcaster {
                 ConnectionManager.sendMessage(participant, event);
             }
         } catch (Exception e) {
-            System.err.println("[BROADCAST WARN] Failed to broadcast MESSAGE_READ: " + e.getMessage());
+            log.error("[BROADCAST WARN] Failed to broadcast MESSAGE_READ", e);
+        }
+    }
+
+    public static void broadcastMessageDelivered(String messageId, String chatId, String deliveredTo, Long deliveredAt, java.util.List<String> participants) {
+        try {
+            JsonObject eventPayload = new JsonObject()
+                    .put("messageId", messageId)
+                    .put("chatId", chatId)
+                    .put("deliveredTo", deliveredTo)
+                    .put("deliveredAt", deliveredAt);
+
+            JsonObject event = new WebSocketMessageBuilder()
+                    .type(WebSocketEventType.MESSAGE_DELIVERED)
+                    .payload(eventPayload)
+                    .build();
+
+            for (String participant : participants) {
+                ConnectionManager.sendMessage(participant, event);
+            }
+        } catch (Exception e) {
+            log.error("[BROADCAST WARN] Failed to broadcast MESSAGE_DELIVERED", e);
         }
     }
 
@@ -68,7 +142,7 @@ public class MessageBroadcaster {
                 }
             }
         } catch (Exception e) {
-            System.err.println("[BROADCAST WARN] Failed to broadcast " + typeStr + ": " + e.getMessage());
+            log.error("[BROADCAST WARN] Failed to broadcast {}", typeStr, e);
         }
     }
 
@@ -86,7 +160,7 @@ public class MessageBroadcaster {
                 ConnectionManager.sendMessage(session.getStudentId(), event);
             }
         } catch (Exception e) {
-            System.err.println("[BROADCAST WARN] Failed to broadcast " + eventType + " for session " + session.getId() + ": " + e.getMessage());
+            log.error("[BROADCAST WARN] Failed to broadcast {} for session {}", eventType, session.getId(), e);
         }
     }
 }

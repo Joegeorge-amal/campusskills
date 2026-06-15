@@ -79,6 +79,7 @@ const AppRoutes = () => {
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="marketplace" element={<Marketplace />} />
         <Route path="messages" element={<Messages />} />
+        <Route path="messages/:chatId" element={<Messages />} />
         <Route path="requests" element={<Requests />} />
         <Route path="sessions" element={<Sessions />} />
         <Route path="history" element={<History />} />

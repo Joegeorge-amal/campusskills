@@ -20,5 +20,10 @@ export const exchangeService = {
   rejectExchange: async (id) => {
     const response = await api.post(`/exchanges/${id}/reject`);
     return response.data;
+  },
+
+  cancelExchange: async (id) => {
+    const response = await api.post(`/exchanges/${id}/cancel`);
+    return response.data;
   }
 };

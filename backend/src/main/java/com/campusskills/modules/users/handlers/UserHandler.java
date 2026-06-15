@@ -116,4 +116,38 @@ public class UserHandler {
             .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("success", true).put("message", "2FA OTP sent successfully")))
             .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
     }
+
+    public void blockUser(RoutingContext ctx) {
+        String userId = ctx.get("authenticatedUserId");
+        if (userId == null) {
+            ApiResponse.sendError(ctx, 401, "Unauthorized");
+            return;
+        }
+        JsonObject body = ctx.body().asJsonObject();
+        if (body == null || !body.containsKey("targetUserId")) {
+            ApiResponse.badRequest(ctx, "targetUserId is required");
+            return;
+        }
+        String targetUserId = body.getString("targetUserId");
+        userService.blockUser(userId, targetUserId)
+            .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("success", true).put("message", "User blocked successfully")))
+            .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
+    }
+
+    public void unblockUser(RoutingContext ctx) {
+        String userId = ctx.get("authenticatedUserId");
+        if (userId == null) {
+            ApiResponse.sendError(ctx, 401, "Unauthorized");
+            return;
+        }
+        JsonObject body = ctx.body().asJsonObject();
+        if (body == null || !body.containsKey("targetUserId")) {
+            ApiResponse.badRequest(ctx, "targetUserId is required");
+            return;
+        }
+        String targetUserId = body.getString("targetUserId");
+        userService.unblockUser(userId, targetUserId)
+            .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("success", true).put("message", "User unblocked successfully")))
+            .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
+    }
 }

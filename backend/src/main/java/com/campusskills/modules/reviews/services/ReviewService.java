@@ -11,8 +11,11 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ReviewService {
+    private static final Logger log = LoggerFactory.getLogger(ReviewService.class);
 
     private final ReviewRepository reviewRepository;
     private final SessionRepository sessionRepository;
@@ -173,7 +176,7 @@ public class ReviewService {
             io.vertx.core.Future<Boolean> statsUpdate = userStatsRepository.updateRatings(revieweeId, avg, count);
             
             io.vertx.core.Future.all(profileUpdate, statsUpdate).onFailure(err -> {
-                System.err.println("Failed to sync ratings for user " + revieweeId + ": " + err.getMessage());
+                log.error("Failed to sync ratings for user {}", revieweeId, err);
             });
         });
     }

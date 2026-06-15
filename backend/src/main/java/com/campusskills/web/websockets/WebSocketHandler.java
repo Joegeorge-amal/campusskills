@@ -47,11 +47,10 @@ public class WebSocketHandler implements Handler<ServerWebSocket> {
                     return;
                 }
 
-                log.info("New WebSocket connection for user: {} with role: {}", userId, role);
+                log.debug("New WebSocket connection for user: {} with role: {}", userId, role);
                 ConnectionManager.addConnection(userId, role, ws);
                 
                 ws.handler(buffer -> {
-                    log.debug("Received message from {}: {}", userId, buffer.toString());
                     try {
                         JsonObject data = buffer.toJsonObject();
                         String typeStr = data.getString("type");
@@ -72,6 +71,17 @@ public class WebSocketHandler implements Handler<ServerWebSocket> {
                                         
                                     vertx.eventBus().send("internal.typing.event", event);
                                 }
+                            } else if (type == WebSocketEventType.MESSAGE_DELIVERED) {
+                                String messageId = payload.getString("messageId");
+                                String chatId = payload.getString("chatId");
+                                if (messageId != null && chatId != null) {
+                                    payload.put("deliveredTo", userId);
+                                    payload.put("deliveredAt", System.currentTimeMillis());
+                                    JsonObject event = new JsonObject()
+                                        .put("type", typeStr)
+                                        .put("payload", payload);
+                                    vertx.eventBus().send("internal.message.delivered", event);
+                                }
                             }
                         }
                     } catch (Exception e) {
@@ -80,7 +90,7 @@ public class WebSocketHandler implements Handler<ServerWebSocket> {
                 });
                 
                 ws.closeHandler(v -> {
-                    log.info("WebSocket connection closed for user: {}", userId);
+                    log.debug("WebSocket connection closed for user: {}", userId);
                     ConnectionManager.removeConnection(userId);
                 });
                 

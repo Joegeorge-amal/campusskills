@@ -5,8 +5,11 @@ import com.campusskills.shared.constants.WebSocketEventType;
 import com.campusskills.web.websockets.ConnectionManager;
 import com.campusskills.web.websockets.WebSocketMessageBuilder;
 import io.vertx.core.json.JsonObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NotificationBroadcaster {
+    private static final Logger log = LoggerFactory.getLogger(NotificationBroadcaster.class);
 
     public static void broadcastNewNotification(Notification notification) {
         try {
@@ -21,7 +24,7 @@ public class NotificationBroadcaster {
                 ConnectionManager.broadcastToUser(notification.getUserId(), event);
             }
         } catch (Exception e) {
-            System.err.println("[BROADCAST WARN] Failed to broadcast NOTIFICATION: " + e.getMessage());
+            log.error("[BROADCAST WARN] Failed to broadcast NOTIFICATION", e);
         }
     }
 }

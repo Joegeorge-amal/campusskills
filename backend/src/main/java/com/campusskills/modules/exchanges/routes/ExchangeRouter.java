@@ -13,6 +13,7 @@ public class ExchangeRouter {
         router.post("/").handler(handler::createExchange);
         router.post("/:id/accept").handler(handler::acceptExchange);
         router.post("/:id/reject").handler(handler::rejectExchange);
+        router.post("/:id/cancel").handler(handler::cancelExchange);
         router.get("/me").handler(handler::getMyExchanges);
 
         return router;

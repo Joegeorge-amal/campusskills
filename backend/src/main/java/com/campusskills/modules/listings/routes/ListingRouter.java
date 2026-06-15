@@ -22,8 +22,8 @@ public class ListingRouter {
         // POST /listings is protected
         router.post("/").handler(JwtAuthMiddleware.create(jwtAuth)).handler(com.campusskills.web.middleware.EmailVerifiedMiddleware.create()).handler(handler::createListing);
 
-        // GET /listings is public
-        router.get("/").handler(handler::getAllListings);
+        // GET /listings is public but can take optional auth for block filtering
+        router.get("/").handler(JwtAuthMiddleware.createOptional(jwtAuth)).handler(handler::getAllListings);
         
         // GET /listings/:id is public
         router.get("/:id").handler(handler::getListingById);

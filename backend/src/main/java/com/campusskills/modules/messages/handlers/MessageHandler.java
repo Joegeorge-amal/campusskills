@@ -24,7 +24,10 @@ public class MessageHandler {
             }
             msg.setSenderId(authId);
             messageService.createMessage(msg)
-                .onSuccess(id -> ApiResponse.created(ctx, new JsonObject().put("id", id).put("message", "Message created successfully")))
+                .onSuccess(id -> {
+                    msg.setId(id);
+                    ApiResponse.created(ctx, JsonObject.mapFrom(msg));
+                })
                 .onFailure(err -> {
                     String errorMsg = err.getMessage();
                     if ("CHAT_NOT_FOUND".equals(errorMsg)) {
@@ -94,6 +97,83 @@ public class MessageHandler {
                     ApiResponse.forbidden(ctx, errorMsg);
                 } else if ("MESSAGE_NOT_FOUND".equals(errorMsg)) {
                     ApiResponse.notFound(ctx, "Message not found");
+                } else if ("CHAT_NOT_FOUND".equals(errorMsg)) {
+                    ApiResponse.notFound(ctx, "Chat not found");
+                } else {
+                    ApiResponse.badRequest(ctx, errorMsg);
+                }
+            });
+    }
+
+    public void editMessage(RoutingContext ctx) {
+        String messageId = ctx.pathParam("messageId");
+        String authId = ctx.get("authenticatedUserId");
+        if (authId == null) {
+            ApiResponse.forbidden(ctx, "Unauthorized");
+            return;
+        }
+
+        String newText;
+        try {
+            newText = ctx.body().asJsonObject().getString("message");
+        } catch (Exception e) {
+            ApiResponse.badRequest(ctx, "Invalid JSON format");
+            return;
+        }
+
+        messageService.editMessage(messageId, authId, newText)
+            .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("success", true).put("message", "Message edited")))
+            .onFailure(err -> {
+                String errorMsg = err.getMessage();
+                if (errorMsg != null && errorMsg.startsWith("UNAUTHORIZED")) {
+                    ApiResponse.forbidden(ctx, errorMsg);
+                } else if ("MESSAGE_NOT_FOUND".equals(errorMsg)) {
+                    ApiResponse.notFound(ctx, "Message not found");
+                } else if ("EDIT_WINDOW_EXPIRED".equals(errorMsg)) {
+                    ApiResponse.forbidden(ctx, "Cannot edit message after 10 minutes");
+                } else {
+                    ApiResponse.badRequest(ctx, errorMsg);
+                }
+            });
+    }
+
+    public void deleteMessage(RoutingContext ctx) {
+        String messageId = ctx.pathParam("messageId");
+        String authId = ctx.get("authenticatedUserId");
+        if (authId == null) {
+            ApiResponse.forbidden(ctx, "Unauthorized");
+            return;
+        }
+
+        messageService.deleteMessage(messageId, authId)
+            .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("success", true).put("message", "Message deleted")))
+            .onFailure(err -> {
+                String errorMsg = err.getMessage();
+                if (errorMsg != null && errorMsg.startsWith("UNAUTHORIZED")) {
+                    ApiResponse.forbidden(ctx, errorMsg);
+                } else if ("MESSAGE_NOT_FOUND".equals(errorMsg)) {
+                    ApiResponse.notFound(ctx, "Message not found");
+                } else if ("DELETE_WINDOW_EXPIRED".equals(errorMsg)) {
+                    ApiResponse.forbidden(ctx, "Cannot delete message after 15 minutes");
+                } else {
+                    ApiResponse.badRequest(ctx, errorMsg);
+                }
+            });
+    }
+    public void markChatAsRead(RoutingContext ctx) {
+        String chatId = ctx.pathParam("chatId");
+        String authId = ctx.get("authenticatedUserId");
+        if (authId == null) {
+            ApiResponse.forbidden(ctx, "Unauthorized");
+            return;
+        }
+
+        messageService.markChatAsRead(chatId, authId)
+            .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("success", true).put("message", "Chat marked as read")))
+            .onFailure(err -> {
+                String errorMsg = err.getMessage();
+                if (errorMsg != null && errorMsg.startsWith("UNAUTHORIZED")) {
+                    ApiResponse.forbidden(ctx, errorMsg);
                 } else if ("CHAT_NOT_FOUND".equals(errorMsg)) {
                     ApiResponse.notFound(ctx, "Chat not found");
                 } else {

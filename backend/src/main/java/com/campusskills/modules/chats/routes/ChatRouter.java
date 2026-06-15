@@ -18,6 +18,7 @@ public class ChatRouter {
 
         router.post("/").handler(handler::createChat);
         router.get("/").handler(handler::getUserChats);
+        router.delete("/:id").handler(handler::deleteChat);
 
         return router;
     }

@@ -13,8 +13,11 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.CompositeFuture;
 import java.util.ArrayList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ChatService {
+    private static final Logger log = LoggerFactory.getLogger(ChatService.class);
     private final ChatRepository repository;
     private final MessageRepository messageRepository;
     private final com.campusskills.modules.users.repositories.UserRepository userRepository;
@@ -47,7 +50,7 @@ public class ChatService {
         }
         
         if (chat.getSourceType() == null) {
-            chat.setSourceType(ChatSourceType.GENERAL);
+            return Future.failedFuture("Chat sourceType is required (CHAT_REQUEST or EXCHANGE_REQUEST)");
         }
 
         return repository.findExistingChat(chat.getSourceType().name(), chat.getSourceId(), uniqueParticipants).compose(existing -> {
@@ -56,8 +59,8 @@ public class ChatService {
             }
 
             return repository.createChat(chat).map(chatId -> {
-                System.out.println(String.format("[LIFECYCLE] Chat CREATED | chatId=%s sourceType=%s sourceId=%s authenticatedUserId=%s", 
-                    chatId, chat.getSourceType(), chat.getSourceId(), authId));
+                log.debug("[LIFECYCLE] Chat CREATED | chatId={} sourceType={} sourceId={} authenticatedUserId={}", 
+                    chatId, chat.getSourceType(), chat.getSourceId(), authId);
                 return new JsonObject()
                     .put("chatId", chatId)
                     .put("chatStatus", chat.getStatus().name())
@@ -80,7 +83,15 @@ public class ChatService {
             matchingUserIdsFuture = Future.succeededFuture(null); // null means no text filter
         }
 
-        return matchingUserIdsFuture.compose(matchingUserIds -> {
+        com.campusskills.modules.users.repositories.UserProfileRepository userProfileRepository = new com.campusskills.modules.users.repositories.UserProfileRepository();
+        Future<java.util.Set<String>> blockedUsersFuture = userProfileRepository.findByUserId(userId).map(profile -> {
+            return profile != null ? profile.getBlockedUsers() : java.util.Collections.emptySet();
+        });
+
+        return CompositeFuture.all(matchingUserIdsFuture, blockedUsersFuture).compose(cf -> {
+            List<String> matchingUserIds = cf.resultAt(0);
+            java.util.Set<String> blockedUsers = cf.resultAt(1);
+
             // If user searched for a name and NO users matched, return empty results immediately
             if (matchingUserIds != null && matchingUserIds.isEmpty()) {
                 return Future.succeededFuture(new JsonObject()
@@ -90,8 +101,8 @@ public class ChatService {
                     .put("total", 0L));
             }
 
-            return repository.countUserChats(userId, statusFilter, matchingUserIds).compose(total -> 
-                repository.fetchUserChats(userId, statusFilter, matchingUserIds, skip, limit).compose(chats -> {
+            return repository.countUserChats(userId, statusFilter, matchingUserIds, blockedUsers).compose(total -> 
+                repository.fetchUserChats(userId, statusFilter, matchingUserIds, blockedUsers, skip, limit).compose(chats -> {
                     if (chats.isEmpty()) {
                         return Future.succeededFuture(new JsonObject()
                             .put("items", new JsonArray())
@@ -111,6 +122,7 @@ public class ChatService {
                             if (lastMessage != null) {
                                 chatJson.put("lastMessagePreview", lastMessage.getMessage());
                                 chatJson.put("lastMessageAt", lastMessage.getCreatedAt());
+                                chatJson.put("lastMessageSenderId", lastMessage.getSenderId());
                             }
                             return null;
                         });
@@ -120,7 +132,31 @@ public class ChatService {
                             return null;
                         });
                         
-                        futures.add(CompositeFuture.all(lastMsgFut, unreadCountFut).mapEmpty());
+                        String otherParticipantId = chat.getParticipants().stream().filter(p -> !p.equals(userId)).findFirst().orElse(null);
+                        Future<Void> profileFut = Future.succeededFuture();
+                        if (otherParticipantId != null) {
+                            profileFut = userProfileRepository.findByUserId(otherParticipantId).map(profile -> {
+                                if (profile != null) {
+                                    JsonObject profileData = new JsonObject();
+                                    profileData.put("name", profile.getName());
+                                    profileData.put("avatarImg", profile.getProfilePicture());
+                                    if (profile.getAvatarColor() != null) {
+                                        try {
+                                            profileData.put("avatarColor", io.vertx.core.json.JsonObject.mapFrom(profile.getAvatarColor()));
+                                        } catch(Exception e) {
+                                            // Handle case if avatarColor is string/map
+                                            if (profile.getAvatarColor() instanceof java.util.Map) {
+                                                profileData.put("avatarColor", new JsonObject((java.util.Map<String, Object>)profile.getAvatarColor()));
+                                            }
+                                        }
+                                    }
+                                    chatJson.put("participantProfile", profileData);
+                                }
+                                return null;
+                            });
+                        }
+                        
+                        futures.add(CompositeFuture.all(lastMsgFut, unreadCountFut, profileFut).mapEmpty());
                     }
 
                     return CompositeFuture.all(futures).map(v -> new JsonObject()
@@ -131,6 +167,23 @@ public class ChatService {
                     );
                 })
             );
+        });
+    }
+
+    public Future<Void> deleteChat(String chatId, String userId) {
+        if (chatId == null || chatId.trim().isEmpty()) {
+            return Future.failedFuture("chatId is required");
+        }
+        return repository.findById(chatId).compose(chat -> {
+            if (chat == null) {
+                return Future.failedFuture("CHAT_NOT_FOUND");
+            }
+            if (!chat.getParticipants().contains(userId)) {
+                return Future.failedFuture("UNAUTHORIZED");
+            }
+            return messageRepository.deleteMessagesByChatId(chatId)
+                .compose(v -> repository.deleteChat(chatId))
+                .mapEmpty();
         });
     }
 }

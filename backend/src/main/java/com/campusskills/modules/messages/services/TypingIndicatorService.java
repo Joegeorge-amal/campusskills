@@ -8,8 +8,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.json.JsonArray;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TypingIndicatorService {
+    private static final Logger log = LoggerFactory.getLogger(TypingIndicatorService.class);
     private final Vertx vertx;
     private final MessageRepository messageRepository;
     private final ConcurrentHashMap<String, Long> activeTypingTimers = new ConcurrentHashMap<>();
@@ -32,7 +35,7 @@ public class TypingIndicatorService {
             if (chat == null) return;
             JsonArray participantsArray = chat.getJsonArray("participants");
             if (participantsArray == null || !participantsArray.contains(userId)) {
-                System.err.println("[TYPING ERROR] Unauthorized typing attempt for chat " + chatId + " by User " + userId);
+                log.warn("[TYPING ERROR] Unauthorized typing attempt for chat {} by User {}", chatId, userId);
                 return;
             }
             
@@ -45,13 +48,11 @@ public class TypingIndicatorService {
                 if (existingTimerId != null) {
                     vertx.cancelTimer(existingTimerId);
                 } else {
-                    System.out.println(String.format("[TYPING_STARTED] chatId=%s authenticatedUserId=%s timestamp=%d", chatId, userId, System.currentTimeMillis()));
                     MessageBroadcaster.broadcastTypingEvent("TYPING_STARTED", chatId, userId, participantList);
                 }
                 
                 long newTimerId = vertx.setTimer(TYPING_TIMEOUT_MS, id -> {
                     activeTypingTimers.remove(key);
-                    System.out.println(String.format("[TYPING_TIMEOUT] chatId=%s authenticatedUserId=%s timestamp=%d", chatId, userId, System.currentTimeMillis()));
                     MessageBroadcaster.broadcastTypingEvent("TYPING_STOPPED", chatId, userId, participantList);
                 });
                 activeTypingTimers.put(key, newTimerId);
@@ -66,7 +67,6 @@ public class TypingIndicatorService {
         Long existingTimerId = activeTypingTimers.remove(key);
         if (existingTimerId != null) {
             vertx.cancelTimer(existingTimerId);
-            System.out.println(String.format("[TYPING_STOPPED] chatId=%s authenticatedUserId=%s timestamp=%d", chatId, userId, System.currentTimeMillis()));
             MessageBroadcaster.broadcastTypingEvent("TYPING_STOPPED", chatId, userId, participantList);
         }
     }

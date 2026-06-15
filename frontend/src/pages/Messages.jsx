@@ -1,15 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useAppData } from '../context/AppDataContext';
+import { useWebSocket } from '../context/WebSocketContext';
 import Avatar from '../components/common/Avatar';
 import ChatListItem from '../components/common/ChatListItem';
 import ChatMessageBubble from '../components/common/ChatMessageBubble';
 import ChatInput from '../components/common/ChatInput';
-import { IconSearch, IconCheck, IconX } from '@tabler/icons-react';
+import { IconSearch, IconCheck, IconX, IconTrash, IconMessageCircle, IconArrowLeft } from '@tabler/icons-react';
 import { chatService } from '../services/chatService';
 import { chatRequestService } from '../services/chatRequestService';
-import { userService } from '../services/userService';
+import { messageService } from '../services/messageService';
+import { AnimatePresence } from 'framer-motion';
+import DeleteChatModal from '../components/modals/DeleteChatModal';
 
 const getInitials = (name) => {
   if (!name) return 'U';
@@ -21,132 +24,405 @@ const getInitials = (name) => {
 const Messages = () => {
   const { user } = useAuth();
   const { triggerToast } = useAppData();
-  const [searchParams] = useSearchParams();
+  const { chatId: activeChatId } = useParams();
+  const navigate = useNavigate();
+  const { lastMessage, sendMessage: sendSocketEvent } = useWebSocket();
   
-  const [activeChatId, setActiveChatId] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const messagesEndRef = useRef(null);
 
-  const [loading, setLoading] = useState(true);
-  const [chats, setChats] = useState([]);
-  const [requests, setRequests] = useState([]);
-  const [userProfiles, setUserProfiles] = useState({});
+  const { 
+    chats, setChats, 
+    chatRequests: requests, setChatRequests: setRequests, 
+    chatMessages, setChatMessages,
+    isChatsLoading: loading
+  } = useAppData();
 
-  const fetchChatsAndRequests = async () => {
-    try {
-      const [chatsRes, reqsRes] = await Promise.all([
-        chatService.getUserChats(),
-        chatRequestService.getUserRequests()
-      ]);
 
-      const chatsData = chatsRes.items || [];
-      const reqsData = (reqsRes.items || []).filter(r => r.receiverId === user?.userId && r.status === 'PENDING');
+  const [typingUsers, setTypingUsers] = useState({});
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [editingMessage, setEditingMessage] = useState(null);
+  const [deletingMessage, setDeletingMessage] = useState(null);
 
-      // Gather unique user IDs to fetch profiles
-      const userIdsToFetch = new Set();
-      chatsData.forEach(c => {
-        const otherId = c.participants?.find(p => p !== user?.userId);
-        if (otherId) userIdsToFetch.add(otherId);
-      });
-      reqsData.forEach(r => {
-        userIdsToFetch.add(r.senderId);
-      });
+  const [loadingOlder, setLoadingOlder] = useState(false);
+  const [hasMoreMessages, setHasMoreMessages] = useState({});
+  const messagesContainerRef = useRef(null);
+  const [showScrollBottom, setShowScrollBottom] = useState(false);
+  const [unreadNewMessages, setUnreadNewMessages] = useState(0);
 
-      const profilesMap = { ...userProfiles };
-      await Promise.all([...userIdsToFetch].map(async (id) => {
-        if (!profilesMap[id]) {
-          try {
-            const profile = await userService.getPublicProfile(id);
-            profilesMap[id] = profile;
-          } catch (e) {
-            console.error('Failed to fetch profile', id);
-          }
+
+
+  // Load historical messages when active chat changes
+  useEffect(() => {
+    if (activeChatId && activeChatId !== 'requests') {
+      if (!chatMessages[activeChatId]) {
+        messageService.getMessages(activeChatId, { page: 1, limit: 50 }).then(res => {
+          setChatMessages(prev => ({ ...prev, [activeChatId]: res.items || [] }));
+          setHasMoreMessages(prev => ({ ...prev, [activeChatId]: res.items.length === 50 }));
+          messageService.markAsRead(activeChatId).catch(console.error);
+          
+          setChats(prevChats => prevChats.map(c => c.id === activeChatId ? { ...c, unread: 0 } : c));
+          
+          // Initial scroll to bottom (instant to prevent jarring slide down)
+          setTimeout(() => {
+             messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
+          }, 50);
+        }).catch(err => {
+          console.error(err);
+        });
+      } else {
+        // If already loaded, just mark as read
+        messageService.markAsRead(activeChatId).catch(console.error);
+        setChats(prevChats => prevChats.map(c => c.id === activeChatId ? { ...c, unread: 0 } : c));
+        
+        // Return to bottom on cache load
+        setTimeout(() => {
+             messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
+        }, 50);
+      }
+      setShowScrollBottom(false);
+      setUnreadNewMessages(0);
+    }
+  }, [activeChatId]);
+
+  // Handle incoming WebSocket messages
+  // Backend sends { type, timestamp, payload } — NOT { event, data }
+  useEffect(() => {
+    if (!lastMessage || !lastMessage.type) return;
+    const { type, payload } = lastMessage;
+
+    if (type === 'NEW_MESSAGE') {
+      const msg = payload;
+      const chatId = msg.chatId;
+      const isOwnMessage = msg.senderId === user?.userId;
+
+      let isAtBottom = false;
+      if (activeChatId === chatId) {
+        const container = messagesContainerRef.current;
+        if (container) {
+          isAtBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150;
         }
+      }
+
+      setChatMessages(prev => {
+        if (!prev[chatId]) return prev;
+        const chatMsgs = prev[chatId];
+        
+        const existingIndex = chatMsgs.findIndex(m => 
+          (msg.tempId && m.tempId === msg.tempId) || 
+          (m._id && m._id === msg._id) || 
+          (m.id && m.id === msg.id) || 
+          (m.id && m.id === msg._id)
+        );
+        
+        if (existingIndex !== -1) {
+          const newMsgs = [...chatMsgs];
+          newMsgs[existingIndex] = { ...newMsgs[existingIndex], ...msg, status: newMsgs[existingIndex].status === 'failed' ? 'failed' : 'sent' };
+          return { ...prev, [chatId]: newMsgs };
+        }
+        
+        return { ...prev, [chatId]: [...chatMsgs, msg] };
+      });
+      
+      setChats(prevChats => prevChats.map(c => {
+        if (c.id === chatId) {
+          const isMe = msg.senderId === user?.userId;
+          return {
+            ...c,
+            preview: isMe ? 'You: ' + msg.message : msg.message,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            unread: (activeChatId !== chatId) ? (c.unread || 0) + 1 : 0
+          };
+        }
+        return c;
       }));
 
-      setUserProfiles(profilesMap);
-
-      // Map chats
-      const mappedChats = chatsData.map(c => {
-        const otherId = c.participants?.find(p => p !== user?.userId);
-        const profile = profilesMap[otherId] || { name: 'Unknown User' };
-        return {
-          id: c._id || c.id,
-          rawChat: c,
-          name: profile.name,
-          init: getInitials(profile.name),
-          bg: '#E5E7EB',
-          col: '#374151',
-          preview: c.lastMessagePreview || 'No messages yet',
-          unread: c.unreadCount || 0,
-          time: c.lastMessageAt ? new Date(c.lastMessageAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
-          msgs: [] // Mocking messages as they are not fetched yet
-        };
-      });
-
-      // Map requests
-      const mappedReqs = reqsData.map(r => {
-        const profile = profilesMap[r.senderId] || { name: 'Unknown User' };
-        return {
-          id: r._id,
-          rawReq: r,
-          name: profile.name,
-          init: getInitials(profile.name),
-          bg: '#E5E7EB',
-          col: '#374151',
-          message: r.message
-        };
-      });
-
-      setChats(mappedChats);
-      setRequests(mappedReqs);
-
-      // Set initial active chat if passed in URL or just the first one
-      if (!activeChatId && !searchParams.get('chatId') && mappedChats.length > 0) {
-        setActiveChatId(mappedChats[0].id);
-      } else if (!activeChatId && searchParams.get('chatId')) {
-        setActiveChatId(searchParams.get('chatId'));
+      // Acknowledge delivery for incoming messages
+      if (!isOwnMessage) {
+        sendSocketEvent('MESSAGE_DELIVERED', { messageId: msg._id || msg.id, chatId: msg.chatId });
       }
-    } catch (err) {
-      console.error(err);
-      triggerToast('Failed to load chats');
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  useEffect(() => {
-    if (user?.userId) {
-      fetchChatsAndRequests();
+      if (activeChatId === chatId) {
+        messageService.markAsRead(chatId).catch(console.error);
+        if (isOwnMessage) {
+          // Always scroll to bottom when YOU send a message
+          setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
+        } else if (isAtBottom) {
+          // Other person sent and we're at the bottom — auto scroll
+          setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
+        } else {
+          // Other person sent and we're scrolled up — show pill
+          setUnreadNewMessages(prev => prev + 1);
+          setShowScrollBottom(true);
+        }
+      }
+
+    } else if (type === 'MESSAGE_EDITED') {
+      const { messageId, chatId, message, editedAt } = payload;
+      setChatMessages(prev => {
+        const chatMsgs = prev[chatId] || [];
+        return {
+          ...prev,
+          [chatId]: chatMsgs.map(m =>
+            (m._id === messageId || m.id === messageId)
+              ? { ...m, message, editedAt, isEdited: true }
+              : m
+          )
+        };
+      });
+      // Scroll to bottom if near bottom
+      if (activeChatId === chatId) {
+        const container = messagesContainerRef.current;
+        if (container && container.scrollHeight - container.scrollTop - container.clientHeight < 150) {
+          setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
+        }
+      }
+
+    } else if (type === 'MESSAGE_DELETED') {
+      const { messageId, chatId, message: deletedText, isDeleted, deletedAt } = payload;
+      setChatMessages(prev => {
+        const chatMsgs = prev[chatId] || [];
+        return {
+          ...prev,
+          [chatId]: chatMsgs.map(m =>
+            (m._id === messageId || m.id === messageId)
+              ? { ...m, message: deletedText, isDeleted, deletedAt }
+              : m
+          )
+        };
+      });
+      // Scroll to bottom if near bottom
+      if (activeChatId === chatId) {
+        const container = messagesContainerRef.current;
+        if (container && container.scrollHeight - container.scrollTop - container.clientHeight < 150) {
+          setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
+        }
+      }
+
+    } else if (type === 'MESSAGE_DELIVERED') {
+      const { messageId, chatId } = payload;
+      setChatMessages(prev => {
+        const chatMsgs = prev[chatId] || [];
+        return {
+          ...prev,
+          [chatId]: chatMsgs.map(m => m._id === messageId || m.id === messageId ? { ...m, isDelivered: true, status: m.status === 'read' ? 'read' : 'delivered' } : m)
+        };
+      });
+    } else if (type === 'MESSAGE_READ') {
+      const { messageId, chatId } = payload;
+      setChatMessages(prev => {
+        const chatMsgs = prev[chatId] || [];
+        return {
+          ...prev,
+          [chatId]: chatMsgs.map(m => (messageId ? (m._id === messageId || m.id === messageId) : true) ? { ...m, isRead: true, isDelivered: true, status: 'read' } : m)
+        };
+      });
+    } else if (type === 'TYPING_STARTED') {
+      const { chatId, userId } = payload;
+      // Only show typing for the other user in the active chat
+      if (userId !== user?.userId) {
+        setTypingUsers(prev => ({ ...prev, [`${chatId}_${userId}`]: true }));
+        // Scroll to show typing bubble if already near bottom
+        if (activeChatId === chatId) {
+          const container = messagesContainerRef.current;
+          if (container && container.scrollHeight - container.scrollTop - container.clientHeight < 150) {
+            setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
+          }
+        }
+        // Auto-clear after 5s in case TYPING_STOPPED is missed
+        setTimeout(() => {
+          setTypingUsers(prev => ({ ...prev, [`${chatId}_${userId}`]: false }));
+        }, 5000);
+      }
+    } else if (type === 'TYPING_STOPPED') {
+      const { chatId, userId } = payload;
+      setTypingUsers(prev => ({ ...prev, [`${chatId}_${userId}`]: false }));
     }
-  }, [user]);
+  }, [lastMessage, activeChatId]);
 
   const filteredChats = chats.filter(c => 
-    c.name.toLowerCase().includes(searchQuery.toLowerCase())
+    (c.name || '').toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const activeChat = chats.find(c => c.id === activeChatId);
+  const activeChatMsgs = chatMessages[activeChatId] || [];
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    setShowScrollBottom(false);
+    setUnreadNewMessages(0);
   };
 
-  const activeChat = chats.find(c => c.id === activeChatId);
+  const handleScroll = async () => {
+    const container = messagesContainerRef.current;
+    if (!container) return;
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [activeChat?.msgs]);
+    const isAtBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150;
+    if (isAtBottom && showScrollBottom) {
+      setShowScrollBottom(false);
+      setUnreadNewMessages(0);
+    }
 
-  const handleSend = (text) => {
+    if (container.scrollTop < 50 && hasMoreMessages[activeChatId] && !loadingOlder) {
+      setLoadingOlder(true);
+      try {
+        const currentPage = Math.floor(activeChatMsgs.length / 50) + 1;
+        const res = await messageService.getMessages(activeChatId, { page: currentPage, limit: 50 });
+        
+        if (res.items && res.items.length > 0) {
+          const oldScrollHeight = container.scrollHeight;
+          
+          setChatMessages(prev => ({
+            ...prev,
+            [activeChatId]: [...res.items, ...prev[activeChatId]]
+          }));
+          
+          setHasMoreMessages(prev => ({
+            ...prev,
+            [activeChatId]: res.items.length === 50
+          }));
+
+          setTimeout(() => {
+            container.scrollTop = container.scrollHeight - oldScrollHeight;
+          }, 0);
+        } else {
+          setHasMoreMessages(prev => ({ ...prev, [activeChatId]: false }));
+        }
+      } catch (error) {
+        console.error('Failed to fetch older messages', error);
+      } finally {
+        setLoadingOlder(false);
+      }
+    }
+  };
+
+  const handleSend = async (text) => {
     if (text.trim() && activeChat) {
-      triggerToast('Sending real messages is not fully implemented yet!');
+      if (editingMessage) {
+        try {
+          const msgId = editingMessage._id || editingMessage.id;
+          setEditingMessage(null);
+
+          await messageService.editMessage(msgId, text);
+        } catch (err) {
+          console.error(err);
+          triggerToast(err?.response?.data?.error || err?.response?.data?.message || 'Failed to edit message');
+        }
+      } else {
+        try {
+          const replyId = replyingTo ? (replyingTo._id || replyingTo.id) : null;
+          const newMessageObj = {
+            tempId: Date.now().toString(),
+            chatId: activeChatId,
+            senderId: user?.userId,
+            message: text,
+            replyToMessageId: replyId,
+            createdAt: new Date().toISOString(),
+            status: 'sent'
+          };
+
+          // Optimistic append — always scroll to bottom immediately when YOU send
+          setChatMessages(prev => ({
+            ...prev,
+            [activeChatId]: [...(prev[activeChatId] || []), newMessageObj]
+          }));
+          setReplyingTo(null);
+          // Use instant scroll for own message send so it doesn't feel laggy
+          requestAnimationFrame(() => {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+          });
+
+          // Send to backend
+          const res = await messageService.sendMessage(activeChatId, text, replyId, newMessageObj.tempId);
+          
+          // Update the sent message with actual DB ID
+          setChatMessages(prev => ({
+            ...prev,
+            [activeChatId]: prev[activeChatId].map(m => 
+              m.tempId === newMessageObj.tempId ? { ...res, tempId: m.tempId, status: 'sent', isDelivered: res.isDelivered, isRead: res.isRead } : m
+            )
+          }));
+
+          // Update list preview
+          setChats(prevChats => prevChats.map(c => {
+            if (c.id === activeChatId) {
+              return { ...c, preview: text, time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) };
+            }
+            return c;
+          }));
+        } catch (err) {
+          console.error(err);
+          triggerToast('Failed to send message');
+          setChatMessages(prev => ({
+            ...prev,
+            [activeChatId]: prev[activeChatId].map(m => 
+              m.tempId === newMessageObj?.tempId ? { ...m, status: 'failed' } : m
+            )
+          }));
+        }
+      }
+      sendSocketEvent('TYPING_STOPPED', { chatId: activeChatId });
+    }
+  };
+
+  const handleDeleteMessage = (msg) => {
+    setDeletingMessage(msg);
+  };
+
+  const confirmDeleteMessage = async () => {
+    if (!deletingMessage) return;
+    try {
+      const msgId = deletingMessage._id || deletingMessage.id;
+      
+      setDeletingMessage(null);
+
+      await messageService.deleteMessage(msgId);
+    } catch (err) {
+      console.error(err);
+      triggerToast(err?.response?.data?.error || err?.response?.data?.message || 'Failed to delete message');
+    }
+  };
+
+  const handleRetry = async (payload) => {
+    if (payload && payload.status === 'failed') {
+      const tempId = payload.tempId || payload.id;
+      
+      setChatMessages(prev => {
+        const msgs = prev[activeChatId] || [];
+        return { ...prev, [activeChatId]: msgs.map(m => m.tempId === tempId ? { ...m, status: 'sent' } : m) };
+      });
+
+      try {
+        const sentMsg = await messageService.sendMessage(activeChatId, payload.message, null, tempId);
+        
+        setChatMessages(prev => {
+          const msgs = prev[activeChatId] || [];
+          return { ...prev, [activeChatId]: msgs.map(m => m.tempId === tempId ? { ...sentMsg, status: 'sent', isDelivered: sentMsg.isDelivered, isRead: sentMsg.isRead } : m) };
+        });
+      } catch (err) {
+        setChatMessages(prev => {
+          const msgs = prev[activeChatId] || [];
+          return { ...prev, [activeChatId]: msgs.map(m => m.tempId === tempId ? { ...m, status: 'failed' } : m) };
+        });
+      }
+    }
+  };
+
+  const handleTyping = (isTyping) => {
+    if (activeChatId && activeChatId !== 'requests') {
+      sendSocketEvent(isTyping ? 'TYPING_STARTED' : 'TYPING_STOPPED', { chatId: activeChatId });
     }
   };
 
   const handleAcceptRequest = async (id) => {
     try {
-      await chatRequestService.acceptRequest(id);
-      triggerToast('Request accepted!');
-      if (activeChatId === 'requests') {
-        setActiveChatId(null);
+      const res = await chatRequestService.acceptRequest(id);
+      if (res && res.chatId) {
+        navigate('/app/messages/' + res.chatId);
+      } else if (activeChatId === 'requests') {
+        navigate('/app/messages');
       }
       fetchChatsAndRequests();
     } catch (err) {
@@ -157,12 +433,29 @@ const Messages = () => {
   const handleDeclineRequest = async (id) => {
     try {
       await chatRequestService.rejectRequest(id);
-      triggerToast('Request declined');
       fetchChatsAndRequests();
     } catch (err) {
       triggerToast('Failed to decline request');
     }
   };
+
+  const handleDeleteChat = async () => {
+    if (!activeChatId) return;
+    setIsDeleting(true);
+    try {
+      await chatService.deleteChat(activeChatId);
+      triggerToast('Chat deleted successfully', 'success');
+      setShowDeleteModal(false);
+      setChats(prev => prev.filter(c => c.id !== activeChatId));
+      navigate('/app/messages');
+    } catch (e) {
+      triggerToast('Failed to delete chat');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const isOtherUserTyping = activeChat && typingUsers[`${activeChat.id}_${activeChat.otherId}`];
 
   return (
     <div id="chat" className="pg on" style={{ padding: 0, height: 'calc(100vh - 60px)', background: 'var(--cs-bg-light)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
@@ -198,7 +491,7 @@ const Messages = () => {
                   justifyContent: 'space-between',
                   transition: 'background 0.2s'
                 }}
-                onClick={() => setActiveChatId('requests')}
+                onClick={() => navigate('/app/messages/requests')}
               >
                 <div style={{ fontSize: '14px', fontWeight: 600, color: activeChatId === 'requests' ? '#1d4ed8' : '#334155' }}>
                   Message Requests
@@ -213,19 +506,38 @@ const Messages = () => {
               Conversations
             </div>
 
-            {filteredChats.map(chat => (
-              <ChatListItem 
-                key={chat.id}
-                avatarProps={{ letters: chat.init, bgColor: chat.bg, textColor: chat.col, size: '36px', fontSize: '13px' }}
-                isOnline={false}
-                name={chat.name}
-                preview={chat.preview}
-                time={chat.time}
-                unreadCount={chat.unread}
-                isActive={activeChatId === chat.id}
-                onClick={() => setActiveChatId(chat.id)}
-              />
-            ))}
+            {filteredChats.map(c => {
+              const msgs = chatMessages[c.id];
+              let displayPreview = c.preview;
+              let displayTime = c.time;
+              
+              if (msgs && msgs.length > 0) {
+                const lastMsg = msgs[msgs.length - 1];
+                const isMe = lastMsg.senderId === user?.userId;
+                if (lastMsg.isDeleted) {
+                  displayPreview = isMe ? 'You deleted this message' : 'This message was deleted';
+                } else {
+                  displayPreview = isMe ? 'You: ' + lastMsg.message : lastMsg.message;
+                }
+                displayTime = new Date(lastMsg.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              }
+              
+              return (
+                <ChatListItem 
+                  key={c.id} 
+                  id={c.id}
+                  name={c.name} 
+                  preview={displayPreview} 
+                  time={displayTime} 
+                  unreadCount={c.unread}
+                  isActive={activeChatId === c.id}
+                  onClick={() => {
+                    navigate('/app/messages/' + c.id);
+                  }}
+                  avatarProps={{ initials: c.init, bg: c.bg, color: c.col, backgroundImage: c.avatar }}
+                />
+              );
+            })}
 
             {!loading && filteredChats.length === 0 && (
               <div style={{ fontSize: '13px', color: '#94a3b8', textAlign: 'center', padding: '24px 0' }}>
@@ -246,21 +558,37 @@ const Messages = () => {
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {requests.map(req => (
                   <div key={req.id} style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '16px', display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
-                    <Avatar letters={req.init} bgColor={req.bg} textColor={req.col} size="48px" fontSize="18px" />
+                    <Avatar initials={req.init} bg={req.bg} color={req.col} backgroundImage={req.avatar} size="48px" fontSize="18px" />
                     <div style={{ flex: 1 }}>
                       <div style={{ fontSize: '15px', fontWeight: 600, color: '#0f172a' }}>{req.name}</div>
                       <div style={{ fontSize: '14px', color: '#475569', marginTop: '4px' }}>{req.message || 'Wants to chat with you'}</div>
                     </div>
                     <div style={{ display: 'flex', gap: '8px' }}>
                       <button 
+                        onClick={async () => {
+                          if (window.confirm('Are you sure you want to block this user?')) {
+                            try {
+                              await userService.blockUser(req.rawReq.senderId);
+                              triggerToast('User blocked successfully');
+                              fetchChatsAndRequests();
+                            } catch (e) {
+                              triggerToast('Failed to block user');
+                            }
+                          }
+                        }}
+                        style={{ width: '36px', height: '36px', borderRadius: '100px', border: '1px solid #e2e8f0', background: '#fff', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', title: 'Block User' }}
+                      >
+                        <span style={{ fontSize: '14px', fontWeight: 'bold' }}>🚫</span>
+                      </button>
+                      <button 
                         onClick={() => handleDeclineRequest(req.id)}
-                        style={{ width: '36px', height: '36px', borderRadius: '100px', border: '1px solid #e2e8f0', background: '#fff', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                        style={{ width: '36px', height: '36px', borderRadius: '100px', border: '1px solid #e2e8f0', background: '#fff', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', title: 'Decline' }}
                       >
                         <IconX size={18} />
                       </button>
                       <button 
                         onClick={() => handleAcceptRequest(req.id)}
-                        style={{ width: '36px', height: '36px', borderRadius: '100px', border: 'none', background: '#3b82f6', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                        style={{ width: '36px', height: '36px', borderRadius: '100px', border: 'none', background: '#3b82f6', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', title: 'Accept' }}
                       >
                         <IconCheck size={18} />
                       </button>
@@ -273,43 +601,223 @@ const Messages = () => {
             <>
               {/* Header */}
               <div style={{ height: '60px', boxSizing: 'border-box', padding: '0 24px', background: 'var(--cs-bg-white)', borderBottom: '0.5px solid var(--cs-border)', display: 'flex', alignItems: 'center', gap: '12px', userSelect: 'none' }}>
-                <Avatar letters={activeChat.init} bgColor={activeChat.bg} textColor={activeChat.col} size="36px" fontSize="14px" />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <button 
+                    onClick={() => navigate('/app/messages')}
+                    style={{ background: 'none', border: 'none', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', padding: '4px', borderRadius: '50%' }}
+                  >
+                    <IconArrowLeft size={20} />
+                  </button>
+                  <Avatar initials={activeChat.init} bg={activeChat.bg} color={activeChat.col} backgroundImage={activeChat.avatar} size="36px" fontSize="14px" />
+                </div>
+                
                 <div style={{ flex: 1 }}>
                   <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--cs-text-main)' }}>{activeChat.name}</div>
                   <div style={{ fontSize: '12px', color: 'var(--cs-text-inactive)', marginTop: '2px' }}>
-                    Offline
+                    {isOtherUserTyping ? 'Typing...' : 'Offline'}
                   </div>
                 </div>
+                <button 
+                  onClick={() => setShowDeleteModal(true)}
+                  style={{ width: '36px', height: '36px', borderRadius: '100px', border: 'none', background: '#fee2e2', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', title: 'Delete Chat' }}
+                >
+                  <IconTrash size={18} />
+                </button>
               </div>
 
-              {/* Messages Area */}
-              <div style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column' }}>
-                {activeChat.msgs.map((msg, i) => (
-                  <ChatMessageBubble 
-                    key={msg.id || i}
-                    isMe={msg.f === 'me'}
-                    avatarProps={{ letters: activeChat.init, bgColor: activeChat.bg, textColor: activeChat.col }}
-                    payload={msg}
-                  />
-                ))}
-                {activeChat.msgs.length === 0 && (
+              {/* Right side (Messages) */}
+              <div 
+                ref={messagesContainerRef}
+                onScroll={handleScroll}
+                style={{ 
+                flex: 1, height: '100%', background: '#f8fafc', 
+                backgroundImage: 'radial-gradient(rgba(15, 23, 42, 0.06) 1px, transparent 1px)', 
+                backgroundSize: '24px 24px',
+                display: 'flex', flexDirection: 'column',
+                overflowY: 'auto', padding: '16px', boxSizing: 'border-box', position: 'relative'
+              }}>
+                <div style={{ flex: 1 }} />
+                {loadingOlder && (
+                  <div style={{ display: 'flex', justifyContent: 'center', padding: '8px 0', opacity: 0.6 }}>
+                    <div style={{ width: '24px', height: '24px', borderRadius: '50%', border: '2px solid #cbd5e1', borderTopColor: '#3b82f6', animation: 'spin 1s linear infinite' }} />
+                  </div>
+                )}
+                {activeChatMsgs.map((msg, i) => {
+                  let status = msg.status;
+                  if (!status && msg.senderId === user?.userId) {
+                    if (msg.isRead) status = 'read';
+                    else if (msg.isDelivered) status = 'delivered';
+                    else status = 'sent';
+                  }
+
+                  const replyToMessage = msg.replyToMessageId ? activeChatMsgs.find(m => m._id === msg.replyToMessageId || m.id === msg.replyToMessageId) : null;
+                  
+                  const isMe = msg.senderId === user?.userId;
+                  const now = Date.now();
+                  const createdAt = msg.createdAt ? new Date(msg.createdAt).getTime() : 0;
+                  const ageMs = now - createdAt;
+                  const canEdit = isMe && ageMs <= 10 * 60 * 1000;
+                  const canDelete = isMe && ageMs <= 15 * 60 * 1000;
+
+                  return (
+                    <ChatMessageBubble 
+                      key={msg.tempId || msg._id || msg.id || i}
+                      isMe={isMe}
+                      avatarProps={{ initials: activeChat.init, bg: activeChat.bg, color: activeChat.col, backgroundImage: activeChat.avatar }}
+                      payload={{
+                        t: msg.message,
+                        time: new Date(msg.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                        f: isMe ? 'me' : 'them',
+                        status: status,
+                        ...msg
+                      }}
+                      onRetry={handleRetry}
+                      onReply={() => setReplyingTo(msg)}
+                      onEdit={canEdit ? () => setEditingMessage(msg) : undefined}
+                      onDelete={canDelete ? () => handleDeleteMessage(msg) : undefined}
+                      replyToMessage={replyToMessage}
+                    />
+                  );
+                })}
+                {activeChatMsgs.length === 0 && (
                   <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: '13px', margin: 'auto' }}>
                     No messages yet. Send a message to start the conversation!
                   </div>
                 )}
+
+                {/* Typing indicator bubble */}
+                {isOtherUserTyping && (
+                  <div style={{ display: 'flex', alignItems: 'flex-end', gap: '8px', marginBottom: '4px' }}>
+                    <Avatar
+                      initials={activeChat.init}
+                      bg={activeChat.bg}
+                      color={activeChat.col}
+                      backgroundImage={activeChat.avatar}
+                      size="28px"
+                      fontSize="11px"
+                    />
+                    <div style={{
+                      background: 'var(--cs-bg-white)',
+                      border: '1px solid var(--cs-border)',
+                      borderRadius: '18px 18px 18px 4px',
+                      padding: '10px 14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      boxShadow: '0 1px 2px rgba(0,0,0,0.06)'
+                    }}>
+                      <span style={{
+                        width: '7px', height: '7px', borderRadius: '50%',
+                        background: '#94a3b8',
+                        display: 'inline-block',
+                        animation: 'typingBounce 1.2s ease-in-out infinite',
+                        animationDelay: '0s'
+                      }} />
+                      <span style={{
+                        width: '7px', height: '7px', borderRadius: '50%',
+                        background: '#94a3b8',
+                        display: 'inline-block',
+                        animation: 'typingBounce 1.2s ease-in-out infinite',
+                        animationDelay: '0.2s'
+                      }} />
+                      <span style={{
+                        width: '7px', height: '7px', borderRadius: '50%',
+                        background: '#94a3b8',
+                        display: 'inline-block',
+                        animation: 'typingBounce 1.2s ease-in-out infinite',
+                        animationDelay: '0.4s'
+                      }} />
+                    </div>
+                  </div>
+                )}
+
                 <div ref={messagesEndRef} />
               </div>
 
+              {/* Scroll to bottom Pill */}
+              <AnimatePresence>
+                {showScrollBottom && (
+                  <div style={{ position: 'absolute', bottom: '80px', right: '24px', zIndex: 10 }}>
+                    <button
+                      onClick={scrollToBottom}
+                      style={{
+                        background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '100px',
+                        padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '8px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                        cursor: 'pointer', color: '#1e293b', fontWeight: 600, fontSize: '13px',
+                        transition: 'transform 0.2s, box-shadow 0.2s'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                      onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+                    >
+                      {unreadNewMessages > 0 ? (
+                        <div style={{ background: '#3b82f6', color: '#fff', borderRadius: '100px', padding: '2px 8px', fontSize: '12px' }}>
+                          {unreadNewMessages} New
+                        </div>
+                      ) : (
+                        <IconArrowLeft size={16} style={{ transform: 'rotate(-90deg)' }} />
+                      )}
+                      <span style={{ color: '#64748b' }}>Scroll to bottom</span>
+                    </button>
+                  </div>
+                )}
+              </AnimatePresence>
+
               {/* Input Bar */}
-              <ChatInput onSend={handleSend} />
+              <ChatInput 
+                onSend={handleSend} 
+                onChange={(e) => handleTyping(e.target.value.length > 0)}
+                replyingTo={replyingTo}
+                onCancelReply={() => setReplyingTo(null)}
+                editingMessage={editingMessage}
+                onCancelEdit={() => setEditingMessage(null)}
+              />
+
+              {/* Delete Message Modal */}
+              <AnimatePresence>
+                {deletingMessage && (
+                  <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '24px' }}>
+                    <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', width: '100%', maxWidth: '320px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}>
+                      <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 600, color: 'var(--cs-text-main)' }}>Delete message?</h3>
+                      <p style={{ margin: '0 0 24px 0', fontSize: '14px', color: 'var(--cs-text-inactive)' }}>Are you sure you want to delete this message? This action cannot be undone.</p>
+                      <div style={{ display: 'flex', gap: '12px' }}>
+                        <button onClick={() => setDeletingMessage(null)} style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#fff', color: '#64748b', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
+                        <button onClick={confirmDeleteMessage} style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: '#ef4444', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>Delete</button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </AnimatePresence>
             </>
           ) : (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--cs-text-inactive)', fontSize: '14px', fontWeight: 500 }}>
-              Select a conversation to start messaging
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--cs-text-inactive)' }}>
+              <div style={{ 
+                width: '80px', height: '80px', borderRadius: '100px', 
+                background: '#f1f5f9', display: 'flex', alignItems: 'center', 
+                justifyContent: 'center', marginBottom: '16px' 
+              }}>
+                <IconMessageCircle size={40} color="#94a3b8" stroke={1.5} />
+              </div>
+              <div style={{ fontSize: '20px', fontWeight: 600, color: 'var(--cs-text-main)', marginBottom: '8px' }}>
+                Your Messages
+              </div>
+              <div style={{ fontSize: '14px', color: '#64748b' }}>
+                Select a conversation to start chatting.
+              </div>
             </div>
           )}
         </div>
       </div>
+      
+      <AnimatePresence>
+        {showDeleteModal && (
+          <DeleteChatModal 
+            onClose={() => setShowDeleteModal(false)}
+            onConfirm={handleDeleteChat}
+            isDeleting={isDeleting}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

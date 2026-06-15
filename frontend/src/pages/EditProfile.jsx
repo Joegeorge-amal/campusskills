@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useAppData } from '../context/AppDataContext';
 import { IconCheck } from '@tabler/icons-react';
 import { HexColorPicker } from "react-colorful";
+import BlockedUsersModal from '../components/modals/BlockedUsersModal';
 
 const EditProfile = () => {
   const { user, updateProfile } = useAuth();
@@ -44,6 +45,7 @@ const EditProfile = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [isUploadingBanner, setIsUploadingBanner] = useState(false);
+  const [showBlockedModal, setShowBlockedModal] = useState(false);
 
   useEffect(() => {
     const mainContent = document.querySelector('.main');
@@ -481,6 +483,23 @@ const EditProfile = () => {
         </div>
       </div>
 
+      {/* Privacy */}
+      <div style={{ background: 'var(--cs-bg-white)', border: '0.5px solid var(--cs-border)', borderRadius: 'var(--cs-radius-lg)', padding: '24px', marginBottom: '24px' }}>
+        <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--cs-text-main)', marginBottom: '20px' }}>Privacy &amp; Safety</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div>
+            <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--cs-text-main)' }}>Blocked Users</div>
+            <div style={{ fontSize: '12px', color: 'var(--cs-text-inactive)', marginTop: '4px' }}>Manage people you have blocked</div>
+          </div>
+          <button 
+            onClick={() => setShowBlockedModal(true)}
+            style={{ padding: '8px 16px', borderRadius: '100px', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-light)', color: 'var(--cs-text-main)', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
+          >
+            Manage
+          </button>
+        </div>
+      </div>
+
       {/* Save / Cancel */}
       <div style={{ display: 'flex', gap: '16px' }}>
         <button disabled={isSaving} onClick={handleSave} style={{ flex: 1, padding: '14px', borderRadius: '100px', border: 'none', background: isSaving ? '#93c5fd' : 'var(--cs-primary)', color: '#fff', fontSize: '15px', fontWeight: 700, cursor: isSaving ? 'default' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
@@ -490,6 +509,10 @@ const EditProfile = () => {
           Cancel
         </button>
       </div>
+
+      {showBlockedModal && (
+        <BlockedUsersModal onClose={() => setShowBlockedModal(false)} />
+      )}
     </div>
   );
 };

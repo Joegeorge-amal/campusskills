@@ -82,12 +82,23 @@ public class ListingRepository {
         return client.updateCollection(COLLECTION, query, update).mapEmpty();
     }
 
+    public Future<Void> incrementRequestCount(String id) {
+        JsonObject query = new JsonObject().put("_id", id);
+        JsonObject update = new JsonObject().put("$inc", new JsonObject().put("requestCount", 1));
+        return client.updateCollection(COLLECTION, query, update).mapEmpty();
+    }
+
     private JsonObject buildSearchQuery(JsonObject filters) {
         JsonObject query = new JsonObject()
             .put("active", true)
             .put("status", new JsonObject().put("$ne", "ADMIN_DISABLED")); // Base condition
 
         if (filters == null) return query;
+
+        io.vertx.core.json.JsonArray blockedUsers = filters.getJsonArray("blockedUsers");
+        if (blockedUsers != null && !blockedUsers.isEmpty()) {
+            query.put("ownerId", new JsonObject().put("$nin", blockedUsers));
+        }
 
         String ownerId = filters.getString("ownerId");
         if (ownerId != null && !ownerId.isEmpty()) {

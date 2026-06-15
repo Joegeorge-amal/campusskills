@@ -11,5 +11,11 @@ export const userService = {
     } catch (error) {
       throw error;
     }
+  },
+  blockUser: async (targetUserId) => {
+    return api.post('/users/me/block', { targetUserId });
+  },
+  unblockUser: async (targetUserId) => {
+    return api.post('/users/me/unblock', { targetUserId });
   }
 };

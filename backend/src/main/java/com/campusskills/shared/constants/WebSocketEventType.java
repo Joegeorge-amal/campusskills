@@ -3,6 +3,9 @@ package com.campusskills.shared.constants;
 public enum WebSocketEventType {
     NEW_MESSAGE,
     MESSAGE_READ,
+    MESSAGE_DELIVERED,
+    MESSAGE_EDITED,
+    MESSAGE_DELETED,
     TYPING_STARTED,
     TYPING_STOPPED,
     USER_ONLINE,
@@ -10,5 +13,12 @@ public enum WebSocketEventType {
     NOTIFICATION,
     SESSION_UPDATE,
     CHAT_UPDATE,
-    EXCHANGE_UPDATE
+    EXCHANGE_UPDATE,
+    NEW_REQUEST,
+    REQUEST_ACCEPTED,
+    REQUEST_REJECTED,
+    REQUEST_CANCELLED,
+    REQUEST_UPDATED,
+    SESSION_BOOKED,
+    SESSION_COMPLETED
 }

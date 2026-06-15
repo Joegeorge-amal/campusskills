@@ -31,7 +31,7 @@ public class ChatRequestHandler {
         String authId = ctx.get("authenticatedUserId");
 
         service.acceptRequest(id, authId)
-            .onSuccess(v -> ApiResponse.ok(ctx, new io.vertx.core.json.JsonObject().put("message", "Request accepted")))
+            .onSuccess(res -> ApiResponse.ok(ctx, new io.vertx.core.json.JsonObject().put("message", "Request accepted").put("chatId", res.getString("chatId"))))
             .onFailure(err -> {
                 if ("NOT_FOUND".equals(err.getMessage())) ApiResponse.notFound(ctx, "Request not found");
                 else if ("FORBIDDEN".equals(err.getMessage())) ApiResponse.forbidden(ctx, "Not authorized");

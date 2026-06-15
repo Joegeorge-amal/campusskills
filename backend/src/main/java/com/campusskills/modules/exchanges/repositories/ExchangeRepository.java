@@ -57,13 +57,23 @@ public class ExchangeRepository {
     public Future<List<Exchange>> findRequestsForUser(String userId) {
         // user is sender or receiver
         JsonObject query = new JsonObject().put("$or", new io.vertx.core.json.JsonArray()
-            .add(new JsonObject().put("senderId", userId))
             .add(new JsonObject().put("initiatorId", userId))
             .add(new JsonObject().put("receiverId", userId))
         );
         return client.find(COLLECTION, query).map(docs -> 
-            docs.stream().map(doc -> doc.mapTo(Exchange.class)).collect(Collectors.toList())
+            docs.stream().map(d -> d.mapTo(Exchange.class)).collect(Collectors.toList())
         );
+    }
+
+    public Future<Boolean> hasActiveRequestForListing(String initiatorId, String listingId) {
+        JsonObject query = new JsonObject()
+            .put("initiatorId", initiatorId)
+            .put("listingId", listingId)
+            .put("status", new JsonObject().put("$in", new io.vertx.core.json.JsonArray()
+                .add(ExchangeStatus.REQUESTED.name())
+                .add(ExchangeStatus.ACCEPTED.name())
+            ));
+        return client.find(COLLECTION, query).map(list -> !list.isEmpty());
     }
 
     public Future<Exchange> findPendingRequestBetween(String senderId, String receiverId) {

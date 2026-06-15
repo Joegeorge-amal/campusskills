@@ -13,6 +13,7 @@ const RequestsCardV2 = ({
   type = 'incoming',
   onAccept,
   onDecline,
+  onCancel,
   reqDetails = {},
   otherUser = {},
   otherUserStats = {},
@@ -42,30 +43,33 @@ const RequestsCardV2 = ({
   const isLearnListing = otherUserExtras.listingType === 'LEARN' || otherUserExtras.listingType === 'LEARN_SWAP';
   const isSwap = reqDetails.type === 'SWAP';
   
+  const listingOfferedSkill = otherUserExtras.offeredSkillName || fallbackTitle;
+  const listingRequestedSkill = otherUserExtras.requestedSkill || fallbackTitle;
+  const explicitOfferedSkill = reqDetails.offeredSkillName;
+
   let theirOffer = null;
   let myOffer = null;
   const otherName = otherUser.name ? otherUser.name.split(' ')[0] : 'User';
   
-  const fallbackOtherUserSkill = otherUser?.skillsOffered?.[0]?.name || otherUser?.skillsOffered?.[0];
-  const fallbackMyUserSkill = user?.skillsOffered?.[0]?.name || user?.skillsOffered?.[0];
-  
   if (type === 'incoming') {
+    // This is MY listing. They are requesting me.
     if (isSwap) {
-       theirOffer = otherUserExtras.offeredSkillName || otherUserExtras.listingRequestedSkill || fallbackOtherUserSkill;
-       myOffer = actualSkill;
+       theirOffer = explicitOfferedSkill || listingRequestedSkill || 'Unknown Skill';
+       myOffer = listingOfferedSkill || 'Unknown Skill';
     } else if (isLearnListing) {
-       theirOffer = actualSkill;
+       theirOffer = explicitOfferedSkill || listingRequestedSkill || 'Unknown Skill';
     } else {
-       myOffer = actualSkill;
+       myOffer = listingOfferedSkill || 'Unknown Skill';
     }
   } else { // outgoing
+    // This is THEIR listing. I am requesting them.
     if (isSwap) {
-       theirOffer = actualSkill;
-       myOffer = otherUserExtras.offeredSkillName || otherUserExtras.listingRequestedSkill || fallbackMyUserSkill;
+       theirOffer = listingOfferedSkill || 'Unknown Skill';
+       myOffer = explicitOfferedSkill || listingRequestedSkill || 'Unknown Skill';
     } else if (isLearnListing) {
-       myOffer = actualSkill;
+       myOffer = explicitOfferedSkill || listingRequestedSkill || 'Unknown Skill';
     } else {
-       theirOffer = actualSkill;
+       theirOffer = listingOfferedSkill || 'Unknown Skill';
     }
   }
 
@@ -174,7 +178,7 @@ const RequestsCardV2 = ({
 
           {type === 'outgoing' && isPending && (
             <button 
-              onClick={(e) => { e.stopPropagation(); /* handle cancel if needed */ }}
+              onClick={(e) => { e.stopPropagation(); if (onCancel) onCancel(); }}
               style={{ padding: '6px 16px', background: '#ffffff', color: '#b91c1c', border: '1px solid #fecaca', borderRadius: '100px', fontWeight: 700, fontSize: '12px', cursor: 'pointer', transition: 'background 0.2s' }}
               onMouseOver={(e) => { e.currentTarget.style.background = '#fee2e2' }}
               onMouseOut={(e) => { e.currentTarget.style.background = '#ffffff' }}

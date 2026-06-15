@@ -2,7 +2,7 @@ import api from './api';
 
 export const sessionService = {
   getSessions: async (filters = {}) => {
-    return api.get('/sessions', { params: filters });
+    return api.get('/sessions/me', { params: filters });
   },
 
   createSession: async (sessionData) => {

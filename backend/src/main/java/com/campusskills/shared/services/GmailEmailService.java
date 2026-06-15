@@ -431,19 +431,10 @@ public class GmailEmailService implements EmailService {
 
         return mailClient.sendMail(message)
             .onSuccess(result -> {
-                System.out.println("=================================================");
-                System.out.println("[SMTP SUCCESS] Email successfully accepted by Gmail!");
-                System.out.println("Message ID: " + result.getMessageID());
-                System.out.println("Recipients: " + result.getRecipients());
-                System.out.println("=================================================");
+                log.debug("[SMTP SUCCESS] Email successfully accepted by Gmail! Message ID: {}, Recipients: {}", result.getMessageID(), result.getRecipients());
             })
             .onFailure(err -> {
-                System.err.println("=================================================");
-                System.err.println("[SMTP FATAL ERROR] Failed to send email!");
-                System.err.println("Error details: " + err.getMessage());
-                System.err.println("Please check your SMTP_USERNAME and App Password!");
-                System.err.println("=================================================");
-                err.printStackTrace();
+                log.error("[SMTP FATAL ERROR] Failed to send email! Please check your SMTP_USERNAME and App Password!", err);
             })
             .mapEmpty();
     }

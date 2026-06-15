@@ -6,9 +6,12 @@ import com.cloudinary.utils.ObjectUtils;
 import java.util.HashMap;
 import java.util.Map;
 import com.campusskills.core.config.Env;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CloudinaryService {
 
+    private static final Logger log = LoggerFactory.getLogger(CloudinaryService.class);
     private final Cloudinary cloudinary;
 
     public CloudinaryService() {
@@ -17,7 +20,7 @@ public class CloudinaryService {
         String apiSecret = Env.get("CLOUDINARY_API_SECRET");
 
         if (cloudName == null || apiKey == null || apiSecret == null) {
-            System.err.println("WARNING: Cloudinary environment variables are missing.");
+            log.warn("Cloudinary environment variables are missing.");
         }
 
         this.cloudinary = new Cloudinary(ObjectUtils.asMap(
@@ -52,7 +55,7 @@ public class CloudinaryService {
 
             return response;
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to generate Cloudinary upload signature", e);
             return null;
         }
     }

@@ -59,4 +59,46 @@ public class JwtAuthMiddleware {
                 });
         };
     }
+
+    public static io.vertx.core.Handler<RoutingContext> createOptional(JWTAuth jwtAuth) {
+        UserRepository userRepository = new UserRepository();
+        return ctx -> {
+            String authHeader = ctx.request().getHeader("Authorization");
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                ctx.next();
+                return;
+            }
+
+            String token = authHeader.substring(7);
+            
+            jwtAuth.authenticate(new JsonObject().put("token", token))
+                .onSuccess(user -> {
+                    JsonObject principal = user.principal();
+                    String userId = principal.getString("userId");
+                    String role = principal.getString("role");
+                    
+                    if (userId == null) {
+                        ctx.next();
+                        return;
+                    }
+                    
+                    userRepository.findById(userId)
+                        .onSuccess(foundUser -> {
+                            if (foundUser != null) {
+                                ctx.put("authenticatedUserId", userId);
+                                if (role != null) {
+                                    ctx.put("authenticatedUserRole", role);
+                                }
+                                if (principal.containsKey("twoFactorVerified")) {
+                                    ctx.put("twoFactorVerified", principal.getBoolean("twoFactorVerified"));
+                                }
+                                ctx.put("user", foundUser);
+                            }
+                            ctx.next();
+                        })
+                        .onFailure(err -> ctx.next());
+                })
+                .onFailure(err -> ctx.next());
+        };
+    }
 }

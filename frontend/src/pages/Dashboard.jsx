@@ -17,9 +17,9 @@ const Dashboard = () => {
   const [isCreateSessionOpen, setIsCreateSessionOpen] = React.useState(false);
   const { user } = useAuth();
   const { 
-    bookedSessions, 
-    conversations, 
-    requests,
+    bookedSessions = [], 
+    conversations = [], 
+    requests = [],
     acceptRequest,
     declineRequest
   } = useAppData();
@@ -191,7 +191,7 @@ const Dashboard = () => {
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', overflowY: 'auto' }}>
               {recentChats.map((chat, idx) => (
-                <div key={chat.id} onClick={() => navigate(`/app/messages?chatId=${chat.id}`)} style={{ border: '1px solid #f3f4f6', borderRadius: '10px', padding: '12px', display: 'flex', alignItems: 'center', gap: '12px', background: '#ffffff', cursor: 'pointer' }}>
+                <div key={chat.id} onClick={() => navigate(`/app/messages/${chat.id}`)} style={{ border: '1px solid #f3f4f6', borderRadius: '10px', padding: '12px', display: 'flex', alignItems: 'center', gap: '12px', background: '#ffffff', cursor: 'pointer' }}>
                   <div style={{ position: 'relative' }}>
                     <Avatar initials={chat.init || 'U'} bg={chat.bg || '#e0e7ff'} color={chat.col || '#1e40af'} size="38px" fontSize="13px" />
                     {idx === 0 && (

@@ -9,9 +9,12 @@ import io.vertx.ext.web.RoutingContext;
 
 import java.util.Arrays;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ListingHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(ListingHandler.class);
     private final ListingService listingService;
     private static final List<String> VALID_DAYS = Arrays.asList("MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY");
 
@@ -123,7 +126,7 @@ public class ListingHandler {
                 .onFailure(err -> ApiResponse.sendError(ctx, 400, err.getMessage())); // Service layer handles deep schema validation
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Invalid request payload during listing creation", e);
             ApiResponse.sendError(ctx, 400, "Invalid request payload");
         }
     }
@@ -144,6 +147,10 @@ public class ListingHandler {
         } catch (NumberFormatException ignored) {}
 
         JsonObject filters = new JsonObject();
+        String authenticatedUserId = ctx.get("authenticatedUserId");
+        if (authenticatedUserId != null) {
+            filters.put("requesterId", authenticatedUserId);
+        }
         if (q != null && !q.trim().isEmpty()) filters.put("q", q.trim());
         if (topics != null && !topics.isEmpty()) filters.put("topics", new io.vertx.core.json.JsonArray(topics));
         if (paymentTypes != null && !paymentTypes.isEmpty()) filters.put("payment_types", new io.vertx.core.json.JsonArray(paymentTypes));
@@ -156,7 +163,7 @@ public class ListingHandler {
                 ApiResponse.ok(ctx, result);
             })
             .onFailure(err -> {
-                err.printStackTrace();
+                log.error("Failed to retrieve listings", err);
                 ApiResponse.internalError(ctx, "Failed to retrieve listings");
             });
     }
@@ -174,7 +181,7 @@ public class ListingHandler {
                 if ("NOT_FOUND".equals(err.getMessage())) {
                     ApiResponse.notFound(ctx, "Listing not found");
                 } else {
-                    err.printStackTrace();
+                    log.error("Failed to retrieve listing by ID", err);
                     ApiResponse.internalError(ctx, "Failed to retrieve listing");
                 }
             });

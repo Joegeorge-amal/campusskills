@@ -33,21 +33,30 @@ public class ChatRepository {
         return client.save(COLLECTION, document);
     }
 
-    public Future<List<Chat>> fetchUserChats(String userId, String statusFilter, List<String> matchingUserIds, int skip, int limit) {
+    public Future<List<Chat>> fetchUserChats(String userId, String statusFilter, List<String> matchingUserIds, java.util.Set<String> blockedUsers, int skip, int limit) {
         JsonObject query = new JsonObject().put("participants", userId);
         if (statusFilter != null && !statusFilter.isEmpty()) {
             query.put("status", statusFilter);
         }
+        
+        JsonArray andConditions = new JsonArray();
+        
         if (matchingUserIds != null && !matchingUserIds.isEmpty()) {
-            query.put("participants", new JsonObject().put("$in", matchingUserIds));
-            // Since we need to match BOTH userId AND the matchingUserIds, we must use $and because 'participants' is used twice
-            query = new JsonObject().put("$and", new JsonArray()
-                .add(new JsonObject().put("participants", userId))
-                .add(new JsonObject().put("participants", new JsonObject().put("$in", matchingUserIds)))
-            );
+            andConditions.add(new JsonObject().put("participants", new JsonObject().put("$in", matchingUserIds)));
+        }
+        
+        if (blockedUsers != null && !blockedUsers.isEmpty()) {
+            andConditions.add(new JsonObject().put("participants", new JsonObject().put("$nin", new JsonArray(new java.util.ArrayList<>(blockedUsers)))));
+        }
+        
+        if (!andConditions.isEmpty()) {
+            andConditions.add(new JsonObject().put("participants", userId));
             if (statusFilter != null && !statusFilter.isEmpty()) {
-                query.getJsonArray("$and").add(new JsonObject().put("status", statusFilter));
+                andConditions.add(new JsonObject().put("status", statusFilter));
+                query.remove("status"); // prevent duplicating condition
             }
+            query.remove("participants");
+            query.put("$and", andConditions);
         }
         
         io.vertx.ext.mongo.FindOptions options = new io.vertx.ext.mongo.FindOptions()
@@ -61,19 +70,30 @@ public class ChatRepository {
                         .collect(Collectors.toList()));
     }
 
-    public Future<Long> countUserChats(String userId, String statusFilter, List<String> matchingUserIds) {
+    public Future<Long> countUserChats(String userId, String statusFilter, List<String> matchingUserIds, java.util.Set<String> blockedUsers) {
         JsonObject query = new JsonObject().put("participants", userId);
         if (statusFilter != null && !statusFilter.isEmpty()) {
             query.put("status", statusFilter);
         }
+        
+        JsonArray andConditions = new JsonArray();
+        
         if (matchingUserIds != null && !matchingUserIds.isEmpty()) {
-            query = new JsonObject().put("$and", new JsonArray()
-                .add(new JsonObject().put("participants", userId))
-                .add(new JsonObject().put("participants", new JsonObject().put("$in", matchingUserIds)))
-            );
+            andConditions.add(new JsonObject().put("participants", new JsonObject().put("$in", matchingUserIds)));
+        }
+        
+        if (blockedUsers != null && !blockedUsers.isEmpty()) {
+            andConditions.add(new JsonObject().put("participants", new JsonObject().put("$nin", new JsonArray(new java.util.ArrayList<>(blockedUsers)))));
+        }
+        
+        if (!andConditions.isEmpty()) {
+            andConditions.add(new JsonObject().put("participants", userId));
             if (statusFilter != null && !statusFilter.isEmpty()) {
-                query.getJsonArray("$and").add(new JsonObject().put("status", statusFilter));
+                andConditions.add(new JsonObject().put("status", statusFilter));
+                query.remove("status");
             }
+            query.remove("participants");
+            query.put("$and", andConditions);
         }
         return client.count(COLLECTION, query);
     }
@@ -104,8 +124,7 @@ public class ChatRepository {
 
     public Future<Boolean> updateChatStatus(String chatId, String chatStatus) {
         JsonObject query = new JsonObject().put("_id", chatId);
-        JsonObject update = new JsonObject()
-            .put("$set", new JsonObject()
+        JsonObject update = new JsonObject().put("$set", new JsonObject()
                 .put("status", chatStatus)
                 .put("updatedAt", System.currentTimeMillis()));
 
@@ -117,5 +136,11 @@ public class ChatRepository {
         JsonObject query = new JsonObject().put("_id", chatId);
         return client.findOne(COLLECTION, query, null)
                 .map(doc -> doc == null ? null : doc.mapTo(Chat.class));
+    }
+
+    public Future<Boolean> deleteChat(String chatId) {
+        JsonObject query = new JsonObject().put("_id", chatId);
+        return client.removeDocument(COLLECTION, query)
+                .map(res -> res.getRemovedCount() > 0);
     }
 }

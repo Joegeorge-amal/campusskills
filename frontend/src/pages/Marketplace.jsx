@@ -4,10 +4,12 @@ import Avatar from '../components/common/Avatar';
 import MarketplaceCard from '../components/common/MarketplaceCard/MarketplaceCard';
 import CategoryFilterTabs from '../components/common/CategoryFilterTabs/CategoryFilterTabs';
 import BookSessionModal from '../components/modals/BookSessionModal';
+import InitialMessageModal from '../components/modals/InitialMessageModal';
 import { IconStar, IconUser, IconMessageCircle, IconRefresh } from '@tabler/icons-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { listingService } from '../services/listingService';
 import { exchangeService } from '../services/exchangeService';
+import { chatRequestService } from '../services/chatRequestService';
 import { useAppData } from '../context/AppDataContext';
 import { useAuth } from '../context/AuthContext';
 
@@ -25,6 +27,7 @@ const Marketplace = () => {
   const [filter, setFilter] = useState('All');
   const [selectedSkill, setSelectedSkill] = useState(null);
   const [isBookModalOpen, setIsBookModalOpen] = useState(false);
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Handle Escape key to close details
@@ -60,6 +63,7 @@ const Marketplace = () => {
       if (!isBackground) {
         setSkills(fetchedSkills);
         cachedListings = fetchedSkills;
+        setPendingSkills([]);
       } else {
         // Background check for new listings
         if (fetchedSkills.length > 0) {
@@ -78,13 +82,8 @@ const Marketplace = () => {
   };
 
   useEffect(() => {
-    fetchListings(false);
-
-    const intervalId = setInterval(() => {
-      fetchListings(true);
-    }, 10000);
-
-    return () => clearInterval(intervalId);
+    const hasCache = !!cachedListings;
+    fetchListings(hasCache);
   }, []);
 
   const handleShowNewListings = () => {
@@ -99,8 +98,19 @@ const Marketplace = () => {
     ? skills 
     : skills.filter(s => s.category === filter);
 
-  const featuredSkills = filter === 'All' ? filteredSkills.slice(0, 3) : filteredSkills.slice(0, 3);
-  const regularSkills = filter === 'All' ? filteredSkills.slice(3) : filteredSkills;
+  const featuredSkills = filter === 'All' 
+    ? [...skills]
+        .filter(s => (s.requestCount || 0) > 0)
+        .sort((a, b) => {
+          if ((b.requestCount || 0) !== (a.requestCount || 0)) {
+            return (b.requestCount || 0) - (a.requestCount || 0);
+          }
+          return (b.createdAt || 0) - (a.createdAt || 0);
+        })
+        .slice(0, 3)
+    : [];
+
+  const regularSkills = filteredSkills;
 
   const renderSkillCard = (skill, i) => (
     <motion.div layout initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} transition={{ type: 'spring', bounce: 0, duration: 0.4, delay: selectedSkill ? 0 : 0.05 * Math.min(i, 10) }} key={skill._id || skill.id}>
@@ -192,19 +202,25 @@ const Marketplace = () => {
                 )}
               </AnimatePresence>
 
-              {!selectedSkill && filter === 'All' && featuredSkills.length > 0 && (
+              {!selectedSkill && filter === 'All' && (
                 <div style={{ marginBottom: '24px' }}>
                   <div style={{ fontSize: '18px', fontWeight: 800, color: '#111827', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Most Requested
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
-                    {featuredSkills.map((skill, i) => renderSkillCard(skill, i))}
-                  </div>
+                  {featuredSkills.length > 0 ? (
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
+                      {featuredSkills.map((skill, i) => renderSkillCard(skill, i))}
+                    </div>
+                  ) : (
+                    <div style={{ fontSize: '15px', color: 'var(--cs-text-inactive)', padding: '24px 0', textAlign: 'center', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
+                      No listings have been requested yet.
+                    </div>
+                  )}
                   <div style={{ height: '1px', background: '#e5e7eb', marginTop: '32px' }} />
                 </div>
               )}
               
-              {!selectedSkill && filter === 'All' && regularSkills.length > 0 && featuredSkills.length > 0 && (
+              {!selectedSkill && filter === 'All' && regularSkills.length > 0 && (
                 <div style={{ fontSize: '18px', fontWeight: 800, color: '#111827', marginBottom: '16px' }}>
                   All Listings
                 </div>
@@ -432,7 +448,7 @@ const Marketplace = () => {
 
                 <button 
                   style={{ flex: 1, padding: '12px 20px', borderRadius: '100px', border: '1px solid #e5e7eb', background: '#ffffff', color: '#374151', fontSize: '14px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                  onClick={() => window.alert('Chat coming soon')}
+                  onClick={() => setIsMessageModalOpen(true)}
                   onMouseOver={(e) => { e.currentTarget.style.background = '#f9fafb'; e.currentTarget.style.borderColor = '#d1d5db'; }}
                   onMouseOut={(e) => { e.currentTarget.style.background = '#ffffff'; e.currentTarget.style.borderColor = '#e5e7eb'; }}
                 >
@@ -519,6 +535,37 @@ const Marketplace = () => {
             } catch (err) {
               console.error(err);
               triggerToast('Failed to send session request');
+            }
+          }}
+        />
+      )}
+
+      {/* Initial Message Modal Overlay */}
+      {isMessageModalOpen && selectedSkill && (
+        <InitialMessageModal 
+          selectedTutor={selectedSkill.owner?.name || 'Unknown User'}
+          onClose={() => setIsMessageModalOpen(false)}
+          onSend={async (messageText) => {
+            try {
+              await chatRequestService.createRequest({
+                receiverId: selectedSkill.owner?.userId || selectedSkill.ownerId,
+                message: messageText
+              });
+              triggerToast('Message request sent successfully!');
+            } catch (err) {
+              const serverError = err.response?.data?.error || err.message || '';
+              if (serverError.includes('FORBIDDEN')) {
+                triggerToast('Cannot send message request to this user.');
+              } else if (serverError.includes('already pending')) {
+                 triggerToast('A message request already exists.');
+              } else if (serverError.includes('already have an active chat')) {
+                 triggerToast('You already have an active chat with this user.');
+              } else if (serverError.includes('Invalid receiverId')) {
+                 triggerToast('You cannot send a request to yourself.');
+              } else {
+                triggerToast(serverError || 'Failed to send message request');
+              }
+              throw err;
             }
           }}
         />

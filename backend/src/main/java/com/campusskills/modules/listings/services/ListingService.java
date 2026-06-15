@@ -4,9 +4,12 @@ import com.campusskills.modules.listings.models.Listing;
 import com.campusskills.modules.listings.repositories.ListingRepository;
 import com.campusskills.modules.users.repositories.UserStatsRepository;
 import io.vertx.core.Future;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ListingService {
     
+    private static final Logger log = LoggerFactory.getLogger(ListingService.class);
     private final ListingRepository listingRepository;
     private final UserStatsRepository statsRepository;
 
@@ -40,10 +43,10 @@ public class ListingService {
         }
         
         return listingRepository.create(listing).onSuccess(listingId -> {
-            System.out.println("[LISTING] Created listing | listingId=" + listingId + " ownerId=" + listing.getOwnerId());
+            log.info("[LISTING] Created listing | listingId={} ownerId={}", listingId, listing.getOwnerId());
             if (statsRepository != null) {
                 statsRepository.recordActivity(listing.getOwnerId())
-                    .onFailure(err -> System.out.println("[LISTING] Failed to record activity: " + err.getMessage()));
+                    .onFailure(err -> log.error("[LISTING] Failed to record activity", err));
             }
         });
     }
@@ -56,7 +59,6 @@ public class ListingService {
             if (Boolean.FALSE.equals(listing.getActive())) {
                 return Future.failedFuture("NOT_FOUND"); // Treat inactive as not found publicly
             }
-            System.out.println("[LISTING] Retrieved listing | listingId=" + id);
             return Future.succeededFuture(listing);
         });
     }
@@ -92,7 +94,7 @@ public class ListingService {
             }
 
             return listingRepository.update(updates).onSuccess(v -> {
-                System.out.println("[LISTING] Updated listing | listingId=" + id + " ownerId=" + ownerId);
+                log.info("[LISTING] Updated listing | listingId={} ownerId={}", id, ownerId);
             });
         });
     }
@@ -103,29 +105,50 @@ public class ListingService {
                 return Future.failedFuture("UNAUTHORIZED");
             }
             return listingRepository.deactivate(id).onSuccess(v -> {
-                System.out.println("[LISTING] Deleted/Deactivated listing | listingId=" + id + " ownerId=" + ownerId);
+                log.info("[LISTING] Deleted/Deactivated listing | listingId={} ownerId={}", id, ownerId);
             });
         });
     }
 
     public Future<io.vertx.core.json.JsonObject> searchListings(io.vertx.core.json.JsonObject filters, int page, int limit) {
-        return listingRepository.countSearch(filters).compose(total -> {
-            return listingRepository.search(filters, page, limit).map(listings -> {
-                int totalPages = (int) Math.ceil((double) total / limit);
-                
-                io.vertx.core.json.JsonArray data = new io.vertx.core.json.JsonArray();
-                for (Listing l : listings) {
-                    data.add(io.vertx.core.json.JsonObject.mapFrom(l));
+        String requesterId = filters.getString("requesterId");
+        
+        Future<java.util.Set<String>> blockedUsersFuture;
+        if (requesterId != null) {
+            com.campusskills.modules.users.repositories.UserProfileRepository userProfileRepository = new com.campusskills.modules.users.repositories.UserProfileRepository();
+            blockedUsersFuture = userProfileRepository.findByUserId(requesterId).map(profile -> {
+                if (profile != null) {
+                    return profile.getBlockedUsers();
                 }
-                
-                return new io.vertx.core.json.JsonObject()
-                    .put("data", data)
-                    .put("pagination", new io.vertx.core.json.JsonObject()
-                        .put("total", total)
-                        .put("page", page)
-                        .put("limit", limit)
-                        .put("totalPages", totalPages)
-                    );
+                return java.util.Collections.emptySet();
+            });
+        } else {
+            blockedUsersFuture = Future.succeededFuture(java.util.Collections.emptySet());
+        }
+
+        return blockedUsersFuture.compose(blockedUsers -> {
+            if (blockedUsers != null && !blockedUsers.isEmpty()) {
+                filters.put("blockedUsers", new io.vertx.core.json.JsonArray(new java.util.ArrayList<>(blockedUsers)));
+            }
+
+            return listingRepository.countSearch(filters).compose(total -> {
+                return listingRepository.search(filters, page, limit).map(listings -> {
+                    int totalPages = (int) Math.ceil((double) total / limit);
+                    
+                    io.vertx.core.json.JsonArray data = new io.vertx.core.json.JsonArray();
+                    for (Listing l : listings) {
+                        data.add(io.vertx.core.json.JsonObject.mapFrom(l));
+                    }
+                    
+                    return new io.vertx.core.json.JsonObject()
+                        .put("data", data)
+                        .put("pagination", new io.vertx.core.json.JsonObject()
+                            .put("total", total)
+                            .put("page", page)
+                            .put("limit", limit)
+                            .put("totalPages", totalPages)
+                        );
+                });
             });
         });
     }

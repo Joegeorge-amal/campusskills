@@ -17,8 +17,10 @@ public class MessageRouter {
         MessageHandler handler = new MessageHandler(service);
 
         router.post("/").handler(handler::createMessage);
-        router.get("/:chatId").handler(handler::getChatMessages);
-        router.patch("/:messageId/read").handler(handler::markAsRead);
+        router.get("/chat/:chatId").handler(handler::getChatMessages);
+        router.patch("/chat/:chatId/read").handler(handler::markChatAsRead);
+        router.patch("/:messageId/edit").handler(handler::editMessage);
+        router.delete("/:messageId").handler(handler::deleteMessage);
 
         // Internal EventBus Consumer for system messages
         vertx.eventBus().<io.vertx.core.json.JsonObject>consumer("internal.message.create", msg -> {
@@ -38,6 +40,15 @@ public class MessageRouter {
             String typeStr = data.getString("type");
             io.vertx.core.json.JsonObject payload = data.getJsonObject("payload");
             typingService.handleTypingEvent(typeStr, payload);
+        });
+
+        vertx.eventBus().<io.vertx.core.json.JsonObject>consumer("internal.message.delivered", msg -> {
+            io.vertx.core.json.JsonObject payload = msg.body().getJsonObject("payload");
+            String messageId = payload.getString("messageId");
+            String deliveredTo = payload.getString("deliveredTo");
+            if (messageId != null && deliveredTo != null) {
+                service.markAsDelivered(messageId, deliveredTo);
+            }
         });
 
         return router;

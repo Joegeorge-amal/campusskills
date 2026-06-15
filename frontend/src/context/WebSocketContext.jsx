@@ -16,14 +16,21 @@ export const WebSocketProvider = ({ children }) => {
 
   const handleStatusChange = useCallback((newStatus) => {
     setStatus(newStatus);
+    if (newStatus === 'disconnected') {
+      // Trigger a silent API call to force Axios interceptor to refresh token if expired
+      import('../services/userService').then(({ userService }) => {
+        userService.getMe().catch(() => {
+          // Ignore errors, this is just to trigger the token refresh
+        });
+      });
+    }
   }, []);
 
   useEffect(() => {
     if (isAuthenticated) {
-      const token = localStorage.getItem(APP_CONFIG.TOKEN_KEY) || localStorage.getItem('cs_token');
-      if (token) {
-        socketService.connect(token, handleMessage, handleStatusChange);
-      }
+      const getToken = () => localStorage.getItem(APP_CONFIG.TOKEN_KEY) || localStorage.getItem('cs_token');
+      socketService.connect(getToken, handleMessage, handleStatusChange);
+
     } else {
       socketService.disconnect();
     }

@@ -17,7 +17,7 @@ public class UserCleanupJob {
         long intervalMs = 30 * 60 * 1000;
         
         vertx.setPeriodic(intervalMs, id -> {
-            log.info("Running UserCleanupJob...");
+            log.debug("Running UserCleanupJob...");
             MongoClient client = MongoManager.getClient();
             
             // Get all active user IDs
@@ -34,14 +34,14 @@ public class UserCleanupJob {
                     // Cleanup user_profiles
                     client.removeDocuments("user_profiles", userIdQuery, r -> {
                         if (r.succeeded() && r.result().getRemovedCount() > 0) {
-                            log.info("Cleaned up {} orphaned user_profiles", r.result().getRemovedCount());
+                            log.debug("Cleaned up {} orphaned user_profiles", r.result().getRemovedCount());
                         }
                     });
                     
                     // Cleanup user_stats
                     client.removeDocuments("user_stats", userIdQuery, r -> {
                         if (r.succeeded() && r.result().getRemovedCount() > 0) {
-                            log.info("Cleaned up {} orphaned user_stats", r.result().getRemovedCount());
+                            log.debug("Cleaned up {} orphaned user_stats", r.result().getRemovedCount());
                         }
                     });
                     

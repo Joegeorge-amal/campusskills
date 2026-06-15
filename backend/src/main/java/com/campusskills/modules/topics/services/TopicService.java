@@ -8,9 +8,13 @@ import io.vertx.core.Future;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import io.vertx.core.json.JsonArray;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TopicService {
 
+    private static final Logger log = LoggerFactory.getLogger(TopicService.class);
     private final TopicRepository topicRepository;
 
     public TopicService(TopicRepository topicRepository) {
@@ -40,7 +44,7 @@ public class TopicService {
                         .anyMatch(t -> t.getName().equalsIgnoreCase(data.name));
                 
                 if (!exists) {
-                    System.out.println("Adding missing topic: " + data.name);
+                    log.info("Adding missing topic: {}", data.name);
                     Topic topic = new Topic();
                     topic.setName(data.name);
                     
@@ -61,7 +65,7 @@ public class TopicService {
             }
 
             if (futures.isEmpty()) {
-                System.out.println("Topics already up to date. Found " + existingTopics.size() + " topics.");
+                log.debug("Topics already up to date. Found {} topics.", existingTopics.size());
                 return Future.succeededFuture();
             }
 

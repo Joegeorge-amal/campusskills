@@ -8,8 +8,11 @@ import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.json.JsonObject;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NotificationService {
+    private static final Logger log = LoggerFactory.getLogger(NotificationService.class);
     private final NotificationRepository repository;
     private final EventBus eventBus;
 
@@ -25,7 +28,7 @@ public class NotificationService {
                 String senderName = payload.getString("senderName"); // Optional, for aggregation
                 handleNotificationCreation(notification, senderName);
             } catch (Exception e) {
-                System.err.println("[NotificationService] Failed to process notification: " + e.getMessage());
+                log.error("[NotificationService] Failed to process notification", e);
             }
         });
     }
@@ -67,7 +70,7 @@ public class NotificationService {
                     });
                 }
             }).onFailure(err -> {
-                System.err.println("[NotificationService] Failed to find unread chat notification: " + err.getMessage());
+                log.warn("[NotificationService] Failed to find unread chat notification", err);
                 repository.create(notification).onSuccess(id -> {
                     NotificationBroadcaster.broadcastNewNotification(notification);
                 });

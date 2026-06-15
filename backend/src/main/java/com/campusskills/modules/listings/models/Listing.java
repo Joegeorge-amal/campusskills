@@ -53,8 +53,11 @@ public class Listing {
     private Long createdAt;
     private Long updatedAt;
 
+    private Integer requestCount; // NEW: tracks total requests received
+
     public Listing() {
         this.status = "ACTIVE";
+        this.requestCount = 0;
     }
 
     // --- Synchronization methods for dual-write ---
@@ -166,4 +169,7 @@ public class Listing {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public Integer getRequestCount() { return requestCount; }
+    public void setRequestCount(Integer requestCount) { this.requestCount = requestCount; }
 }

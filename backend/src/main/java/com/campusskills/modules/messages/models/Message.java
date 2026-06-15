@@ -15,10 +15,17 @@ public class Message {
     private String senderId;
     private String message;
     private Boolean isRead;
+    private Boolean isDelivered;
     private Long readAt;
+    private Long deliveredAt;
     private Long createdAt;
     private MessageType type;
     private String sessionId;
+    private String replyToMessageId;
+    private Boolean isDeleted;
+    private Long editedAt;
+    private Long deletedAt;
+    private String tempId;
 
     public Message() {}
 
@@ -62,6 +69,22 @@ public class Message {
         isRead = read;
     }
 
+    public Boolean getIsDelivered() {
+        return isDelivered;
+    }
+
+    public void setIsDelivered(Boolean delivered) {
+        isDelivered = delivered;
+    }
+
+    public Long getDeliveredAt() {
+        return deliveredAt;
+    }
+
+    public void setDeliveredAt(Long deliveredAt) {
+        this.deliveredAt = deliveredAt;
+    }
+
     public Long getReadAt() {
         return readAt;
     }
@@ -92,5 +115,45 @@ public class Message {
 
     public void setSessionId(String sessionId) {
         this.sessionId = sessionId;
+    }
+
+    public String getReplyToMessageId() {
+        return replyToMessageId;
+    }
+
+    public void setReplyToMessageId(String replyToMessageId) {
+        this.replyToMessageId = replyToMessageId;
+    }
+
+    public Boolean getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Boolean deleted) {
+        isDeleted = deleted;
+    }
+
+    public Long getEditedAt() {
+        return editedAt;
+    }
+
+    public void setEditedAt(Long editedAt) {
+        this.editedAt = editedAt;
+    }
+
+    public Long getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(Long deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public String getTempId() {
+        return tempId;
+    }
+
+    public void setTempId(String tempId) {
+        this.tempId = tempId;
     }
 }

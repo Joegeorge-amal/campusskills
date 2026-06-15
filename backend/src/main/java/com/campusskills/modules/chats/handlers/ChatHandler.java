@@ -70,4 +70,30 @@ public class ChatHandler {
             .onSuccess(result -> ApiResponse.paginatedOk(ctx, result.getJsonArray("items"), result.getInteger("page"), result.getInteger("limit"), result.getLong("total")))
             .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
     }
+
+    public void deleteChat(RoutingContext ctx) {
+        String authId = ctx.get("authenticatedUserId");
+        if (authId == null) {
+            ApiResponse.forbidden(ctx, "Unauthorized");
+            return;
+        }
+
+        String chatId = ctx.pathParam("id");
+        if (chatId == null || chatId.isEmpty()) {
+            ApiResponse.badRequest(ctx, "Chat ID is required");
+            return;
+        }
+
+        chatService.deleteChat(chatId, authId)
+            .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("message", "Chat deleted successfully")))
+            .onFailure(err -> {
+                if ("CHAT_NOT_FOUND".equals(err.getMessage())) {
+                    ApiResponse.notFound(ctx, "Chat not found");
+                } else if ("UNAUTHORIZED".equals(err.getMessage())) {
+                    ApiResponse.forbidden(ctx, "Not a participant");
+                } else {
+                    ApiResponse.internalError(ctx, err.getMessage());
+                }
+            });
+    }
 }

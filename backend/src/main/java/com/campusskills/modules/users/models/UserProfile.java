@@ -5,12 +5,15 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.campusskills.shared.models.SkillProfile;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserProfile {
     @JsonProperty("_id")
     private String id;
     private String userId;
+    @JsonAlias("displayName")
     private String name;
     @JsonProperty("programme")
     private String programme;
@@ -31,8 +34,10 @@ public class UserProfile {
     private String exchangePreference;
     private Boolean profileCompleted;
     private Boolean heatmapVisibility = true;
+    private String institutionId;
     private Long createdAt;
     private Long updatedAt;
+    private Set<String> blockedUsers = new HashSet<>();
 
     public UserProfile() {}
 
@@ -98,4 +103,15 @@ public class UserProfile {
 
     public String getExchangePreference() { return exchangePreference; }
     public void setExchangePreference(String exchangePreference) { this.exchangePreference = exchangePreference; }
+
+    public Set<String> getBlockedUsers() {
+        if (blockedUsers == null) {
+            blockedUsers = new HashSet<>();
+        }
+        return blockedUsers;
+    }
+
+    public void setBlockedUsers(Set<String> blockedUsers) {
+        this.blockedUsers = blockedUsers;
+    }
 }

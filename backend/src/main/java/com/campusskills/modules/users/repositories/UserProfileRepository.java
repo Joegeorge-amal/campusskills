@@ -53,4 +53,20 @@ public class UserProfileRepository {
             .put("$set", new JsonObject().put("updatedAt", System.currentTimeMillis()));
         return client.updateCollection(COLLECTION, query, updateDoc).map(res -> res.getDocModified() > 0);
     }
+
+    public Future<Boolean> blockUser(String userId, String targetUserId) {
+        JsonObject query = new JsonObject().put("userId", userId);
+        JsonObject updateDoc = new JsonObject()
+            .put("$addToSet", new JsonObject().put("blockedUsers", targetUserId))
+            .put("$set", new JsonObject().put("updatedAt", System.currentTimeMillis()));
+        return client.updateCollection(COLLECTION, query, updateDoc).map(res -> res.getDocModified() > 0);
+    }
+
+    public Future<Boolean> unblockUser(String userId, String targetUserId) {
+        JsonObject query = new JsonObject().put("userId", userId);
+        JsonObject updateDoc = new JsonObject()
+            .put("$pull", new JsonObject().put("blockedUsers", targetUserId))
+            .put("$set", new JsonObject().put("updatedAt", System.currentTimeMillis()));
+        return client.updateCollection(COLLECTION, query, updateDoc).map(res -> res.getDocModified() > 0);
+    }
 }

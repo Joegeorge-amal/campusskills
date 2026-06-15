@@ -37,7 +37,7 @@ public class MessageRepository {
         JsonObject query = new JsonObject().put("chatId", chatId);
         
         FindOptions options = new FindOptions()
-                .setSort(new JsonObject().put("createdAt", 1))
+                .setSort(new JsonObject().put("createdAt", -1))
                 .setLimit(limit)
                 .setSkip(skip);
                 
@@ -83,11 +83,56 @@ public class MessageRepository {
                 .map(res -> res.getDocModified() > 0);
     }
 
+    public Future<Boolean> markMessageAsDelivered(String messageId, Long deliveredAt) {
+        JsonObject query = new JsonObject().put("_id", messageId);
+        JsonObject update = new JsonObject().put("$set", new JsonObject()
+                .put("isDelivered", true)
+                .put("deliveredAt", deliveredAt));
+        return client.updateCollection(COLLECTION, query, update).map(res -> res.getDocModified() > 0);
+    }
+
+    public Future<Boolean> editMessage(String messageId, String newContent, Long editedAt) {
+        JsonObject query = new JsonObject().put("_id", messageId);
+        JsonObject update = new JsonObject().put("$set", new JsonObject()
+                .put("message", newContent)
+                .put("editedAt", editedAt));
+        return client.updateCollection(COLLECTION, query, update).map(res -> res.getDocModified() > 0);
+    }
+
+    public Future<Boolean> softDeleteMessage(String messageId, Long deletedAt) {
+        JsonObject query = new JsonObject().put("_id", messageId);
+        JsonObject update = new JsonObject().put("$set", new JsonObject()
+                .put("message", "This message was deleted.")
+                .put("isDeleted", true)
+                .put("deletedAt", deletedAt));
+        return client.updateCollection(COLLECTION, query, update).map(res -> res.getDocModified() > 0);
+    }
+
+    public Future<Boolean> markChatMessagesAsRead(String chatId, String userId, Long readAt) {
+        JsonObject query = new JsonObject()
+                .put("chatId", chatId)
+                .put("senderId", new JsonObject().put("$ne", userId))
+                .put("isRead", false);
+        JsonObject update = new JsonObject().put("$set", new JsonObject()
+                .put("isRead", true)
+                .put("readAt", readAt));
+        
+        io.vertx.ext.mongo.UpdateOptions options = new io.vertx.ext.mongo.UpdateOptions().setMulti(true);
+        return client.updateCollectionWithOptions(COLLECTION, query, update, options)
+                .map(res -> true);
+    }
+
     public Future<Long> countUnreadMessagesForUser(String chatId, String userId) {
         JsonObject query = new JsonObject()
                 .put("chatId", chatId)
                 .put("senderId", new JsonObject().put("$ne", userId))
                 .put("isRead", false);
         return client.count(COLLECTION, query);
+    }
+
+    public Future<Boolean> deleteMessagesByChatId(String chatId) {
+        JsonObject query = new JsonObject().put("chatId", chatId);
+        return client.removeDocuments(COLLECTION, query)
+                .map(res -> true); // Even if 0 messages, it's successful
     }
 }

@@ -5,8 +5,11 @@ import com.campusskills.modules.messages.repositories.MessageRepository;
 import io.vertx.core.Future;
 
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MessageService {
+    private static final Logger log = LoggerFactory.getLogger(MessageService.class);
     private final MessageRepository repository;
     private final TypingIndicatorService typingService;
     private final io.vertx.core.eventbus.EventBus eventBus;
@@ -49,6 +52,7 @@ public class MessageService {
             
             message.setMessage(content); // Store trimmed content
             return repository.createMessage(message).onSuccess(id -> {
+                message.setId(id); // Set the DB-generated ID before broadcasting
                 com.campusskills.web.websockets.MessageBroadcaster.broadcastNewMessage(message, participantList);
                 typingService.clearTypingState(message.getChatId(), message.getSenderId(), participantList);
                 
@@ -85,14 +89,13 @@ public class MessageService {
             }
             io.vertx.core.json.JsonArray participantsArray = chat.getJsonArray("participants");
             if (participantsArray == null || !participantsArray.contains(authId)) {
-                System.err.println("[RETRIEVAL] Unauthorized message access for chat " + chatId + " by User " + authId);
+                log.warn("[RETRIEVAL] Unauthorized message access for chat {} by User {}", chatId, authId);
                 return Future.failedFuture("UNAUTHORIZED: User is not a participant of this chat");
             }
 
-            System.out.println("[RETRIEVAL] User " + authId + " requested messages for chat " + chatId + " | page: " + page + " limit: " + limit);
-            
             return repository.countMessagesByChatId(chatId).compose(total -> 
                 repository.fetchChatMessages(chatId, skip, limit).map(list -> {
+                    java.util.Collections.reverse(list);
                     io.vertx.core.json.JsonArray items = new io.vertx.core.json.JsonArray();
                     list.forEach(msg -> items.add(io.vertx.core.json.JsonObject.mapFrom(msg)));
                     return new io.vertx.core.json.JsonObject()
@@ -133,7 +136,7 @@ public class MessageService {
 
                 io.vertx.core.json.JsonArray participantsArray = chat.getJsonArray("participants");
                 if (participantsArray == null || !participantsArray.contains(authId)) {
-                    System.err.println("[RETRIEVAL ERROR] Unauthorized read receipt attempt for message " + messageId + " by User " + authId);
+                    log.warn("[RETRIEVAL ERROR] Unauthorized read receipt attempt for message {} by User {}", messageId, authId);
                     return Future.failedFuture("UNAUTHORIZED: User is not a participant of this chat");
                 }
                 
@@ -145,11 +148,141 @@ public class MessageService {
                 
                 return repository.markMessageAsRead(messageId, readAt).compose(updated -> {
                     if (updated) {
-                        System.out.println(String.format("[MESSAGE_READ] messageId=%s chatId=%s authenticatedUserId=%s readAt=%d", messageId, message.getChatId(), authId, readAt));
                         com.campusskills.web.websockets.MessageBroadcaster.broadcastMessageRead(messageId, message.getChatId(), authId, readAt, participantList);
                     }
                     return Future.succeededFuture();
                 });
+            });
+        });
+    }
+
+    public Future<Void> editMessage(String messageId, String authId, String newText) {
+        if (messageId == null || messageId.trim().isEmpty()) return Future.failedFuture("messageId is required");
+        if (authId == null || authId.trim().isEmpty()) return Future.failedFuture("authId is required");
+        if (newText == null || newText.trim().isEmpty()) return Future.failedFuture("New text is required");
+        if (newText.length() > 2000) return Future.failedFuture("Message exceeds 2000 characters");
+
+        return repository.getMessageById(messageId).compose(message -> {
+            if (message == null) return Future.failedFuture("MESSAGE_NOT_FOUND");
+            if (!authId.equals(message.getSenderId())) return Future.failedFuture("UNAUTHORIZED: Cannot edit someone else's message");
+            if (message.getIsDeleted() != null && message.getIsDeleted()) return Future.failedFuture("Cannot edit a deleted message");
+
+            long now = System.currentTimeMillis();
+            long createdAt = message.getCreatedAt() != null ? message.getCreatedAt() : 0L;
+            if ((now - createdAt) > 10 * 60 * 1000) {
+                return Future.failedFuture("EDIT_WINDOW_EXPIRED");
+            }
+
+            return repository.editMessage(messageId, newText.trim(), now).compose(updated -> {
+                if (updated) {
+                    message.setMessage(newText.trim());
+                    message.setEditedAt(now);
+                    return repository.getChatById(message.getChatId()).compose(chat -> {
+                        if (chat != null) {
+                            io.vertx.core.json.JsonArray participantsArray = chat.getJsonArray("participants");
+                            java.util.List<String> participantList = participantsArray.stream()
+                                    .map(Object::toString)
+                                    .collect(java.util.stream.Collectors.toList());
+                            com.campusskills.web.websockets.MessageBroadcaster.broadcastMessageEdited(message, participantList);
+                        }
+                        return Future.succeededFuture();
+                    });
+                }
+                return Future.failedFuture("Failed to edit message");
+            });
+        });
+    }
+
+    public Future<Void> deleteMessage(String messageId, String authId) {
+        if (messageId == null || messageId.trim().isEmpty()) return Future.failedFuture("messageId is required");
+        if (authId == null || authId.trim().isEmpty()) return Future.failedFuture("authId is required");
+
+        return repository.getMessageById(messageId).compose(message -> {
+            if (message == null) return Future.failedFuture("MESSAGE_NOT_FOUND");
+            if (!authId.equals(message.getSenderId())) return Future.failedFuture("UNAUTHORIZED: Cannot delete someone else's message");
+            if (message.getIsDeleted() != null && message.getIsDeleted()) return Future.succeededFuture(); // Idempotent
+
+            long now = System.currentTimeMillis();
+            long createdAt = message.getCreatedAt() != null ? message.getCreatedAt() : 0L;
+            if ((now - createdAt) > 15 * 60 * 1000) {
+                return Future.failedFuture("DELETE_WINDOW_EXPIRED");
+            }
+
+            return repository.softDeleteMessage(messageId, now).compose(updated -> {
+                if (updated) {
+                    message.setIsDeleted(true);
+                    message.setDeletedAt(now);
+                    message.setMessage("This message was deleted.");
+                    return repository.getChatById(message.getChatId()).compose(chat -> {
+                        if (chat != null) {
+                            io.vertx.core.json.JsonArray participantsArray = chat.getJsonArray("participants");
+                            java.util.List<String> participantList = participantsArray.stream()
+                                    .map(Object::toString)
+                                    .collect(java.util.stream.Collectors.toList());
+                            com.campusskills.web.websockets.MessageBroadcaster.broadcastMessageDeleted(message, participantList);
+                        }
+                        return Future.succeededFuture();
+                    });
+                }
+                return Future.failedFuture("Failed to delete message");
+            });
+        });
+    }
+
+    public Future<Void> markAsDelivered(String messageId, String deliveredTo) {
+        if (messageId == null || messageId.trim().isEmpty()) {
+            return Future.failedFuture("messageId is required");
+        }
+        return repository.getMessageById(messageId).compose(message -> {
+            if (message == null) {
+                return Future.failedFuture("Message not found");
+            }
+            if (message.getSenderId().equals(deliveredTo)) {
+                return Future.succeededFuture();
+            }
+            return repository.getChatById(message.getChatId()).compose(chat -> {
+                if (chat == null) {
+                    return Future.failedFuture("Chat not found");
+                }
+                
+                java.util.List<String> participantList = ((io.vertx.core.json.JsonArray) chat.getJsonArray("participants"))
+                    .stream()
+                    .map(Object::toString)
+                    .collect(java.util.stream.Collectors.toList());
+
+                Long deliveredAt = System.currentTimeMillis();
+                
+                return repository.markMessageAsDelivered(messageId, deliveredAt).compose(updated -> {
+                    if (updated) {
+                        com.campusskills.web.websockets.MessageBroadcaster.broadcastMessageDelivered(messageId, message.getChatId(), deliveredTo, deliveredAt, participantList);
+                    }
+                    return Future.succeededFuture();
+                });
+            });
+        });
+    }
+
+    public Future<Void> markChatAsRead(String chatId, String authId) {
+        if (chatId == null || chatId.trim().isEmpty()) {
+            return Future.failedFuture("chatId is required");
+        }
+        if (authId == null || authId.trim().isEmpty()) {
+            return Future.failedFuture("authId is required");
+        }
+
+        return repository.getChatById(chatId).compose(chat -> {
+            if (chat == null) {
+                return Future.failedFuture("CHAT_NOT_FOUND");
+            }
+            io.vertx.core.json.JsonArray participantsArray = chat.getJsonArray("participants");
+            if (participantsArray == null || !participantsArray.contains(authId)) {
+                return Future.failedFuture("UNAUTHORIZED: User is not a participant of this chat");
+            }
+
+            Long readAt = System.currentTimeMillis();
+            return repository.markChatMessagesAsRead(chatId, authId, readAt).compose(v -> {
+                // Return success immediately, no broadcast needed since the UI handles unread counts locally
+                return Future.succeededFuture();
             });
         });
     }

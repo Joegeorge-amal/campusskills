@@ -17,6 +17,8 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.JWTOptions;
 import io.vertx.ext.auth.jwt.JWTAuth;
 import org.mindrot.jbcrypt.BCrypt;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +34,7 @@ import java.util.UUID;
 import com.campusskills.core.config.Env;
 
 public class UserService {
+    private static final Logger log = LoggerFactory.getLogger(UserService.class);
     
     private final UserRepository userRepository;
     private final UserProfileRepository profileRepository;
@@ -133,7 +136,7 @@ public class UserService {
             user.setPasswordHash(BCrypt.hashpw(password, BCrypt.gensalt()));
 
             return userRepository.createUser(user).compose(userId -> {
-                System.out.println("[AUTH] Created new user: " + userId + " with email: " + normalizedEmail);
+                log.info("[AUTH] Created new user: {} with email: {}", userId, normalizedEmail);
                 user.setId(userId);
                 
                 UserProfile profile = new UserProfile();
@@ -173,7 +176,7 @@ public class UserService {
                 Future<String> otpFut = otpRepository.create(otpVerification)
                     .compose(v -> {
                         emailService.sendOtpEmail(normalizedEmail, otp)
-                            .onFailure(err -> System.out.println("[AUTH] Failed to send OTP email: " + err.getMessage()));
+                            .onFailure(err -> log.error("[AUTH] Failed to send OTP email", err));
                         return Future.succeededFuture("otp-sent");
                     });
 
@@ -206,7 +209,7 @@ public class UserService {
         return userRepository.findByEmail(normalizedEmail).compose(user -> {
             if (user == null) {
                 if (isSuperAdmin(normalizedEmail)) {
-                    System.out.println("[AUTH] Auto-seeding super admin account on first login attempt: " + normalizedEmail);
+                    log.info("[AUTH] Auto-seeding super admin account on first login attempt: {}", normalizedEmail);
                     return signup(normalizedEmail, password, "Super Admin").compose(signupRes -> {
                         return login(normalizedEmail, password);
                     });
@@ -238,7 +241,7 @@ public class UserService {
         if (isPrivileged) {
             // Send 2FA login OTP
             resendTwoFactorOtp(user.getId()).onFailure(err -> {
-                System.out.println("[AUTH] Auto-send 2FA OTP during login skipped/failed: " + err.getMessage());
+                log.debug("[AUTH] Auto-send 2FA OTP during login skipped/failed", err);
             });
             return;
         }
@@ -249,10 +252,10 @@ public class UserService {
                 // Always attempt to resend. The resendOtp method has a built-in 1-minute cooldown 
                 // to prevent spam, so it's safe to call it unconditionally here.
                 resendOtp(user.getId()).onFailure(err -> {
-                    System.out.println("[AUTH] Auto-send OTP during login skipped/failed: " + err.getMessage());
+                    log.debug("[AUTH] Auto-send OTP during login skipped/failed", err);
                 });
             }).onFailure(err -> {
-                System.out.println("[AUTH] Error checking OTP status: " + err.getMessage());
+                log.error("[AUTH] Error checking OTP status", err);
             });
         }
     }
@@ -317,11 +320,10 @@ public class UserService {
             UserWallet wallet = cf.resultAt(3);
 
             if (user == null) {
-                System.out.println("[AUTH] Failed to fetch profile. User not found for ID: " + userId);
+                log.warn("[AUTH] Failed to fetch profile. User not found for ID: {}", userId);
                 throw new RuntimeException("User not found");
             }
 
-            System.out.println("[AUTH] Successfully aggregated profile for user ID: " + userId);
             JsonObject response = new JsonObject();
             
             JsonObject userJson = JsonObject.mapFrom(user);
@@ -376,11 +378,21 @@ public class UserService {
                 JsonObject response = new JsonObject();
                 
                 JsonObject profileJson = JsonObject.mapFrom(profile);
+                
+                // Fallback name if missing
+                String pName = profileJson.getString("name");
+                if (pName == null || pName.trim().isEmpty()) {
+                    String uName = user.getEmail().split("@")[0];
+                    profileJson.put("name", uName);
+                }
+
                 // Strip sensitive data
                 profileJson.remove("phoneNumber");
                 profileJson.remove("upi");
                 
                 response.put("profile", profileJson);
+                // Also add top-level name for backward compatibility in some frontend usages
+                response.put("name", profileJson.getString("name"));
                 response.put("email", user.getEmail());
                 response.put("createdAt", user.getCreatedAt());
                 response.put("emailVerified", user.getEmailVerified());
@@ -452,7 +464,7 @@ public class UserService {
                     return otpRepository.updateOtp(verification.getId(), newHash, newExpiry, now)
                         .compose(v -> {
                             emailService.sendOtpEmail(user.getEmail(), newOtp)
-                                .onFailure(err -> System.out.println("[AUTH] Failed to resend OTP email: " + err.getMessage()));
+                                .onFailure(err -> log.error("[AUTH] Failed to resend OTP email", err));
                             return Future.succeededFuture();
                         });
                 } else {
@@ -469,7 +481,7 @@ public class UserService {
                     return otpRepository.create(newVerification)
                         .compose(v -> {
                             emailService.sendOtpEmail(user.getEmail(), newOtp)
-                                .onFailure(err -> System.out.println("[AUTH] Failed to resend OTP email: " + err.getMessage()));
+                                .onFailure(err -> log.error("[AUTH] Failed to resend OTP email", err));
                             return Future.succeededFuture();
                         });
                 }
@@ -529,7 +541,7 @@ public class UserService {
                     return otpRepository.updateOtp(verification.getId(), newHash, newExpiry, now)
                         .compose(v -> {
                             emailService.sendTwoFactorOtpEmail(user.getEmail(), newOtp)
-                                .onFailure(err -> System.out.println("[AUTH] Failed to resend 2FA OTP email: " + err.getMessage()));
+                                .onFailure(err -> log.error("[AUTH] Failed to resend 2FA OTP email", err));
                             return Future.succeededFuture();
                         });
                 } else {
@@ -546,7 +558,7 @@ public class UserService {
                     return otpRepository.create(newVerification)
                         .compose(v -> {
                             emailService.sendTwoFactorOtpEmail(user.getEmail(), newOtp)
-                                .onFailure(err -> System.out.println("[AUTH] Failed to send 2FA OTP email: " + err.getMessage()));
+                                .onFailure(err -> log.error("[AUTH] Failed to send 2FA OTP email", err));
                             return Future.succeededFuture();
                         });
                 }
@@ -617,7 +629,7 @@ public class UserService {
                     return otpRepository.updateOtp(verification.getId(), hashedOtp, expiry, now)
                         .compose(v -> {
                             emailService.sendPasswordResetOtpEmail(normalizedEmail, otp)
-                                .onFailure(err -> System.out.println("[AUTH] Failed to send Reset OTP email: " + err.getMessage()));
+                                .onFailure(err -> log.error("[AUTH] Failed to send Reset OTP email", err));
                             return Future.succeededFuture();
                         })
                         .map(v -> new JsonObject().put("message", "If an account exists for this email, a verification code has been sent."));
@@ -634,7 +646,7 @@ public class UserService {
                     return otpRepository.create(newVerification)
                         .compose(v -> {
                             emailService.sendPasswordResetOtpEmail(normalizedEmail, otp)
-                                .onFailure(err -> System.out.println("[AUTH] Failed to send Reset OTP email: " + err.getMessage()));
+                                .onFailure(err -> log.error("[AUTH] Failed to send Reset OTP email", err));
                             return Future.succeededFuture();
                         })
                         .map(v -> new JsonObject().put("message", "If an account exists for this email, a verification code has been sent."));
@@ -701,11 +713,19 @@ public class UserService {
                 return userRepository.updateUser(user).compose(v -> {
                     return passwordResetTokenRepository.deleteByUserId(user.getId()).compose(v2 -> {
                         emailService.sendPasswordChangeConfirmationEmail(user.getEmail())
-                            .onFailure(err -> System.out.println("[AUTH] Failed to send password change confirmation: " + err.getMessage()));
+                            .onFailure(err -> log.error("[AUTH] Failed to send password change confirmation", err));
                         return Future.succeededFuture(new JsonObject().put("message", "Password successfully reset"));
                     });
                 });
             });
         });
+    }
+
+    public Future<Boolean> blockUser(String userId, String targetUserId) {
+        return profileRepository.blockUser(userId, targetUserId);
+    }
+
+    public Future<Boolean> unblockUser(String userId, String targetUserId) {
+        return profileRepository.unblockUser(userId, targetUserId);
     }
 }

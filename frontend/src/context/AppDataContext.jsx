@@ -1,6 +1,13 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+
+import React, { createContext, useState, useContext, useEffect, useCallback, useRef } from 'react';
 import { useWebSocket } from './WebSocketContext';
 import { useAuth } from './AuthContext';
+import { chatService } from '../services/chatService';
+import { userService } from '../services/userService';
+import { exchangeService } from '../services/exchangeService';
+import { chatRequestService } from '../services/chatRequestService';
+import { listingService } from '../services/listingService';
+import { sessionService } from '../services/sessionService';
 
 const AppDataContext = createContext();
 
@@ -8,596 +15,471 @@ export const AppDataProvider = ({ children }) => {
   const { user, updateProfile } = useAuth();
   const [toastMessage, setToastMessage] = useState(null);
   
-  // 0. Notifications
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      type: 'booked',
-      title: 'Session Reminder',
-      message: 'You have a session with Priya S. in 30 minutes.',
-      timestamp: '30m ago',
-      unread: true,
-      actionUrl: '/app/sessions',
-      actionLabel: 'View Session'
-    },
-    {
-      id: 2,
-      type: 'swap_accepted',
-      title: 'Swap Request Accepted',
-      message: 'Aisha T. accepted your Japanese N5 swap request.',
-      timestamp: '1h ago',
-      unread: true,
-      actionUrl: '/app/sessions',
-      actionLabel: 'View Details'
-    },
-    {
-      id: 3,
-      type: 'payment',
-      title: 'Payment Received',
-      message: 'Dev R. paid ₹300 for the C++ session.',
-      timestamp: '2h ago',
-      unread: true
-    }
-  ]);
+  const [chats, setChats] = useState([]);
+  const [chatMessages, setChatMessages] = useState({});
+  const [chatRequests, setChatRequests] = useState([]);
+  const [requestsData, setRequestsData] = useState([]);
+  const [sessionsData, setSessionsData] = useState([]);
   
+  const [isChatsLoading, setIsChatsLoading] = useState(true);
+  const [isRequestsLoading, setIsRequestsLoading] = useState(true);
+  const [isSessionsLoading, setIsSessionsLoading] = useState(true);
+
+  const [notifications, setNotifications] = useState([]);
+
+  const triggerToast = (msg) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
+
   const markAllAsRead = () => {
     setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
   };
 
-  const { lastMessage } = useWebSocket();
+  const fetchInitialData = useCallback(async () => {
+    if (!user?.userId) return;
+    try {
+      setIsChatsLoading(true);
+      setIsRequestsLoading(true);
+      setIsSessionsLoading(true);
+
+      const [chatsRes, exchangesData, chatReqsRes, sessionsRes] = await Promise.all([
+        chatService.getUserChats(),
+        exchangeService.getMyExchanges(),
+        chatRequestService.getUserRequests(),
+        sessionService.getSessions()
+      ]);
+
+      const chatsData = chatsRes.items || [];
+      const chatReqs = chatReqsRes.items || [];
+      const allRawRequests = [...exchangesData, ...chatReqs];
+
+      const getInitials = (name) => {
+        if (!name) return 'U';
+        const parts = name.split(' ');
+        if (parts.length > 1) return (parts[0][0] + parts[1][0]).toUpperCase();
+        return name.substring(0, 2).toUpperCase();
+      };
+
+      // Map Chats
+      const mappedChats = chatsData.map(c => {
+        const otherId = c.participants?.find(p => p !== user?.userId);
+        const pProfile = c.participantProfile || {};
+        const displayName = pProfile.name || 'Unknown User';
+        
+        const isMe = c.lastMessageSenderId === user?.userId;
+        let previewText = c.lastMessagePreview || 'No messages yet';
+        if (isMe && c.lastMessagePreview) {
+          previewText = 'You: ' + c.lastMessagePreview;
+        }
+
+        return {
+          id: c._id || c.id,
+          rawChat: c,
+          otherId: otherId,
+          name: displayName,
+          init: getInitials(displayName),
+          bg: pProfile.avatarColor?.bg || '#eef2ff',
+          col: pProfile.avatarColor?.text || '#1d4ed8',
+          avatar: pProfile.profilePicture || pProfile.avatarImg,
+          preview: previewText,
+          unread: c.unreadCount || 0,
+          time: c.lastMessageAt ? new Date(c.lastMessageAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
+        };
+      });
+      setChats(mappedChats);
+
+      // Map Requests
+      const otherUserIds = [...new Set(allRawRequests.map(req => {
+        const myId = user.userId;
+        if (req.initiatorId) {
+          return req.initiatorId === myId ? req.receiverId : req.initiatorId;
+        } else {
+          return req.senderId === myId ? req.receiverId : req.senderId;
+        }
+      }).filter(Boolean))];
+
+      const userProfilesMap = {};
+      await Promise.all(otherUserIds.map(async (id) => {
+        try {
+          const res = await userService.getPublicProfile(id);
+          userProfilesMap[id] = res;
+        } catch (e) {}
+      }));
+
+      const listingIds = [...new Set(allRawRequests.map(req => req.listingId).filter(Boolean))];
+      const listingsMap = {};
+      await Promise.all(listingIds.map(async (id) => {
+        try {
+          const res = await listingService.getListingById(id);
+          listingsMap[id] = res;
+        } catch (e) {}
+      }));
+
+      const mappedRequests = allRawRequests.map(req => {
+        const myId = user.userId;
+        let isIncoming = false;
+        let otherUserId = null;
+        let isExchange = false;
+
+        if (req.initiatorId) {
+          isExchange = true;
+          isIncoming = req.receiverId === myId;
+          otherUserId = isIncoming ? req.initiatorId : req.receiverId;
+        } else {
+          isIncoming = req.receiverId === myId;
+          otherUserId = isIncoming ? req.senderId : req.receiverId;
+        }
+
+        const otherUserRes = userProfilesMap[otherUserId];
+        const otherUser = otherUserRes?.profile || { name: 'Unknown User' };
+        
+        let title = '';
+        let sub = '';
+        let tagText = '';
+        let tagType = 'primary';
+        
+        if (isExchange) {
+          if (req.type === 'SWAP') {
+            title = isIncoming ? `${otherUser.name} proposed a skill swap` : `You proposed a skill swap to ${otherUser.name}`;
+            tagText = 'Skill swap request';
+            tagType = 'success';
+          } else {
+            title = isIncoming ? `${otherUser.name} requested a session` : `You requested a session with ${otherUser.name}`;
+            tagText = 'Session request';
+          }
+          sub = req.message || 'No additional message provided.';
+        } else {
+          title = isIncoming ? `${otherUser.name} wants to chat` : `You requested to chat with ${otherUser.name}`;
+          tagText = 'Chat request';
+          sub = req.message || 'No additional message provided.';
+        }
+
+        const statusLower = (req.status || '').toLowerCase();
+        if (statusLower === 'rejected' || statusLower === 'declined') {
+          title = isIncoming ? 'You declined the request' : 'They declined the request';
+          sub = 'This request was not accepted.';
+        } else if (statusLower === 'cancelled') {
+          title = isIncoming ? 'They cancelled the request' : 'You cancelled the request';
+          sub = 'This request was cancelled.';
+        } else if (statusLower === 'completed') {
+          title = 'Request completed';
+          sub = 'This request has been fulfilled.';
+        } else if (statusLower === 'accepted') {
+          title = 'Request accepted';
+          sub = 'This request was accepted and a session was created.';
+        }
+
+          const listing = req.listingId ? listingsMap[req.listingId] : null;
+          
+          let offeredSkillName = null;
+          let requestedSkillName = null;
+          
+          if (listing) {
+            const offered = listing.offeredSkills?.[0];
+            offeredSkillName = offered?.name || offered;
+            
+            const requested = listing.requestedSkills?.[0];
+            requestedSkillName = requested?.name || requested;
+          }
+          
+          const userExtras = {
+            email: otherUserRes?.email,
+            createdAt: otherUserRes?.createdAt,
+            isProfileVerified: otherUserRes?.emailVerified,
+            listingTitle: listing?.title,
+            listingType: listing?.listingType,
+            requestedSkill: requestedSkillName,
+            listingRequestedSkill: requestedSkillName,
+            offeredSkillName: offeredSkillName,
+          };
+
+          return {
+            id: req.exchangeId || req._id,
+            rawReq: req,
+            direction: isIncoming ? 'incoming' : 'outgoing',
+            status: req.status.toLowerCase(),
+            title,
+            sub,
+            message: sub,
+            type: tagText,
+            typeCls: tagType === 'success' ? 'c-code' : 'c-prim',
+            name: otherUser.name,
+            init: getInitials(otherUser.name),
+            bg: otherUser.avatarColor?.bg || '#eef2ff',
+            col: otherUser.avatarColor?.text || '#1d4ed8',
+            avatar: otherUser.profilePicture || otherUser.avatarImg,
+            otherUser,
+            otherUserExtras: userExtras,
+            otherUserStats: otherUserRes?.stats || {}
+          };
+      });
+
+      setRequestsData(mappedRequests);
+      const pendingChatReqs = mappedRequests.filter(r => r.direction === 'incoming' && r.status === 'pending' && r.type === 'Chat request');
+      setChatRequests(pendingChatReqs);
+
+      // Map Sessions
+      const rawSessions = sessionsRes?.items || [];
+      const sessionOtherUserIds = [...new Set(rawSessions.map(s => {
+        return s.teacherId === user.userId ? s.studentId : s.teacherId;
+      }).filter(Boolean))];
+
+      await Promise.all(sessionOtherUserIds.map(async (id) => {
+        if (!userProfilesMap[id]) {
+          try {
+            const res = await userService.getPublicProfile(id);
+            userProfilesMap[id] = res;
+          } catch (e) {}
+        }
+      }));
+
+      const mappedSessions = rawSessions.map(s => {
+        const otherId = s.teacherId === user.userId ? s.studentId : s.teacherId;
+        const otherProfile = userProfilesMap[otherId]?.profile || { name: 'Unknown User' };
+        
+        let dateStr = 'TBD';
+        let timeStr = 'TBD';
+        let monthStr = '';
+        let dayStr = '';
+        
+        if (s.scheduledStart) {
+          const d = new Date(s.scheduledStart);
+          dateStr = d.toLocaleDateString();
+          timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          const parts = d.toDateString().split(' ');
+          monthStr = parts[1].toUpperCase();
+          dayStr = parts[2];
+        }
+
+        return {
+          id: s._id || s.id,
+          rawSession: s,
+          topic: s.topic || 'Skill Session',
+          otherUser: otherProfile,
+          name: otherProfile.name,
+          init: getInitials(otherProfile.name),
+          bg: otherProfile.avatarColor?.bg || '#eef2ff',
+          col: otherProfile.avatarColor?.text || '#1d4ed8',
+          avatar: otherProfile.profilePicture || otherProfile.avatarImg,
+          role: s.teacherId === user.userId ? 'Teaching' : 'Learning',
+          status: s.status,
+          date: dateStr,
+          time: timeStr,
+          day: dayStr,
+          month: monthStr,
+          mode: s.meetingLink ? 'Online' : 'In-person'
+        };
+      });
+
+      setSessionsData(mappedSessions);
+
+    } catch (err) {
+      console.error('Failed to load global data', err);
+    } finally {
+      setIsChatsLoading(false);
+      setIsRequestsLoading(false);
+      setIsSessionsLoading(false);
+    }
+  }, [user]);
 
   useEffect(() => {
-    if (lastMessage && lastMessage.type === 'NOTIFICATION') {
+    if (user?.userId) {
+      fetchInitialData();
+    }
+  }, [user, fetchInitialData]);
+
+  const { lastMessage } = useWebSocket();
+
+  const processedMessageRef = useRef(null);
+
+  useEffect(() => {
+    if (!lastMessage || processedMessageRef.current === lastMessage) return;
+    processedMessageRef.current = lastMessage;
+
+    if (lastMessage.type === 'NOTIFICATION') {
+      const notifType = lastMessage.payload.type;
       const newNotif = {
         id: lastMessage.payload.id || Date.now(),
-        type: lastMessage.payload.type.toLowerCase(),
+        type: notifType.toLowerCase(),
         title: lastMessage.payload.title,
         message: lastMessage.payload.message,
         time: 'Just now',
         unread: true
       };
       setNotifications(prev => [newNotif, ...prev]);
-    } else if (lastMessage && lastMessage.type === 'NEW_MESSAGE') {
+
+      if (
+        notifType === 'SESSION_BOOKED' ||
+        notifType === 'SESSION_COMPLETED'
+      ) {
+        fetchInitialData();
+      }
+    } else if (
+      lastMessage.type === 'NEW_REQUEST' ||
+      lastMessage.type === 'REQUEST_ACCEPTED' ||
+      lastMessage.type === 'REQUEST_REJECTED' ||
+      lastMessage.type === 'REQUEST_CANCELLED' ||
+      lastMessage.type === 'REQUEST_UPDATED'
+    ) {
       const msg = lastMessage.payload;
-      setConversations(prev => prev.map(chat => {
-        if (chat.id === msg.chatId || (chat.participants && chat.participants.includes(msg.senderId))) {
-          return {
-            ...chat,
-            lastMsg: msg.message,
-            time: 'Just now',
-            unreadCount: (chat.unreadCount || 0) + 1,
-            msgs: [...(chat.msgs || []), {
-              id: msg.id || Date.now(),
-              text: msg.message,
-              sender: 'them',
-              time: 'Just now'
-            }]
-          };
-        }
-        return chat;
-      }));
-    }
-  }, [lastMessage]);
-
-  // 1. Marketplace skills list (removed, now fetching from backend, keeping empty array for mock references)
-  const [skills, setSkills] = useState([]);
-  // 2. Student Conversations
-  const [conversations, setConversations] = useState([
-    {
-      id: 0,
-      name: 'Priya S.',
-      init: 'PS',
-      bg: '#E6F1FB',
-      col: '#0C447C',
-      skill: 'React.js',
-      online: true,
-      unread: 1,
-      time: 'now',
-      preview: 'Sure! 4 PM works for me.',
-      msgs: [
-        { f: 'them', t: 'Hey! I can teach you React.js.' },
-        { f: 'me', t: 'Awesome! Is tomorrow 4 PM okay?' },
-        { f: 'them', t: 'Sure! 4 PM works for me.' },
-        { f: 'them', type: 'pay', title: 'Session booking', sub: 'Tomorrow · 4 PM · 1 hr · ₹300', price: 300 }
-      ]
-    },
-    {
-      id: 1,
-      name: 'Rohan M.',
-      init: 'RM',
-      bg: '#FBEAF0',
-      col: '#72243E',
-      skill: 'Figma',
-      online: false,
-      unread: 0,
-      time: '2h',
-      preview: 'Can we do a skill swap?',
-      msgs: [
-        { f: 'them', t: 'Thanks for the DSA session!' },
-        { f: 'me', t: 'Happy to help! Want another one?' },
-        { f: 'them', t: 'Actually, can we do a skill swap?' },
-        { f: 'them', type: 'swap', title: 'Skill swap request', sub: 'I teach Figma · You teach DSA', offer: 'DSA' }
-      ]
-    },
-    {
-      id: 2,
-      name: 'Aisha T.',
-      init: 'AT',
-      bg: '#EAF3DE',
-      col: '#27500A',
-      skill: 'Japanese',
-      online: true,
-      unread: 2,
-      time: '1d',
-      preview: 'Yoroshiku onegaishimasu!',
-      msgs: [
-        { f: 'me', t: 'Hi Aisha! Interested in Japanese N5.' },
-        { f: 'them', t: 'Hello! I teach from scratch.' },
-        { f: 'them', t: 'Yoroshiku onegaishimasu!' }
-      ]
-    },
-    {
-      id: 3,
-      name: 'Vikram N.',
-      init: 'VN',
-      bg: '#FAEEDA',
-      col: '#633806',
-      skill: 'Algebra',
-      online: false,
-      unread: 0,
-      time: '3d',
-      preview: 'Session confirmed for 25th.',
-      msgs: [
-        { f: 'them', t: 'Confirmed — C++ from you, algebra from me.' },
-        { f: 'me', t: '25th May evening works!' },
-        { f: 'them', t: 'Session confirmed for 25th.' }
-      ]
-    }
-  ]);
-
-  // 3. Transactions List
-  const [transactions, setTransactions] = useState([
-    {
-      id: 101,
-      title: 'Received · DSA · Rohan M.',
-      desc: 'Wallet credited',
-      amount: '+₹300',
-      type: 'received',
-      date: '20 May'
-    },
-    {
-      id: 102,
-      title: 'Skill swap · C++ ↔ Figma',
-      desc: 'With Priya S.',
-      amount: 'Swap',
-      type: 'swap',
-      date: '19 May'
-    },
-    {
-      id: 103,
-      title: 'Paid · Japanese N5 · Aisha T.',
-      desc: 'Wallet debited',
-      amount: '−₹250',
-      type: 'paid',
-      date: '18 May'
-    },
-    {
-      id: 104,
-      title: 'Withdrawn → HDFC ••42',
-      desc: 'Credited to bank',
-      amount: '−₹500',
-      type: 'withdrawn',
-      date: '12 May'
-    },
-    {
-      id: 105,
-      title: 'Received · C++ · Dev R.',
-      desc: 'Wallet credited',
-      amount: '+₹300',
-      type: 'received',
-      date: '10 May'
-    }
-  ]);
-
-  // 4. Requests (Pending / Sent)
-  const [requests, setRequests] = useState([
-    {
-      id: 1,
-      direction: 'incoming',
-      name: 'Priya R.',
-      init: 'PR',
-      bg: '#E1F5EE',
-      col: '#0F6E56',
-      title: 'Priya R. wants a session',
-      sub: 'DSA · 1 hr · ₹300',
-      type: 'Payment request',
-      typeCls: 'c-code',
-      status: 'pending'
-    },
-    {
-      id: 2,
-      direction: 'incoming',
-      name: 'Sai M.',
-      init: 'SM',
-      bg: '#FAEEDA',
-      col: '#633806',
-      title: 'Sai M. sent a swap request',
-      sub: 'He offers Guitar · Wants C++',
-      type: 'Skill swap request',
-      typeCls: 'c-mus',
-      status: 'pending'
-    },
-    {
-      id: 3,
-      direction: 'outgoing',
-      name: 'Priya S.',
-      init: 'PS',
-      bg: '#E6F1FB',
-      col: '#0C447C',
-      title: 'React.js basics',
-      sub: 'Priya S. · ₹300/hr · Online\n📅 26 May · 4:00 PM',
-      status: 'Pending'
-    },
-    {
-      id: 4,
-      direction: 'outgoing',
-      name: 'Vikram N.',
-      init: 'VN',
-      bg: '#EAF3DE',
-      col: '#3B6D11',
-      title: 'Vikram N. · Linear algebra',
-      sub: 'Swap: you teach C++',
-      status: 'Confirmed'
-    }
-  ]);
-
-  // 5. Booked Sessions
-  const [bookedSessions, setBookedSessions] = useState([
-    {
-      id: 10,
-      title: 'React.js · Priya S.',
-      time: '4:00 PM · Online',
-      date: '22',
-      month: 'MAY',
-      info: 'React.js · Priya S. · ₹300 paid',
-      status: 'join'
-    },
-    {
-      id: 11,
-      title: 'Teaching C++ · Sai M.',
-      time: '5:30 PM · Skill swap',
-      date: '25',
-      month: 'MAY',
-      info: 'Teaching C++ · Sai M. · Skill swap',
-      status: 'join'
-    },
-    {
-      id: 12,
-      title: 'DSA · Rohan M.',
-      time: 'Completed · 55 min · Paid',
-      date: '14',
-      month: 'MAY',
-      status: 'completed',
-      reviewed: true
-    },
-    {
-      id: 13,
-      title: 'Japanese N5 · Aisha T.',
-      time: 'Completed · 60 min · ₹250 paid',
-      date: '10',
-      month: 'MAY',
-      status: 'completed',
-      reviewed: false
-    }
-  ]);
-
-  // 6. Admin Reports List
-  const [adminReports, setAdminReports] = useState([
-    {
-      id: 1,
-      title: 'Report: No-show',
-      sub: 'By Arjun K. · Against Dev R. · 18 May',
-      desc: 'No-show for scheduled Python session on 18 May. Student paid ₹300 and tutor did not attend.',
-      severity: 'High',
-      severityCls: 'report-ico-high',
-      status: 'open',
-      reporter: 'Arjun K.',
-      target: 'Dev R.',
-      amount: 300
-    },
-    {
-      id: 2,
-      title: 'Report: Misleading listing',
-      sub: 'By Priya S. · Against Sneha K. · 20 May',
-      desc: 'Guitar basics listing was misleading — advertised advanced techniques but only covered basics.',
-      severity: 'Medium',
-      severityCls: 'report-ico-medium',
-      status: 'open',
-      reporter: 'Priya S.',
-      target: 'Sneha K.',
-      amount: 300
-    },
-    {
-      id: 3,
-      title: 'Report: Poor conduct',
-      sub: 'By Rohan M. · Against Vikram N. · 22 May',
-      desc: 'Tutor was 30 min late and ended session early without refund.',
-      severity: 'Medium',
-      severityCls: 'report-ico-medium',
-      status: 'open',
-      reporter: 'Rohan M.',
-      target: 'Vikram N.',
-      amount: 300
-    }
-  ]);
-
-
-  // ─── TOAST TRIGGER ───
-  const triggerToast = (msg) => {
-    setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage(null);
-    }, 2800);
-  };
-
-  // ─── MESSAGING LOGIC ───
-  const sendChatMessage = (convId, text) => {
-    if (!text.trim()) return;
-
-    setConversations((prev) =>
-      prev.map((c) => {
-        if (c.id === convId) {
-          const newMsgs = [...c.msgs, { f: 'me', t: text }];
-          return {
-            ...c,
-            msgs: newMsgs,
-            preview: text,
-            time: 'now',
-            unread: 0
-          };
-        }
-        return c;
-      })
-    );
-
-    // Dynamic mock response like in the prototype after 1.2s
-    setTimeout(() => {
-      const responses = [
-        'Got it!',
-        'Sure!',
-        "Let me check my schedule.",
-        'Sounds good!',
-        "I'll confirm shortly."
-      ];
-      const botReply = responses[Math.floor(Math.random() * responses.length)];
-
-      setConversations((prev) =>
-        prev.map((c) => {
-          if (c.id === convId) {
-            return {
-              ...c,
-              msgs: [...c.msgs, { f: 'them', t: botReply }],
-              preview: botReply,
-              time: 'now'
-            };
+      const myId = user?.userId;
+      
+      if (lastMessage.type === 'NEW_REQUEST') {
+        const isExchange = !!msg.initiatorId;
+        const isIncoming = isExchange ? msg.receiverId === myId : msg.receiverId === myId;
+        const otherUser = msg.otherUser || { name: 'Unknown User' };
+        
+        let title = '';
+        let sub = '';
+        let tagText = '';
+        let tagType = 'primary';
+        
+        if (isExchange) {
+          if (msg.type === 'SWAP') {
+            title = isIncoming ? `${otherUser.name} proposed a skill swap` : `You proposed a skill swap to ${otherUser.name}`;
+            tagText = 'Skill swap request';
+            tagType = 'success';
+          } else {
+            title = isIncoming ? `${otherUser.name} requested a session` : `You requested a session with ${otherUser.name}`;
+            tagText = 'Session request';
           }
-          return c;
-        })
-      );
-    }, 1200);
-  };
+          sub = msg.message || 'No additional message provided.';
+        } else {
+          title = isIncoming ? `${otherUser.name} wants to chat` : `You requested to chat with ${otherUser.name}`;
+          tagText = 'Chat request';
+          sub = msg.message || 'No additional message provided.';
+        }
 
-  // ─── TRANSACTION & WALLET ACTIONS ───
-  const payForSession = (amount, tutorName, skillName) => {
-    if (user.walletBalance < amount) {
-      triggerToast('Insufficient wallet balance!');
-      return false;
-    }
-
-    // Deduct cash from user context
-    updateProfile({ walletBalance: user.walletBalance - amount });
-
-    // Add transaction row
-    const newTx = {
-      id: Date.now(),
-      title: `Paid · ${skillName} · ${tutorName}`,
-      desc: 'Wallet debited',
-      amount: `−₹${amount}`,
-      type: 'paid',
-      date: 'Today'
-    };
-    setTransactions((prev) => [newTx, ...prev]);
-
-    // Book upcoming session
-    const newSession = {
-      id: Date.now(),
-      title: `${skillName} · ${tutorName}`,
-      time: '4:00 PM · Online',
-      date: new Date().getDate().toString(),
-      month: 'MAY',
-      info: `${skillName} · ${tutorName} · ₹${amount} paid`,
-      status: 'join'
-    };
-    setBookedSessions((prev) => [newSession, ...prev]);
-    triggerToast(`₹${amount} paid! Session booked with ${tutorName}.`);
-    return true;
-  };
-
-  const depositMoney = (amount) => {
-    updateProfile({ walletBalance: user.walletBalance + amount });
-    const newTx = {
-      id: Date.now(),
-      title: 'Added money',
-      desc: 'Wallet credited via Net Banking',
-      amount: `+₹${amount}`,
-      type: 'received',
-      date: 'Today'
-    };
-    setTransactions((prev) => [newTx, ...prev]);
-    triggerToast(`₹${amount} added to your CampusSkills wallet!`);
-  };
-
-  const withdrawMoney = (amount, bankName) => {
-    if (user.walletBalance < amount) {
-      triggerToast('Insufficient funds for withdrawal!');
-      return false;
-    }
-    updateProfile({ walletBalance: user.walletBalance - amount });
-    const newTx = {
-      id: Date.now(),
-      title: `Withdrawn → ${bankName}`,
-      desc: 'Credited in 1-2 days',
-      amount: `−₹${amount}`,
-      type: 'withdrawn',
-      date: 'Today'
-    };
-    setTransactions((prev) => [newTx, ...prev]);
-    triggerToast(`₹${amount} withdrawal initiated. Credited in 1–2 business days.`);
-    return true;
-  };
-
-  // ─── SWAP PROPOSAL ACTIONS ───
-  const submitSwapProposal = (tutorName, skillName, offerSkill, schedule, note) => {
-    const newReq = {
-      id: Date.now(),
-      direction: 'outgoing',
-      name: tutorName,
-      init: tutorName.split(' ').map(n => n[0]).join('').toUpperCase(),
-      bg: '#EEEDFE',
-      col: '#3C3489',
-      title: `${tutorName} · ${skillName}`,
-      sub: `Swap: you teach ${offerSkill} · awaiting reply`,
-      status: 'Pending'
-    };
-    setRequests((prev) => [newReq, ...prev]);
-    triggerToast(`Swap request sent to ${tutorName}! Offering: ${offerSkill}`);
-  };
-
-  const acceptRequest = (reqId, options = {}) => {
-    setRequests((prev) =>
-      prev.map((r) => {
-        if (r.id === reqId) return { ...r, status: 'accepted' };
-        return r;
-      })
-    );
-
-    const matchedReq = requests.find((r) => r.id === reqId);
-    if (matchedReq) {
-      if (matchedReq.type && matchedReq.type.includes('Payment')) {
-        // Book bookedSession
-        const newSess = {
-          id: Date.now(),
-          title: matchedReq.sub.split(' · ')[0] + ' · ' + matchedReq.name,
-          time: '5:00 PM · Online',
-          date: '28',
-          month: 'MAY',
-          info: matchedReq.sub,
-          status: 'join'
+        const getInitials = (name) => {
+          if (!name) return 'U';
+          const parts = name.split(' ');
+          if (parts.length > 1) return (parts[0][0] + parts[1][0]).toUpperCase();
+          return name.substring(0, 2).toUpperCase();
         };
-        setBookedSessions((prev) => [newSess, ...prev]);
-        triggerToast(`Accepted! Session confirmed with ${matchedReq.name}`);
+
+        const mapped = {
+          id: msg.exchangeId || msg.id || msg._id,
+          rawReq: msg,
+          direction: isIncoming ? 'incoming' : 'outgoing',
+          status: msg.status ? msg.status.toLowerCase() : 'pending',
+          title,
+          sub,
+          message: sub,
+          type: tagText,
+          typeCls: tagType === 'success' ? 'c-code' : 'c-prim',
+          name: otherUser.name,
+          init: getInitials(otherUser.name),
+          bg: otherUser.avatarColor?.bg || '#eef2ff',
+          col: otherUser.avatarColor?.text || '#1d4ed8',
+          avatar: otherUser.profilePicture || otherUser.avatarImg || otherUser.avatar,
+          otherUser,
+          otherUserExtras: {}
+        };
+
+        setRequestsData(prev => [mapped, ...prev]);
+        if (!isExchange && isIncoming) {
+          setChatRequests(prev => [mapped, ...prev]);
+        }
+        
+        // Fetch full context (listing, extras, stats) in the background to complete the card
+        fetchInitialData();
       } else {
-        // Swap accept
-        const newSess = {
-          id: Date.now(),
-          title: 'Swap · ' + matchedReq.name,
-          time: '6:00 PM · Skill Swap',
-          date: '29',
-          month: 'MAY',
-          info: matchedReq.sub,
-          status: 'soon'
-        };
-        setBookedSessions((prev) => [newSess, ...prev]);
-        if (!options.hideToast) {
-          triggerToast(`Swap accepted! Exchange confirmed with ${matchedReq.name}`);
+        const idToUpdate = msg.exchangeId || msg.id || msg._id;
+        const newStatus = msg.status ? msg.status.toLowerCase() : 'pending';
+        
+        setRequestsData(prev => prev.map(r => r.id === idToUpdate ? { ...r, status: newStatus } : r));
+        
+        if (newStatus !== 'pending') {
+          setChatRequests(prev => prev.filter(r => r.id !== idToUpdate));
         }
       }
+    } else if (lastMessage.type === 'NEW_MESSAGE') {
+      const msg = lastMessage.payload;
+      
+      setChatMessages(prev => {
+        if (!prev[msg.chatId]) return prev;
+        if (prev[msg.chatId].find(m => m.id === msg.id || m._id === msg.id)) return prev;
+        return { ...prev, [msg.chatId]: [...prev[msg.chatId], msg] };
+      });
+
+      setChats(prevChats => {
+        const existingIndex = prevChats.findIndex(c => c.id === msg.chatId);
+        if (existingIndex > -1) {
+          const chat = prevChats[existingIndex];
+          const updatedChat = {
+            ...chat,
+            preview: msg.message,
+            time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            unread: msg.senderId !== user?.userId ? (chat.unread || 0) + 1 : chat.unread
+          };
+          const newChats = [...prevChats];
+          newChats.splice(existingIndex, 1);
+          return [updatedChat, ...newChats];
+        } else {
+          return prevChats;
+        }
+      });
+      
+      // Async fetch if chat is missing, to avoid side-effects in state updater
+      setChats(prevChats => {
+        if (prevChats.findIndex(c => c.id === msg.chatId) === -1) {
+          setTimeout(() => fetchInitialData(), 0);
+        }
+        return prevChats;
+      });
+
+    } else if (lastMessage.type === 'MESSAGE_EDITED') {
+      const msg = lastMessage.payload;
+      setChatMessages(prev => {
+        if (!prev[msg.chatId]) return prev;
+        return {
+          ...prev,
+          [msg.chatId]: prev[msg.chatId].map(m => 
+            (m.id === msg.messageId || m._id === msg.messageId) ? { ...m, message: msg.message, editedAt: msg.editedAt } : m
+          )
+        };
+      });
+      // Optionally update preview if it was the last message
+      setChats(prevChats => prevChats.map(c => 
+        (c.id === msg.chatId && c.preview) ? { ...c, preview: msg.message } : c
+      ));
+    } else if (lastMessage && lastMessage.type === 'MESSAGE_DELETED') {
+      const msg = lastMessage.payload;
+      setChatMessages(prev => {
+        if (!prev[msg.chatId]) return prev;
+        return {
+          ...prev,
+          [msg.chatId]: prev[msg.chatId].map(m => 
+            (m.id === msg.messageId || m._id === msg.messageId) ? { ...m, isDeleted: true, message: msg.message, deletedAt: msg.deletedAt } : m
+          )
+        };
+      });
+      setChats(prevChats => prevChats.map(c => 
+        (c.id === msg.chatId) ? { ...c, preview: c.preview } : c
+      )); // Could update preview but keeping it simple for now
     }
-  };
+  }, [lastMessage, user?.userId, fetchInitialData]);
 
-  const declineRequest = (reqId) => {
-    setRequests((prev) => prev.filter((r) => r.id !== reqId));
-    triggerToast('Request declined.');
-  };
-
-  // ─── ADD ACTIVE SKILL IN PROFILE ───
-  const addSkillOffering = (skillName, category, priceText) => {
-    const isPaid = priceText.includes('₹');
-    const priceNum = isPaid ? parseInt(priceText.replace(/[^0-9]/g, '')) : 0;
-
-    const newSkill = {
-      id: skills.length,
-      name: skillName,
-      cat: category,
-      catCls: category === 'Coding' ? 'c-code' : category === 'Design' ? 'c-des' : 'c-mus',
-      price: priceText,
-      priceNum: priceNum,
-      type: isPaid ? 'paid' : 'swap',
-      rating: '5.0',
-      sessions: 0,
-      mode: 'Online',
-      avail: 'Weekday evenings',
-      desc: `Learn ${skillName} with step by step guides. Custom tailored topics for college students.`,
-      topics: ['Introduction', 'Core components', 'Practical case study'],
-      teacher: {
-        name: user.name,
-        init: user.name.split(' ').map(n => n[0]).join('').toUpperCase(),
-        bg: '#EEEDFE',
-        col: '#3C3489',
-        year: user.year,
-        branch: user.branch,
-        college: user.college,
-        bio: user.bio,
-        skills: `Teaches: ${skillName}`,
-        rating: '5.0',
-        sessions: 0,
-        upi: user.upi
-      }
-    };
-    setSkills((prev) => [...prev, newSkill]);
-    triggerToast(`Added skill: ${skillName}!`);
-  };
-
-  // ─── ADMIN PANELS MODERATION ───
-  const createSession = (sessionData) => {
-    const d = sessionData.date ? new Date(sessionData.date) : new Date();
-    const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-    const newSession = {
-      id: Date.now(),
-      title: `${sessionData.title} · ${sessionData.student.split(' ')[0]}`,
-      time: `${sessionData.time || '10:00 AM'} · ${sessionData.mode}`,
-      date: d.getDate().toString(),
-      month: months[d.getMonth()],
-      info: `${sessionData.skill} · ${sessionData.type}`,
-      status: 'soon'
-    };
-    setBookedSessions(prev => [newSession, ...prev]);
-  };
-
-
-  const unreadMessagesCount = conversations.reduce((acc, c) => acc + (c.unread || 0), 0);
-  const pendingRequestsCount = requests.filter(r => r.status.toLowerCase() === 'pending').length;
+  const unreadMessagesCount = chats.reduce((acc, c) => acc + (c.unread || 0), 0);
+  const pendingRequestsCount = requestsData.filter(r => r.status.toLowerCase() === 'pending').length;
 
   return (
     <AppDataContext.Provider
       value={{
-        skills,
-        conversations,
-        transactions,
-        requests,
-        bookedSessions,
-        adminReports,
+        chats,
+        setChats,
+        chatMessages,
+        setChatMessages,
+        isChatsLoading,
+        chatRequests,
+        requestsData,
+        isRequestsLoading,
+        sessionsData,
+        isSessionsLoading,
+        fetchInitialData,
         toastMessage,
         triggerToast,
-        sendChatMessage,
-        payForSession,
-        depositMoney,
-        withdrawMoney,
-        submitSwapProposal,
-        acceptRequest,
-        declineRequest,
-        addSkillOffering,
-        createSession,
         notifications,
         markAllAsRead,
         unreadMessagesCount,

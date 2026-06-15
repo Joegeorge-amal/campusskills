@@ -48,6 +48,8 @@ public class UserRouter {
         router.post("/me/resend-otp").handler(handler::resendOtp);
         router.post("/me/verify-2fa").handler(handler::verifyTwoFactorOtp);
         router.post("/me/resend-2fa-otp").handler(handler::resendTwoFactorOtp);
+        router.post("/me/block").handler(handler::blockUser);
+        router.post("/me/unblock").handler(handler::unblockUser);
 
         return router;
     }

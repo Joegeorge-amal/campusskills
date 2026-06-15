@@ -6,7 +6,7 @@ let reconnectTimer = null;
 let isExpectedClose = false;
 
 export const socketService = {
-  connect: (token, onMessage, onStatusChange) => {
+  connect: (tokenOrGetter, onMessage, onStatusChange) => {
     if (wsConnection) {
       console.warn('[WS-Service] Connection already active. Disconnect first.');
       return;
@@ -15,7 +15,14 @@ export const socketService = {
     isExpectedClose = false;
     onStatusChange('connecting');
 
-    const wsUrl = `ws://localhost:8080/chat?token=${encodeURIComponent(token)}`;
+    const token = typeof tokenOrGetter === 'function' ? tokenOrGetter() : tokenOrGetter;
+    if (!token) {
+      console.warn('[WS-Service] No token provided, aborting connection.');
+      onStatusChange('disconnected');
+      return;
+    }
+
+    const wsUrl = `ws://localhost:8080/ws?token=${encodeURIComponent(token)}`;
 
     try {
       wsConnection = new WebSocket(wsUrl);
@@ -45,7 +52,7 @@ export const socketService = {
           reconnectTimer = setTimeout(() => {
             // Exponential backoff reconnect
             reconnectInterval = Math.min(reconnectInterval * 2, maxReconnectInterval);
-            socketService.connect(token, onMessage, onStatusChange);
+            socketService.connect(tokenOrGetter, onMessage, onStatusChange);
           }, reconnectInterval);
         } else {
           console.log('[WS-Service] Disconnected cleanly.');

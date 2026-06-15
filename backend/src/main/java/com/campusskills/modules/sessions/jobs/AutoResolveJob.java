@@ -26,13 +26,13 @@ public class AutoResolveJob {
         long intervalMs = 10 * 60 * 1000;
         
         vertx.setPeriodic(intervalMs, id -> {
-            log.info("Running AutoResolveJob...");
+            log.debug("Running AutoResolveJob...");
             
             repository.autoResolveExpiredSessions().onComplete(ar -> {
                 if (ar.succeeded()) {
                     List<Session> resolvedSessions = ar.result();
                     if (!resolvedSessions.isEmpty()) {
-                        log.info("AutoResolveJob completed. Auto-resolved {} sessions.", resolvedSessions.size());
+                        log.debug("AutoResolveJob completed. Auto-resolved {} sessions.", resolvedSessions.size());
                         if (eventBus != null) {
                             for (Session s : resolvedSessions) {
                                 JsonObject notifTeacher = new JsonObject()
