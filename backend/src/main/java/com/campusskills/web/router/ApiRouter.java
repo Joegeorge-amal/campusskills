@@ -95,6 +95,7 @@ public class ApiRouter {
         router.mountSubRouter("/admin", com.campusskills.modules.admin.routes.AdminRouter.create(vertx, jwtAuth));
         router.mountSubRouter("/verifications", com.campusskills.modules.users.routes.VerificationRouter.create(vertx, jwtAuth));
         router.mountSubRouter("/images", com.campusskills.modules.images.routes.ImageRouter.create(vertx));
+        router.mountSubRouter("/disputes", com.campusskills.modules.disputes.routes.DisputeRouter.create(vertx, jwtAuth));
         
         // Global Error Handling
         router.route().failureHandler(GlobalErrorHandler.create());

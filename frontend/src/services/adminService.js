@@ -22,9 +22,13 @@ const adminService = {
   },
 
   updateDisputeStatus: async (disputeId, updateData) => {
-    // Backend expects status string or JSON object depending on how it's implemented.
-    // The handler does: body.getString("status") and optional "adminNotes"
+    // updateData should include { status, resolutionType, adminNotes }
     const response = await api.patch(`/admin/disputes/${disputeId}`, updateData);
+    return response.data;
+  },
+
+  forceCompleteSession: async (sessionId) => {
+    const response = await api.post(`/admin/sessions/${sessionId}/force-complete`);
     return response.data;
   },
 
@@ -56,6 +60,11 @@ const adminService = {
   markNotificationsRead: async (id = null) => {
     const payload = id ? { id } : {};
     const response = await api.patch('/admin/notifications/read', payload);
+    return response.data;
+  },
+
+  getOverview: async () => {
+    const response = await api.get('/admin/overview');
     return response.data;
   }
 };

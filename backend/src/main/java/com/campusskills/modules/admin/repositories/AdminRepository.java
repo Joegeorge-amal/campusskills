@@ -156,32 +156,45 @@ public class AdminRepository {
 
         // 1. Initial Match (dispute statuses + optional filter)
         JsonObject matchStage = new JsonObject();
-        JsonArray disputeStatuses = new JsonArray().add("DISPUTED").add("OPEN").add("REVIEWING").add("RESOLVED");
         if (status != null && !status.trim().isEmpty()) {
             matchStage.put("status", status.trim());
-        } else {
-            matchStage.put("status", new JsonObject().put("$in", disputeStatuses));
         }
 
         if (q != null && !q.trim().isEmpty()) {
-            // Text search on sessions (disputeReason, etc.)
             matchStage.put("$text", new JsonObject().put("$search", q.trim()));
         }
 
-        pipeline.add(new JsonObject().put("$match", matchStage));
+        if (!matchStage.isEmpty()) {
+            pipeline.add(new JsonObject().put("$match", matchStage));
+        }
 
-        // 2. Lookup user_profiles for participants
-        // Participants is an array of user IDs. We can lookup profiles where userId in participants.
+        // 2. Lookup sessions
+        pipeline.add(new JsonObject().put("$lookup", new JsonObject()
+            .put("from", "sessions")
+            .put("localField", "sessionId")
+            .put("foreignField", "_id")
+            .put("as", "sessionDetails")
+        ));
+        
+        // 3. Lookup user profiles for reporter
         pipeline.add(new JsonObject().put("$lookup", new JsonObject()
             .put("from", "user_profiles")
-            .put("localField", "participants")
+            .put("localField", "reporterId")
             .put("foreignField", "userId")
-            .put("as", "participantProfiles")
+            .put("as", "reporterProfile")
+        ));
+        
+        // 4. Lookup user profiles for reported
+        pipeline.add(new JsonObject().put("$lookup", new JsonObject()
+            .put("from", "user_profiles")
+            .put("localField", "reportedId")
+            .put("foreignField", "userId")
+            .put("as", "reportedProfile")
         ));
 
-        // 3. Facet for pagination
+        // 5. Facet for pagination
         JsonArray dataFacet = new JsonArray()
-            .add(new JsonObject().put("$sort", new JsonObject().put("updatedAt", -1)))
+            .add(new JsonObject().put("$sort", new JsonObject().put("createdAt", -1)))
             .add(new JsonObject().put("$skip", skip))
             .add(new JsonObject().put("$limit", limit));
 
@@ -194,7 +207,7 @@ public class AdminRepository {
         ));
 
         io.vertx.ext.mongo.AggregateOptions options = new io.vertx.ext.mongo.AggregateOptions();
-        return client.aggregateWithOptions("sessions", pipeline, options)
+        return client.aggregateWithOptions("disputes", pipeline, options)
             .collect(java.util.stream.Collectors.toList())
             .map(results -> {
                 if (results.isEmpty()) {
@@ -212,27 +225,24 @@ public class AdminRepository {
 
                 JsonArray formattedData = new JsonArray();
                 for (int i = 0; i < data.size(); i++) {
-                    JsonObject session = data.getJsonObject(i);
-                    JsonArray profiles = session.getJsonArray("participantProfiles", new JsonArray());
+                    JsonObject d = data.getJsonObject(i);
+                    JsonArray repProfiles = d.getJsonArray("reporterProfile", new JsonArray());
+                    JsonArray rptProfiles = d.getJsonArray("reportedProfile", new JsonArray());
+                    JsonArray sessArr = d.getJsonArray("sessionDetails", new JsonArray());
                     
-                    String participant1Name = "Unknown";
-                    String participant2Name = "Unknown";
-                    
-                    if (profiles.size() > 0) {
-                        participant1Name = profiles.getJsonObject(0).getString("name", "Unknown");
-                    }
-                    if (profiles.size() > 1) {
-                        participant2Name = profiles.getJsonObject(1).getString("name", "Unknown");
-                    }
+                    String participant1Name = repProfiles.isEmpty() ? "Unknown" : repProfiles.getJsonObject(0).getString("name", "Unknown");
+                    String participant2Name = rptProfiles.isEmpty() ? "Unknown" : rptProfiles.getJsonObject(0).getString("name", "Unknown");
+                    JsonObject sess = sessArr.isEmpty() ? new JsonObject() : sessArr.getJsonObject(0);
 
                     formattedData.add(new JsonObject()
-                        .put("id", session.getString("_id"))
-                        .put("status", session.getString("status"))
+                        .put("id", d.getString("_id"))
+                        .put("status", d.getString("status"))
                         .put("participants", participant1Name + " vs " + participant2Name)
-                        .put("reason", session.getString("disputeReason", "Unknown Reason"))
-                        .put("amount", session.getDouble("price", 0.0))
-                        .put("currency", session.getString("currency", "INR"))
-                        .put("updatedAt", session.getLong("updatedAt"))
+                        .put("reason", d.getString("reasonType", "Unknown Reason"))
+                        .put("amount", sess.getDouble("price", 0.0))
+                        .put("currency", sess.getString("currency", "INR"))
+                        .put("updatedAt", d.getLong("updatedAt"))
+                        .put("createdAt", d.getLong("createdAt"))
                     );
                 }
 
@@ -355,8 +365,8 @@ public class AdminRepository {
         return client.updateCollection("users", query, update).map(res -> res.getDocModified() > 0);
     }
 
-    public Future<Boolean> updateDisputeStatus(String sessionId, String status, String adminNotes) {
-        JsonObject query = new JsonObject().put("_id", sessionId);
+    public Future<Boolean> updateDisputeStatus(String disputeId, String status, String adminNotes) {
+        JsonObject query = new JsonObject().put("_id", disputeId);
         JsonObject setFields = new JsonObject()
             .put("status", status)
             .put("updatedAt", System.currentTimeMillis());
@@ -366,7 +376,7 @@ public class AdminRepository {
         }
         
         JsonObject update = new JsonObject().put("$set", setFields);
-        return client.updateCollection("sessions", query, update).map(res -> res.getDocModified() > 0);
+        return client.updateCollection("disputes", query, update).map(res -> res.getDocModified() > 0);
     }
 
     public Future<Boolean> cancelSession(String sessionId) {
@@ -486,5 +496,266 @@ public class AdminRepository {
             .put("status", status)
             .put("updatedAt", System.currentTimeMillis()));
         return client.updateCollection("skill_listings", query, update).map(res -> res.getDocModified() > 0);
+    }
+
+    public Future<JsonObject> getOverviewStats() {
+        Future<Long> studentsCount = client.count("users", new JsonObject().put("role", "USER"));
+        Future<Long> sessionsCount = client.count("sessions", new JsonObject().put("status", new JsonObject().put("$in", new JsonArray().add("ACCEPTED").add("IN_PROGRESS"))));
+        Future<Long> disputesCount = client.count("disputes", new JsonObject().put("status", "OPEN"));
+        
+        JsonArray revenuePipeline = new JsonArray()
+            .add(new JsonObject().put("$match", new JsonObject().put("status", "COMPLETED")))
+            .add(new JsonObject().put("$group", new JsonObject().put("_id", null).put("total", new JsonObject().put("$sum", "$amount"))));
+            
+        Future<Long> revenueFuture = client.aggregateWithOptions("sessions", revenuePipeline, new io.vertx.ext.mongo.AggregateOptions()).collect(java.util.stream.Collectors.toList())
+            .map(results -> {
+                if (results.isEmpty()) return 0L;
+                return results.get(0).getLong("total", 0L);
+            });
+
+        return io.vertx.core.CompositeFuture.all(studentsCount, sessionsCount, disputesCount, revenueFuture)
+            .map(cf -> {
+                return new JsonObject()
+                    .put("totalStudents", new JsonObject().put("value", (Long) cf.resultAt(0)).put("trend", "+0 this week").put("isPositive", true))
+                    .put("activeSessions", new JsonObject().put("value", (Long) cf.resultAt(1)).put("trend", "+0 today").put("isPositive", true))
+                    .put("openDisputes", new JsonObject().put("value", (Long) cf.resultAt(2)).put("trend", "0 resolved today").put("isPositive", false))
+                    .put("revenue", new JsonObject().put("value", (Long) cf.resultAt(3)).put("trend", "Estimated").put("isPositive", true))
+                    .put("estimatedRevenue", true); 
+            });
+    }
+
+    public Future<JsonArray> getRecentRegistrations() {
+        FindOptions options = new FindOptions().setSort(new JsonObject().put("createdAt", -1)).setLimit(5);
+        return client.findWithOptions("user_profiles", new JsonObject(), options).map(users -> {
+            JsonArray arr = new JsonArray();
+            for(JsonObject u : users) {
+                String name = u.getString("name", "Unknown");
+                
+                long diff = System.currentTimeMillis() - u.getLong("createdAt", System.currentTimeMillis());
+                long mins = diff / 60000;
+                long hrs = mins / 60;
+                long days = hrs / 24;
+                String timeStr = mins < 60 ? mins + "m ago" : (hrs < 24 ? hrs + "h ago" : days + "d ago");
+
+                arr.add(new JsonObject()
+                    .put("id", u.getString("userId"))
+                    .put("name", name)
+                    .put("initial", name.isEmpty() ? "U" : name.substring(0, 1).toUpperCase())
+                    .put("info", u.getString("department", "Unknown Dept"))
+                    .put("role", "Student")
+                    .put("time", timeStr)
+                );
+            }
+            return arr;
+        });
+    }
+
+    public Future<JsonArray> getPendingDisputes() {
+        JsonObject query = new JsonObject().put("status", "OPEN");
+        FindOptions options = new FindOptions().setSort(new JsonObject().put("createdAt", -1)).setLimit(3);
+        return client.findWithOptions("disputes", query, options).map(disputes -> {
+            JsonArray arr = new JsonArray();
+            for(JsonObject d : disputes) {
+                Long createdAt = d.getLong("createdAt", System.currentTimeMillis());
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("MMM d, yyyy");
+                String dateStr = "Filed " + sdf.format(new java.util.Date(createdAt));
+                
+                arr.add(new JsonObject()
+                    .put("id", d.getString("_id"))
+                    .put("parties", d.getString("studentId", "Student") + " vs " + d.getString("teacherId", "Tutor"))
+                    .put("reason", d.getString("reason", "No reason provided"))
+                    .put("date", dateStr)
+                    .put("amount", d.getLong("amount", 0L))
+                    .put("status", "open")
+                );
+            }
+            return arr;
+        });
+    }
+
+    public Future<JsonObject> getCategoryPerformance() {
+        JsonArray pipeline = new JsonArray()
+            .add(new JsonObject().put("$addFields", new JsonObject()
+                .put("listingObjectId", new JsonObject().put("$toObjectId", "$listingId"))
+            ))
+            .add(new JsonObject().put("$lookup", new JsonObject()
+                .put("from", "skill_listings")
+                .put("localField", "listingObjectId")
+                .put("foreignField", "_id")
+                .put("as", "listing")
+            ))
+            .add(new JsonObject().put("$unwind", new JsonObject()
+                .put("path", "$listing")
+                .put("preserveNullAndEmptyArrays", false)
+            ))
+            .add(new JsonObject().put("$group", new JsonObject()
+                .put("_id", "$listing.category")
+                .put("sessions", new JsonObject().put("$sum", 1))
+            ))
+            .add(new JsonObject().put("$sort", new JsonObject().put("sessions", -1)))
+            .add(new JsonObject().put("$limit", 5));
+            
+        return client.aggregateWithOptions("sessions", pipeline, new io.vertx.ext.mongo.AggregateOptions()).collect(java.util.stream.Collectors.toList())
+            .map(results -> {
+                JsonArray categories = new JsonArray();
+                int totalSessions = 0;
+                String[] colors = {"#3b82f6", "#1e3a8a", "#60a5fa", "#ef4444", "#9ca3af"};
+                for (int i = 0; i < results.size(); i++) {
+                    JsonObject r = results.get(i);
+                    String name = r.getString("_id");
+                    if (name == null || name.isEmpty()) name = "Uncategorized";
+                    int sessions = r.getInteger("sessions", 0);
+                    totalSessions += sessions;
+                    categories.add(new JsonObject()
+                        .put("name", name)
+                        .put("sessions", sessions)
+                        .put("rating", 0.0) 
+                        .put("status", "Stable")
+                        .put("fill", Math.min(100, sessions * 15)) 
+                        .put("color", colors[i % colors.length])
+                    );
+                }
+                return new JsonObject()
+                    .put("totalSessions", totalSessions)
+                    .put("activeTutors", 0) 
+                    .put("avgRating", 0.0)
+                    .put("categories", categories);
+            });
+    }
+
+    public Future<JsonArray> getTopTutors() {
+        JsonArray pipeline = new JsonArray()
+            .add(new JsonObject().put("$match", new JsonObject().put("status", "COMPLETED")))
+            .add(new JsonObject().put("$group", new JsonObject()
+                .put("_id", "$teacherId")
+                .put("sessions", new JsonObject().put("$sum", 1))
+                .put("earnings", new JsonObject().put("$sum", "$amount"))
+            ))
+            .add(new JsonObject().put("$sort", new JsonObject().put("sessions", -1)))
+            .add(new JsonObject().put("$limit", 5))
+            .add(new JsonObject().put("$lookup", new JsonObject()
+                .put("from", "user_profiles")
+                .put("localField", "_id")
+                .put("foreignField", "userId")
+                .put("as", "profile")
+            ))
+            .add(new JsonObject().put("$unwind", new JsonObject()
+                .put("path", "$profile")
+                .put("preserveNullAndEmptyArrays", true)
+            ));
+
+        return client.aggregateWithOptions("sessions", pipeline, new io.vertx.ext.mongo.AggregateOptions()).collect(java.util.stream.Collectors.toList())
+            .map(results -> {
+                JsonArray arr = new JsonArray();
+                for (int i = 0; i < results.size(); i++) {
+                    JsonObject r = results.get(i);
+                    JsonObject profile = r.getJsonObject("profile");
+                    if (profile == null) profile = new JsonObject();
+                    
+                    String name = profile.getString("name", "Unknown Tutor");
+                    arr.add(new JsonObject()
+                        .put("id", r.getString("_id"))
+                        .put("name", name)
+                        .put("initial", name.isEmpty() ? "T" : name.substring(0, 1).toUpperCase())
+                        .put("dept", profile.getString("department", "General"))
+                        .put("sessions", r.getInteger("sessions", 0))
+                        .put("rating", profile.getDouble("averageRating", 0.0)) 
+                        .put("earnings", String.valueOf(r.getInteger("earnings", 0)))
+                        .put("rank", i + 1)
+                    );
+                }
+                return arr;
+            });
+    }
+
+    public Future<JsonArray> getLiveActivity() {
+        FindOptions options = new FindOptions().setSort(new JsonObject().put("createdAt", -1)).setLimit(5);
+        
+        Future<List<JsonObject>> registrations = client.findWithOptions("user_profiles", new JsonObject(), options);
+        Future<List<JsonObject>> sessions = client.findWithOptions("sessions", new JsonObject(), options);
+        Future<List<JsonObject>> disputes = client.findWithOptions("disputes", new JsonObject(), options);
+        
+        return io.vertx.core.CompositeFuture.all(registrations, sessions, disputes).map(cf -> {
+            List<JsonObject> allActivity = new java.util.ArrayList<>();
+            
+            List<JsonObject> regs = cf.resultAt(0);
+            for (JsonObject reg : regs) {
+                String name = reg.getString("name", "Unknown");
+                allActivity.add(new JsonObject()
+                    .put("id", "reg_" + reg.getString("userId"))
+                    .put("type", "registration")
+                    .put("title", name + " registered")
+                    .put("subtitle", reg.getString("department", "Student"))
+                    .put("createdAt", reg.getLong("createdAt", 0L))
+                    .put("status", "success")
+                );
+            }
+            
+            List<JsonObject> sess = cf.resultAt(1);
+            for (JsonObject s : sess) {
+                String status = s.getString("status", "PENDING");
+                allActivity.add(new JsonObject()
+                    .put("id", "sess_" + s.getString("_id"))
+                    .put("type", "session")
+                    .put("title", "Session " + status.toLowerCase())
+                    .put("subtitle", s.getString("topic", "General") + " session")
+                    .put("createdAt", s.getLong("createdAt", 0L))
+                    .put("status", "info")
+                );
+            }
+            
+            List<JsonObject> disps = cf.resultAt(2);
+            for (JsonObject d : disps) {
+                allActivity.add(new JsonObject()
+                    .put("id", "disp_" + d.getString("_id"))
+                    .put("type", "dispute")
+                    .put("title", "Dispute raised")
+                    .put("subtitle", d.getString("reason", "No reason"))
+                    .put("createdAt", d.getLong("createdAt", 0L))
+                    .put("status", "warning")
+                );
+            }
+            
+            allActivity.sort((a, b) -> Long.compare(b.getLong("createdAt", 0L), a.getLong("createdAt", 0L)));
+            
+            JsonArray result = new JsonArray();
+            for (int i = 0; i < Math.min(5, allActivity.size()); i++) {
+                JsonObject item = allActivity.get(i);
+                long diff = System.currentTimeMillis() - item.getLong("createdAt", 0L);
+                long mins = diff / 60000;
+                long hrs = mins / 60;
+                long days = hrs / 24;
+                String timeStr = mins < 60 ? mins + "m ago" : (hrs < 24 ? hrs + "h ago" : days + "d ago");
+                item.put("time", timeStr);
+                result.add(item);
+            }
+            return result;
+        });
+    }
+
+    public Future<JsonObject> getPlatformHealthMetrics() {
+        Future<Long> totalSessionsFut = client.count("sessions", new JsonObject());
+        Future<Long> completedSessionsFut = client.count("sessions", new JsonObject().put("status", "COMPLETED"));
+        Future<Long> totalDisputesFut = client.count("disputes", new JsonObject());
+        Future<Long> totalReviewsFut = client.count("reviews", new JsonObject());
+        Future<Long> positiveReviewsFut = client.count("reviews", new JsonObject().put("rating", new JsonObject().put("$gte", 4)));
+
+        return io.vertx.core.CompositeFuture.all(totalSessionsFut, completedSessionsFut, totalDisputesFut, totalReviewsFut, positiveReviewsFut)
+            .map(cf -> {
+                long totalSessions = cf.resultAt(0);
+                long completedSessions = cf.resultAt(1);
+                long totalDisputes = cf.resultAt(2);
+                long totalReviews = cf.resultAt(3);
+                long positiveReviews = cf.resultAt(4);
+
+                long sessionCompletionRate = totalSessions == 0 ? 100 : (completedSessions * 100) / totalSessions;
+                long disputeRate = totalSessions == 0 ? 0 : (totalDisputes * 100) / totalSessions;
+                long positiveRatingRate = totalReviews == 0 ? 100 : (positiveReviews * 100) / totalReviews;
+
+                return new JsonObject()
+                    .put("sessionCompletionRate", sessionCompletionRate)
+                    .put("disputeRate", disputeRate)
+                    .put("positiveRatingRate", positiveRatingRate);
+            });
     }
 }

@@ -30,7 +30,7 @@ import BookSessionRequest from '../pages/BookSessionRequest';
 import AdminOverview from '../pages/admin/AdminOverview';
 import AdminListings from '../pages/admin/AdminListings';
 import AdminUsers from '../pages/admin/AdminUsers';
-import AdminReports from '../pages/admin/AdminReports';
+import AdminDisputes from '../pages/admin/AdminDisputes';
 import AdminSessions from '../pages/admin/AdminSessions';
 import AdminAnalytics from '../pages/admin/AdminAnalytics';
 import AdminPayments from '../pages/admin/AdminPayments';
@@ -105,7 +105,7 @@ const AppRoutes = () => {
         <Route path="dashboard" element={<AdminOverview />} />
         <Route path="listings" element={<AdminListings />} />
         <Route path="users" element={<AdminUsers />} />
-        <Route path="reports" element={<AdminReports />} />
+        <Route path="reports" element={<AdminDisputes />} />
         <Route path="sessions" element={<AdminSessions />} />
         <Route path="analytics" element={<AdminAnalytics />} />
         <Route path="payments" element={<AdminPayments />} />

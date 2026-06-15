@@ -211,6 +211,7 @@ public class ExchangeService {
                             session.setScheduledStart(proposed.getLong("scheduledStart"));
                             session.setScheduledEnd(proposed.getLong("scheduledEnd"));
                             session.setTopic(proposed.getString("topic"));
+                            session.setListingId(exchange.getListingId());
                             
                             sessionFutures.add(sessionRepository.createSession(session).onSuccess(sessId -> {
                                 // Notify both student and teacher

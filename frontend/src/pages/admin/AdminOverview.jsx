@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   IconUsers, 
   IconBook, 
@@ -11,19 +11,58 @@ import {
   IconCalendarEvent,
   IconCash,
   IconUserX,
-  IconGavel
+  IconGavel,
+  IconLoader2
 } from '@tabler/icons-react';
-import {
-  platformOverview,
-  liveActivity,
-  categoryPerformance,
-  platformHealth,
-  topTutors,
-  recentRegistrations,
-  pendingDisputes
-} from '../../data/adminDashboardData';
+import adminService from '../../services/adminService';
 
 const AdminOverview = () => {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      const res = await adminService.getOverview();
+      setData(res);
+      setError(null);
+    } catch (err) {
+      console.error("Failed to fetch overview data", err);
+      setError("Failed to load dashboard overview. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="admin-overview fade-in" style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh'}}>
+        <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#6b7280', gap: '12px'}}>
+          <IconLoader2 size={32} className="spin" />
+          <div>Loading overview data...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !data) {
+    return (
+      <div className="admin-overview fade-in">
+        <div style={{padding: '32px', background: '#fef2f2', color: '#ef4444', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '12px'}}>
+          <IconAlertTriangle />
+          {error || 'Failed to load data'}
+        </div>
+      </div>
+    );
+  }
+
+  const { platformOverview, liveActivity, categoryPerformance, platformHealth, topTutors, recentRegistrations, pendingDisputes } = data;
+
   return (
     <div className="admin-overview fade-in">
       
@@ -37,11 +76,11 @@ const AdminOverview = () => {
           </div>
           <div className="admin-hero-right">
             <div className="admin-hero-stat-box">
-              <span className="hero-stat-val">47</span>
+              <span className="hero-stat-val">{platformOverview?.totalStudents?.value || 0}</span>
               <span className="hero-stat-lbl">Active Now</span>
             </div>
             <div className="admin-hero-stat-box">
-              <span className="hero-stat-val" style={{color: '#6ee7b7'}}>1</span>
+              <span className="hero-stat-val" style={{color: '#6ee7b7'}}>{platformOverview?.activeSessions?.value || 0}</span>
               <span className="hero-stat-lbl">LIVE Session</span>
             </div>
           </div>
@@ -78,7 +117,7 @@ const AdminOverview = () => {
           <div className="ostard-icon" style={{background: '#fef3c7', color: '#d97706'}}>
             <IconCurrencyRupee size={20} />
           </div>
-          <div className="ostard-label">REVENUE (₹)</div>
+          <div className="ostard-label">VALUE EXCHANGED (₹)</div>
           <div className="ostard-value">{platformOverview.revenue.value}</div>
           <div className={`ostard-trend ${platformOverview.revenue.isPositive ? 'positive' : 'negative'}`}>
             {platformOverview.revenue.isPositive ? <IconTrendingUp size={16} /> : <IconTrendingDown size={16} />}
@@ -137,26 +176,33 @@ const AdminOverview = () => {
             <span className="panel-hdr-sub">This month</span>
           </div>
           <div className="cat-perf-list">
-            {categoryPerformance.categories.map((cat, idx) => (
-              <div key={idx} className="cat-perf-item">
-                <div className="cat-perf-top">
-                  <div className="cat-perf-name">
-                    <span className="cat-dot" style={{background: cat.color}}></span>
-                    {cat.name}
-                    <span className={`cat-status-pill ${cat.status.toLowerCase()}`}>
-                      {cat.status === 'Growing' ? <IconTrendingUp size={12}/> : (cat.status === 'Declining' ? <IconTrendingDown size={12}/> : '')}
-                      {cat.status}
-                    </span>
-                  </div>
-                  <div className="cat-perf-stats">
-                    {cat.sessions} sessions <span className="cat-rating"><IconStarFilled size={10} color="#f59e0b"/> {cat.rating}</span>
-                  </div>
-                </div>
-                <div className="cat-perf-bar-bg">
-                  <div className="cat-perf-bar-fill" style={{width: `${cat.fill}%`, background: cat.color}}></div>
-                </div>
+            {categoryPerformance.categories.length === 0 ? (
+              <div style={{ padding: '40px 0', textAlign: 'center', color: '#9ca3af', fontSize: '0.95rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <IconBook size={28} style={{ marginBottom: '12px', color: '#cbd5e1' }} />
+                <div>No active sessions yet.</div>
               </div>
-            ))}
+            ) : (
+              categoryPerformance.categories.map((cat, idx) => (
+                <div key={idx} className="cat-perf-item">
+                  <div className="cat-perf-top">
+                    <div className="cat-perf-name">
+                      <span className="cat-dot" style={{background: cat.color}}></span>
+                      {cat.name}
+                      <span className={`cat-status-pill ${cat.status.toLowerCase()}`}>
+                        {cat.status === 'Growing' ? <IconTrendingUp size={12}/> : (cat.status === 'Declining' ? <IconTrendingDown size={12}/> : '')}
+                        {cat.status}
+                      </span>
+                    </div>
+                    <div className="cat-perf-stats">
+                      {cat.sessions} sessions <span className="cat-rating"><IconStarFilled size={10} color="#f59e0b"/> {cat.rating}</span>
+                    </div>
+                  </div>
+                  <div className="cat-perf-bar-bg">
+                    <div className="cat-perf-bar-fill" style={{width: `${cat.fill}%`, background: cat.color}}></div>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
           <div className="cat-perf-footer">
             <div className="cpf-stat">
@@ -265,7 +311,7 @@ const AdminOverview = () => {
           <div style={{display: 'flex', alignItems: 'center', gap: '12px'}}>
             <IconAlertTriangle size={20} color="#ef4444" />
             <h3 style={{margin: 0}}>Pending Disputes</h3>
-            <span className="panel-badge red">3 open</span>
+            <span className="panel-badge red">{pendingDisputes.length} open</span>
           </div>
           <a href="/admin/reports" className="panel-view-all">View all →</a>
         </div>

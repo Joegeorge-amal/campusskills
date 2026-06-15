@@ -38,9 +38,12 @@ public class AdminRouter {
         
         router.get("/sessions").handler(handler::getSessions);
         router.patch("/sessions/:id/cancel").handler(handler::cancelSession);
+        router.post("/sessions/:id/force-complete").handler(handler::forceCompleteSession);
 
         router.get("/listings").handler(handler::getListings);
         router.patch("/listings/:id/status").handler(handler::updateListingStatus);
+
+        router.get("/overview").handler(handler::getOverviewData);
 
         router.get("/notifications").handler(handler::getNotifications);
         router.patch("/notifications/read").handler(handler::markNotificationsRead);

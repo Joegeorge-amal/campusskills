@@ -60,7 +60,10 @@ public class TopicService {
                     topic.setCreatedAt(System.currentTimeMillis());
                     topic.setUpdatedAt(System.currentTimeMillis());
                     
-                    futures.add(topicRepository.create(topic));
+                    futures.add(topicRepository.create(topic).recover(err -> {
+                        log.warn("Failed to seed topic {} (maybe duplicate): {}", data.name, err.getMessage());
+                        return Future.succeededFuture();
+                    }));
                 }
             }
 

@@ -111,6 +111,24 @@ public class AdminHandler {
             .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
     }
 
+
+
+    public void forceCompleteSession(RoutingContext ctx) {
+        String id = ctx.pathParam("id");
+        JsonObject user = ctx.get("user");
+        String adminId = user.getString("userId");
+
+        adminService.forceCompleteSession(id, adminId)
+            .onSuccess(success -> ApiResponse.ok(ctx, new JsonObject().put("success", success).put("message", "Session forcefully completed")))
+            .onFailure(err -> {
+                if (err.getMessage() != null && (err.getMessage().equals("Session not found") || err.getMessage().equals("Session is already fully confirmed"))) {
+                    ApiResponse.badRequest(ctx, err.getMessage());
+                } else {
+                    ApiResponse.internalError(ctx, "Failed to force complete session");
+                }
+            });
+    }
+
     public void getNotifications(RoutingContext ctx) {
         int page = 1;
         int limit = 20;
@@ -241,5 +259,9 @@ public class AdminHandler {
             .onFailure(err -> ApiResponse.internalError(ctx, "Failed to update listing: " + err.getMessage()));
     }
 
-
+    public void getOverviewData(RoutingContext ctx) {
+        adminService.getOverviewData()
+            .onSuccess(data -> ApiResponse.ok(ctx, data))
+            .onFailure(err -> ApiResponse.internalError(ctx, "Failed to fetch overview: " + err.getMessage()));
+    }
 }
