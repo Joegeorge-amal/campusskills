@@ -44,11 +44,13 @@ public class AdminRouter {
         router.patch("/listings/:id/status").handler(handler::updateListingStatus);
 
         router.get("/overview").handler(handler::getOverviewData);
+        router.get("/analytics").handler(handler::getAnalyticsData);
 
         router.get("/notifications").handler(handler::getNotifications);
         router.patch("/notifications/read").handler(handler::markNotificationsRead);
 
-
+        router.get("/settings").handler(handler::getSettings);
+        router.put("/settings").handler(handler::updateSettings);
         return router;
     }
 }

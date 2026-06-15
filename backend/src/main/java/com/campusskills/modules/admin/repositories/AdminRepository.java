@@ -806,4 +806,131 @@ public class AdminRepository {
                     .put("positiveRatingRate", positiveRatingRate);
             });
     }
+
+    public Future<JsonObject> getAnalyticsData(Integer filterYear, String filterDepartment, String filterMonth) {
+        JsonObject query = new JsonObject();
+        if (filterDepartment != null && !filterDepartment.isEmpty() && !"all".equalsIgnoreCase(filterDepartment)) {
+            // We use 'programme' field for department
+            query.put("programme", new JsonObject().put("$regex", filterDepartment).put("$options", "i"));
+        }
+
+        return client.find("user_profiles", query).map(profiles -> {
+            int currentYear = filterYear != null ? filterYear : java.util.Calendar.getInstance().get(java.util.Calendar.YEAR);
+            int prevYear = currentYear - 1;
+
+            int currentYearCount = 0;
+            int prevYearCount = 0;
+            int[] monthlyCounts = new int[12];
+
+            for (JsonObject profile : profiles) {
+                Long createdAt = profile.getLong("createdAt");
+                if (createdAt != null) {
+                    java.util.Calendar cal = java.util.Calendar.getInstance();
+                    cal.setTimeInMillis(createdAt);
+                    int y = cal.get(java.util.Calendar.YEAR);
+                    int m = cal.get(java.util.Calendar.MONTH); // 0-11
+
+                    if (y == currentYear) {
+                        currentYearCount++;
+                        monthlyCounts[m]++;
+                    } else if (y == prevYear) {
+                        prevYearCount++;
+                    }
+                }
+            }
+
+            // Calculate peak month
+            int peakMonthIdx = 0;
+            int peakMonthVal = 0;
+            for (int i = 0; i < 12; i++) {
+                if (monthlyCounts[i] > peakMonthVal) {
+                    peakMonthVal = monthlyCounts[i];
+                    peakMonthIdx = i;
+                }
+            }
+            String[] monthNames = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+            String peakMonthName = peakMonthVal > 0 ? monthNames[peakMonthIdx] : "None";
+
+            int currentMonthIdx = currentYear == java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)
+                ? java.util.Calendar.getInstance().get(java.util.Calendar.MONTH)
+                : 11;
+            int monthsPassed = currentMonthIdx + 1;
+            double monthlyAvg = (double) currentYearCount / monthsPassed;
+            String monthlyAvgStr = String.format("%.1f", monthlyAvg);
+
+            // Calculate YoY Growth
+            double yoyGrowth = 0.0;
+            if (prevYearCount > 0) {
+                yoyGrowth = ((double)(currentYearCount - prevYearCount) / prevYearCount) * 100;
+            } else if (currentYearCount > 0) {
+                yoyGrowth = 100.0; // From 0 to something
+            }
+            
+            String yoyColor = yoyGrowth >= 0 ? "#10b981" : "#ef4444";
+            String yoySign = yoyGrowth >= 0 ? "+" : "";
+
+            JsonObject stats = new JsonObject()
+                .put("totalRegistrations", new JsonObject().put("value", currentYearCount).put("sub", "Students registered in " + currentYear))
+                .put("peakMonth", new JsonObject().put("value", peakMonthName).put("sub", peakMonthVal + " registrations"))
+                .put("monthlyAvg", new JsonObject().put("value", monthlyAvgStr).put("sub", "Registrations per month"))
+                .put("yoyGrowth", new JsonObject().put("value", yoySign + String.format("%.1f", yoyGrowth) + "%").put("sub", "Compared to " + prevYear).put("color", yoyColor));
+
+            JsonArray chartData = new JsonArray();
+            for (int i = 0; i < 12; i++) {
+                chartData.add(new JsonObject().put("month", monthNames[i]).put("registrations", monthlyCounts[i]));
+            }
+
+            return new JsonObject()
+                .put("stats", stats)
+                .put("chartData", chartData)
+                .put("meta", new JsonObject()
+                    .put("year", currentYear)
+                    .put("yoyGrowth", yoySign + String.format("%.1f", yoyGrowth) + "% YoY")
+                );
+        });
+    }
+
+    private JsonObject getDefaultSettings() {
+        return new JsonObject()
+            .put("type", "global_settings")
+            .put("platformAccess", new JsonObject()
+                .put("isLive", true))
+            .put("platformSettings", new JsonObject()
+                .put("skill_swaps", true)
+                .put("email_verify", true)
+                .put("auto_suspend", false)
+                .put("public_tutors", false))
+            .put("notificationSettings", new JsonObject()
+                .put("new_user_alerts", true)
+                .put("dispute_alerts", true)
+                .put("payment_alerts", false));
+    }
+
+    public Future<JsonObject> getSettings() {
+        JsonObject query = new JsonObject().put("type", "global_settings");
+        return client.findOne("platform_settings", query, null).compose(result -> {
+            if (result == null || result.isEmpty()) {
+                JsonObject defaultSettings = getDefaultSettings();
+                defaultSettings.put("createdAt", System.currentTimeMillis());
+                return client.save("platform_settings", defaultSettings)
+                    .map(res -> defaultSettings);
+            }
+            return Future.succeededFuture(result);
+        });
+    }
+
+    public Future<JsonObject> updateSettings(JsonObject newSettings, String updatedBy) {
+        JsonObject query = new JsonObject().put("type", "global_settings");
+        JsonObject update = new JsonObject().put("$set", new JsonObject()
+            .put("platformAccess", newSettings.getJsonObject("platformAccess", new JsonObject()))
+            .put("platformSettings", newSettings.getJsonObject("platformSettings", new JsonObject()))
+            .put("notificationSettings", newSettings.getJsonObject("notificationSettings", new JsonObject()))
+            .put("updatedBy", updatedBy)
+            .put("updatedAt", System.currentTimeMillis())
+        );
+
+        io.vertx.ext.mongo.UpdateOptions options = new io.vertx.ext.mongo.UpdateOptions().setUpsert(true);
+        return client.updateCollectionWithOptions("platform_settings", query, update, options)
+            .compose(res -> getSettings());
+    }
 }

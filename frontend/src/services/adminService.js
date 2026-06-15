@@ -47,6 +47,11 @@ const adminService = {
     return response.data;
   },
 
+  getAnalyticsData: async (params) => {
+    const response = await api.get('/admin/analytics', { params });
+    return response.data;
+  },
+
   updateListingStatus: async (listingId, status) => {
     const response = await api.patch(`/admin/listings/${listingId}/status`, { status });
     return response.data;
@@ -65,6 +70,16 @@ const adminService = {
 
   getOverview: async () => {
     const response = await api.get('/admin/overview');
+    return response.data;
+  },
+
+  getSettings: async () => {
+    const response = await api.get('/admin/settings');
+    return response.data;
+  },
+
+  updateSettings: async (settings) => {
+    const response = await api.put('/admin/settings', settings);
     return response.data;
   }
 };

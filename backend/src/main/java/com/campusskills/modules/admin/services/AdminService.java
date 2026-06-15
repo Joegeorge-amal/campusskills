@@ -239,4 +239,16 @@ public class AdminService {
                     );
             });
     }
+
+    public Future<JsonObject> getAnalyticsData(Integer year, String department, String month) {
+        return adminRepository.getAnalyticsData(year, department, month);
+    }
+
+    public Future<JsonObject> getSettings() {
+        return adminRepository.getSettings();
+    }
+
+    public Future<JsonObject> updateSettings(JsonObject newSettings, String updatedBy) {
+        return adminRepository.updateSettings(newSettings, updatedBy);
+    }
 }

@@ -142,7 +142,9 @@ const AdminNotifications = () => {
       </button>
 
       {isOpen && (
-        <div className="admin-notif-dropdown fade-in">
+        <>
+          <div className="admin-notif-overlay fade-in" onClick={() => setIsOpen(false)}></div>
+          <div className="admin-notif-dropdown fade-in">
           <div className="admin-notif-header">
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <h3 style={{ margin: 0, fontSize: '14px', color: '#111827' }}>Notifications</h3>
@@ -166,7 +168,7 @@ const AdminNotifications = () => {
             ) : notifications.length === 0 ? (
               <div className="admin-notif-empty">No notifications</div>
             ) : (
-              (showAll ? notifications : notifications.slice(0, 3)).map((notif) => (
+              notifications.map((notif) => (
                 <div 
                   key={notif.id} 
                   className={`admin-notif-item ${!notif.isRead ? 'unread' : ''}`}
@@ -186,14 +188,8 @@ const AdminNotifications = () => {
               ))
             )}
           </div>
-          {!showAll && notifications.length > 3 && (
-            <div className="admin-notif-footer">
-              <button className="admin-notif-view-all" onClick={() => setShowAll(true)} style={{ background: 'none', border: 'none', cursor: 'pointer', width: '100%', padding: '12px', fontSize: '13px' }}>
-                View All Notifications →
-              </button>
-            </div>
-          )}
         </div>
+        </>
       )}
     </div>
   );

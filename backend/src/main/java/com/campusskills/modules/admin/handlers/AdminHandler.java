@@ -264,4 +264,46 @@ public class AdminHandler {
             .onSuccess(data -> ApiResponse.ok(ctx, data))
             .onFailure(err -> ApiResponse.internalError(ctx, "Failed to fetch overview: " + err.getMessage()));
     }
+
+    public void getAnalyticsData(RoutingContext ctx) {
+        String yearParam = ctx.request().getParam("year");
+        String department = ctx.request().getParam("department");
+        String month = ctx.request().getParam("month");
+
+        Integer year = null;
+        if (yearParam != null) {
+            try {
+                year = Integer.parseInt(yearParam);
+            } catch (NumberFormatException e) {
+                // Ignore invalid year, will use current year
+            }
+        }
+
+        adminService.getAnalyticsData(year, department, month)
+            .onSuccess(data -> ApiResponse.ok(ctx, data))
+            .onFailure(err -> ApiResponse.internalError(ctx, "Failed to fetch analytics: " + err.getMessage()));
+    }
+
+    public void getSettings(RoutingContext ctx) {
+        adminService.getSettings()
+            .onSuccess(data -> ApiResponse.ok(ctx, data))
+            .onFailure(err -> ApiResponse.internalError(ctx, "Failed to fetch settings: " + err.getMessage()));
+    }
+
+    public void updateSettings(RoutingContext ctx) {
+        JsonObject body;
+        try {
+            body = ctx.getBodyAsJson();
+        } catch (Exception e) {
+            ApiResponse.badRequest(ctx, "Invalid JSON payload");
+            return;
+        }
+
+        JsonObject user = ctx.get("user");
+        String updatedBy = user != null ? user.getString("id") : "system";
+
+        adminService.updateSettings(body, updatedBy)
+            .onSuccess(data -> ApiResponse.ok(ctx, data))
+            .onFailure(err -> ApiResponse.internalError(ctx, "Failed to update settings: " + err.getMessage()));
+    }
 }
