@@ -28,7 +28,7 @@ public class ChatService {
         this.userRepository = userRepository;
     }
 
-    public Future<JsonObject> createChat(Chat chat, String authId) {
+    public Future<JsonObject> getOrCreateChat(Chat chat, String authId) {
         if (chat.getParticipants() == null || chat.getParticipants().isEmpty()) {
             return Future.failedFuture("participants list is required");
         }
@@ -46,28 +46,53 @@ public class ChatService {
         chat.setParticipants(uniqueParticipants);
 
         if (chat.getStatus() == null) {
-            chat.setStatus(ChatStatus.PENDING);
+            chat.setStatus(ChatStatus.ACTIVE);
         }
         
         if (chat.getSourceType() == null) {
             return Future.failedFuture("Chat sourceType is required (CHAT_REQUEST or EXCHANGE_REQUEST)");
         }
 
-        return repository.findExistingChat(chat.getSourceType().name(), chat.getSourceId(), uniqueParticipants).compose(existing -> {
+        // 1. Search for an existing active conversation between the two users
+        return repository.findActiveChatBetweenUsers(uniqueParticipants.get(0), uniqueParticipants.get(1)).compose(existing -> {
             if (existing != null) {
-                return Future.failedFuture("CHAT_ALREADY_EXISTS");
+                log.debug("[LIFECYCLE] Chat REUSED | chatId={} sourceType={} sourceId={} authenticatedUserId={}", 
+                    existing.getId(), existing.getSourceType(), existing.getSourceId(), authId);
+                return Future.succeededFuture(new JsonObject()
+                    .put("chatId", existing.getId())
+                    .put("chatStatus", existing.getStatus().name())
+                    .put("sourceType", existing.getSourceType().name())
+                    .put("sourceId", existing.getSourceId()));
             }
 
-            return repository.createChat(chat).map(chatId -> {
-                log.debug("[LIFECYCLE] Chat CREATED | chatId={} sourceType={} sourceId={} authenticatedUserId={}", 
-                    chatId, chat.getSourceType(), chat.getSourceId(), authId);
-                return new JsonObject()
-                    .put("chatId", chatId)
-                    .put("chatStatus", chat.getStatus().name())
-                    .put("sourceType", chat.getSourceType().name())
-                    .put("sourceId", chat.getSourceId());
+            // 2. Otherwise, check if a chat exists with this source (safety fallback)
+            return repository.findExistingChat(chat.getSourceType().name(), chat.getSourceId(), uniqueParticipants).compose(existingSrc -> {
+                if (existingSrc != null) {
+                    log.debug("[LIFECYCLE] Chat REUSED by source | chatId={} sourceType={} sourceId={} authenticatedUserId={}", 
+                        existingSrc.getId(), existingSrc.getSourceType(), existingSrc.getSourceId(), authId);
+                    return Future.succeededFuture(new JsonObject()
+                        .put("chatId", existingSrc.getId())
+                        .put("chatStatus", existingSrc.getStatus().name())
+                        .put("sourceType", existingSrc.getSourceType().name())
+                        .put("sourceId", existingSrc.getSourceId()));
+                }
+
+                // 3. Create a new conversation if none exists
+                return repository.createChat(chat).map(chatId -> {
+                    log.debug("[LIFECYCLE] Chat CREATED | chatId={} sourceType={} sourceId={} authenticatedUserId={}", 
+                        chatId, chat.getSourceType(), chat.getSourceId(), authId);
+                    return new JsonObject()
+                        .put("chatId", chatId)
+                        .put("chatStatus", chat.getStatus().name())
+                        .put("sourceType", chat.getSourceType().name())
+                        .put("sourceId", chat.getSourceId());
+                });
             });
         });
+    }
+
+    public Future<JsonObject> createChat(Chat chat, String authId) {
+        return getOrCreateChat(chat, authId);
     }
 
     public Future<JsonObject> getUserChats(String userId, String statusFilter, String q, int page, int limit) {

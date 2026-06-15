@@ -284,6 +284,78 @@ export const AppDataProvider = ({ children }) => {
     }
   }, [user]);
 
+  const fetchSessionsOnly = useCallback(async () => {
+    if (!user?.userId) return;
+    try {
+      setIsSessionsLoading(true);
+      const sessionsRes = await sessionService.getSessions();
+      const rawSessions = sessionsRes?.items || [];
+      const sessionOtherUserIds = [...new Set(rawSessions.map(s => {
+        return s.teacherId === user.userId ? s.studentId : s.teacherId;
+      }).filter(Boolean))];
+
+      const userProfilesMap = {};
+      await Promise.all(sessionOtherUserIds.map(async (id) => {
+        try {
+          const res = await userService.getPublicProfile(id);
+          userProfilesMap[id] = res;
+        } catch (e) {}
+      }));
+
+      const getInitials = (name) => {
+        if (!name) return 'U';
+        const parts = name.split(' ');
+        if (parts.length > 1) return (parts[0][0] + parts[1][0]).toUpperCase();
+        return name.substring(0, 2).toUpperCase();
+      };
+
+      const mappedSessions = rawSessions.map(s => {
+        const otherId = s.teacherId === user.userId ? s.studentId : s.teacherId;
+        const otherProfile = userProfilesMap[otherId]?.profile || { name: 'Unknown User' };
+        
+        let dateStr = 'TBD';
+        let timeStr = 'TBD';
+        let monthStr = '';
+        let dayStr = '';
+        
+        if (s.scheduledStart) {
+          const d = new Date(s.scheduledStart);
+          dateStr = d.toLocaleDateString();
+          timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          const parts = d.toDateString().split(' ');
+          monthStr = parts[1].toUpperCase();
+          dayStr = parts[2];
+        }
+
+        return {
+          id: s._id || s.id,
+          rawSession: s,
+          topic: s.topic || 'Skill Session',
+          otherUser: otherProfile,
+          name: otherProfile.name,
+          init: getInitials(otherProfile.name),
+          bg: otherProfile.avatarColor?.bg || '#eef2ff',
+          col: otherProfile.avatarColor?.text || '#1d4ed8',
+          avatar: otherProfile.profilePicture || otherProfile.avatarImg,
+          role: s.teacherId === user.userId ? 'Teaching' : 'Learning',
+          status: s.status,
+          date: dateStr,
+          time: timeStr,
+          day: dayStr,
+          month: monthStr,
+          mode: s.mode === 'IN_PERSON' ? 'In-person' : 'Online'
+        };
+      });
+
+      setSessionsData(mappedSessions);
+    } catch (err) {
+      console.error('Failed to load sessions data', err);
+    } finally {
+      setIsSessionsLoading(false);
+    }
+  }, [user]);
+
+
   useEffect(() => {
     if (user?.userId) {
       fetchInitialData();
@@ -487,7 +559,9 @@ export const AppDataProvider = ({ children }) => {
         sessionsData,
         isSessionsLoading,
         fetchInitialData,
+        fetchSessionsOnly,
         toastMessage,
+
         triggerToast,
         notifications,
         markAllAsRead,

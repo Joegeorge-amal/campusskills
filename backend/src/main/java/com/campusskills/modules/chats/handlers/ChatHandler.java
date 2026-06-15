@@ -27,7 +27,7 @@ public class ChatHandler {
             }
             chat.getParticipants().add(authId);
             
-            chatService.createChat(chat, authId)
+            chatService.getOrCreateChat(chat, authId)
                 .onSuccess(data -> ApiResponse.created(ctx, data))
                 .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
         } catch (Exception e) {

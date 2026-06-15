@@ -160,7 +160,7 @@ public class ChatRequestService {
             chat.setParticipants(Arrays.asList(req.getSenderId(), authId));
             chat.setStatus(ChatStatus.ACTIVE);
 
-            return chatService.createChat(chat, req.getSenderId()).compose(chatRes -> {
+            return chatService.getOrCreateChat(chat, req.getSenderId()).compose(chatRes -> {
                 String chatId = chatRes.getString("chatId");
                 return repository.updateStatusAndChatId(requestId, RequestStatus.ACCEPTED, chatId).compose(v -> {
                     

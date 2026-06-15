@@ -5,8 +5,6 @@ import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import { sessionService } from '../services/sessionService';
 import ReportSessionModal from '../components/modals/ReportSessionModal';
-import { useSessionReminder } from '../hooks/useSessionReminder';
-import SessionReminderOverlay from '../components/modals/SessionReminderOverlay';
 import { 
   IconChevronDown, 
   IconChevronUp, 
@@ -25,9 +23,6 @@ import {
 const Sessions = () => {
   const { user } = useAuth();
   const { sessionsData, requestsData, isSessionsLoading, triggerToast, fetchInitialData } = useAppData();
-  
-  const { activeReminder, dismissReminder } = useSessionReminder(sessionsData);
-
   const [expandedSessionId, setExpandedSessionId] = useState(null);
   const [paymentInfos, setPaymentInfos] = useState({});
   const [loadingPaymentId, setLoadingPaymentId] = useState(null);
@@ -569,11 +564,6 @@ const Sessions = () => {
   return (
     <div id="sessions" className="pg on" style={{ padding: '32px 40px', backgroundColor: 'var(--cs-bg-light)', backgroundImage: 'radial-gradient(rgba(15, 23, 42, 0.06) 1px, transparent 1px)', backgroundSize: '24px 24px', minHeight: '100vh', boxSizing: 'border-box', overflowY: 'auto' }}>
       <ReportSessionModal />
-      <SessionReminderOverlay 
-        session={activeReminder} 
-        onDismiss={dismissReminder} 
-        onProposePostponement={(s) => setActiveSession(s)}
-      />
 
       {/* Coming up soon Section */}
       <div style={{ marginBottom: '28px' }}>

@@ -6,6 +6,7 @@ import Toast from '../components/common/Toast';
 import Sidebar from '../components/common/Sidebar/Sidebar';
 import AppHeader from '../components/common/AppHeader/AppHeader';
 import ConfirmModal from '../components/modals/ConfirmModal';
+import SessionReminderManager from '../components/modals/SessionReminderManager';
 import {
   IconHome,
   IconLayoutGrid,
@@ -214,6 +215,8 @@ const AppLayout = () => {
         confirmText="Sign Out"
         isDanger={true}
       />
+
+      <SessionReminderManager />
     </div>
   );
 };

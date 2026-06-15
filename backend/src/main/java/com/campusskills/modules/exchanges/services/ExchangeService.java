@@ -148,8 +148,17 @@ public class ExchangeService {
                 return Future.failedFuture("Exchange is not REQUESTED");
             }
 
-            // Update to ACCEPTED
-            return repository.updateStatus(exchangeId, ExchangeStatus.ACCEPTED).compose(updated -> {
+            // Resolve chat and update Exchange to ACCEPTED
+            com.campusskills.modules.chats.models.Chat newChat = new com.campusskills.modules.chats.models.Chat();
+            newChat.setSourceType(com.campusskills.shared.constants.ChatSourceType.EXCHANGE_REQUEST);
+            newChat.setSourceId(exchangeId);
+            newChat.setParticipants(java.util.Arrays.asList(exchange.getInitiatorId(), exchange.getReceiverId()));
+            newChat.setStatus(com.campusskills.shared.constants.ChatStatus.ACTIVE);
+
+            return chatService.getOrCreateChat(newChat, exchange.getReceiverId()).compose(chatRes -> {
+                String chatId = chatRes.getString("chatId");
+                return repository.updateStatusAndChatId(exchangeId, ExchangeStatus.ACCEPTED, chatId);
+            }).compose(updated -> {
                 sendNotification(
                     exchange.getInitiatorId(),
                     "EXCHANGE_REQUEST_ACCEPTED",
@@ -158,21 +167,6 @@ public class ExchangeService {
                     "EXCHANGE",
                     exchangeId
                 );
-
-
-                // Create a chat for the exchange if it doesn't exist
-                com.campusskills.modules.chats.models.Chat newChat = new com.campusskills.modules.chats.models.Chat();
-                newChat.setSourceType(com.campusskills.shared.constants.ChatSourceType.EXCHANGE_REQUEST);
-                newChat.setSourceId(exchangeId);
-                newChat.setParticipants(java.util.Arrays.asList(exchange.getInitiatorId(), exchange.getReceiverId()));
-                newChat.setStatus(com.campusskills.shared.constants.ChatStatus.ACTIVE);
-                
-                chatService.createChat(newChat, exchange.getReceiverId())
-                    .onFailure(err -> {
-                        if (!"CHAT_ALREADY_EXISTS".equals(err.getMessage())) {
-                            log.error("Failed to create chat for exchange", err);
-                        }
-                    });
 
                 return listingRepository.findById(exchange.getListingId()).compose(listing -> {
                     List<Future<String>> sessionFutures = new ArrayList<>();
