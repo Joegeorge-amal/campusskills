@@ -61,7 +61,7 @@ const AdminOverview = () => {
     );
   }
 
-  const { platformOverview, liveActivity, categoryPerformance, platformHealth, topTutors, recentRegistrations, pendingDisputes } = data;
+  const { platformOverview, liveActivity, categoryPerformance, platformHealth, topTutors, recentRegistrations, pendingDisputes, weeklyRegistrations } = data;
 
   return (
     <div className="admin-overview fade-in">
@@ -285,7 +285,7 @@ const AdminOverview = () => {
         <div className="admin-panel">
           <div className="admin-panel-header">
             <h3>Recent Registrations</h3>
-            <span className="panel-hdr-sub active-blue">+38 this week</span>
+            <span className="panel-hdr-sub active-blue">+{weeklyRegistrations || 0} this week</span>
           </div>
           <div className="admin-list-widget">
             {recentRegistrations.map(reg => (

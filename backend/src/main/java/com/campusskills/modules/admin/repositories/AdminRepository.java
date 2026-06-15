@@ -525,29 +525,77 @@ public class AdminRepository {
     }
 
     public Future<JsonArray> getRecentRegistrations() {
-        FindOptions options = new FindOptions().setSort(new JsonObject().put("createdAt", -1)).setLimit(5);
-        return client.findWithOptions("user_profiles", new JsonObject(), options).map(users -> {
-            JsonArray arr = new JsonArray();
-            for(JsonObject u : users) {
-                String name = u.getString("name", "Unknown");
-                
-                long diff = System.currentTimeMillis() - u.getLong("createdAt", System.currentTimeMillis());
-                long mins = diff / 60000;
-                long hrs = mins / 60;
-                long days = hrs / 24;
-                String timeStr = mins < 60 ? mins + "m ago" : (hrs < 24 ? hrs + "h ago" : days + "d ago");
+        JsonArray pipeline = new JsonArray()
+            .add(new JsonObject().put("$sort", new JsonObject().put("createdAt", -1)))
+            .add(new JsonObject().put("$limit", 5))
+            .add(new JsonObject().put("$lookup", new JsonObject()
+                .put("from", "users")
+                .put("localField", "userId")
+                .put("foreignField", "_id")
+                .put("as", "userAccount")
+            ))
+            .add(new JsonObject().put("$unwind", new JsonObject()
+                .put("path", "$userAccount")
+                .put("preserveNullAndEmptyArrays", true)
+            ));
 
-                arr.add(new JsonObject()
-                    .put("id", u.getString("userId"))
-                    .put("name", name)
-                    .put("initial", name.isEmpty() ? "U" : name.substring(0, 1).toUpperCase())
-                    .put("info", u.getString("department", "Unknown Dept"))
-                    .put("role", "Student")
-                    .put("time", timeStr)
-                );
-            }
-            return arr;
-        });
+        return client.aggregateWithOptions("user_profiles", pipeline, new io.vertx.ext.mongo.AggregateOptions()).collect(java.util.stream.Collectors.toList())
+            .map(results -> {
+                JsonArray arr = new JsonArray();
+                for (JsonObject u : results) {
+                    String name = u.getString("name", "Unknown");
+                    String programme = u.getString("programme", null);
+                    String year = u.getString("year", null);
+
+                    String info = "";
+                    if (programme != null && !programme.isEmpty()) {
+                        info = programme;
+                        if (year != null && !year.isEmpty()) {
+                            info += " · " + year;
+                        }
+                    } else {
+                        info = "New User";
+                    }
+
+                    // Get the actual role from the users collection
+                    JsonObject userAccount = u.getJsonObject("userAccount");
+                    String role = "Student";
+                    if (userAccount != null) {
+                        String rawRole = userAccount.getString("role", "USER");
+                        if ("ADMIN".equalsIgnoreCase(rawRole) || "SUPER_ADMIN".equalsIgnoreCase(rawRole)) {
+                            role = "Admin";
+                        }
+                    }
+
+                    // Check if user has any listings (tutor indicator)
+                    boolean hasListings = u.containsKey("skillsOffered") && u.getJsonArray("skillsOffered") != null && !u.getJsonArray("skillsOffered").isEmpty();
+                    if (hasListings && "Student".equals(role)) {
+                        role = "Tutor";
+                    }
+
+                    long diff = System.currentTimeMillis() - u.getLong("createdAt", System.currentTimeMillis());
+                    long mins = diff / 60000;
+                    long hrs = mins / 60;
+                    long days = hrs / 24;
+                    String timeStr = mins < 60 ? mins + "m ago" : (hrs < 24 ? hrs + "h ago" : days + "d ago");
+
+                    arr.add(new JsonObject()
+                        .put("id", u.getString("userId"))
+                        .put("name", name)
+                        .put("initial", name.isEmpty() ? "U" : name.substring(0, 1).toUpperCase())
+                        .put("info", info)
+                        .put("role", role)
+                        .put("time", timeStr)
+                    );
+                }
+                return arr;
+            });
+    }
+
+    public Future<Long> getWeeklyRegistrationCount() {
+        long oneWeekAgo = System.currentTimeMillis() - (7L * 24 * 60 * 60 * 1000);
+        JsonObject query = new JsonObject().put("createdAt", new JsonObject().put("$gte", oneWeekAgo));
+        return client.count("user_profiles", query);
     }
 
     public Future<JsonArray> getPendingDisputes() {

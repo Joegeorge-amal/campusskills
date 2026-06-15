@@ -222,12 +222,17 @@ public class AdminService {
                 .put("disputeRate", 0L)
                 .put("positiveRatingRate", 0L)));
             
-        return io.vertx.core.CompositeFuture.all(java.util.Arrays.asList(statsFuture, recentRegsFuture, pendingDispsFuture, catPerfFuture, topTutorsFuture, liveActivityFuture, healthMetricsFuture))
+        Future<Long> weeklyRegsFuture = adminRepository.getWeeklyRegistrationCount()
+            .recover(err -> Future.succeededFuture(0L));
+            
+        return io.vertx.core.CompositeFuture.all(java.util.Arrays.asList(statsFuture, recentRegsFuture, pendingDispsFuture, catPerfFuture, topTutorsFuture, liveActivityFuture, healthMetricsFuture, weeklyRegsFuture))
             .map(cf -> {
                 JsonObject health = (JsonObject) cf.resultAt(6);
+                Long weeklyRegs = cf.resultAt(7);
                 return new JsonObject()
                     .put("platformOverview", (JsonObject) cf.resultAt(0))
                     .put("recentRegistrations", (io.vertx.core.json.JsonArray) cf.resultAt(1))
+                    .put("weeklyRegistrations", weeklyRegs)
                     .put("pendingDisputes", (io.vertx.core.json.JsonArray) cf.resultAt(2))
                     .put("categoryPerformance", (JsonObject) cf.resultAt(3))
                     .put("topTutors", (io.vertx.core.json.JsonArray) cf.resultAt(4))

@@ -10,44 +10,82 @@
   overflow: hidden;
 }
 
-/* ─── TOP NAVBAR (DARK) ─── */
+/* ─── TOP NAVBAR (GRADIENT GLASS) ─── */
 .admin-topnav {
-  height: 64px;
+  height: 68px;
   width: 100%;
   box-sizing: border-box;
-  background-color: rgba(17, 24, 39, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 35%, #3b82f6 70%, #6366f1 100%);
+  background-size: 200% 200%;
+  animation: navGradientShift 8s ease infinite;
   color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 24px;
+  padding: 0 28px;
   flex-shrink: 0;
   z-index: 20;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 30px rgba(59, 130, 246, 0.25), 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: visible;
+}
+
+.admin-topnav::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  pointer-events: none;
+}
+
+.admin-topnav::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+}
+
+@keyframes navGradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .admin-topnav-left {
   display: flex;
   align-items: center;
+  position: relative;
+  z-index: 1;
 }
 
 .admin-logo-group {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 .admin-logo-circle {
-  width: 32px;
-  height: 32px;
+  width: 38px;
+  height: 38px;
   background: #ffffff;
-  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  padding: 3px;
+}
+
+.admin-logo-circle:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
 }
 
 .admin-logo-img {
@@ -57,25 +95,33 @@
 }
 
 .admin-brand-name {
-  font-weight: 700;
-  font-size: 1.1rem;
-  letter-spacing: -0.02em;
+  font-weight: 800;
+  font-size: 1.15rem;
+  letter-spacing: -0.03em;
+  background: linear-gradient(135deg, #ffffff 0%, #c7d2fe 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .admin-badge-pill {
-  background: #1e3a8a;
-  color: #60a5fa;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(6px);
+  color: #e0e7ff;
   font-size: 10px;
   font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 12px;
-  letter-spacing: 0.5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .admin-topnav-right {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
 }
 
 .admin-nav-notifications {
@@ -83,55 +129,69 @@
 }
 
 .admin-bell-btn {
-  background: transparent;
-  border: none;
-  color: #9ca3af;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.85);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 8px;
-  border-radius: 50%;
+  padding: 9px;
+  border-radius: 10px;
   position: relative;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(4px);
 }
 
 .admin-bell-btn:hover {
-  background: #1f2937;
+  background: rgba(255, 255, 255, 0.2);
   color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .admin-bell-badge {
   position: absolute;
-  top: 4px;
-  right: 4px;
+  top: 2px;
+  right: 2px;
   background: #ef4444;
   color: white;
   font-size: 10px;
   font-weight: 700;
   padding: 2px 5px;
   border-radius: 10px;
-  border: 2px solid #111827;
+  border: 2px solid rgba(30, 58, 138, 0.8);
+  animation: badgePulse 2s ease-in-out infinite;
+}
+
+@keyframes badgePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
 }
 
 .admin-user-profile {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding-left: 24px;
-  border-left: 1px solid #374151;
+  padding: 6px 6px 6px 14px;
+  margin-left: 8px;
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+  cursor: default;
 }
 
 .admin-avatar {
   width: 36px;
   height: 36px;
-  background: #3b82f6;
-  border-radius: 50%;
+  background: linear-gradient(135deg, #818cf8, #6366f1);
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 14px;
+  color: #ffffff;
+  border: 1.5px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
 }
 
 .admin-user-info {
@@ -142,68 +202,36 @@
 .admin-user-name {
   font-size: 0.85rem;
   font-weight: 600;
+  color: #ffffff;
 }
 
 .admin-user-role {
-  font-size: 0.75rem;
-  color: #9ca3af;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.02em;
 }
 
 .admin-signout-btn {
-  background: transparent;
-  border: 1px solid #374151;
-  color: #e5e7eb;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 500;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #e0e7ff;
+  padding: 7px 16px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(4px);
 }
 
 .admin-signout-btn:hover {
-  background: #1f2937;
-  border-color: #4b5563;
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+  transform: translateY(-1px);
 }
 
 /* ─── NOTIFICATIONS DROPDOWN ─── */
-.admin-nav-notifications {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.admin-bell-btn {
-  background: transparent;
-  border: none;
-  color: #9ca3af;
-  cursor: pointer;
-  position: relative;
-  padding: 8px;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-
-.admin-bell-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #f3f4f6;
-}
-
-.admin-bell-badge {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  background: #ef4444;
-  color: white;
-  font-size: 10px;
-  font-weight: bold;
-  padding: 2px 5px;
-  border-radius: 10px;
-  line-height: 1;
-}
 
 .admin-notif-dropdown {
   position: absolute;
@@ -1535,6 +1563,60 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.ar-empty-state,
+.as-empty-state,
+.admin-users-empty {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 64px 24px;
+  text-align: center;
+  color: #64748b;
+  font-size: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ar-empty-illustration {
+  margin-bottom: 24px;
+}
+
+.ar-empty-icon-ring {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ecfdf5 0%, #eff6ff 50%, #f0f9ff 100%);
+  border: 2px solid #d1fae5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #10b981;
+  animation: emptyPulse 3s ease-in-out infinite;
+}
+
+@keyframes emptyPulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.15); }
+  50% { transform: scale(1.05); box-shadow: 0 0 0 16px rgba(16, 185, 129, 0); }
+}
+
+.ar-empty-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 8px 0;
+}
+
+.ar-empty-desc {
+  font-size: 0.95rem;
+  color: #94a3b8;
+  line-height: 1.6;
+  margin: 0;
+  max-width: 400px;
 }
 
 .ar-card {
