@@ -7,7 +7,8 @@ const ProfileHeader = ({
   isOwner = false, 
   onEditProfile,
   onImageChange,
-  onRemovePhoto
+  onRemovePhoto,
+  publicActions
 }) => {
   const [isBannerHovered, setIsBannerHovered] = useState(false);
   const [bannerGradient, setBannerGradient] = useState(null);
@@ -55,7 +56,9 @@ const ProfileHeader = ({
       </div>
 
       <div style={{ margin: '-68px auto 0', padding: '0 24px', position: 'relative', pointerEvents: 'none' }}>
-        <Heatmap visible={user?.heatmapVisibility !== false} />
+        {user?.heatmapVisibility !== false && (
+          <Heatmap visible={true} />
+        )}
 
         <div style={{ pointerEvents: 'auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
@@ -69,8 +72,8 @@ const ProfileHeader = ({
               <Avatar initials={initials} bg={user?.avatarColor?.bg || "#eef2ff"} color={user?.avatarColor?.text || "#1d4ed8"} backgroundImage={user?.avatarImg} size="120px" fontSize="44px" />
             </div>
             
-            {isOwner && (
-              <div style={{ display: 'flex', gap: '12px', marginTop: '80px' }}>
+            <div style={{ display: 'flex', gap: '12px', marginTop: '80px', alignItems: 'center' }}>
+              {isOwner ? (
                 <button 
                   onClick={onEditProfile} 
                   className="btn-secondary"
@@ -78,8 +81,10 @@ const ProfileHeader = ({
                 >
                   Edit Profile
                 </button>
-              </div>
-            )}
+              ) : (
+                publicActions
+              )}
+            </div>
           </div>
         </div>
       </div>
