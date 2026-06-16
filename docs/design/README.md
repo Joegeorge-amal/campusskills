@@ -1,31 +1,31 @@
-#### CampusSkills UI/UX Design Documentation
+# CampusSkills UI/UX Design Documentation
 
-# Overview
+## Overview
 
 CampusSkills is a peer-to-peer skill exchange platform designed to enable students to teach, learn, and collaborate through structured skill-sharing sessions.
 
 The platform provides an integrated ecosystem where students can discover skills, create learning opportunities, exchange expertise, and track their progress through an intuitive digital experience.
 
 
-# Designers
+## Designers
 
 Lakshitha & Ajay
 
-# Role
+## Role
 
 UI/UX Designer
 
-# Design Tool
+## Design Tool
 
 Figma
 
-## Project Scope
+# Project Scope
 
-# Total Screens Designed
+## Total Screens Designed
 
 51 Screens
 
-# Design Approach
+## Design Approach
 
 * Modern SaaS Dashboard
 * Student-Centric Experience
@@ -34,9 +34,9 @@ Figma
 * Scalable Component Design
 
 
-## Modules Designed
+# Modules Designed
 
-# Student Module
+## Student Module
 
 * Landing Page
 * Login & Registration
@@ -49,7 +49,7 @@ Figma
 * Notifications
 * Progress Tracking
 
-# Session Management
+## Session Management
 
 * Create Online Session
 * Create Offline Session
@@ -57,7 +57,7 @@ Figma
 * Session Exchange
 * Session Returns
 
-# Admin Module
+## Admin Module
 
 * Admin Dashboard
 * User Management
@@ -66,22 +66,22 @@ Figma
 * Platform Monitoring
 
 
-## Design Principles
+# Design Principles
 
-# Trust & Collaboration
+## Trust & Collaboration
 
 Blue was selected as the primary color to communicate trust, collaboration, and professionalism.
 
-# Information Clarity
+## Information Clarity
 
 A card-based layout was implemented to improve information hierarchy and allow users to quickly scan sessions, requests, and statistics.
 
-# User-Centered Experience
+## User-Centered Experience
 
 The platform was designed specifically for college students participating in peer-to-peer skill exchange programs.
 
 
-# Deliverables
+## Deliverables
 
 * High-Fidelity UI Screens
 * Interactive Prototype
@@ -92,7 +92,7 @@ The platform was designed specifically for college students participating in pee
 * Admin Interfaces
 
 
-## Documentation
+# Documentation
 
 Additional design resources can be found in:
 
