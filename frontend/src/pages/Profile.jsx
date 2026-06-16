@@ -557,7 +557,7 @@ const Profile = () => {
         {/* Verified Skills Section */}
         <div style={{ marginBottom: '32px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-            <div style={{ background: '#ecfdf5', borderRadius: '50%', padding: '2px' }}>
+            <div style={{ width: '24px', height: '24px', background: '#ecfdf5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <IconCheck size={14} strokeWidth={3} style={{ color: '#22c55e' }} />
             </div>
             <span style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>Verified Skills</span>
@@ -614,9 +614,9 @@ const Profile = () => {
         {pendingSkills.length > 0 && (
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-              <div style={{ background: '#fef3c7', borderRadius: '50%', padding: '2px' }}>
-                <IconCircle size={14} strokeWidth={3} style={{ color: '#f59e0b' }} />
-              </div>
+            <div style={{ width: '24px', height: '24px', background: '#fef3c7', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <IconCircle size={14} strokeWidth={3} style={{ color: '#f59e0b' }} />
+            </div>
               <span style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>Pending Verification</span>
               <span style={{ fontSize: '11px', color: '#6b7280', background: '#f3f4f6', padding: '2px 8px', borderRadius: '100px', fontWeight: 600 }}>{pendingSkills.length}</span>
             </div>
