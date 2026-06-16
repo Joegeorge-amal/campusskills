@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useAppData } from '../context/AppDataContext';
 import Avatar from '../components/common/Avatar';
+import ReviewSection from '../components/profile/ReviewSection';
 import { 
   IconCheck, 
   IconCalendarMonth, 
@@ -29,6 +30,18 @@ const Profile = () => {
   const { user, updateProfile } = useAuth();
   const { triggerToast } = useAppData();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.scrollToReviews) {
+      setTimeout(() => {
+        const el = document.getElementById('reviews-section');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 300);
+    }
+  }, [location.state]);
 
   const [newSkill, setNewSkill] = useState('');
   const [activeQuizSkill, setActiveQuizSkill] = useState(null);
@@ -697,6 +710,15 @@ const Profile = () => {
               })}
             </div>
           )}
+        </div>
+
+        {/* Reviews History Section */}
+        <div style={{ marginTop: '40px' }}>
+          <ReviewSection 
+            userId={user?.userId || user?.id || user?._id}
+            averageRating={user?.stats?.ratingAvg}
+            reviewCount={user?.stats?.ratingCount}
+          />
         </div>
       </div>
       </div>

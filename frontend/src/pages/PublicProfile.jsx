@@ -7,6 +7,7 @@ import ProfileHeader from '../components/profile/ProfileHeader';
 import StatsCards from '../components/profile/StatsCards';
 import TrustScore from '../components/profile/TrustScore';
 import VerifiedSkills from '../components/profile/VerifiedSkills';
+import ReviewSection from '../components/profile/ReviewSection';
 import MarketplaceCard from '../components/common/MarketplaceCard/MarketplaceCard';
 
 import { userService } from '../services/userService';
@@ -135,6 +136,15 @@ const PublicProfile = () => {
             </div>
           </div>
         )}
+        
+        {/* Reviews Section */}
+        <div style={{ marginBottom: '40px' }}>
+          <ReviewSection 
+            userId={profileData.userId} 
+            averageRating={statsData?.ratingAvg}
+            reviewCount={statsData?.ratingCount}
+          />
+        </div>
       </div>
     </div>
   );

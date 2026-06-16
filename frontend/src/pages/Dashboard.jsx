@@ -9,37 +9,35 @@ import {
   IconSparkles, 
   IconCheck, 
   IconStarFilled, 
-  IconStar,
-  IconArrowUpRight 
+  IconStar
 } from '@tabler/icons-react';
 
 const Dashboard = () => {
   const [isCreateSessionOpen, setIsCreateSessionOpen] = React.useState(false);
   const { user } = useAuth();
   const { 
-    bookedSessions = [], 
-    conversations = [], 
-    requests = [],
+    sessionsData = [], 
+    requestsData = [],
     acceptRequest,
     declineRequest
   } = useAppData();
   const navigate = useNavigate();
 
+  // Get completed sessions
+  const completedSessions = sessionsData.filter(s => s.status === 'COMPLETED');
+
   // Mock stats
   const stats = {
     trustScore: user?.stats?.ratingAvg?.toFixed(1) || '0.0',
     skillsOffered: user?.skillsOffered?.length || 0,
-    sessionsDone: user?.stats?.sessionsCompleted || 0
+    sessionsDone: completedSessions.length
   };
 
-  // Get upcoming sessions for the dashboard (limit to 2)
-  const upcomingSessions = bookedSessions.filter(s => s.status === 'join' || s.status === 'soon').slice(0, 2);
-
-  // Get recent chats (limit to 2)
-  const recentChats = conversations.slice(0, 2);
+  // Get upcoming sessions for the dashboard (limit to 2 or 3)
+  const upcomingSessions = sessionsData.filter(s => s.status === 'SCHEDULED').slice(0, 3);
 
   // Filter for real incoming pending requests
-  const pendingRequests = requests.filter(r => r.direction === 'incoming' && r.status === 'pending');
+  const pendingRequests = requestsData.filter(r => r.direction === 'incoming' && r.status === 'pending');
   const activeRequest = pendingRequests.length > 0 ? pendingRequests[0] : null;
 
   if (!user) return null;
@@ -90,7 +88,7 @@ const Dashboard = () => {
                 {stats.trustScore} <IconStarFilled size={16} style={{ color: '#facc15' }} />
               </div>
               <div style={{ fontSize: '10px', color: 'rgba(255, 255, 255, 0.8)', fontWeight: 500 }}>
-                Trust score · Top 10%
+                Trust score
               </div>
             </div>
             <button 
@@ -114,9 +112,6 @@ const Dashboard = () => {
               <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '2px', lineHeight: 1 }}>{stats.skillsOffered}</div>
               <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500 }}>Skills offered</div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', fontWeight: 700, color: '#059669', marginTop: '2px' }}>
-              <IconArrowUpRight size={12} strokeWidth={2.5} /> Active
-            </div>
           </div>
 
           {/* Stat 2 */}
@@ -128,13 +123,14 @@ const Dashboard = () => {
               <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '2px', lineHeight: 1 }}>{stats.sessionsDone}</div>
               <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500 }}>Sessions done</div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', fontWeight: 700, color: '#059669', marginTop: '2px' }}>
-              <IconArrowUpRight size={12} strokeWidth={2.5} /> +2 this week
-            </div>
           </div>
 
           {/* Stat 3 */}
-          <div className="glossy-card" style={{ background: '#ffffff', borderRadius: '12px', padding: '16px', border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div 
+            className="glossy-card" 
+            onClick={() => navigate('/app/profile', { state: { scrollToReviews: true } })}
+            style={{ background: '#ffffff', borderRadius: '12px', padding: '16px', border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column', gap: '10px', cursor: 'pointer' }}
+          >
             <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: '#fef3c7', color: '#92400e', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 2px rgba(0, 0, 0, 0.15)' }}>
               <IconStar size={24} strokeWidth={1.5} />
             </div>
@@ -142,14 +138,14 @@ const Dashboard = () => {
               <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '2px', lineHeight: 1 }}>{stats.trustScore}</div>
               <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500 }}>Trust score</div>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', fontWeight: 700, color: '#059669', marginTop: '2px' }}>
-              <IconArrowUpRight size={12} strokeWidth={2.5} /> Top 10%
+            <div style={{ fontSize: '11px', color: '#6b7280', fontWeight: 500 }}>
+              Based on {user?.stats?.ratingCount || 0} reviews
             </div>
           </div>
 
         </div>
 
-        {/* Two Column Layout: Sessions & Messages */}
+        {/* Two Column Layout: Sessions & Pending Requests */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
           
           {/* Upcoming Sessions Card */}
@@ -161,20 +157,23 @@ const Dashboard = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', overflowY: 'auto' }}>
               {upcomingSessions.length > 0 ? upcomingSessions.map((session, i) => (
                 <div key={session.id || i} style={{ border: '1px solid #dbeafe', borderRadius: '16px', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '16px', background: 'linear-gradient(to bottom right, rgba(239, 246, 255, 0.6) 0%, rgba(255, 255, 255, 0.6) 100%)' }}>
-                  <div style={{ background: session.status === 'soon' ? '#3b82f6' : '#1d4ed8', borderRadius: '14px', width: '48px', height: '56px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#ffffff', boxShadow: session.status === 'soon' ? '0 4px 12px rgba(59, 130, 246, 0.4)' : '0 4px 12px rgba(29, 78, 216, 0.4)' }}>
-                    <div style={{ fontSize: '18px', fontWeight: 700, lineHeight: 1.1 }}>{session.date?.split(' ')[0] || '22'}</div>
+                  <div style={{ background: '#1d4ed8', borderRadius: '14px', width: '48px', height: '56px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#ffffff', boxShadow: '0 4px 12px rgba(29, 78, 216, 0.4)' }}>
+                    <div style={{ fontSize: '18px', fontWeight: 700, lineHeight: 1.1 }}>{session.day || '22'}</div>
                     <div style={{ fontSize: '10px', fontWeight: 600, textTransform: 'uppercase' }}>{session.month || 'MAY'}</div>
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#111827', marginBottom: '2px' }}>{session.title || 'React.js'}{session.partner ? ` · ${session.partner}` : ''}</div>
-                    <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500 }}>{session.time || '4:00 PM'} · {session.type === 'swap' ? 'Swap' : 'Online'}</div>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#111827', marginBottom: '2px' }}>
+                      {session.topic}
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#4b5563', fontWeight: 600, marginBottom: '2px' }}>
+                      Partner: {session.name}
+                    </div>
+                    <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500 }}>
+                      {session.time} · {session.mode}
+                    </div>
                   </div>
                   <div>
-                    {session.status === 'soon' ? (
-                      <button style={{ fontSize: '12px', padding: '8px 20px', borderRadius: '14px', border: '1px solid #e5e7eb', background: '#ffffff', color: '#9ca3af', fontWeight: 700 }} disabled>Soon</button>
-                    ) : (
-                      <button style={{ fontSize: '12px', padding: '8px 20px', borderRadius: '14px', border: 'none', background: '#1e3a8a', color: '#ffffff', cursor: 'pointer', fontWeight: 700 }}>Join</button>
-                    )}
+                    <button onClick={() => navigate('/app/sessions')} style={{ fontSize: '12px', padding: '8px 20px', borderRadius: '14px', border: 'none', background: '#1e3a8a', color: '#ffffff', cursor: 'pointer', fontWeight: 700 }}>Open</button>
                   </div>
                 </div>
               )) : (
@@ -183,34 +182,43 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Recent Messages Card */}
+          {/* Pending Requests Card */}
           <div className="glossy-card" style={{ background: '#ffffff', borderRadius: '12px', padding: '16px', border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <span style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>Recent messages</span>
-              <button onClick={() => navigate('/app/messages')} style={{ fontSize: '12px', color: '#1d4ed8', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}>Open</button>
+              <span style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>Pending Requests</span>
+              <button onClick={() => navigate('/app/requests')} style={{ fontSize: '12px', color: '#1d4ed8', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}>Open</button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', overflowY: 'auto' }}>
-              {recentChats.map((chat, idx) => (
-                <div key={chat.id} onClick={() => navigate(`/app/messages/${chat.id}`)} style={{ border: '1px solid #f3f4f6', borderRadius: '10px', padding: '12px', display: 'flex', alignItems: 'center', gap: '12px', background: '#ffffff', cursor: 'pointer' }}>
-                  <div style={{ position: 'relative' }}>
-                    <Avatar initials={chat.init || 'U'} bg={chat.bg || '#e0e7ff'} color={chat.col || '#1e40af'} size="38px" fontSize="13px" />
-                    {idx === 0 && (
-                      <div style={{ position: 'absolute', bottom: '0px', right: '0px', width: '10px', height: '10px', background: '#10b981', border: '2px solid #ffffff', borderRadius: '50%' }}></div>
-                    )}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '13px', fontWeight: 700, color: '#111827', marginBottom: '2px' }}>{chat.name || 'Unknown User'}</div>
-                    <div style={{ fontSize: '11px', color: '#6b7280', fontWeight: 500 }}>{chat.preview || chat.lastMsg || 'No messages'}</div>
-                  </div>
-                  {chat.unread > 0 && (
-                    <div style={{ background: '#1d4ed8', color: '#ffffff', fontSize: '10px', fontWeight: 700, width: '20px', height: '20px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      {chat.unread}
+              {pendingRequests.length > 0 ? pendingRequests.map((req, i) => {
+                let reqType = 'Session Request';
+                if (req.type?.toLowerCase().includes('swap')) {
+                  reqType = 'Swap Request';
+                } else if (req.type?.toLowerCase().includes('chat')) {
+                  reqType = 'Chat Request';
+                } else if (req.otherUserExtras?.listingType === 'TEACH' || req.otherUserExtras?.listingType === 'TEACH_SWAP') {
+                  reqType = 'Teach Request';
+                } else if (req.otherUserExtras?.listingType === 'LEARN' || req.otherUserExtras?.listingType === 'LEARN_SWAP') {
+                  reqType = 'Learn Request';
+                }
+
+                const listingTitle = req.otherUserExtras?.listingTitle || 'Skill Session';
+                const participantName = req.name || 'Unknown User';
+
+                return (
+                  <div key={req.id || i} style={{ border: '1px solid #f3f4f6', borderRadius: '10px', padding: '12px', display: 'flex', alignItems: 'center', gap: '12px', background: '#ffffff' }}>
+                    <Avatar initials={req.init || 'U'} bg={req.bg || '#e0e7ff'} color={req.col || '#1e40af'} size="38px" fontSize="13px" />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--cs-primary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '2px' }}>
+                        {reqType}
+                      </div>
+                      <div style={{ fontSize: '13px', fontWeight: 600, color: '#111827' }}>
+                        {listingTitle} • {participantName}
+                      </div>
                     </div>
-                  )}
-                </div>
-              ))}
-              {recentChats.length === 0 && (
-                <div style={{ fontSize: '12px', color: '#9ca3af', padding: '16px 0', textAlign: 'center' }}>No recent messages.</div>
+                  </div>
+                );
+              }) : (
+                <div style={{ fontSize: '12px', color: '#9ca3af', padding: '16px 0', textAlign: 'center' }}>No pending requests.</div>
               )}
             </div>
           </div>

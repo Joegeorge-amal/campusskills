@@ -14,6 +14,10 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.campusskills.modules.users.models.UserProfile;
+import com.campusskills.modules.sessions.models.Session;
+import java.util.stream.Collectors;
+
 public class ReviewService {
     private static final Logger log = LoggerFactory.getLogger(ReviewService.class);
 
@@ -114,20 +118,35 @@ public class ReviewService {
         if (limit < 1 || limit > 100) limit = 20;
         int skip = (page - 1) * limit;
 
-        // Optionally, we could count total reviews here, but the user profile already has reviewCount.
-        // So we just fetch the list.
         final int fLimit = limit;
         final int fPage = page;
         
-        return reviewRepository.fetchUserReviews(userId, skip, limit).map(list -> {
-            JsonArray items = new JsonArray();
-            for (Review r : list) {
-                items.add(JsonObject.mapFrom(r));
-            }
-            return new JsonObject()
-                .put("items", items)
-                .put("page", fPage)
-                .put("limit", fLimit);
+        return reviewRepository.fetchUserReviews(userId, skip, limit).compose(list -> {
+            List<Future<JsonObject>> futures = list.stream().map(r -> {
+                Future<UserProfile> profFut = userProfileRepository.findByUserId(r.getReviewerId());
+                Future<Session> sessFut = r.getSessionId() != null ? sessionRepository.getSessionById(r.getSessionId()) : Future.succeededFuture(null);
+                
+                return Future.join(profFut, sessFut).map(join -> {
+                    UserProfile profile = join.resultAt(0);
+                    Session session = join.resultAt(1);
+                    
+                    JsonObject json = JsonObject.mapFrom(r);
+                    json.put("reviewerName", profile != null ? profile.getName() : "Unknown User");
+                    json.put("sessionTitle", session != null ? session.getTopic() : "Skill Session");
+                    return json;
+                });
+            }).collect(Collectors.toList());
+            
+            return Future.all(futures).map(all -> {
+                JsonArray items = new JsonArray();
+                for (int i = 0; i < all.size(); i++) {
+                    items.add((JsonObject) all.resultAt(i));
+                }
+                return new JsonObject()
+                    .put("items", items)
+                    .put("page", fPage)
+                    .put("limit", fLimit);
+            });
         });
     }
 
