@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { IconShieldCheck, IconShieldCheckFilled, IconSparkles } from '@tabler/icons-react';
 import { motion } from 'framer-motion';
 
-const TrustScore = ({ trustScorePercent, isProfileVerified, totalSkills, verifiedCount }) => {
+const TrustScore = ({ trustScorePercent, isProfileVerified, totalSkills, verifiedCount, variant = 'default' }) => {
   const [isFlyingUp, setIsFlyingUp] = useState(false);
   const prevScoreRef = useRef(trustScorePercent);
 
@@ -15,6 +15,62 @@ const TrustScore = ({ trustScorePercent, isProfileVerified, totalSkills, verifie
     }
     prevScoreRef.current = trustScorePercent;
   }, [trustScorePercent, totalSkills]);
+
+  if (variant === 'blue') {
+    return (
+      <div style={{ 
+        background: 'linear-gradient(90deg, #3b82f6 0%, #3174f6 100%)', 
+        borderRadius: '12px', 
+        padding: '20px 24px', 
+        marginBottom: '32px',
+        boxShadow: '0 4px 12px rgba(59, 130, 246, 0.2)'
+      }}>
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '20px',
+          marginBottom: '16px'
+        }}>
+          <div style={{ 
+            background: 'rgba(255, 255, 255, 0.2)', 
+            width: '64px',
+            height: '64px',
+            borderRadius: '16px', 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            flexShrink: 0
+          }}>
+            <IconShieldCheck size={36} stroke={1.5} style={{ color: '#ffffff' }} />
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div style={{ fontSize: '15px', color: 'rgba(255, 255, 255, 0.95)', fontWeight: 500, marginBottom: '2px' }}>
+              Verification Trust Score
+            </div>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
+              <div style={{ fontSize: '42px', fontWeight: 800, color: '#ffffff', lineHeight: 1, letterSpacing: '-1px' }}>
+                {trustScorePercent}%
+              </div>
+              <div style={{ fontSize: '14px', color: 'rgba(255, 255, 255, 0.9)', fontWeight: 500 }}>
+                {verifiedCount} / {totalSkills} verified
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Progress Bar */}
+        <div style={{ height: '6px', background: 'rgba(255, 255, 255, 0.2)', borderRadius: '100px', overflow: 'hidden' }}>
+          <div style={{ 
+            height: '100%', 
+            width: `${trustScorePercent}%`, 
+            background: '#ffffff', 
+            borderRadius: '100px',
+            transition: 'width 1s cubic-bezier(0.34, 1.56, 0.64, 1)'
+          }}></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ background: '#ffffff', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', marginBottom: '32px', border: '1px solid #f3f4f6', position: 'relative', overflow: 'hidden' }}>
