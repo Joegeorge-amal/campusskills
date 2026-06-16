@@ -342,26 +342,28 @@ button, input, select, textarea {
 
 /* ─── DARK MODE ─── */
 [data-theme="dark"] {
-  --cs-bg-light: #0f0f15;
-  --cs-bg-white: #16161f;
-  --cs-bg-hover: #1e1e2b;
-  --cs-bg-app: #0a0a0e;
-  --cs-bg-card: #1a1a25;
-  --cs-bg-elevated: #22223a;
-  --cs-bg-input: #1a1a28;
+  --cs-bg-light: #0f172a;
+  --cs-bg-white: #1E293B;
+  --cs-bg-hover: #273548;
+  --cs-bg-app: #0a0e17;
+  --cs-bg-card: #1E293B;
+  --cs-bg-elevated: #2a3a4e;
+  --cs-bg-input: #1a2738;
 
-  --cs-text-main: #e4e4ec;
-  --cs-text-secondary: #9a9ab0;
-  --cs-text-inactive: #6a6a7e;
-  --cs-text-muted: #505065;
+  --cs-text-main: #f1f5f9;
+  --cs-text-secondary: #94a3b8;
+  --cs-text-inactive: #64748b;
+  --cs-text-muted: #4b5565;
 
-  --cs-border: rgba(255, 255, 255, 0.06);
+  --cs-border: rgba(255, 255, 255, 0.08);
   --cs-border-light: rgba(255, 255, 255, 0.04);
-  --cs-shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
-  --cs-shadow-md: 0 8px 30px rgba(0, 0, 0, 0.5);
-  --cs-shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.6);
+  --cs-card-border: #334155;
 
-  --cs-overlay: rgba(0, 0, 0, 0.7);
+  --cs-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --cs-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+  --cs-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5), 0 4px 8px rgba(0, 0, 0, 0.3);
+
+  --cs-overlay: rgba(0, 0, 0, 0.75);
 }
 
 [data-theme="dark"] body {
@@ -1490,4 +1492,34 @@ button, input, select, textarea {
 
 [data-theme="dark"] .ar-notes {
   color: #22c55e;
+}
+
+/* ─── CARD STYLING OVERRIDE ─── */
+[data-theme="dark"] .mc,
+[data-theme="dark"] .rc,
+[data-theme="dark"] .sc,
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .auth-card,
+[data-theme="dark"] .setup-card,
+[data-theme="dark"] .modal-content,
+[data-theme="dark"] .photo-modal,
+[data-theme="dark"] .admin-modal,
+[data-theme="dark"] .admin-panel,
+[data-theme="dark"] .admin-ostard,
+[data-theme="dark"] .admin-user-row,
+[data-theme="dark"] .ar-card,
+[data-theme="dark"] .as-card,
+[data-theme="dark"] .notif-panel,
+[data-theme="dark"] .txn-item,
+[data-theme="dark"] .landing-feature-card,
+[data-theme="dark"] .landing-testimonial-card {
+  border-color: var(--cs-card-border) !important;
+}
+
+[data-theme="dark"] .admin-panel,
+[data-theme="dark"] .admin-ostard,
+[data-theme="dark"] .admin-user-row,
+[data-theme="dark"] .ar-card,
+[data-theme="dark"] .as-card {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
