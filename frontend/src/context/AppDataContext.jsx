@@ -45,10 +45,10 @@ export const AppDataProvider = ({ children }) => {
       setIsSessionsLoading(true);
 
       const [chatsRes, exchangesData, chatReqsRes, sessionsRes] = await Promise.all([
-        chatService.getUserChats(),
-        exchangeService.getMyExchanges(),
-        chatRequestService.getUserRequests(),
-        sessionService.getSessions()
+        chatService.getUserChats().catch(e => { console.warn('fetchInitialData: chats failed', e); return { items: [] }; }),
+        exchangeService.getMyExchanges().catch(e => { console.warn('fetchInitialData: exchanges failed', e); return []; }),
+        chatRequestService.getUserRequests().catch(e => { console.warn('fetchInitialData: requests failed', e); return { items: [] }; }),
+        sessionService.getSessions().catch(e => { console.warn('fetchInitialData: sessions failed', e); return { items: [] }; })
       ]);
 
       const chatsData = chatsRes.items || [];
@@ -480,9 +480,9 @@ export const AppDataProvider = ({ children }) => {
       const msg = lastMessage.payload;
       
       setChatMessages(prev => {
-        if (!prev[msg.chatId]) return prev;
-        if (prev[msg.chatId].find(m => m.id === msg.id || m._id === msg.id)) return prev;
-        return { ...prev, [msg.chatId]: [...prev[msg.chatId], msg] };
+        const existing = prev[msg.chatId] || [];
+        if (existing.find(m => m.id === msg.id || m._id === msg.id)) return prev;
+        return { ...prev, [msg.chatId]: [...existing, msg] };
       });
 
       setChats(prevChats => {

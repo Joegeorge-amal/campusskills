@@ -112,8 +112,7 @@ const Messages = () => {
       }
 
       setChatMessages(prev => {
-        if (!prev[chatId]) return prev;
-        const chatMsgs = prev[chatId];
+        const chatMsgs = prev[chatId] || [];
         
         const existingIndex = chatMsgs.findIndex(m => 
           (msg.tempId && m.tempId === msg.tempId) || 

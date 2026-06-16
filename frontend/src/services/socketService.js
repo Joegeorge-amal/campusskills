@@ -82,7 +82,7 @@ export const socketService = {
     }
 
     try {
-      const messageBody = JSON.stringify({ event: eventType, data: payload });
+      const messageBody = JSON.stringify({ type: eventType, payload });
       wsConnection.send(messageBody);
       return true;
     } catch (e) {
