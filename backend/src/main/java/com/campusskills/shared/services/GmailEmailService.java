@@ -24,7 +24,7 @@ public class GmailEmailService implements EmailService {
 
     public GmailEmailService(Vertx vertx) {
         String host = Env.getOrDefault("SMTP_HOST", "smtp.gmail.com");
-        int port = Integer.parseInt(Env.getOrDefault("SMTP_PORT", "465"));
+        int port = Integer.parseInt(Env.getOrDefault("SMTP_PORT", "587"));
         
         String username = Env.get("SMTP_USERNAME");
         String password = Env.get("SMTP_PASSWORD");
@@ -34,12 +34,12 @@ public class GmailEmailService implements EmailService {
         }
         
         this.fromName = Env.getOrDefault("MAIL_FROM_NAME", "CampusSkills");
-        this.fromAddress = Env.getOrDefault("MAIL_FROM_ADDRESS", username);
+        this.fromAddress = Env.getOrDefault("MAIL_FROM_ADDRESS", "campusskillsnoreply@gmail.com");
 
         MailConfig config = new MailConfig()
             .setHostname(host)
             .setPort(port)
-            .setSsl(true)
+            .setStarttls(StartTLSOptions.REQUIRED)
             .setLogin(LoginOption.REQUIRED)
             .setAuthMethods("PLAIN LOGIN")
             .setUsername(username)
