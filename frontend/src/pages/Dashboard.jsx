@@ -125,21 +125,19 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Stat 3 */}
+          {/* Stat 3 - Trust Score */}
           <div 
-            className="glossy-card" 
+            className="glossy-card ts-card" 
             onClick={() => navigate('/app/profile', { state: { scrollToReviews: true } })}
             style={{ background: '#ffffff', borderRadius: '12px', padding: '16px', border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column', gap: '10px', cursor: 'pointer' }}
           >
-            <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: '#fef3c7', color: '#92400e', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 2px rgba(0, 0, 0, 0.15)' }}>
+            <div className="tsc-icon" style={{ width: '48px', height: '48px', borderRadius: '16px', background: '#fef3c7', color: '#92400e', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 2px rgba(0, 0, 0, 0.15)' }}>
               <IconStar size={24} strokeWidth={1.5} />
             </div>
-            <div>
-              <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '2px', lineHeight: 1 }}>{stats.trustScore}</div>
-              <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500 }}>Trust score</div>
-            </div>
-            <div style={{ fontSize: '11px', color: '#6b7280', fontWeight: 500 }}>
-              Based on {user?.stats?.ratingCount || 0} reviews
+            <div className="tsc-body" style={{ display: 'flex', flexDirection: 'column' }}>
+              <div className="tsc-score" style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '2px', lineHeight: 1 }}>{stats.trustScore}</div>
+              <div className="tsc-label" style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500, marginBottom: '2px' }}>Trust score</div>
+              <div className="tsc-based" style={{ fontSize: '11px', color: '#6b7280', fontWeight: 500 }}>Based on {user?.stats?.ratingCount || 0} reviews</div>
             </div>
           </div>
 
