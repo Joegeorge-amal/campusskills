@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppData } from '../context/AppDataContext';
+import { useAuth } from '../context/AuthContext';
 import { IconMapPin, IconCalendarMonth, IconMessageCircle, IconDotsVertical } from '@tabler/icons-react';
 
 import ProfileHeader from '../components/profile/ProfileHeader';
@@ -20,6 +21,7 @@ const PublicProfile = () => {
   const { rollNo } = useParams();
   const navigate = useNavigate();
   const { triggerToast } = useAppData();
+  const { user: currentUser } = useAuth();
 
   const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState(null);
@@ -45,7 +47,24 @@ const PublicProfile = () => {
     }
   };
 
-  const publicActions = (
+  const handleBlockUser = async () => {
+    if (!profileData?.userId) return;
+    if (window.confirm('Are you sure you want to block this user?')) {
+      try {
+        await userService.blockUser(profileData.userId);
+        triggerToast('User blocked successfully.');
+        navigate('/app/dashboard');
+      } catch (err) {
+        console.error('Block user error:', err);
+        triggerToast('Failed to block user');
+      }
+    }
+    setIsMenuOpen(false);
+  };
+
+  const isViewingSelf = currentUser?.userId === profileData?.userId || currentUser?.rollNo?.toLowerCase() === rollNo?.toLowerCase();
+
+  const publicActions = isViewingSelf ? null : (
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', position: 'relative' }}>
       <button 
         onClick={handleChatClick}
@@ -99,13 +118,16 @@ const PublicProfile = () => {
               Report User
             </button>
             <button 
+              onClick={handleBlockUser}
               style={{ 
                 width: '100%', textAlign: 'left', padding: '12px 16px', 
-                background: 'none', border: 'none', color: '#9ca3af', 
-                fontSize: '14px', fontWeight: 500, cursor: 'not-allowed' 
+                background: 'none', border: 'none', color: '#ef4444', 
+                fontSize: '14px', fontWeight: 500, cursor: 'pointer' 
               }}
+              onMouseOver={(e) => e.target.style.background = '#fef2f2'}
+              onMouseOut={(e) => e.target.style.background = 'none'}
             >
-              Block User (Coming soon)
+              Block User
             </button>
           </div>
         </>

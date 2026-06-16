@@ -21,6 +21,19 @@ export const AuthProvider = ({ children }) => {
       const response = await userService.getMe();
       const fullData = response.data || response;
       if (fullData && fullData.user) {
+        // Auto-unblock self if accidentally blocked
+        let blockedUsers = fullData.user.blockedUsers || [];
+        const selfId = fullData.user.userId || fullData.user._id || fullData.user.id;
+        if (selfId && blockedUsers.includes(selfId)) {
+          try {
+            await userService.unblockUser(selfId);
+            blockedUsers = blockedUsers.filter(id => id !== selfId);
+            fullData.user.blockedUsers = blockedUsers;
+          } catch (e) {
+            console.error('Failed to auto-unblock self', e);
+          }
+        }
+
         setUser(prev => {
           const updated = { 
             ...prev, 

@@ -58,7 +58,14 @@ const Marketplace = () => {
       }
       // Add mode mapping logic based on filter if needed, currently fetches all
       const res = await listingService.searchListings({ limit: 50 });
-      const fetchedSkills = res?.listings || res?.data || (Array.isArray(res) ? res : []);
+      const rawFetchedSkills = res?.listings || res?.data || (Array.isArray(res) ? res : []);
+      
+      const fetchedSkills = rawFetchedSkills.filter(skill => {
+        if (!user) return true;
+        const ownerId = skill.owner?.userId || skill.ownerId || skill.owner?._id || skill.owner?.id;
+        const myId = user.userId || user._id || user.id;
+        return String(ownerId) !== String(myId);
+      });
       
       if (!isBackground) {
         setSkills(fetchedSkills);
