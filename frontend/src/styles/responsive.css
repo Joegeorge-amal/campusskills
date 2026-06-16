@@ -72,6 +72,7 @@
   #home .grid-3 .glossy-card {
     flex-direction: row !important;
     align-items: center !important;
+    justify-content: center !important;
     gap: 14px !important;
     padding: 16px 20px !important;
     min-height: 100px !important;
@@ -92,6 +93,11 @@
   #home .grid-3 .glossy-card > div:last-child > div:first-child {
     font-size: 22px !important;
     margin-bottom: 0 !important;
+  }
+
+  #home .grid-3 .sc-skills > div:last-child,
+  #home .grid-3 .sc-sessions > div:last-child {
+    text-align: center !important;
   }
 
   /* ─── MOBILE FULLSCREEN SEARCH OVERLAY ─── */
@@ -643,7 +649,7 @@
     text-align: center !important;
     gap: 6px !important;
     padding: 24px 16px !important;
-    min-height: 120px !important;
+    min-height: 100px !important;
   }
 
   #home .grid-3 div.ts-card .tsc-icon {
@@ -653,28 +659,27 @@
   #home .grid-3 div.ts-card .tsc-body {
     display: flex !important;
     flex-direction: row !important;
-    flex-wrap: wrap !important;
+    flex-wrap: nowrap !important;
     justify-content: center !important;
     align-items: baseline !important;
-    gap: 2px 10px !important;
+    gap: 8px !important;
   }
 
   #home .grid-3 div.ts-card .tsc-score {
-    font-size: 22px !important;
+    font-size: 20px !important;
     margin: 0 !important;
     line-height: 1 !important;
+  }
+
+  #home .grid-3 div.ts-card .tsc-label {
+    font-size: 11px !important;
+    margin: 0 !important;
   }
 
   #home .grid-3 div.ts-card .tsc-based {
     font-size: 11px !important;
     color: #6b7280 !important;
     font-weight: 500 !important;
-  }
-
-  #home .grid-3 div.ts-card .tsc-label {
-    flex: 0 0 100% !important;
-    text-align: center !important;
-    font-size: 12px !important;
     margin: 0 !important;
   }
 }
