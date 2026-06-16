@@ -57,7 +57,7 @@ const Dashboard = () => {
       <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
         <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#1e40af', margin: '0 0 24px 8px', letterSpacing: '-0.5px' }}>Dashboard</h1>
         {/* Hero Banner */}
-        <div style={{ 
+        <div className="dashboard-hero" style={{ 
           background: 'linear-gradient(105deg, #1e3a8a 0%, #3b82f6 55%, #1e3a8a 100%)', 
           borderRadius: '12px', 
           padding: '20px 28px', 

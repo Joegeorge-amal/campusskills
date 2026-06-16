@@ -5,6 +5,12 @@ let maxReconnectInterval = 30000;
 let reconnectTimer = null;
 let isExpectedClose = false;
 
+// Environment-based WebSocket URL (VITE_WS_URL overrides auto-detection)
+const WS_BASE_URL = import.meta.env.VITE_WS_URL
+  || (import.meta.env.MODE === 'production'
+    ? 'wss://campusskills.onrender.com/ws'
+    : 'ws://localhost:8080/ws');
+
 export const socketService = {
   connect: (tokenOrGetter, onMessage, onStatusChange) => {
     if (wsConnection) {
@@ -22,7 +28,7 @@ export const socketService = {
       return;
     }
 
-    const wsUrl = `ws://localhost:8080/ws?token=${encodeURIComponent(token)}`;
+    const wsUrl = `${WS_BASE_URL}?token=${encodeURIComponent(token)}`;
 
     try {
       wsConnection = new WebSocket(wsUrl);
