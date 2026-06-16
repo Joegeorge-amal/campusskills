@@ -32,6 +32,7 @@ public class ApiRouter {
             .addRelativeOrigin(frontendOrigin)
             .allowedMethod(HttpMethod.GET)
             .allowedMethod(HttpMethod.POST)
+            .allowedMethod(HttpMethod.PUT)
             .allowedMethod(HttpMethod.PATCH)
             .allowedMethod(HttpMethod.DELETE)
             .allowedMethod(HttpMethod.OPTIONS)
