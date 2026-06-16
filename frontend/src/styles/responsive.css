@@ -1,5 +1,11 @@
 /* Responsive Breakpoints */
 
+/* Hide mobile-only elements on desktop (defined first so mobile rules override) */
+.mobile-menu-btn,
+.mobile-search-btn {
+  display: none !important;
+}
+
 @media (max-width: 768px) {
   /* ─── MOBILE HEADER REDESIGN ─── */
   .topbar {
@@ -239,12 +245,6 @@
     border-bottom: 0.5px solid rgba(0, 0, 0, 0.08);
     height: auto !important;
   }
-}
-
-/* Hide mobile-only elements on desktop */
-.mobile-menu-btn,
-.mobile-search-btn {
-  display: none !important;
 }
 
 /* ─── AUTH & SETUP SCREEN RESPONSIVENESS ─── */
