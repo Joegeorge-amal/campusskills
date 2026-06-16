@@ -4,8 +4,12 @@ import com.campusskills.modules.users.services.UserService;
 import com.campusskills.web.response.ApiResponse;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AuthHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(AuthHandler.class);
     
     private final UserService userService;
 
@@ -28,10 +32,12 @@ public class AuthHandler {
                     } else if ("DOMAIN_NOT_ALLOWED".equals(err.getMessage())) {
                         ApiResponse.sendError(ctx, 403, "Email domain not allowed for registration");
                     } else {
+                        log.error("Signup failed", err);
                         ApiResponse.badRequest(ctx, err.getMessage());
                     }
                 });
         } catch (Exception e) {
+            log.error("Invalid signup request payload", e);
             ApiResponse.badRequest(ctx, "Invalid JSON format");
         }
     }

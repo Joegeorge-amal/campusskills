@@ -1,6 +1,7 @@
 package com.campusskills.web.response;
 
 import io.vertx.core.json.JsonObject;
+import io.vertx.core.json.Json;
 import io.vertx.ext.web.RoutingContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,14 +16,20 @@ public class ApiResponse {
     }
 
     private static void sendSuccess(RoutingContext ctx, int statusCode, Object data) {
-        JsonObject response = new JsonObject()
-                .put("success", true)
-                .put("data", data);
-        
-        ctx.response()
-                .setStatusCode(statusCode)
-                .putHeader("content-type", "application/json")
-                .end(response.encode());
+        try {
+            Object normalizedData = data == null ? null : Json.decodeValue(Json.encode(data));
+            JsonObject response = new JsonObject()
+                    .put("success", true)
+                    .put("data", normalizedData);
+            
+            ctx.response()
+                    .setStatusCode(statusCode)
+                    .putHeader("content-type", "application/json")
+                    .end(response.encode());
+        } catch (Exception e) {
+            log.error("[{}] Failed to serialize success response for {}", getRequestId(ctx), ctx.request().path(), e);
+            ctx.fail(e);
+        }
     }
 
     public static void sendError(RoutingContext ctx, int statusCode, String message) {
