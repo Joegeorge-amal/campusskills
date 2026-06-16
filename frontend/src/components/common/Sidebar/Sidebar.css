@@ -208,13 +208,17 @@
   .sb {
     position: fixed;
     left: 0;
+    top: 0;
+    height: 100vh;
     transform: translateX(-100%);
+    z-index: 1001;
   }
   .sb.open {
     transform: translateX(0);
   }
   .sb-overlay {
     display: none;
+    z-index: 1000;
   }
   .sb-overlay.open {
     display: block;
