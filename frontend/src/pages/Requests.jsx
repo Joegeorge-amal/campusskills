@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useAppData } from '../context/AppDataContext';
@@ -7,6 +8,7 @@ import SkillSwapModal from '../components/modals/SkillSwapModal';
 import ConfirmModal from '../components/modals/ConfirmModal';
 import { exchangeService } from '../services/exchangeService';
 import { chatRequestService } from '../services/chatRequestService';
+import { IconX } from '@tabler/icons-react';
 
 // Helper to get initials
 const getInitials = (name) => {
@@ -25,6 +27,8 @@ const Requests = () => {
   const [processingId, setProcessingId] = useState(null);
   const [processingAction, setProcessingAction] = useState(null); // 'accept', 'decline', 'cancel'
   
+  const [bookingModalReq, setBookingModalReq] = useState(null);
+
   const [isIncomingOpen, setIsIncomingOpen] = useState(true);
   const [isSentOpen, setIsSentOpen] = useState(true);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
@@ -209,8 +213,10 @@ const Requests = () => {
                       onAccept={() => {
                         if (req.type === 'Skill swap request') {
                           setSwapModalRequest(req);
-                        } else {
+                        } else if (req.type === 'Chat request') {
                           handleAccept(req.id);
+                        } else {
+                          setBookingModalReq(req);
                         }
                       }}
                       onDecline={() => handleDeclineClick(req.id)}
@@ -356,6 +362,94 @@ const Requests = () => {
             return handleAccept(reqId, true, payload);
           }}
         />
+      )}
+
+      {/* Booking Confirmation Modal */}
+      {bookingModalReq && ReactDOM.createPortal(
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.6)',
+          backdropFilter: 'blur(4px)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          zIndex: 1000, padding: '16px'
+        }}>
+          <div style={{
+            backgroundColor: '#ffffff', borderRadius: '16px', padding: '24px',
+            maxWidth: '400px', width: '100%',
+            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
+            boxSizing: 'border-box'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#111827' }}>
+                Accept Session Request
+              </h3>
+              <button onClick={() => setBookingModalReq(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', padding: 0 }}>
+                <IconX size={20} />
+              </button>
+            </div>
+
+            <div style={{ marginBottom: '16px' }}>
+              <div style={{ fontSize: '14px', fontWeight: 600, color: '#111827', marginBottom: '8px' }}>
+                {bookingModalReq.name} wants to learn from you
+              </div>
+
+              {/* Skills */}
+              {bookingModalReq.otherUserExtras?.listingTitle && (
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '6px', fontSize: '13px', color: '#4b5563' }}>
+                  <span style={{ fontWeight: 600, minWidth: '70px' }}>Topic:</span>
+                  <span>{bookingModalReq.otherUserExtras.listingTitle}</span>
+                </div>
+              )}
+
+              {/* Proposed Time */}
+              {(() => {
+                const rawReq = bookingModalReq.rawReq;
+                const startTime = rawReq?.proposedStartTime;
+                if (startTime) {
+                  const d = new Date(startTime);
+                  return (
+                    <div style={{ display: 'flex', gap: '8px', marginBottom: '6px', fontSize: '13px', color: '#4b5563' }}>
+                      <span style={{ fontWeight: 600, minWidth: '70px' }}>Time:</span>
+                      <span>{d.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })} at {d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                    </div>
+                  );
+                }
+                const duration = rawReq?.preferredDurationMinutes;
+                return (
+                  <div style={{ display: 'flex', gap: '8px', marginBottom: '6px', fontSize: '13px', color: '#6b7280' }}>
+                    <span style={{ fontWeight: 600, minWidth: '70px' }}>Duration:</span>
+                    <span>{duration ? `${duration} minutes` : 'TBD'}</span>
+                  </div>
+                );
+              })()}
+
+              {/* Message */}
+              {bookingModalReq.message && (
+                <div style={{ marginTop: '12px', padding: '12px', background: '#f9fafb', borderRadius: '8px', fontSize: '13px', color: '#374151', border: '1px solid #e5e7eb' }}>
+                  <div style={{ fontWeight: 600, marginBottom: '4px', fontSize: '11px', color: '#9ca3af', textTransform: 'uppercase' }}>Message</div>
+                  {bookingModalReq.message}
+                </div>
+              )}
+            </div>
+
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button onClick={() => setBookingModalReq(null)}
+                style={{ flex: 1, padding: '10px', background: '#e5e7eb', color: '#374151', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '13px' }}>
+                Cancel
+              </button>
+              <button onClick={async () => {
+                const reqId = bookingModalReq.id;
+                setBookingModalReq(null);
+                await handleAccept(reqId, false, {});
+              }}
+                disabled={!!processingId}
+                style={{ flex: 1, padding: '10px', background: '#2563eb', color: '#fff', border: 'none', borderRadius: '8px', cursor: processingId ? 'not-allowed' : 'pointer', fontWeight: 600, fontSize: '13px', opacity: processingId ? 0.6 : 1 }}>
+                {processingId ? 'Accepting...' : 'Accept Request'}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
 
       <ConfirmModal

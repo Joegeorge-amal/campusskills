@@ -225,7 +225,7 @@ public class ExchangeService {
                     } else {
                         // Tutoring
                         Number sessionStartNum = payload.getNumber("firstSessionStart");
-                        Long sessionStart = sessionStartNum != null ? sessionStartNum.longValue() : null;
+                        Long sessionStart = sessionStartNum != null ? sessionStartNum.longValue() : exchange.getProposedStartTime();
                         if (sessionStart != null) {
                             String teacherId = exchange.getReceiverId();
                             String studentId = exchange.getInitiatorId();

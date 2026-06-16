@@ -24,6 +24,7 @@ public class Exchange {
     private Integer preferredDurationMinutes;
     private String preferredFirstTeacher;
     private String offeredSkillName;
+    private Long proposedStartTime;
     private Long createdAt;
     private Long updatedAt;
 
@@ -64,6 +65,9 @@ public class Exchange {
 
     public String getOfferedSkillName() { return offeredSkillName; }
     public void setOfferedSkillName(String offeredSkillName) { this.offeredSkillName = offeredSkillName; }
+
+    public Long getProposedStartTime() { return proposedStartTime; }
+    public void setProposedStartTime(Long proposedStartTime) { this.proposedStartTime = proposedStartTime; }
 
     public Long getCreatedAt() { return createdAt; }
     public void setCreatedAt(Long createdAt) { this.createdAt = createdAt; }

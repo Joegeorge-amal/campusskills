@@ -551,7 +551,29 @@ const Marketplace = () => {
             try {
               setIsBookModalOpen(false);
               const isSwap = requestMode === 'SWAP';
-              await exchangeService.createExchange({
+
+              // Compute next occurrence timestamp for the chosen slot
+              let proposedStartTime;
+              if (!isSwap && slot) {
+                const days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+                const targetDay = days.indexOf((slot.date || '').toLowerCase());
+                const timeMatch = (slot.time || '').match(/(\d+):(\d+)\s*(AM|PM)/i);
+                if (targetDay !== -1 && timeMatch) {
+                  let hrs = parseInt(timeMatch[1]);
+                  const mins = parseInt(timeMatch[2]);
+                  if (timeMatch[3].toUpperCase() === 'PM' && hrs < 12) hrs += 12;
+                  if (timeMatch[3].toUpperCase() === 'AM' && hrs === 12) hrs = 0;
+                  const now = new Date();
+                  const next = new Date(now);
+                  next.setHours(hrs, mins, 0, 0);
+                  let daysUntil = targetDay - now.getDay();
+                  if (daysUntil <= 0 || (daysUntil === 0 && next <= now)) daysUntil += 7;
+                  next.setDate(next.getDate() + daysUntil);
+                  proposedStartTime = next.getTime();
+                }
+              }
+
+              const exchangeData = {
                 listingId: selectedSkill._id || selectedSkill.id,
                 receiverId: selectedSkill.owner?.userId || selectedSkill.ownerId,
                 type: isSwap ? 'SWAP' : 'TUTORING',
@@ -559,8 +581,10 @@ const Marketplace = () => {
                 message: isSwap && slot ? `[Prefers your slot: ${slot.date} ${slot.time}]\n\n${message}` : message,
                 offeredSkillName: isSwap ? offeredSkillName : undefined,
                 requesterAvailableTimes: isSwap ? availableTimes : undefined,
-                preferredDurationMinutes: isSwap ? preferredDuration : undefined
-              });
+                preferredDurationMinutes: isSwap ? preferredDuration : undefined,
+                proposedStartTime: isSwap ? undefined : proposedStartTime
+              };
+              await exchangeService.createExchange(exchangeData);
               triggerToast('Session request sent successfully!');
             } catch (err) {
               console.error(err);
