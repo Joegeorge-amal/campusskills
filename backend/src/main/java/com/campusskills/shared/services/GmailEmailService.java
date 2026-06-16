@@ -39,11 +39,15 @@ public class GmailEmailService implements EmailService {
         MailConfig config = new MailConfig()
             .setHostname(host)
             .setPort(port)
-            .setStarttls(StartTLSOptions.REQUIRED)
             .setLogin(LoginOption.REQUIRED)
-            .setAuthMethods("PLAIN LOGIN")
             .setUsername(username)
             .setPassword(password);
+
+        if (port == 465) {
+            config.setSsl(true);
+        } else {
+            config.setStarttls(StartTLSOptions.DISABLED);
+        }
 
         this.mailClient = MailClient.createShared(vertx, config);
     }
@@ -431,10 +435,10 @@ public class GmailEmailService implements EmailService {
 
         return mailClient.sendMail(message)
             .onSuccess(result -> {
-                log.debug("[SMTP SUCCESS] Email successfully accepted by Gmail! Message ID: {}, Recipients: {}", result.getMessageID(), result.getRecipients());
+                log.debug("[SMTP SUCCESS] Email accepted by SMTP server. Message ID: {}, Recipients: {}", result.getMessageID(), result.getRecipients());
             })
             .onFailure(err -> {
-                log.error("[SMTP FATAL ERROR] Failed to send email. Please check SMTP_HOST, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD, and MAIL_FROM_ADDRESS.", err);
+                log.error("SMTP send failed", err);
             })
             .mapEmpty();
     }
