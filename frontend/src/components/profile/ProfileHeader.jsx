@@ -55,7 +55,7 @@ const ProfileHeader = ({
       >
       </div>
 
-      <div style={{ margin: '-68px auto 0', padding: '0 24px', position: 'relative', pointerEvents: 'none' }}>
+      <div style={{ maxWidth: '1000px', margin: '-68px auto 0', padding: '0 24px', position: 'relative', pointerEvents: 'none' }}>
         {user?.heatmapVisibility !== false && (
           <Heatmap visible={true} />
         )}

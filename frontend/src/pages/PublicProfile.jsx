@@ -206,6 +206,7 @@ const PublicProfile = () => {
           isProfileVerified={isProfileVerified} 
           totalSkills={totalSkills} 
           verifiedCount={verifiedCount} 
+          variant="blue"
         />
 
         <div style={{ marginBottom: '40px' }}>
