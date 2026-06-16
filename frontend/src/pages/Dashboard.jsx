@@ -58,7 +58,7 @@ const Dashboard = () => {
         <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#1e40af', margin: '0 0 24px 8px', letterSpacing: '-0.5px' }}>Dashboard</h1>
         {/* Hero Banner */}
         <div className="dashboard-hero desktop-hero" style={{ 
-          background: 'linear-gradient(135deg, #2f5fe9 0%, #3d7cf6 55%, #3f43d8 100%)', 
+          background: 'linear-gradient(135deg, #5589f0 0%, #8b5cf6 100%)', 
           borderRadius: '12px', 
           padding: '20px 28px', 
           marginBottom: '16px', 
@@ -101,7 +101,7 @@ const Dashboard = () => {
         </div>
 
         <div className="dashboard-hero mobile-hero" style={{ 
-          background: 'linear-gradient(135deg, #2f5fe9 0%, #3d7cf6 55%, #3f43d8 100%)', 
+          background: 'linear-gradient(135deg, #5589f0 0%, #8b5cf6 100%)', 
           borderRadius: '12px', 
           marginBottom: '16px', 
           color: '#ffffff', 
