@@ -255,6 +255,29 @@
   .mobile-hero {
     display: flex !important;
   }
+
+  .mobile-hero .hero-left {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+  }
+
+  .mobile-hero .hero-left > div {
+    margin-bottom: 0 !important;
+  }
+
+  .mobile-hero .hero-right {
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+
+  .mobile-hero .hero-trust-box,
+  .mobile-hero .hero-create-btn {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    justify-content: center !important;
+    text-align: center !important;
+  }
 }
 
 /* ─── AUTH & SETUP SCREEN RESPONSIVENESS ─── */

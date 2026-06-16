@@ -112,13 +112,13 @@ const Dashboard = () => {
           alignItems: 'center', 
           padding: '16px 20px' 
         }}>
-          <div>
+          <div className="hero-left">
             <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.55)', marginBottom: '2px', fontWeight: 500 }}>Welcome back</div>
             <div style={{ fontSize: '18px', fontWeight: 700, marginBottom: '2px', letterSpacing: '-0.2px' }}>{user?.name || 'User'}</div>
             <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.8)', fontWeight: 400 }}>{user?.year ? `${user.year} · ${user.programme || ''}` : ''}</div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
-            <div style={{ 
+          <div className="hero-right" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
+            <div className="hero-trust-box" style={{ 
               background: 'rgba(255, 255, 255, 0.1)', 
               border: '1px solid rgba(255, 255, 255, 0.2)', 
               borderRadius: '10px', 
@@ -135,6 +135,7 @@ const Dashboard = () => {
               </div>
             </div>
             <button 
+              className="hero-create-btn"
               onClick={() => setIsCreateSessionOpen(true)}
               style={{ padding: '6px 16px', background: '#ffffff', color: '#1e40af', border: 'none', borderRadius: '10px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
             >
