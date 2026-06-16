@@ -104,7 +104,7 @@ const Dashboard = () => {
         <div className="grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '16px', flexShrink: 0 }}>
           
           {/* Stat 1 */}
-          <div className="glossy-card" style={{ background: '#ffffff', borderRadius: '12px', padding: '16px', border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div className="glossy-card sc-card sc-skills" style={{ background: '#ffffff', borderRadius: '12px', padding: '16px', border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: '#f0f6ff', color: '#1e3a8a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 2px rgba(0, 0, 0, 0.15)' }}>
               <IconSparkles size={24} strokeWidth={1.5} />
             </div>
@@ -115,7 +115,7 @@ const Dashboard = () => {
           </div>
 
           {/* Stat 2 */}
-          <div className="glossy-card" style={{ background: '#ffffff', borderRadius: '12px', padding: '16px', border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div className="glossy-card sc-card sc-sessions" style={{ background: '#ffffff', borderRadius: '12px', padding: '16px', border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: '#ecfdf5', color: '#065f46', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 2px rgba(0, 0, 0, 0.15)' }}>
               <IconCheck size={24} strokeWidth={1.5} />
             </div>

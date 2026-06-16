@@ -68,6 +68,32 @@
     font-size: 9px;
   }
 
+  /* ─── DASHBOARD STAT CARDS: HORIZONTAL LAYOUT ON MOBILE ─── */
+  #home .grid-3 .glossy-card {
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 14px !important;
+    padding: 16px 20px !important;
+    min-height: 100px !important;
+  }
+
+  #home .grid-3 .glossy-card > div:first-child {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    border-radius: 12px !important;
+  }
+
+  #home .grid-3 .glossy-card > div:first-child svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  #home .grid-3 .glossy-card > div:last-child > div:first-child {
+    font-size: 22px !important;
+    margin-bottom: 0 !important;
+  }
+
   /* ─── MOBILE FULLSCREEN SEARCH OVERLAY ─── */
   .mobile-search-overlay {
     position: fixed;
