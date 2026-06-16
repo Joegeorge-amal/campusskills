@@ -95,7 +95,8 @@ const AdminSessions = () => {
       </div>
 
       {/* Top Stat Cards */}
-      <div className="admin-sessions-stats" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
+      {activeFilter === 'All' && (
+        <div className="admin-sessions-stats" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
         
         {/* Active / Upcoming Flip Card */}
         <div className="al-flip-container">
@@ -126,6 +127,7 @@ const AdminSessions = () => {
         </div>
 
       </div>
+      )}
 
       {/* Sessions List */}
       <div className="admin-sessions-list">

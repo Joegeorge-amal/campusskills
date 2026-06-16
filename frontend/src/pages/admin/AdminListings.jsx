@@ -107,7 +107,8 @@ const AdminListings = () => {
       </div>
 
       {/* Top Stat Cards */}
-      <div className="admin-sessions-stats" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
+      {activeFilter === 'All' && (
+        <div className="admin-sessions-stats" style={{ gridTemplateColumns: 'repeat(2, 1fr)' }}>
         
         {/* Active / Pending Flip Card */}
         <div className="al-flip-container">
@@ -138,6 +139,7 @@ const AdminListings = () => {
         </div>
 
       </div>
+      )}
 
       {/* Listings List */}
       <div className="admin-sessions-list">
@@ -153,9 +155,14 @@ const AdminListings = () => {
         ) : (
           listings.map(listing => {
             const statusUpper = (listing.status || '').toUpperCase();
-            const isDisabled = statusUpper === 'ADMIN_DISABLED' || listing.active === false;
+            const isAdminDisabled = statusUpper === 'ADMIN_DISABLED';
+            const isUserDeleted = listing.active === false;
             const timeStr = listing.createdAt ? new Date(listing.createdAt).toLocaleDateString() : 'Unknown date';
-            const dotColor = isDisabled ? '#ef4444' : (statusUpper === 'ACTIVE' ? '#10b981' : '#3b82f6');
+            
+            let dotColor = '#10b981';
+            if (isUserDeleted) dotColor = '#9ca3af';
+            else if (isAdminDisabled) dotColor = '#ef4444';
+            else if (statusUpper === 'PENDING') dotColor = '#3b82f6';
             
             return (
               <div key={listing.id} className="as-card">
@@ -164,9 +171,15 @@ const AdminListings = () => {
                   <div className="as-info">
                     <div className="as-title-row">
                       <span className="as-title">{listing.title || 'Untitled Listing'}</span>
-                      {statusUpper === 'ACTIVE' && !isDisabled && <span className="as-status-pill done">ACTIVE</span>}
-                      {isDisabled && <span className="as-status-pill live" style={{background: '#fee2e2', color: '#ef4444'}}>DISABLED</span>}
-                      {statusUpper === 'PENDING' && !isDisabled && <span className="as-status-pill" style={{background: '#fef3c7', color: '#d97706'}}>PENDING</span>}
+                      {isUserDeleted ? (
+                        <span className="as-status-pill" style={{background: '#f3f4f6', color: '#6b7280'}}>DELETED</span>
+                      ) : isAdminDisabled ? (
+                        <span className="as-status-pill live" style={{background: '#fee2e2', color: '#ef4444'}}>DISABLED</span>
+                      ) : statusUpper === 'PENDING' ? (
+                        <span className="as-status-pill" style={{background: '#fef3c7', color: '#d97706'}}>PENDING</span>
+                      ) : (
+                        <span className="as-status-pill done">ACTIVE</span>
+                      )}
                     </div>
                     <div className="as-meta">
                       {listing.ownerName} &middot; {listing.category || 'General'} &middot; Created on {timeStr}
@@ -174,7 +187,9 @@ const AdminListings = () => {
                   </div>
                 </div>
                 <div className="as-card-right">
-                  {isDisabled ? (
+                  {isUserDeleted ? (
+                    <span style={{ fontSize: '13px', color: '#9ca3af', fontStyle: 'italic' }}>Deleted by user</span>
+                  ) : isAdminDisabled ? (
                     <button 
                       className="as-cancel-btn"
                       style={{borderColor: '#10b981', color: '#10b981'}}

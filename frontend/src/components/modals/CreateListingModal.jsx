@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { useAppData } from '../../context/AppDataContext';
 import { useAuth } from '../../context/AuthContext';
@@ -6,6 +6,8 @@ import { IconX, IconPlus, IconTrash } from '@tabler/icons-react';
 import { listingService } from '../../services/listingService';
 import MarketplaceCard from '../common/MarketplaceCard/MarketplaceCard';
 import AutocompleteInput from '../AutocompleteInput';
+import CustomSelect from '../common/CustomSelect';
+import CustomTimeInput from '../common/CustomTimeInput';
 
 const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
   const { triggerToast } = useAppData();
@@ -311,21 +313,28 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
                   </div>
                 ) : (
                   <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <select className="clm-input" value={newSkillName} onChange={e => {
-                      setNewSkillName(e.target.value);
-                      const skillObj = user.skillsOffered.find(s => s.name === e.target.value);
-                      if (skillObj) setNewSkillLevel(skillObj.level);
-                    }} style={{flex: 2, height: '42px', boxSizing: 'border-box'}}>
-                      <option value="" disabled hidden>Select a skill from your profile...</option>
-                      {user.skillsOffered.map((s, idx) => (
-                        <option key={`off-${idx}`} value={s.name}>{s.name}</option>
-                      ))}
-                    </select>
-                    <select className="clm-input" value={newSkillLevel} onChange={e => setNewSkillLevel(e.target.value)} style={{flex: 1, height: '42px', boxSizing: 'border-box'}}>
-                      <option value="Beginner">Beginner</option>
-                      <option value="Intermediate">Intermediate</option>
-                      <option value="Advanced">Advanced</option>
-                    </select>
+                    <CustomSelect 
+                      value={newSkillName} 
+                      onChange={val => {
+                        setNewSkillName(val);
+                        const skillObj = user.skillsOffered.find(s => s.name === val);
+                        if (skillObj) setNewSkillLevel(skillObj.level);
+                      }}
+                      options={(user.skillsOffered || []).map(s => ({ value: s.name, label: s.name }))}
+                      placeholder="Select a skill from your profile..."
+                      style={{flex: 2}}
+                    />
+                    <CustomSelect 
+                      value={newSkillLevel} 
+                      onChange={val => setNewSkillLevel(val)}
+                      options={[
+                        { value: 'Beginner', label: 'Beginner' },
+                        { value: 'Intermediate', label: 'Intermediate' },
+                        { value: 'Advanced', label: 'Advanced' }
+                      ]}
+                      placeholder="Level"
+                      style={{flex: 1}}
+                    />
                     <button type="button" onClick={() => {
                       if (!newSkillName) return;
                       setOfferedSkills([...offeredSkills, { name: newSkillName, level: newSkillLevel }]);
@@ -414,23 +423,42 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
             <div className="clm-row clm-row-2">
               <div className="clm-field">
                 <label>Mode</label>
-                <select className="clm-input" value={availability} onChange={(e) => setAvailability(e.target.value)}>
-                  <option value="ONLINE">Online</option>
-                  <option value="IN_PERSON">In Person</option>
-                  <option value="EITHER">Either</option>
-                </select>
+                <CustomSelect 
+                  value={availability} 
+                  onChange={val => setAvailability(val)}
+                  options={[
+                    { value: 'ONLINE', label: 'Online' },
+                    { value: 'IN_PERSON', label: 'In Person' },
+                    { value: 'EITHER', label: 'Either' }
+                  ]}
+                  placeholder="Select mode"
+                />
               </div>
             </div>
             <div style={{ display: 'flex', gap: '8px' }}>
-              <select className="clm-input" value={newSlotDay} onChange={e => setNewSlotDay(e.target.value)}>
-                {['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map(d => <option key={d}>{d}</option>)}
-              </select>
-              <input type="time" className="clm-input" value={newSlotTime} onChange={e => setNewSlotTime(e.target.value)} />
-              <select className="clm-input" value={newSlotDuration} onChange={e => setNewSlotDuration(e.target.value)}>
-                <option value="30">30 min</option>
-                <option value="60">60 min</option>
-                <option value="90">90 min</option>
-              </select>
+              <CustomSelect 
+                value={newSlotDay} 
+                onChange={val => setNewSlotDay(val)}
+                options={['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map(d => ({ value: d, label: d }))}
+                placeholder="Day"
+                style={{flex: 1}}
+              />
+              <CustomTimeInput 
+                value={newSlotTime} 
+                onChange={val => setNewSlotTime(val)} 
+                style={{flex: 1}}
+              />
+              <CustomSelect 
+                value={newSlotDuration} 
+                onChange={val => setNewSlotDuration(val)}
+                options={[
+                  { value: '30', label: '30 min' },
+                  { value: '60', label: '60 min' },
+                  { value: '90', label: '90 min' }
+                ]}
+                placeholder="Duration"
+                style={{flex: 1}}
+              />
               <button type="button" onClick={handleAddSlot} style={{padding: '0 16px', background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer'}}>Add</button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>

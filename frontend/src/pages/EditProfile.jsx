@@ -5,6 +5,7 @@ import { useAppData } from '../context/AppDataContext';
 import { IconCheck } from '@tabler/icons-react';
 import { HexColorPicker } from "react-colorful";
 import BlockedUsersModal from '../components/modals/BlockedUsersModal';
+import CustomSelect from '../components/common/CustomSelect';
 
 const EditProfile = () => {
   const { user, updateProfile } = useAuth();
@@ -394,15 +395,17 @@ const EditProfile = () => {
         <div style={{ marginBottom: '16px' }}>
           <label style={labelStyle}>Phone number</label>
           <div style={{ display: 'flex', gap: '12px' }}>
-            <select 
+            <CustomSelect 
               value={countryCode} 
-              onChange={e => setCountryCode(e.target.value)} 
-              style={{ ...inputStyle, width: '120px', flexShrink: 0, cursor: 'pointer' }}
-            >
-              <option value="+91">IN +91</option>
-              <option value="+1">US +1</option>
-              <option value="+44">UK +44</option>
-            </select>
+              onChange={val => setCountryCode(val)} 
+              style={{ width: '120px', flexShrink: 0 }}
+              options={[
+                { value: '+91', label: 'IN +91' },
+                { value: '+1', label: 'US +1' },
+                { value: '+44', label: 'UK +44' }
+              ]}
+              placeholder="Code"
+            />
             <input 
               type="tel" 
               placeholder="9876543210" 
@@ -415,9 +418,19 @@ const EditProfile = () => {
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
           <div>
             <label style={labelStyle}>Year</label>
-            <select style={{ ...inputStyle, cursor: 'pointer' }} value={year} onChange={e => setYear(e.target.value)}>
-              <option>1st year</option><option>2nd year</option><option>3rd year</option><option>4th year</option>
-            </select>
+            <CustomSelect 
+              value={year} 
+              onChange={val => setYear(val)}
+              options={[
+                { value: '1st year', label: '1st year' },
+                { value: '2nd year', label: '2nd year' },
+                { value: '3rd year', label: '3rd year' },
+                { value: '4th year', label: '4th year' },
+                { value: 'Alumni', label: 'Alumni' },
+                { value: 'Faculty', label: 'Faculty' }
+              ]}
+              placeholder="Select year"
+            />
           </div>
           <div><label style={labelStyle}>Programme / Department</label><input style={inputStyle} type="text" value={programme} onChange={e => setProgramme(e.target.value)} /></div>
         </div>

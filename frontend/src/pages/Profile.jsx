@@ -423,7 +423,7 @@ const Profile = () => {
               onClick={() => setIsCreateSessionOpen(true)}
               style={{ padding: '8px 16px', borderRadius: '12px', border: 'none', background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)', color: '#ffffff', fontSize: '13px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
             >
-              <IconPlus size={16} /> Create Session
+              <IconPlus size={16} /> Create Listing
             </button>
           </div>
         </div>

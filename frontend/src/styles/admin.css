@@ -1141,16 +1141,18 @@
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   padding: 8px 16px;
-  border-radius: 20px;
-  width: 250px;
-  transition: all 0.3s ease;
+  border-radius: 8px;
+  width: 180px;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform: translateY(0);
 }
 
 .admin-u-search:focus-within {
   width: 400px;
   background: #ffffff;
   border-color: #cbd5e1;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15), 0 4px 12px -4px rgba(0, 0, 0, 0.08);
+  transform: translateY(-3px);
 }
 
 .admin-u-search input {

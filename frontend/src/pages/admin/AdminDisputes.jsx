@@ -158,24 +158,16 @@ const AdminDisputes = () => {
       </div>
 
       {/* Disputes List */}
-      <div className="admin-reports-list">
+      <div className="admin-disputes-list">
         {loading ? (
-          <div className="ar-empty-state">
+          <div className="as-empty-state">
             <IconLoader2 className="spinner" size={24} style={{ marginBottom: '8px', color: '#3b82f6' }} />
             <div>Loading disputes...</div>
           </div>
         ) : error ? (
-          <div className="ar-empty-state" style={{ color: '#ef4444' }}>{error}</div>
+          <div className="as-empty-state" style={{ color: '#ef4444' }}>{error}</div>
         ) : disputes.length === 0 ? (
-          <div className="ar-empty-state">
-            <div className="ar-empty-illustration">
-              <div className="ar-empty-icon-ring">
-                <IconShieldCheck size={48} strokeWidth={1.5} />
-              </div>
-            </div>
-            <h3 className="ar-empty-title">All Clear!</h3>
-            <p className="ar-empty-desc">No disputes found matching your criteria.<br/>When users report issues, they'll appear here for review.</p>
-          </div>
+          <div className="as-empty-state">No disputes found matching your criteria.</div>
         ) : (
           disputes.map(disp => {
             const isExpanded = expandedIds.has(disp._id);
