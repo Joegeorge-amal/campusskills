@@ -1,6 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
+import { IconSun, IconMoon, IconLogout } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { 
   IconLayoutDashboard, 
   IconUsers, 
@@ -20,10 +22,24 @@ import adminService from '../services/adminService';
 
 const AdminLayout = () => {
   const { logout, user } = useAuth();
+  const { toggleTheme, isDark } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const dropdownRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsProfileOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const handleSignOut = () => {
+    setIsProfileOpen(false);
     logout();
     navigate('/login');
   };
@@ -35,12 +51,10 @@ const AdminLayout = () => {
     const fetchStats = async () => {
       try {
         const [disputesRes, sessionsRes] = await Promise.all([
-          adminService.getDisputes({ limit: 1 }), // Just fetch to get total count
+          adminService.getDisputes({ limit: 1 }),
           adminService.getSessions({ status: 'LIVE', limit: 1 })
         ]);
         
-        // Count open disputes only (client-side approximation if we just fetch first page, but actually let's just use the total returned or a specific status if we want)
-        // Since backend pagination.total is total of requested status, let's just fetch OPEN disputes.
         const openDisputesRes = await adminService.getDisputes({ status: 'OPEN', limit: 1 });
         setDisputeCount(openDisputesRes?.pagination?.total || 0);
         
@@ -51,7 +65,7 @@ const AdminLayout = () => {
     };
     
     fetchStats();
-    const interval = setInterval(fetchStats, 60000); // refresh every minute
+    const interval = setInterval(fetchStats, 60000);
     return () => clearInterval(interval);
   }, []);
 
@@ -83,7 +97,7 @@ const AdminLayout = () => {
         <div className="admin-topnav-right">
           <AdminNotifications />
           
-          <div className="admin-user-profile">
+          <div className="admin-user-profile" ref={dropdownRef} style={{ position: 'relative', cursor: 'pointer' }} onClick={() => setIsProfileOpen((prev) => !prev)}>
             <div className="admin-avatar">
               {user?.name ? user.name[0].toUpperCase() : 'A'}
             </div>
@@ -91,11 +105,52 @@ const AdminLayout = () => {
               <span className="admin-user-name">{user?.name || 'Admin'}</span>
               <span className="admin-user-role">Super Admin</span>
             </div>
+
+            {isProfileOpen && (
+              <div style={{
+                position: 'absolute',
+                top: 'calc(100% + 8px)',
+                right: 0,
+                width: 200,
+                background: '#ffffff',
+                borderRadius: 12,
+                boxShadow: '0 10px 25px rgba(0,0,0,0.15)',
+                border: '1px solid #e2e8f0',
+                zIndex: 200,
+                overflow: 'hidden',
+              }}>
+                <button
+                  onClick={(e) => { e.stopPropagation(); setIsProfileOpen(false); toggleTheme(); }}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+                    padding: '12px 16px', border: 'none', background: 'none',
+                    fontSize: 13, fontWeight: 500, color: '#0f172a', cursor: 'pointer',
+                    textAlign: 'left', transition: 'background 0.15s',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = '#f1f5f9'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+                >
+                  {isDark ? <IconSun size={16} /> : <IconMoon size={16} />}
+                  <span>{isDark ? 'Light Mode' : 'Dark Mode'}</span>
+                </button>
+                <div style={{ height: '0.5px', background: '#e2e8f0' }} />
+                <button
+                  onClick={(e) => { e.stopPropagation(); setIsProfileOpen(false); handleSignOut(); }}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 10, width: '100%',
+                    padding: '12px 16px', border: 'none', background: 'none',
+                    fontSize: 13, fontWeight: 500, color: '#ef4444', cursor: 'pointer',
+                    textAlign: 'left', transition: 'background 0.15s',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.background = '#fef2f2'}
+                  onMouseLeave={(e) => e.currentTarget.style.background = 'none'}
+                >
+                  <IconLogout size={16} />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            )}
           </div>
-          
-          <button className="admin-signout-btn" onClick={handleSignOut}>
-            Sign out
-          </button>
         </div>
       </header>
 

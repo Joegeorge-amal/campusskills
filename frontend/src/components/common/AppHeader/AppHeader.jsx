@@ -1,5 +1,8 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { IconMenu2, IconFilter, IconBell, IconSearch, IconX } from '@tabler/icons-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { IconMenu2, IconFilter, IconSun, IconMoon, IconUser, IconLogout } from '@tabler/icons-react';
+import { useAuth } from '../../../context/AuthContext';
+import { useTheme } from '../../../context/ThemeContext';
 import Avatar from '../Avatar';
 import logo from '../../../assets/kju_campus_logo.png';
 import NotificationDropdown from '../../notifications/NotificationDropdown';
@@ -22,33 +25,39 @@ const AppHeader = ({
   notifications,
   markAllAsRead,
   isAdminMode,
-  onAvatarClick
+  onLogout
 }) => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
-  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
-  const [mobileSearchQuery, setMobileSearchQuery] = useState('');
-  const searchInputRef = useRef(null);
-
-  const openMobileSearch = useCallback(() => {
-    setIsMobileSearchOpen(true);
-    setMobileSearchQuery('');
-    setTimeout(() => searchInputRef.current?.focus(), 100);
-  }, []);
-
-  const closeMobileSearch = useCallback(() => {
-    setIsMobileSearchOpen(false);
-    setMobileSearchQuery('');
-  }, []);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const navigate = useNavigate();
+  const { toggleTheme, isDark } = useTheme();
+  const { logout } = useAuth();
 
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape' && isMobileSearchOpen) {
-        closeMobileSearch();
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsProfileOpen(false);
       }
     };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isMobileSearchOpen, closeMobileSearch]);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleViewProfile = () => {
+    setIsProfileOpen(false);
+    navigate('/app/profile');
+  };
+
+  const handleSignOut = () => {
+    setIsProfileOpen(false);
+    if (onLogout) {
+      onLogout();
+    } else {
+      logout();
+      navigate('/login');
+    }
+  };
 
   return (
     <div className="topbar">
@@ -70,9 +79,6 @@ const AppHeader = ({
           <div className="topbar-brand-name">Campus<span>Skills</span></div>
         </div>
       </div>
-      
-      {/* Title removed per user request */}
-      {/* Title removed per user request */}
       
       {showSearch && (
         <GlobalSearch />
@@ -102,74 +108,54 @@ const AppHeader = ({
           </div>
         ))}
 
-        {showSearch && (
-          <button
-            className="mobile-search-btn header-icon-box"
-            onClick={openMobileSearch}
-            aria-label="Search"
-          >
-            <IconSearch size={20} />
-          </button>
-        )}
-
         <NotificationDropdown />
 
         {avatarData && (
-          <div className="header-icon-box" onClick={onAvatarClick}>
-            <Avatar 
-              initials={avatarData.initials}
-              bg="#eff6ff"
-              color="#1e40af"
-              backgroundImage={avatarData.backgroundImage}
-              size="30px"
-              fontSize="13px"
-              style={{ 
-                borderRadius: '10px', 
-                fontWeight: 700,
-                boxShadow: '0 2px 6px rgba(0, 0, 0, 0.12)'
-              }}
-            />
-          </div>
-        )}
-      </div>
-
-      {/* ─── MOBILE FULLSCREEN SEARCH OVERLAY ─── */}
-      {isMobileSearchOpen && (
-        <div className="mobile-search-overlay" onClick={closeMobileSearch}>
-          <div className="mobile-search-modal" onClick={e => e.stopPropagation()}>
-            <div className="mobile-search-header">
-              <div className="mobile-search-input-wrap">
-                <IconSearch size={20} className="mobile-search-input-icon" />
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  className="mobile-search-input"
-                  placeholder="Search CampusSkills..."
-                  value={mobileSearchQuery}
-                  onChange={e => setMobileSearchQuery(e.target.value)}
-                />
-              </div>
-              <button className="mobile-search-close" onClick={closeMobileSearch}>
-                <IconX size={22} />
-              </button>
+          <div className="profile-trigger" ref={dropdownRef}>
+            <div 
+              className="header-icon-box" 
+              onClick={() => setIsProfileOpen((prev) => !prev)}
+            >
+              <Avatar 
+                initials={avatarData.initials}
+                bg="#eff6ff"
+                color="#1e40af"
+                backgroundImage={avatarData.backgroundImage}
+                size="30px"
+                fontSize="13px"
+                style={{ 
+                  borderRadius: '10px', 
+                  fontWeight: 700,
+                  boxShadow: '0 2px 6px rgba(0, 0, 0, 0.12)'
+                }}
+              />
             </div>
-            {!mobileSearchQuery.trim() && (
-              <div className="mobile-search-hints">
-                <div className="mobile-search-hint-section">
-                  <div className="mobile-search-hint-label">Popular skills</div>
-                  <div className="mobile-search-hint-chips">
-                    {['Web Dev', 'UI/UX', 'Python', 'Data Science', 'Design', 'Mobile Dev'].map(s => (
-                      <button key={s} className="mobile-search-hint-chip" onClick={() => { setMobileSearchQuery(s); }}>
-                        {s}
-                      </button>
-                    ))}
-                  </div>
+
+            {isProfileOpen && (
+              <div className="profile-dropdown">
+                <div className="profile-dropdown-header">
+                  <div className="profile-dd-name">{avatarData.name}</div>
+                  <div className="profile-dd-meta">{avatarData.meta}</div>
                 </div>
+                <div className="profile-dd-divider" />
+                <button className="profile-dd-item" onClick={handleViewProfile}>
+                  <IconUser size={16} stroke={1.5} />
+                  <span>View Profile</span>
+                </button>
+                <button className="profile-dd-item" onClick={() => { setIsProfileOpen(false); toggleTheme(); }}>
+                  {isDark ? <IconSun size={16} stroke={1.5} /> : <IconMoon size={16} stroke={1.5} />}
+                  <span>{isDark ? 'Light Mode' : 'Dark Mode'}</span>
+                </button>
+                <div className="profile-dd-divider" />
+                <button className="profile-dd-item profile-dd-signout" onClick={handleSignOut}>
+                  <IconLogout size={16} stroke={1.5} />
+                  <span>Sign Out</span>
+                </button>
               </div>
             )}
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

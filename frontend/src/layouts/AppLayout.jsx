@@ -142,7 +142,7 @@ const AppLayout = () => {
         notifications={notifications}
         markAllAsRead={markAllAsRead}
         isAdminMode={false}
-        onAvatarClick={() => navigate('/app/profile')}
+        onLogout={handleSignOut}
       />
 
       <div className="app-body">

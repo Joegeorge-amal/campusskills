@@ -3,6 +3,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { AppDataProvider } from './context/AppDataContext';
 import { WebSocketProvider } from './context/WebSocketContext';
+import { ThemeProvider } from './context/ThemeContext';
 import { ErrorBoundary } from './ErrorBoundary';
 import AppRoutes from './routes/AppRoutes';
 
@@ -12,9 +13,11 @@ const App = () => {
       <BrowserRouter>
         <AuthProvider>
           <WebSocketProvider>
+            <ThemeProvider>
             <AppDataProvider>
               <AppRoutes />
             </AppDataProvider>
+            </ThemeProvider>
           </WebSocketProvider>
         </AuthProvider>
       </BrowserRouter>
