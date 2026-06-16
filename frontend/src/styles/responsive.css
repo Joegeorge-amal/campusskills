@@ -80,3 +80,89 @@
     border-radius: 20px;
   }
 }
+
+/* ─── MEDIUM/LARGE PHONES: 430px ─── */
+@media (max-width: 430px) {
+  .pg {
+    padding: 16px !important;
+  }
+  #market.pg,
+  #chat.pg {
+    padding: 0 !important;
+  }
+
+  .auth-card {
+    padding: 24px 20px !important;
+  }
+
+  .setup-card {
+    padding: 20px 16px !important;
+  }
+
+  .auth-page {
+    padding: 12px !important;
+  }
+
+  .auth-container {
+    padding: 8px !important;
+  }
+
+  .grid-3 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .grid-4 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .login-type-selector {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .modal-content {
+    width: 96vw !important;
+  }
+
+  .filter-chip {
+    padding: 4px 10px;
+    font-size: 11px;
+  }
+
+  .topbar-actions {
+    gap: 4px;
+  }
+}
+
+/* ─── SMALL PHONES: 360px ─── */
+@media (max-width: 360px) {
+  .pg {
+    padding: 12px !important;
+  }
+  #market.pg,
+  #chat.pg {
+    padding: 0 !important;
+  }
+
+  .auth-card {
+    padding: 20px 16px !important;
+  }
+
+  .grid-4 {
+    grid-template-columns: 1fr !important;
+  }
+
+  .brand-title {
+    font-size: 20px !important;
+  }
+
+  .modal-content {
+    width: 98vw !important;
+    border-radius: 16px !important;
+    padding: 16px !important;
+  }
+}
