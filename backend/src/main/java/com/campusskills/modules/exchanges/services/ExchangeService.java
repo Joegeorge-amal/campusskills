@@ -8,6 +8,13 @@ import com.campusskills.shared.constants.ExchangeStatus;
 import com.campusskills.shared.constants.SessionStatus;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -226,6 +233,12 @@ public class ExchangeService {
                         // Tutoring
                         Number sessionStartNum = payload.getNumber("firstSessionStart");
                         Long sessionStart = sessionStartNum != null ? sessionStartNum.longValue() : exchange.getProposedStartTime();
+                        
+                        // Fallback: compute from listing's primary available slot
+                        if (sessionStart == null && listing != null && listing.getAvailableSlots() != null && !listing.getAvailableSlots().isEmpty()) {
+                            sessionStart = computeNextSlotTime(listing.getAvailableSlots().get(0));
+                        }
+                        
                         if (sessionStart != null) {
                             String teacherId = exchange.getReceiverId();
                             String studentId = exchange.getInitiatorId();
@@ -318,5 +331,40 @@ public class ExchangeService {
 
     public Future<List<Exchange>> getMyExchanges(String userId) {
         return repository.findRequestsForUser(userId);
+    }
+
+    private static Long computeNextSlotTime(com.campusskills.modules.listings.models.ListingSlot slot) {
+        if (slot == null || slot.getDayOfWeek() == null || slot.getStartTime() == null) return null;
+        try {
+            LocalTime time = null;
+            String raw = slot.getStartTime().trim().toUpperCase();
+            // Try 12-hour format "HH:MM AM/PM" first
+            java.util.regex.Matcher m = java.util.regex.Pattern.compile("(\\d{1,2}):(\\d{2})\\s*(AM|PM)").matcher(raw);
+            if (m.find()) {
+                int h = Integer.parseInt(m.group(1));
+                int min = Integer.parseInt(m.group(2));
+                if (m.group(3).equals("PM") && h < 12) h += 12;
+                if (m.group(3).equals("AM") && h == 12) h = 0;
+                time = LocalTime.of(h, min);
+            } else {
+                // Try 24-hour format "HH:MM"
+                DateTimeFormatter fmt24 = DateTimeFormatter.ofPattern("HH:mm");
+                time = LocalTime.parse(raw, fmt24);
+            }
+            DayOfWeek targetDay = slot.getDayOfWeek();
+            LocalDate today = LocalDate.now();
+            LocalDate nextDate = today.with(TemporalAdjusters.next(targetDay));
+            // If today IS the target day and the time hasn't passed yet, use today
+            if (today.getDayOfWeek() == targetDay) {
+                LocalTime now = LocalTime.now();
+                if (time.isAfter(now)) {
+                    nextDate = today;
+                }
+            }
+            return nextDate.atTime(time).atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+        } catch (Exception e) {
+            log.warn("Failed to compute next slot time for slot {} {}", slot.getDayOfWeek(), slot.getStartTime(), e);
+            return null;
+        }
     }
 }
