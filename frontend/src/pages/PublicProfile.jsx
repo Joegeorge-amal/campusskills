@@ -222,7 +222,20 @@ const PublicProfile = () => {
             <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#111827', marginBottom: '20px' }}>Active Listings</h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '20px' }}>
               {listings.map(listing => (
-                <MarketplaceCard key={listing._id} listing={listing} currentUser={null} />
+                <MarketplaceCard 
+                  key={listing._id}
+                  title={listing.title}
+                  description={listing.description}
+                  category={listing.category}
+                  typeLabel={listing.listingType === 'SWAP' ? 'Skill Swap' : (listing.listingType === 'TEACH' ? 'Offering' : 'Requesting')}
+                  price={listing.listingType === 'SWAP' ? 'Skill Swap' : (listing.price ? `₹${listing.price}/hr` : 'Free')}
+                  user={{ name: profileData?.name || 'Unknown', year: profileData?.year || '', branch: profileData?.programme || '' }}
+                  rating={statsData?.ratingAvg?.toFixed(1) || '5.0'}
+                  sessionsCount={statsData?.sessionsCompleted || 0}
+                  mode={listing.availability === 'ONLINE' ? 'Online' : (listing.availability || 'In-person')}
+                  isVerified={uniqueVerified.includes(listing.title)}
+                  variant="profile"
+                />
               ))}
             </div>
           </div>
