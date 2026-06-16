@@ -33,18 +33,9 @@ const AutocompleteInput = ({ allTopics, onAddSkill, placeholder }) => {
   };
 
   const commitSkill = () => {
-    if (inputValue.trim() !== '') {
-      // If there is an exact case-insensitive match, use it
-      const exactMatch = allTopics.find(t => t.toLowerCase() === inputValue.trim().toLowerCase());
-      if (exactMatch) {
-        onAddSkill(exactMatch);
-      } else if (bestMatch && (bestMatch.distance <= 1 || (bestMatch.distance <= 2 && inputValue.length >= 3))) {
-        // If there's a close fuzzy match, autocorrect (but be careful not to snap 1-letter words to 3-letter words)
-        onAddSkill(bestMatch.item);
-      } else {
-        // Otherwise, add what they typed as a custom skill
-        onAddSkill(inputValue.trim());
-      }
+    const val = inputValue.trim();
+    if (val !== '') {
+      onAddSkill(val);
       setInputValue('');
     }
   };
