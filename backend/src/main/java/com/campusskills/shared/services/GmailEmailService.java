@@ -34,7 +34,7 @@ public class GmailEmailService implements EmailService {
         }
         
         this.fromName = Env.getOrDefault("MAIL_FROM_NAME", "CampusSkills");
-        this.fromAddress = Env.getOrDefault("MAIL_FROM_ADDRESS", "campusskillsnoreply@gmail.com");
+        this.fromAddress = Env.getOrDefault("MAIL_FROM_ADDRESS", username);
 
         MailConfig config = new MailConfig()
             .setHostname(host)
@@ -434,7 +434,7 @@ public class GmailEmailService implements EmailService {
                 log.debug("[SMTP SUCCESS] Email successfully accepted by Gmail! Message ID: {}, Recipients: {}", result.getMessageID(), result.getRecipients());
             })
             .onFailure(err -> {
-                log.error("[SMTP FATAL ERROR] Failed to send email! Please check your SMTP_USERNAME and App Password!", err);
+                log.error("[SMTP FATAL ERROR] Failed to send email. Please check SMTP_HOST, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD, and MAIL_FROM_ADDRESS.", err);
             })
             .mapEmpty();
     }

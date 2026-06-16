@@ -45,10 +45,9 @@ public class ApiRouter {
         router.route().handler(BodyHandler.create());
         
         // 3.5 Email Service
-        // Changed default to "gmail" so you don't need to pass the environment variable every time!
         String emailProvider = Env.getOrDefault("EMAIL_PROVIDER", "gmail");
         EmailService emailService;
-        if ("gmail".equalsIgnoreCase(emailProvider)) {
+        if ("gmail".equalsIgnoreCase(emailProvider) || "brevo".equalsIgnoreCase(emailProvider) || "smtp".equalsIgnoreCase(emailProvider)) {
             emailService = new com.campusskills.shared.services.GmailEmailService(vertx);
         } else {
             emailService = new com.campusskills.shared.services.StubEmailService();
