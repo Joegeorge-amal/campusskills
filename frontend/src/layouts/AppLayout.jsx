@@ -19,7 +19,7 @@ import {
 
 const AppLayout = () => {
   const { user, avBg, avCol, logout } = useAuth();
-  const { unreadMessagesCount, pendingRequestsCount, notifications, markAllAsRead } = useAppData();
+  const { unreadMessagesCount, pendingRequestsCount, notifications, markAllAsRead, setSearchQuery } = useAppData();
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
@@ -35,16 +35,17 @@ const AppLayout = () => {
   const [isFilterModalOpen, setIsFilterModalOpen] = React.useState(false);
   const [isLogoutModalOpen, setIsLogoutModalOpen] = React.useState(false);
 
-  // Reset active chip on navigation
+  // Reset active chip and search query on navigation
   React.useEffect(() => {
     setActiveChip('');
-  }, [location.pathname]);
+    setSearchQuery('');
+  }, [location.pathname, setSearchQuery]);
 
   const getPageConfig = () => {
     const path = location.pathname;
     let config = { showSearch: true, chips: [], isAdvanced: false };
     
-    if (path.includes('/app/messages')) {
+    if (path.includes('/app/profile') || path.includes('/app/setup') || path.includes('/app/history')) {
       config.showSearch = false;
     } else if (path.includes('/app/marketplace')) {
       config.showSearch = true;

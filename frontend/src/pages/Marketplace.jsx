@@ -18,7 +18,7 @@ let cachedListings = null;
 
 const Marketplace = () => {
   const navigate = useNavigate();
-  const { triggerToast } = useAppData();
+  const { triggerToast, searchQuery } = useAppData();
   const { user } = useAuth();
   const [skills, setSkills] = useState(cachedListings || []);
   const [pendingSkills, setPendingSkills] = useState([]);
@@ -29,7 +29,6 @@ const Marketplace = () => {
   const [isBookModalOpen, setIsBookModalOpen] = useState(false);
   const [requestMode, setRequestMode] = useState('TUTORING'); // 'TUTORING' or 'SWAP'
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
 
   // Handle Escape key to close details
   useEffect(() => {
@@ -95,9 +94,30 @@ const Marketplace = () => {
     if (container) container.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const filteredSkills = filter === 'All' 
+  const filteredSkills = (filter === 'All' 
     ? skills 
-    : skills.filter(s => s.category === filter);
+    : skills.filter(s => s.category === filter)
+  ).filter(s => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    
+    const titleMatch = s.title?.toLowerCase().includes(q);
+    const descMatch = s.description?.toLowerCase().includes(q);
+    const catMatch = s.category?.toLowerCase().includes(q);
+    
+    const offeredMatch = s.offeredSkills?.some(tag => {
+      const tagStr = (typeof tag === 'string' ? tag : tag?.name) || '';
+      return tagStr.toLowerCase().includes(q);
+    });
+    const requestedMatch = s.requestedSkills?.some(tag => {
+      const tagStr = (typeof tag === 'string' ? tag : tag?.name) || '';
+      return tagStr.toLowerCase().includes(q);
+    });
+    
+    const creatorNameMatch = s.creatorName?.toLowerCase().includes(q) || s.creatorDisplayName?.toLowerCase().includes(q) || (s.creatorProfile && s.creatorProfile.name?.toLowerCase().includes(q));
+    
+    return titleMatch || descMatch || catMatch || offeredMatch || requestedMatch || creatorNameMatch;
+  });
 
   const featuredSkills = filter === 'All' 
     ? [...skills]

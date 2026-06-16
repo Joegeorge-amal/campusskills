@@ -23,7 +23,7 @@ import {
 
 const Sessions = () => {
   const { user } = useAuth();
-  const { sessionsData, requestsData, isSessionsLoading, triggerToast, fetchInitialData } = useAppData();
+  const { sessionsData, requestsData, isSessionsLoading, triggerToast, fetchInitialData, searchQuery } = useAppData();
   const [expandedSessionId, setExpandedSessionId] = useState(null);
   const [paymentInfos, setPaymentInfos] = useState({});
   const [loadingPaymentId, setLoadingPaymentId] = useState(null);
@@ -226,8 +226,16 @@ const Sessions = () => {
   const now = Date.now();
   const soonLimit = now + 48 * 60 * 60 * 1000; // 48 hours
 
+  const filteredSessions = sessionsData.filter(s => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    const titleMatch = s.topic?.toLowerCase().includes(q);
+    const participantMatch = s.name?.toLowerCase().includes(q);
+    return titleMatch || participantMatch;
+  });
+
   // Filter and sort sessions
-  const allScheduled = sessionsData
+  const allScheduled = filteredSessions
     .filter(s => s.status === 'SCHEDULED')
     .sort((a, b) => (a.rawSession.scheduledStart || 0) - (b.rawSession.scheduledStart || 0));
 
@@ -237,7 +245,7 @@ const Sessions = () => {
     s.rawSession.scheduledStart >= now - 3600000 // up to 1 hour ago
   );
 
-  const pastSessions = sessionsData
+  const pastSessions = filteredSessions
     .filter(s => s.status === 'COMPLETED' || s.status === 'CANCELLED')
     .sort((a, b) => (b.rawSession.updatedAt || 0) - (a.rawSession.updatedAt || 0));
 

@@ -26,6 +26,7 @@ export const AppDataProvider = ({ children }) => {
   const [isSessionsLoading, setIsSessionsLoading] = useState(true);
 
   const [notifications, setNotifications] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const triggerToast = (msg) => {
     setToastMessage(msg);
@@ -566,7 +567,9 @@ export const AppDataProvider = ({ children }) => {
         notifications,
         markAllAsRead,
         unreadMessagesCount,
-        pendingRequestsCount
+        pendingRequestsCount,
+        searchQuery,
+        setSearchQuery
       }}
     >
       {children}

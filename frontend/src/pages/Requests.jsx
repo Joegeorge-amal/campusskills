@@ -18,7 +18,7 @@ const getInitials = (name) => {
 
 const Requests = () => {
   const { user } = useAuth();
-  const { triggerToast, requestsData, isRequestsLoading: loading, fetchInitialData } = useAppData();
+  const { triggerToast, requestsData, isRequestsLoading: loading, fetchInitialData, searchQuery } = useAppData();
   
   const [swapModalRequest, setSwapModalRequest] = useState(null);
   const [declineConfirmReq, setDeclineConfirmReq] = useState(null);
@@ -146,10 +146,20 @@ const Requests = () => {
 
   const historyStatuses = ['accepted', 'confirmed', 'declined', 'rejected', 'cancelled', 'completed'];
   
-  const activeRequests = requestsData.filter(r => !historyStatuses.includes(r.status));
+  const filteredRequests = requestsData.filter(r => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    
+    const listingTitleMatch = r.otherUserExtras?.listingTitle?.toLowerCase().includes(q);
+    const participantMatch = r.name?.toLowerCase().includes(q) || r.otherUser?.name?.toLowerCase().includes(q);
+    
+    return listingTitleMatch || participantMatch;
+  });
+
+  const activeRequests = filteredRequests.filter(r => !historyStatuses.includes(r.status));
   const incomingRequests = activeRequests.filter(r => r.direction === 'incoming');
   const outgoingRequests = activeRequests.filter(r => r.direction === 'outgoing');
-  const historyRequests = requestsData
+  const historyRequests = filteredRequests
     .filter(r => historyStatuses.includes(r.status))
     .sort((a, b) => {
       const aTime = a.rawReq?.updatedAt || a.rawReq?.createdAt || 0;
