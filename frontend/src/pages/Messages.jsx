@@ -475,7 +475,7 @@ const Messages = () => {
         
         {/* Left: Chat List */}
         <div style={{ width: '280px', display: 'flex', flexDirection: 'column', borderRight: '0.5px solid var(--cs-border)' }}>
-          <div style={{ height: '60px', boxSizing: 'border-box', padding: '0 16px', borderBottom: '0.5px solid var(--cs-border)', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div style={{ boxSizing: 'border-box', padding: '16px', borderBottom: '0.5px solid var(--cs-border)', display: 'flex', flexDirection: 'column' }}>
             <div style={{ position: 'relative' }}>
               <IconSearch style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--cs-text-inactive)' }} size={14} />
               <input 
@@ -488,7 +488,7 @@ const Messages = () => {
             </div>
             
             {/* Filter Pills */}
-            <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+            <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
               {['all', 'unread', 'read'].map(filter => (
                 <button
                   key={filter}
