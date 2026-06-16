@@ -30,10 +30,10 @@ public class SkillVerificationRepository {
         );
     }
 
-    public Future<List<SkillVerification>> findByUserIdAndSkill(String userId, String skillName) {
+    public Future<List<SkillVerification>> findByUserIdAndSkill(String userId, String skill) {
         JsonObject query = new JsonObject()
             .put("userId", userId)
-            .put("skillName", skillName);
+            .put("skill", skill);
         return client.find(COLLECTION, query).map(docs -> 
             docs.stream().map(doc -> doc.mapTo(SkillVerification.class)).collect(Collectors.toList())
         );

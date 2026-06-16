@@ -8,10 +8,14 @@ public class SkillVerification {
     @JsonProperty("_id")
     private String id;
     private String userId;
-    private String skillName;
-    private VerificationStatus status;
-    private Long requestedAt;
-    private Long evaluatedAt;
+    private String skill;
+    private Double score;
+    private Boolean passed;
+    private Integer warningCount;
+    private Boolean failedDueToTabSwitch;
+    private Long startedAt;
+    private Long completedAt;
+    private String status; // e.g. "COMPLETED", "FAILED_TAB_SWITCH", "TIMEOUT"
 
     public SkillVerification() {}
 
@@ -21,15 +25,27 @@ public class SkillVerification {
     public String getUserId() { return userId; }
     public void setUserId(String userId) { this.userId = userId; }
 
-    public String getSkillName() { return skillName; }
-    public void setSkillName(String skillName) { this.skillName = skillName; }
+    public String getSkill() { return skill; }
+    public void setSkill(String skill) { this.skill = skill; }
 
-    public VerificationStatus getStatus() { return status; }
-    public void setStatus(VerificationStatus status) { this.status = status; }
+    public Double getScore() { return score; }
+    public void setScore(Double score) { this.score = score; }
 
-    public Long getRequestedAt() { return requestedAt; }
-    public void setRequestedAt(Long requestedAt) { this.requestedAt = requestedAt; }
+    public Boolean getPassed() { return passed; }
+    public void setPassed(Boolean passed) { this.passed = passed; }
 
-    public Long getEvaluatedAt() { return evaluatedAt; }
-    public void setEvaluatedAt(Long evaluatedAt) { this.evaluatedAt = evaluatedAt; }
+    public Integer getWarningCount() { return warningCount; }
+    public void setWarningCount(Integer warningCount) { this.warningCount = warningCount; }
+
+    public Boolean getFailedDueToTabSwitch() { return failedDueToTabSwitch; }
+    public void setFailedDueToTabSwitch(Boolean failedDueToTabSwitch) { this.failedDueToTabSwitch = failedDueToTabSwitch; }
+
+    public Long getStartedAt() { return startedAt; }
+    public void setStartedAt(Long startedAt) { this.startedAt = startedAt; }
+
+    public Long getCompletedAt() { return completedAt; }
+    public void setCompletedAt(Long completedAt) { this.completedAt = completedAt; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

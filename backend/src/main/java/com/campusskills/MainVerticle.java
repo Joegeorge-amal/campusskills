@@ -46,7 +46,10 @@ public class MainVerticle extends AbstractVerticle {
         new com.campusskills.modules.topics.services.TopicService(
             new com.campusskills.modules.topics.repositories.TopicRepository()
         ).seedSystemTopics()
-         .onSuccess(v -> log.info("System topics seeded successfully"))
+         .onSuccess(v -> {
+             log.info("System topics seeded successfully");
+             com.campusskills.modules.topics.services.QuestionBankSeeder.seed(vertx, MongoManager.getClient());
+         })
          .onFailure(err -> log.error("Failed to seed system topics", err));
 
         // 3. Initialize JWT Auth

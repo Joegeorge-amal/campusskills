@@ -18,7 +18,8 @@ public class VerificationRouter {
 
         router.route().handler(JwtAuthMiddleware.create(jwtAuth));
         
-        router.post("/").handler(handler::requestVerification);
+        router.get("/questions/:skill").handler(handler::getQuestions);
+        router.post("/submit").handler(handler::submitVerification);
         router.get("/me").handler(handler::getMyRequests);
 
         return router;

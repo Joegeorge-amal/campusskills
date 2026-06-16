@@ -1,0 +1,502 @@
+[
+  {
+    "skill": "Python",
+    "question": "Which of the following is the correct way to define a function in Python?",
+    "options": ["def my_function():", "function my_function():", "func my_function():", "define my_function():"],
+    "correctAnswer": 0
+  },
+  {
+    "skill": "Python",
+    "question": "Which data structure in Python is immutable?",
+    "options": ["List", "Dictionary", "Tuple", "Set"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "Python",
+    "question": "What is the correct way to insert an element at a specific index in a list?",
+    "options": ["list.add(index, element)", "list.insert(index, element)", "list.append(index, element)", "list.put(index, element)"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Python",
+    "question": "What will be the output of the expression `3 ** 2`?",
+    "options": ["6", "8", "9", "12"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "Python",
+    "question": "Which keyword is used to handle exceptions in Python?",
+    "options": ["catch", "except", "error", "handle"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Python",
+    "question": "How do you start a single-line comment in Python?",
+    "options": ["//", "/*", "#", "<!--"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "Python",
+    "question": "What is the output of `print(type({}))`?",
+    "options": ["<class 'list'>", "<class 'set'>", "<class 'dict'>", "<class 'tuple'>"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "Python",
+    "question": "How do you remove the last element from a list and return it?",
+    "options": ["list.remove()", "list.pop()", "list.delete()", "list.shift()"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Python",
+    "question": "Which method is used to convert a string to lowercase?",
+    "options": ["lower()", "toLowerCase()", "downcase()", "lowercase()"],
+    "correctAnswer": 0
+  },
+  {
+    "skill": "Python",
+    "question": "What does the `len()` function return when applied to a string?",
+    "options": ["The memory size of the string", "The number of words in the string", "The number of characters in the string", "The maximum character in the string"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "HTML/CSS",
+    "question": "Which HTML5 element is used to specify a footer for a document or section?",
+    "options": [
+      "<bottom>",
+      "<footer>",
+      "<section>",
+      "<div>"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "HTML/CSS",
+    "question": "In CSS, which property is used to change the background color of an element?",
+    "options": [
+      "color",
+      "bgcolor",
+      "background-color",
+      "background-image"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "HTML/CSS",
+    "question": "What is the correct HTML for creating a hyperlink?",
+    "options": [
+      "<a url=\"http://www.example.com\">Example</a>",
+      "<a href=\"http://www.example.com\">Example</a>",
+      "<a>http://www.example.com</a>",
+      "<link href=\"http://www.example.com\">Example</link>"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "HTML/CSS",
+    "question": "Which CSS property controls the text size?",
+    "options": [
+      "font-size",
+      "text-style",
+      "font-style",
+      "text-size"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "skill": "HTML/CSS",
+    "question": "How do you select an element with the id \"main-header\" in CSS?",
+    "options": [
+      ".main-header",
+      "*main-header",
+      "main-header",
+      "#main-header"
+    ],
+    "correctAnswer": 3
+  },
+  {
+    "skill": "HTML/CSS",
+    "question": "Which HTML attribute is used to define inline styles?",
+    "options": [
+      "style",
+      "class",
+      "font",
+      "styles"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "skill": "HTML/CSS",
+    "question": "Which of the following is the correct way to link an external CSS file to an HTML document?",
+    "options": [
+      "<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">",
+      "<style src=\"style.css\"></style>",
+      "<stylesheet>style.css</stylesheet>",
+      "<link src=\"style.css\" type=\"text/css\">"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "skill": "HTML/CSS",
+    "question": "Which CSS property is used to change the text color of an element?",
+    "options": [
+      "fgcolor",
+      "text-color",
+      "color",
+      "font-color"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "HTML/CSS",
+    "question": "How do you specify a border width of 10px top, 5px right, 2px bottom, and 1px left in CSS?",
+    "options": [
+      "border-width: 10px 1px 2px 5px;",
+      "border-width: 10px 5px 2px 1px;",
+      "border-width: 10px 2px 5px 1px;",
+      "border-width: 1px 2px 5px 10px;"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "HTML/CSS",
+    "question": "Which HTML element is used to define the title of a document, displayed in the browser's title bar or tab?",
+    "options": [
+      "<head>",
+      "<header>",
+      "<meta>",
+      "<title>"
+    ],
+    "correctAnswer": 3
+  },
+  {
+    "skill": "Java",
+    "question": "Which of the following is NOT a fundamental concept of Object-Oriented Programming in Java?",
+    "options": [
+      "Inheritance",
+      "Polymorphism",
+      "Compilation",
+      "Encapsulation"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "Java",
+    "question": "What happens if you attempt to compile a Java file containing a 'public' class named 'MyClass', but the file is named 'YourClass.java'?",
+    "options": [
+      "It compiles successfully",
+      "It throws a runtime error",
+      "It throws a compilation error",
+      "It generates a warning but compiles"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "Java",
+    "question": "Which keyword is used to prevent a class from being subclassed in Java?",
+    "options": [
+      "static",
+      "final",
+      "abstract",
+      "private"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Java",
+    "question": "What is the default value of a local variable declared inside a method in Java?",
+    "options": [
+      "null",
+      "0",
+      "Garbage value",
+      "Local variables do not have default values"
+    ],
+    "correctAnswer": 3
+  },
+  {
+    "skill": "Java",
+    "question": "Which collection interface in Java is designed to not allow duplicate elements?",
+    "options": [
+      "List",
+      "Set",
+      "Map",
+      "Queue"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Java",
+    "question": "How do you properly compare the contents of two String objects 'str1' and 'str2' for equality in Java?",
+    "options": [
+      "str1 == str2",
+      "str1.equals(str2)",
+      "str1.compare(str2)",
+      "str1 = str2"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Java",
+    "question": "What is the main purpose of the 'transient' keyword in Java?",
+    "options": [
+      "To make a variable accessible by multiple threads",
+      "To prevent a variable from being serialized",
+      "To define a variable that can be changed by the garbage collector",
+      "To indicate a method that cannot be overridden"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Java",
+    "question": "Which of the following statements about Java exceptions is true?",
+    "options": [
+      "Runtime exceptions must be caught or declared in the method signature",
+      "Checked exceptions do not require a try-catch block",
+      "The finally block executes regardless of whether an exception is thrown",
+      "Error and Exception are both subclasses of RuntimeException"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "Java",
+    "question": "What is the correct way to start a thread execution in Java?",
+    "options": [
+      "thread.run()",
+      "thread.start()",
+      "thread.init()",
+      "thread.execute()"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Java",
+    "question": "In Java 8 and later, which feature provides a concise way to pass a block of code or behavior as a method argument?",
+    "options": [
+      "Anonymous inner classes only",
+      "Generics",
+      "Lambda expressions",
+      "Reflection"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "React",
+    "question": "What is JSX in React?",
+    "options": [
+      "A syntax extension for JavaScript that allows writing HTML-like code inside JavaScript",
+      "A completely new programming language built specifically for React",
+      "A state management library used to handle complex component state",
+      "A built-in React method to fetch data asynchronously from an API"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "skill": "React",
+    "question": "Which of the following hooks is primarily used for handling side effects in a functional component?",
+    "options": [
+      "useState",
+      "useEffect",
+      "useRef",
+      "useReducer"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "React",
+    "question": "How are 'props' used in React components?",
+    "options": [
+      "To manage the internal local state of a single component",
+      "To pass data from a parent component down to a child component",
+      "To interact directly with the browser's local storage",
+      "To update the virtual DOM directly without triggering a re-render"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "React",
+    "question": "What is the primary function of the Virtual DOM in React?",
+    "options": [
+      "It replaces the browser's DOM entirely to improve cross-site security",
+      "It acts as a lightweight, in-memory representation of the real DOM to optimize rendering performance",
+      "It is a special database instance used to securely store React component state",
+      "It provides a mechanism to automatically style components using CSS-in-JS"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "React",
+    "question": "Why is it important to provide a unique `key` prop when rendering a list of elements in React?",
+    "options": [
+      "It ensures that the elements receive unique CSS classes across the application",
+      "It helps React efficiently identify which items have changed, been added, or been removed",
+      "It automatically sorts the rendered list in alphabetical or numerical order",
+      "It prevents browser memory leaks by unmounting hidden list elements"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "React",
+    "question": "What common problem does the React Context API solve in a large application?",
+    "options": [
+      "It handles complex form validation logic without needing external libraries",
+      "It manages client-side URL routing and browser navigation history",
+      "It avoids 'prop drilling' by allowing data to be shared across the component tree directly",
+      "It completely replaces the need for making asynchronous API calls"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "React",
+    "question": "What is the primary difference between the `useState` and `useRef` hooks?",
+    "options": [
+      "Updating `useState` causes a component to re-render, while updating `useRef` does not trigger a re-render",
+      "`useRef` is strictly used for global state management, while `useState` is used for local component state",
+      "`useState` can only store primitive data types, while `useRef` can store complex objects",
+      "There is no functional difference; they are completely interchangeable in React"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "skill": "React",
+    "question": "How can you optimize performance in React by preventing a functional component from re-rendering unless its props have changed?",
+    "options": [
+      "By wrapping the component in `React.memo`",
+      "By wrapping the component's state in the `useReducer` hook",
+      "By defining the component as an ES6 Class component instead",
+      "By conditionally removing the `useEffect` hook during renders"
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "skill": "React",
+    "question": "What will happen if you directly mutate the state object in React (e.g., `state.count = 1`) instead of using the provided state updater function?",
+    "options": [
+      "The component will immediately re-render to display the newly mutated value",
+      "React will throw a strict-mode syntax error and crash the application",
+      "The state value will change in memory, but the component will not re-render to reflect the update visually",
+      "The browser will freeze due to an infinite rendering loop"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "React",
+    "question": "Which of the following best describes the purpose of the `useMemo` hook?",
+    "options": [
+      "It memorizes a callback function reference to safely pass to child components",
+      "It caches the result of an expensive calculation so it doesn't need to be recomputed on every render",
+      "It automatically stores the previous state of a component to implement undo/redo functionality",
+      "It fetches data from an external API and permanently caches the JSON response locally"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "JavaScript",
+    "question": "What is the primary difference between let and var when declaring variables in JavaScript?",
+    "options": [
+      "let has block scope, while var has function scope.",
+      "let can only be used for numbers, while var is for all data types.",
+      "var variables cannot be reassigned, while let variables can.",
+      "let is hoisted to the top of the scope, while var is not."
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "skill": "JavaScript",
+    "question": "What does the strict equality operator (===) do in JavaScript?",
+    "options": [
+      "Compares only the value of two operands, ignoring type.",
+      "Compares both the value and the type of two operands.",
+      "Assigns a variable to a strictly typed value.",
+      "Converts a string to a number before comparing."
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "JavaScript",
+    "question": "Which array method is used to create a new array with the results of calling a provided function on every element in the calling array?",
+    "options": [
+      "filter()",
+      "reduce()",
+      "map()",
+      "forEach()"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "JavaScript",
+    "question": "What is the main purpose of a Promise in JavaScript?",
+    "options": [
+      "To represent the eventual completion or failure of an asynchronous operation.",
+      "To guarantee that a variable's value will never change throughout the program.",
+      "To synchronously block the main thread until a network request finishes.",
+      "To enforce strict type-checking in modern JavaScript applications."
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "skill": "JavaScript",
+    "question": "What will be the output of console.log(typeof null) in JavaScript?",
+    "options": [
+      "null",
+      "undefined",
+      "object",
+      "string"
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "JavaScript",
+    "question": "How does an arrow function handle the 'this' keyword differently than a traditional function expression?",
+    "options": [
+      "It always binds 'this' to the global window object.",
+      "It creates its own new 'this' context when invoked.",
+      "It inherits 'this' from the enclosing lexical context.",
+      "It requires 'this' to be explicitly passed as an argument."
+    ],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "JavaScript",
+    "question": "Which method is generally the most efficient way to select a single HTML element by its unique ID attribute?",
+    "options": [
+      "document.querySelector('.id')",
+      "document.getElementById('id')",
+      "document.getElementsByClassName('id')",
+      "document.getElementsByTagName('id')"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "JavaScript",
+    "question": "Which of the following methods converts a JavaScript object into a JSON string?",
+    "options": [
+      "JSON.parse()",
+      "JSON.stringify()",
+      "Object.toString()",
+      "String(object)"
+    ],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "JavaScript",
+    "question": "What is a closure in JavaScript?",
+    "options": [
+      "A function that has access to the outer enclosing function's variables, even after the outer function has finished executing.",
+      "A method used to safely close a database connection to prevent memory leaks.",
+      "The process of ending a loop using the break keyword.",
+      "A built-in security feature that prevents cross-site scripting (XSS) attacks."
+    ],
+    "correctAnswer": 0
+  },
+  {
+    "skill": "JavaScript",
+    "question": "Given the array `const colors = ['red', 'green', 'blue'];`, how would you use array destructuring to extract 'red' and 'green' into variables?",
+    "options": [
+      "const [red, green] = colors;",
+      "const {red, green} = colors;",
+      "const color1='red', color2='green' = colors;",
+      "const [c1: 'red', c2: 'green'] = colors;"
+    ],
+    "correctAnswer": 0
+  }
+]

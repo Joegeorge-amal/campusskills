@@ -1,41 +1,117 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom';
-import { getQuizForSkill } from '../../data/quizData';
+import { verificationService } from '../../services/verificationService';
 import { IconCircleCheckFilled, IconAlertTriangleFilled, IconClock, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 
 const SkillQuizModal = ({ isOpen, skillName, onClose, onComplete }) => {
-  const [step, setStep] = useState('quiz'); // 'quiz', 'confirm', 'pass', 'fail'
-  const [quizData, setQuizData] = useState(null);
+  const [step, setStep] = useState('loading'); // 'loading', 'not_available', 'quiz', 'confirm', 'pass', 'fail', 'fail_cheat'
+  const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
-  const [timeLeft, setTimeLeft] = useState(15 * 60); // 15 mins
+  const [timeLeft, setTimeLeft] = useState(10 * 60); // 10 mins
   const [finalScore, setFinalScore] = useState(0);
-
+  
+  const [warningCount, setWarningCount] = useState(0);
+  const [showWarningMsg, setShowWarningMsg] = useState('');
+  
+  const timerRef = useRef(null);
+  const startTimeRef = useRef(null);
+  
   useEffect(() => {
     if (isOpen && skillName) {
-      setQuizData(getQuizForSkill(skillName));
-      setStep('pass');
-      setCurrentQuestionIndex(0);
+      setStep('loading');
+      setWarningCount(0);
+      setShowWarningMsg('');
       setAnswers({});
-      setTimeLeft(15 * 60);
-      setFinalScore(100);
+      setTimeLeft(10 * 60);
+      setFinalScore(0);
+      
+      verificationService.getQuestions(skillName)
+        .then(res => {
+          if (!res || res.length === 0) {
+            setStep('not_available');
+          } else {
+            setQuestions(res);
+            setStep('quiz');
+            setCurrentQuestionIndex(0);
+            startTimeRef.current = Date.now();
+          }
+        })
+        .catch(err => {
+          console.error('Failed to load questions:', err);
+          setStep('not_available');
+        });
+    } else {
+      clearInterval(timerRef.current);
     }
   }, [isOpen, skillName]);
 
+  // Anti-Cheat Logic
+  useEffect(() => {
+    if (!isOpen || step !== 'quiz') return;
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        handleTabSwitch();
+      }
+    };
+    
+    const handleBlur = () => {
+      handleTabSwitch();
+    };
+
+    window.addEventListener('blur', handleBlur);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener('blur', handleBlur);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isOpen, step, warningCount]);
+
+  const handleTabSwitch = () => {
+    const newCount = warningCount + 1;
+    setWarningCount(newCount);
+    
+    if (newCount === 1) {
+      setShowWarningMsg('Please remain on this tab. Switching tabs repeatedly will invalidate the verification.');
+    } else if (newCount === 2) {
+      setShowWarningMsg('Second warning. One more tab switch will fail the verification.');
+    } else if (newCount >= 3) {
+      handleForceFailCheat();
+    }
+    
+    setTimeout(() => setShowWarningMsg(''), 5000);
+  };
+
+  const handleForceFailCheat = async () => {
+    setStep('fail_cheat');
+    try {
+      await verificationService.submitVerification({
+        skill: skillName,
+        answers: {},
+        failedDueToTabSwitch: true,
+        warningCount: 3,
+        startedAt: startTimeRef.current
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   // Timer logic
   useEffect(() => {
-    let timer;
     if (isOpen && step === 'quiz' && timeLeft > 0) {
-      timer = setInterval(() => {
+      timerRef.current = setInterval(() => {
         setTimeLeft(prev => prev - 1);
       }, 1000);
     } else if (timeLeft === 0 && step === 'quiz') {
-      handleCalculateScore();
+      handleSubmitScore();
     }
-    return () => clearInterval(timer);
+    return () => clearInterval(timerRef.current);
   }, [isOpen, step, timeLeft]);
 
-  if (!isOpen || !quizData) return null;
+  if (!isOpen) return null;
 
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
@@ -44,14 +120,18 @@ const SkillQuizModal = ({ isOpen, skillName, onClose, onComplete }) => {
   };
 
   const handleOptionSelect = (optIndex) => {
+    const question = questions[currentQuestionIndex];
+    const qKey = question.question;
+    const qId = question._id;
     setAnswers(prev => ({
       ...prev,
-      [currentQuestionIndex]: optIndex
+      [qKey]: optIndex,
+      [qId]: optIndex
     }));
   };
 
   const handleNext = () => {
-    if (currentQuestionIndex < quizData.questions.length - 1) {
+    if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
     } else {
       setStep('confirm');
@@ -64,210 +144,221 @@ const SkillQuizModal = ({ isOpen, skillName, onClose, onComplete }) => {
     }
   };
 
-  const handleCalculateScore = () => {
-    let correctCount = 0;
-    quizData.questions.forEach((q, index) => {
-      if (answers[index] === q.correctIndex) {
-        correctCount++;
+  const handleSubmitScore = async () => {
+    setStep('loading');
+    try {
+      const res = await verificationService.submitVerification({
+        skill: skillName,
+        answers: answers,
+        failedDueToTabSwitch: false,
+        warningCount: warningCount,
+        startedAt: startTimeRef.current
+      });
+      
+      setFinalScore(res.score);
+      if (res.passed) {
+        setStep('pass');
+      } else {
+        setStep('fail');
       }
-    });
-    
-    const scorePct = Math.round((correctCount / quizData.questions.length) * 100);
-    setFinalScore(scorePct);
-    
-    if (scorePct >= 70) {
-      setStep('pass');
-    } else {
+    } catch (err) {
+      console.error('Submit error:', err);
+      alert("NETWORK ERROR: Could not connect to the backend!\nIf you are seeing this, your Java backend is definitely running the OLD code or is turned off. Please run 'mvn clean package -DskipTests' and restart it!");
       setStep('fail');
     }
   };
 
   const handleReturnToProfile = () => {
     if (step === 'pass') {
-      onComplete(skillName, finalScore, quizData.domain);
+      onComplete(skillName, finalScore);
     } else {
-      // Just close if fail
       onClose();
     }
   };
 
-  const renderQuizStep = () => {
-    const question = quizData.questions[currentQuestionIndex];
-    const isLastQuestion = currentQuestionIndex === quizData.questions.length - 1;
-
-    return (
-      <div style={{ padding: '32px', height: '100%', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
-          <div>
-            <div style={{ fontSize: '20px', fontWeight: 700, color: '#111827' }}>{skillName} Verification</div>
-            <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '4px' }}>Question {currentQuestionIndex + 1} of {quizData.questions.length}</div>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#f3f4f6', padding: '8px 16px', borderRadius: '24px', fontWeight: 600, color: '#374151', fontSize: '14px' }}>
-            <IconClock size={18} /> {formatTime(timeLeft)}
-          </div>
+  const renderContent = () => {
+    if (step === 'loading') {
+      return (
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+          Loading...
         </div>
+      );
+    }
 
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: '18px', fontWeight: 600, color: '#1f2937', marginBottom: '24px', lineHeight: 1.5 }}>
-            {question.text}
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {question.options.map((opt, idx) => {
-              const isSelected = answers[currentQuestionIndex] === idx;
-              return (
-                <div 
-                  key={idx}
-                  onClick={() => handleOptionSelect(idx)}
-                  style={{ 
-                    padding: '16px 20px', 
-                    borderRadius: '12px', 
-                    border: `2px solid ${isSelected ? '#534AB7' : '#e5e7eb'}`, 
-                    background: isSelected ? '#f5f4ff' : '#ffffff',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '16px',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  <div style={{ 
-                    width: '24px', height: '24px', borderRadius: '50%', 
-                    border: `2px solid ${isSelected ? '#534AB7' : '#d1d5db'}`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center'
-                  }}>
-                    {isSelected && <div style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#534AB7' }}></div>}
-                  </div>
-                  <div style={{ fontSize: '15px', color: isSelected ? '#3730a3' : '#4b5563', fontWeight: isSelected ? 600 : 500 }}>
-                    {opt}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '32px', paddingTop: '24px', borderTop: '1px solid #e5e7eb' }}>
-          <button 
-            onClick={handlePrev}
-            disabled={currentQuestionIndex === 0}
-            style={{ 
-              padding: '12px 24px', borderRadius: '24px', border: '1px solid #e5e7eb', background: '#ffffff', 
-              color: currentQuestionIndex === 0 ? '#9ca3af' : '#374151', fontSize: '14px', fontWeight: 600, 
-              cursor: currentQuestionIndex === 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '8px' 
-            }}
-          >
-            <IconChevronLeft size={18} /> Previous
-          </button>
-          
-          <button 
-            onClick={handleNext}
-            style={{ 
-              padding: '12px 32px', borderRadius: '24px', border: 'none', background: '#534AB7', 
-              color: '#ffffff', fontSize: '14px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' 
-            }}
-          >
-            {isLastQuestion ? 'Finish' : 'Next'} {isLastQuestion ? '' : <IconChevronRight size={18} />}
+    if (step === 'not_available') {
+      return (
+        <div style={{ padding: '32px', textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <IconAlertTriangleFilled size={48} color="#f59e0b" style={{ margin: '0 auto 16px' }} />
+          <h2 style={{ fontSize: '24px', fontWeight: 800, marginBottom: '16px' }}>Not Available</h2>
+          <p style={{ color: '#6b7280', marginBottom: '32px' }}>
+            Verification not available for this skill yet.
+          </p>
+          <button onClick={onClose} style={{ padding: '12px', background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}>
+            Close
           </button>
         </div>
-      </div>
-    );
+      );
+    }
+
+    if (step === 'fail_cheat') {
+      return (
+        <div style={{ padding: '32px', textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <IconAlertTriangleFilled size={48} color="#dc2626" style={{ margin: '0 auto 16px' }} />
+          <h2 style={{ fontSize: '24px', fontWeight: 800, color: '#dc2626', marginBottom: '16px' }}>Verification Failed</h2>
+          <p style={{ color: '#6b7280', marginBottom: '32px' }}>
+            You switched tabs too many times. Your attempt has been recorded as a failure.
+          </p>
+          <button onClick={onClose} style={{ padding: '12px', background: '#e5e7eb', color: '#374151', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600 }}>
+            Return to Profile
+          </button>
+        </div>
+      );
+    }
+
+    if (step === 'quiz') {
+      const question = questions[currentQuestionIndex];
+      const isLastQuestion = currentQuestionIndex === questions.length - 1;
+      const qId = question.question;
+
+      return (
+        <div style={{ padding: '32px', height: '100%', display: 'flex', flexDirection: 'column' }}>
+          {showWarningMsg && (
+            <div style={{ padding: '12px', background: '#fee2e2', color: '#dc2626', borderRadius: '8px', marginBottom: '16px', fontWeight: 600, fontSize: '14px', textAlign: 'center' }}>
+              {showWarningMsg}
+            </div>
+          )}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px' }}>
+            <span style={{ color: '#6b7280', fontWeight: 600 }}>
+              Question {currentQuestionIndex + 1} of {questions.length}
+            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: timeLeft < 60 ? '#ef4444' : '#1d4ed8', fontWeight: 700, background: timeLeft < 60 ? '#fee2e2' : '#eff6ff', padding: '6px 12px', borderRadius: '100px' }}>
+              <IconClock size={18} />
+              {formatTime(timeLeft)}
+            </div>
+          </div>
+
+          <h3 style={{ fontSize: '20px', color: '#111827', marginBottom: '32px', lineHeight: '1.5' }}>
+            {question.question}
+          </h3>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1 }}>
+            {question.options.map((opt, i) => (
+              <button
+                key={i}
+                onClick={() => handleOptionSelect(i)}
+                style={{
+                  padding: '16px 20px',
+                  border: answers[qId] === i ? '2px solid #1d4ed8' : '2px solid #e5e7eb',
+                  background: answers[qId] === i ? '#eff6ff' : '#fff',
+                  borderRadius: '12px',
+                  textAlign: 'left',
+                  fontSize: '15px',
+                  color: '#374151',
+                  fontWeight: answers[qId] === i ? 600 : 500,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px'
+                }}
+              >
+                <div style={{
+                  width: '20px', height: '20px',
+                  borderRadius: '50%',
+                  border: answers[qId] === i ? '6px solid #1d4ed8' : '2px solid #d1d5db',
+                  background: '#fff'
+                }} />
+                {opt}
+              </button>
+            ))}
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '32px', paddingTop: '24px', borderTop: '1px solid #e5e7eb' }}>
+            <button
+              onClick={handlePrev}
+              disabled={currentQuestionIndex === 0}
+              style={{
+                padding: '12px 24px', borderRadius: '8px', border: '1px solid #d1d5db',
+                background: '#fff', color: '#374151', fontWeight: 600, cursor: currentQuestionIndex === 0 ? 'not-allowed' : 'pointer',
+                display: 'flex', alignItems: 'center', gap: '8px', opacity: currentQuestionIndex === 0 ? 0.5 : 1
+              }}
+            >
+              <IconChevronLeft size={18} /> Previous
+            </button>
+            <button
+              onClick={handleNext}
+              disabled={answers[qId] === undefined}
+              style={{
+                padding: '12px 24px', borderRadius: '8px', border: 'none',
+                background: answers[qId] === undefined ? '#93c5fd' : '#1d4ed8',
+                color: '#fff', fontWeight: 600, cursor: answers[qId] === undefined ? 'not-allowed' : 'pointer',
+                display: 'flex', alignItems: 'center', gap: '8px'
+              }}
+            >
+              {isLastQuestion ? 'Review' : 'Next'} <IconChevronRight size={18} />
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    if (step === 'confirm') {
+      const answeredCount = Object.keys(answers).filter(k => k.length > 24 || k.includes(' ')).length;
+      return (
+        <div style={{ padding: '32px', textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <h2 style={{ fontSize: '24px', fontWeight: 800, marginBottom: '16px' }}>Ready to submit?</h2>
+          <p style={{ color: '#6b7280', marginBottom: '32px' }}>
+            You have answered {answeredCount} of {questions.length} questions.
+          </p>
+          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+            <button onClick={() => setStep('quiz')} style={{ padding: '12px 24px', background: '#fff', border: '1px solid #d1d5db', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}>
+              Go Back
+            </button>
+            <button onClick={handleSubmitScore} style={{ padding: '12px 24px', background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}>
+              Submit Test
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    if (step === 'pass') {
+      return (
+        <div style={{ padding: '32px', textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <IconCircleCheckFilled size={64} color="#10b981" style={{ margin: '0 auto 24px' }} />
+          <h2 style={{ fontSize: '28px', fontWeight: 800, color: '#111827', marginBottom: '8px' }}>Verification Passed!</h2>
+          <p style={{ fontSize: '18px', color: '#6b7280', marginBottom: '32px' }}>
+            Score: <span style={{ fontWeight: 800, color: '#10b981' }}>{finalScore}%</span>
+          </p>
+          <button onClick={handleReturnToProfile} style={{ padding: '14px 24px', background: '#10b981', color: '#fff', border: 'none', borderRadius: '12px', fontWeight: 700, fontSize: '16px', cursor: 'pointer' }}>
+            Add to Profile
+          </button>
+        </div>
+      );
+    }
+
+    if (step === 'fail') {
+      return (
+        <div style={{ padding: '32px', textAlign: 'center', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#fee2e2', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', fontSize: '32px', fontWeight: 800 }}>
+            !
+          </div>
+          <h2 style={{ fontSize: '28px', fontWeight: 800, color: '#111827', marginBottom: '8px' }}>Not quite there yet</h2>
+          <p style={{ fontSize: '16px', color: '#6b7280', marginBottom: '8px' }}>
+            You scored <strong style={{ color: '#ef4444' }}>{finalScore}%</strong>. A minimum of 60% is required to pass.
+          </p>
+          <button onClick={handleReturnToProfile} style={{ marginTop: '24px', padding: '14px 24px', background: '#e5e7eb', color: '#374151', border: 'none', borderRadius: '12px', fontWeight: 700, fontSize: '16px', cursor: 'pointer' }}>
+            Return to Profile
+          </button>
+        </div>
+      );
+    }
   };
 
-  const renderConfirmStep = () => (
-    <div style={{ padding: '48px', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-      <IconAlertTriangleFilled size={64} style={{ color: '#eab308', marginBottom: '24px' }} />
-      <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '12px' }}>Submit Quiz?</div>
-      <div style={{ fontSize: '15px', color: '#6b7280', maxWidth: '400px', marginBottom: '32px', lineHeight: 1.5 }}>
-        Are you sure you want to submit? You will not be able to change your answers after submission.
-      </div>
-      
-      <div style={{ display: 'flex', gap: '16px', width: '100%', maxWidth: '400px' }}>
-        <button 
-          onClick={() => setStep('quiz')}
-          style={{ flex: 1, padding: '14px', borderRadius: '24px', border: '1px solid #e5e7eb', background: '#ffffff', color: '#374151', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}
-        >
-          Go Back
-        </button>
-        <button 
-          onClick={handleCalculateScore}
-          style={{ flex: 1, padding: '14px', borderRadius: '24px', border: 'none', background: '#534AB7', color: '#ffffff', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}
-        >
-          Submit
-        </button>
-      </div>
-    </div>
-  );
-
-  const renderPassStep = () => (
-    <div style={{ padding: '48px', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-      <IconCircleCheckFilled size={80} style={{ color: '#10b981', marginBottom: '24px' }} />
-      <div style={{ fontSize: '28px', fontWeight: 700, color: '#111827', marginBottom: '8px' }}>Congratulations!</div>
-      <div style={{ fontSize: '16px', color: '#4b5563', marginBottom: '24px' }}>You passed the {skillName} verification quiz.</div>
-      
-      <div style={{ background: '#f3f4f6', borderRadius: '16px', padding: '24px', width: '100%', maxWidth: '300px', marginBottom: '32px' }}>
-        <div style={{ fontSize: '13px', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px' }}>Confidence Score</div>
-        <div style={{ fontSize: '48px', fontWeight: 700, color: '#059669', lineHeight: 1 }}>{finalScore}%</div>
-      </div>
-
-      <button 
-        onClick={handleReturnToProfile}
-        style={{ width: '100%', maxWidth: '300px', padding: '16px', borderRadius: '24px', border: 'none', background: '#534AB7', color: '#ffffff', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}
-      >
-        Return to Profile
-      </button>
-    </div>
-  );
-
-  const renderFailStep = () => (
-    <div style={{ padding: '48px', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-      <IconAlertTriangleFilled size={80} style={{ color: '#ef4444', marginBottom: '24px' }} />
-      <div style={{ fontSize: '28px', fontWeight: 700, color: '#111827', marginBottom: '8px' }}>Keep practicing!</div>
-      <div style={{ fontSize: '16px', color: '#4b5563', marginBottom: '24px', maxWidth: '400px', lineHeight: 1.5 }}>
-        You didn't pass the {skillName} verification this time. You scored {finalScore}%, but 70% is required to pass.
-      </div>
-      
-      <button 
-        onClick={handleReturnToProfile}
-        style={{ width: '100%', maxWidth: '300px', padding: '16px', borderRadius: '24px', border: 'none', background: '#534AB7', color: '#ffffff', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}
-      >
-        Return to Profile
-      </button>
-      
-      <div style={{ fontSize: '14px', color: '#6b7280', marginTop: '24px' }}>
-        You can retake this quiz in 24 hours.
-      </div>
-    </div>
-  );
-
   return ReactDOM.createPortal(
-    <div style={{
-      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-      background: 'rgba(0,0,0,0.6)', zIndex: 1000,
-      display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '16px', paddingTop: '80px'
-    }}>
-      <style>{`
-        .sqm-wrapper {
-          background: #ffffff;
-          border-radius: 16px;
-          width: 100%;
-          max-width: 500px;
-          overflow: hidden;
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-          display: flex;
-          flex-direction: column;
-          animation: modalDropIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes modalDropIn {
-          from { opacity: 0; transform: translateY(-40px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
-      <div className="sqm-wrapper">
-        {step === 'quiz' && renderQuizStep()}
-        {step === 'confirm' && renderConfirmStep()}
-        {step === 'pass' && renderPassStep()}
-        {step === 'fail' && renderFailStep()}
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 99999 }}>
+      <div style={{ background: '#fff', width: '100%', maxWidth: '600px', height: '600px', borderRadius: '24px', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}>
+        {renderContent()}
       </div>
     </div>,
     document.body

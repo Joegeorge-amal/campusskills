@@ -12,18 +12,33 @@ public class VerificationHandler {
         this.service = service;
     }
 
-    public void requestVerification(RoutingContext ctx) {
+    public void getQuestions(RoutingContext ctx) {
+        String skill = ctx.pathParam("skill");
+        if (skill == null || skill.trim().isEmpty()) {
+            ApiResponse.badRequest(ctx, "skill parameter is required");
+            return;
+        }
+
+        service.getQuestions(skill)
+            .onSuccess(questions -> {
+                io.vertx.core.json.JsonArray arr = new io.vertx.core.json.JsonArray(questions);
+                ApiResponse.ok(ctx, arr);
+            })
+            .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
+    }
+
+    public void submitVerification(RoutingContext ctx) {
         JsonObject user = ctx.get("user");
         String userId = user.getString("userId");
         
         JsonObject body = ctx.body().asJsonObject();
-        if (body == null || !body.containsKey("skillName")) {
-            ApiResponse.badRequest(ctx, "skillName is required");
+        if (body == null || !body.containsKey("skill")) {
+            ApiResponse.badRequest(ctx, "skill is required");
             return;
         }
         
-        service.requestVerification(userId, body.getString("skillName"))
-            .onSuccess(verification -> ApiResponse.created(ctx, JsonObject.mapFrom(verification)))
+        service.submitVerification(userId, body)
+            .onSuccess(verification -> ApiResponse.ok(ctx, JsonObject.mapFrom(verification)))
             .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
     }
 
