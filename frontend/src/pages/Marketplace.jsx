@@ -557,12 +557,16 @@ const Marketplace = () => {
               if (!isSwap && slot) {
                 const days = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
                 const targetDay = days.indexOf((slot.date || '').toLowerCase());
-                const timeMatch = (slot.time || '').match(/(\d+):(\d+)\s*(AM|PM)/i);
+                // Match HH:MM, optionally followed by AM/PM (handles both 12h and 24h formats)
+                const timeMatch = (slot.time || '').match(/(\d{1,2}):(\d{2})(?:\s*(AM|PM))?/i);
                 if (targetDay !== -1 && timeMatch) {
                   let hrs = parseInt(timeMatch[1]);
                   const mins = parseInt(timeMatch[2]);
-                  if (timeMatch[3].toUpperCase() === 'PM' && hrs < 12) hrs += 12;
-                  if (timeMatch[3].toUpperCase() === 'AM' && hrs === 12) hrs = 0;
+                  const ampm = timeMatch[3];
+                  if (ampm) {
+                    if (ampm.toUpperCase() === 'PM' && hrs < 12) hrs += 12;
+                    if (ampm.toUpperCase() === 'AM' && hrs === 12) hrs = 0;
+                  }
                   const now = new Date();
                   const next = new Date(now);
                   next.setHours(hrs, mins, 0, 0);

@@ -232,7 +232,12 @@ public class ExchangeService {
                     } else {
                         // Tutoring
                         Number sessionStartNum = payload.getNumber("firstSessionStart");
-                        Long sessionStart = sessionStartNum != null ? sessionStartNum.longValue() : exchange.getProposedStartTime();
+                        Long sessionStart = null;
+                        if (sessionStartNum != null) {
+                            sessionStart = sessionStartNum.longValue();
+                        } else if (exchange.getProposedStartTime() != null) {
+                            sessionStart = exchange.getProposedStartTime();
+                        }
                         
                         // Fallback: compute from listing's primary available slot
                         if (sessionStart == null && listing != null && listing.getAvailableSlots() != null && !listing.getAvailableSlots().isEmpty()) {
