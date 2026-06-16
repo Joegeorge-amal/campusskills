@@ -16,6 +16,16 @@ const adminService = {
     return response.data;
   },
 
+  getReports: async (params) => {
+    const response = await api.get('/admin/reports', { params });
+    return response.data;
+  },
+
+  updateReportStatus: async (reportId, updateData) => {
+    const response = await api.patch(`/admin/reports/${reportId}`, updateData);
+    return response.data;
+  },
+
   getDisputes: async (params) => {
     const response = await api.get('/admin/disputes', { params });
     return response.data;

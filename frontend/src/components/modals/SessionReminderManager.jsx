@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { useAppData } from '../../context/AppDataContext';
 import { useSessionReminder } from '../../hooks/useSessionReminder';
@@ -16,6 +16,25 @@ const SessionReminderManager = () => {
   const [rescheduleTime, setRescheduleTime] = useState('');
   const [rescheduleDuration, setRescheduleDuration] = useState('60');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const handleOpenReschedule = (e) => {
+      const session = e.detail;
+      handleProposePostponement(session);
+    };
+
+    const handleRefreshData = () => {
+      fetchSessionsOnly();
+    };
+
+    document.addEventListener('openReschedule', handleOpenReschedule);
+    document.addEventListener('refreshSessionsData', handleRefreshData);
+
+    return () => {
+      document.removeEventListener('openReschedule', handleOpenReschedule);
+      document.removeEventListener('refreshSessionsData', handleRefreshData);
+    };
+  }, [fetchSessionsOnly]);
 
   const handleRescheduleSubmit = async () => {
     if (isSubmitting) return;

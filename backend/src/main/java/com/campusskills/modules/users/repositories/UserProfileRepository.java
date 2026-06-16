@@ -31,6 +31,17 @@ public class UserProfileRepository {
         });
     }
 
+    public Future<java.util.List<UserProfile>> searchProfilesByName(String q, int limit) {
+        JsonObject query = new JsonObject();
+        if (q != null && !q.trim().isEmpty()) {
+            query.put("name", new JsonObject().put("$regex", q.trim()).put("$options", "i"));
+        }
+        io.vertx.ext.mongo.FindOptions options = new io.vertx.ext.mongo.FindOptions().setLimit(limit);
+        return client.findWithOptions(COLLECTION, query, options).map(docs -> 
+            docs.stream().map(doc -> doc.mapTo(UserProfile.class)).collect(java.util.stream.Collectors.toList())
+        );
+    }
+
     public Future<Boolean> updateRatings(String userId, Double averageRating, Integer reviewCount) {
         JsonObject query = new JsonObject().put("userId", userId);
         JsonObject update = new JsonObject().put("$set", new JsonObject()
@@ -68,5 +79,13 @@ public class UserProfileRepository {
             .put("$pull", new JsonObject().put("blockedUsers", targetUserId))
             .put("$set", new JsonObject().put("updatedAt", System.currentTimeMillis()));
         return client.updateCollection(COLLECTION, query, updateDoc).map(res -> res.getDocModified() > 0);
+    }
+
+    public Future<java.util.List<String>> getBlockedByUsers(String targetUserId) {
+        JsonObject query = new JsonObject().put("blockedUsers", targetUserId);
+        io.vertx.ext.mongo.FindOptions options = new io.vertx.ext.mongo.FindOptions().setFields(new JsonObject().put("userId", 1));
+        return client.findWithOptions(COLLECTION, query, options).map(docs -> 
+            docs.stream().map(doc -> doc.getString("userId")).collect(java.util.stream.Collectors.toList())
+        );
     }
 }

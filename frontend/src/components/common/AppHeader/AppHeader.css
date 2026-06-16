@@ -81,7 +81,7 @@
   display: flex;
   align-items: center;
   gap: 7px;
-  overflow-x: auto;
+  overflow: visible;
   padding-top: 10px;
   padding-bottom: 10px;
   margin-top: -10px;

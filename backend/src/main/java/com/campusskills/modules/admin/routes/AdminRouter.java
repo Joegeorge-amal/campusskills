@@ -36,6 +36,9 @@ public class AdminRouter {
         router.get("/disputes").handler(handler::getDisputes);
         router.patch("/disputes/:id").handler(handler::updateDisputeStatus);
         
+        router.get("/reports").handler(handler::getReports);
+        router.patch("/reports/:id").handler(handler::updateReportStatus);
+        
         router.get("/sessions").handler(handler::getSessions);
         router.patch("/sessions/:id/cancel").handler(handler::cancelSession);
         router.post("/sessions/:id/force-complete").handler(handler::forceCompleteSession);

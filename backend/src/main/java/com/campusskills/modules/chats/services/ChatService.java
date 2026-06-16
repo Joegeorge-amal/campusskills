@@ -109,8 +109,15 @@ public class ChatService {
         }
 
         com.campusskills.modules.users.repositories.UserProfileRepository userProfileRepository = new com.campusskills.modules.users.repositories.UserProfileRepository();
-        Future<java.util.Set<String>> blockedUsersFuture = userProfileRepository.findByUserId(userId).map(profile -> {
-            return profile != null ? profile.getBlockedUsers() : java.util.Collections.emptySet();
+        Future<java.util.Set<String>> blockedUsersFuture = userProfileRepository.findByUserId(userId).compose(profile -> {
+            java.util.Set<String> blockedUsers = new java.util.HashSet<>();
+            if (profile != null && profile.getBlockedUsers() != null) {
+                blockedUsers.addAll(profile.getBlockedUsers());
+            }
+            return userProfileRepository.getBlockedByUsers(userId).map(blockedBy -> {
+                blockedUsers.addAll(blockedBy);
+                return blockedUsers;
+            });
         });
 
         return CompositeFuture.all(matchingUserIdsFuture, blockedUsersFuture).compose(cf -> {

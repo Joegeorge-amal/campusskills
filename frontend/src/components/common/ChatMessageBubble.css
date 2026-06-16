@@ -231,3 +231,91 @@
 .msg-bubble-sending {
   opacity: 0.8;
 }
+
+/* System Messages */
+.msg-system-row {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin: 16px 0;
+  box-sizing: border-box;
+}
+
+.msg-system-bubble {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  max-width: 450px;
+  width: 100%;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.msg-system-header {
+  font-size: 11px;
+  font-weight: 700;
+  color: #1e3a8a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.msg-system-body {
+  font-size: 13px;
+  color: #334155;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  margin-bottom: 12px;
+}
+
+.msg-system-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.msg-system-btn {
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.msg-system-btn-primary {
+  background: #1d4ed8;
+  color: #ffffff;
+}
+
+.msg-system-btn-primary:hover {
+  background: #1e40af;
+}
+
+.msg-system-btn-secondary {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.msg-system-btn-secondary:hover {
+  background: #cbd5e1;
+}
+
+.msg-system-btn-danger {
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fca5a5;
+}
+
+.msg-system-btn-danger:hover {
+  background: #fecaca;
+}
+

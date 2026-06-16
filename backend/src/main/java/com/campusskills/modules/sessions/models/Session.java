@@ -30,6 +30,10 @@ public class Session {
     private RescheduleProposal rescheduleProposal;
     private Long createdAt;
     private Long updatedAt;
+    private Boolean sent30MinChatReminder;
+    private Boolean sentStartChatReminder;
+    private String cancelledBy;
+    private String cancellationReason;
 
     public Session() {
     }
@@ -93,4 +97,16 @@ public class Session {
 
     public String getMode() { return mode; }
     public void setMode(String mode) { this.mode = mode; }
+
+    public Boolean getSent30MinChatReminder() { return sent30MinChatReminder; }
+    public void setSent30MinChatReminder(Boolean sent30MinChatReminder) { this.sent30MinChatReminder = sent30MinChatReminder; }
+
+    public Boolean getSentStartChatReminder() { return sentStartChatReminder; }
+    public void setSentStartChatReminder(Boolean sentStartChatReminder) { this.sentStartChatReminder = sentStartChatReminder; }
+
+    public String getCancelledBy() { return cancelledBy; }
+    public void setCancelledBy(String cancelledBy) { this.cancelledBy = cancelledBy; }
+
+    public String getCancellationReason() { return cancellationReason; }
+    public void setCancellationReason(String cancellationReason) { this.cancellationReason = cancellationReason; }
 }

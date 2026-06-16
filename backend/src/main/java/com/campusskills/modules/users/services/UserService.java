@@ -406,6 +406,23 @@ public class UserService {
         });
     }
 
+    public Future<List<JsonObject>> searchUsers(String query, int limit, String requesterId) {
+        Future<List<String>> invisibleFut = requesterId != null ? getInvisibleUsers(requesterId) : Future.succeededFuture(new ArrayList<>());
+        
+        return invisibleFut.compose(invisibleUsers -> {
+            return profileRepository.searchProfilesByName(query, limit).map(profiles -> {
+                return profiles.stream()
+                    .filter(p -> !invisibleUsers.contains(p.getUserId()) && (requesterId == null || !requesterId.equals(p.getUserId())))
+                    .map(p -> {
+                        return new JsonObject()
+                            .put("id", p.getUserId())
+                            .put("displayName", p.getName())
+                            .put("course", p.getProgramme());
+                    }).collect(java.util.stream.Collectors.toList());
+            });
+        });
+    }
+
     public Future<JsonObject> verifyEmail(String userId, String otp) {
         if (otp == null || otp.trim().isEmpty()) {
             return Future.failedFuture("OTP is required");
@@ -727,5 +744,20 @@ public class UserService {
 
     public Future<Boolean> unblockUser(String userId, String targetUserId) {
         return profileRepository.unblockUser(userId, targetUserId);
+    }
+
+    public Future<List<String>> getInvisibleUsers(String userId) {
+        return profileRepository.findByUserId(userId).compose(profile -> {
+            List<String> blockedUsers = new ArrayList<>();
+            if (profile != null && profile.getBlockedUsers() != null) {
+                blockedUsers.addAll(profile.getBlockedUsers());
+            }
+            return profileRepository.getBlockedByUsers(userId).map(blockedBy -> {
+                for (String b : blockedBy) {
+                    if (!blockedUsers.contains(b)) blockedUsers.add(b);
+                }
+                return blockedUsers;
+            });
+        });
     }
 }

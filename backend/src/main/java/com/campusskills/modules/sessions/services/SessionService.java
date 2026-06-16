@@ -90,14 +90,37 @@ public class SessionService {
             return repository.updateSessionFields(sessionId, updates).compose(v -> repository.getSessionById(sessionId)).compose(updatedSession -> {
                 if (Boolean.TRUE.equals(updatedSession.getTeacherConfirmedCompletion()) && Boolean.TRUE.equals(updatedSession.getStudentConfirmedCompletion())) {
                     JsonObject finalUpdate = new JsonObject().put("status", SessionStatus.COMPLETED.name());
-                    return repository.updateSessionFields(sessionId, finalUpdate).onSuccess(v2 -> {
-                        sendNotification(session.getTeacherId(), com.campusskills.shared.constants.NotificationType.SESSION_COMPLETED, "Session Completed", "The session has been completed.", "SESSION", sessionId);
-                        sendNotification(session.getStudentId(), com.campusskills.shared.constants.NotificationType.SESSION_COMPLETED, "Session Completed", "The session has been completed.", "SESSION", sessionId);
-                        statsRepository.recordActivity(session.getTeacherId());
-                        statsRepository.recordActivity(session.getStudentId());
-                        emitSessionEvent(sessionId, "SESSION_COMPLETED", null);
+                    return repository.updateSessionFields(sessionId, finalUpdate).compose(v2 -> {
+                        if (session.getChatId() != null) {
+                            createAndBroadcastSystemMessage(session.getChatId(), "Session completed successfully.\nPayment and reviews are now available.", sessionId, null, null, null);
+                        }
+                        
+                        com.campusskills.modules.users.repositories.UserProfileRepository profileRepo = new com.campusskills.modules.users.repositories.UserProfileRepository();
+                        return profileRepo.findByUserId(session.getTeacherId()).compose(teacherProfile -> {
+                            String teacherName = teacherProfile != null ? teacherProfile.getName() : "Teacher";
+                            return profileRepo.findByUserId(session.getStudentId()).compose(studentProfile -> {
+                                String studentName = studentProfile != null ? studentProfile.getName() : "Student";
+                                String topic = session.getTopic() != null ? session.getTopic() : "Session";
+                                
+                                String msgToTeacher = topic + " Session with " + studentName + " was completed.";
+                                String msgToStudent = topic + " Session with " + teacherName + " was completed.";
+                                
+                                sendNotification(session.getTeacherId(), com.campusskills.shared.constants.NotificationType.SESSION_COMPLETED, "Session Completed", msgToTeacher, "SESSION", sessionId);
+                                sendNotification(session.getStudentId(), com.campusskills.shared.constants.NotificationType.SESSION_COMPLETED, "Session Completed", msgToStudent, "SESSION", sessionId);
+                                statsRepository.recordActivity(session.getTeacherId());
+                                statsRepository.recordActivity(session.getStudentId());
+                                emitSessionEvent(sessionId, "SESSION_COMPLETED", null);
+                                return Future.succeededFuture();
+                            });
+                        });
                     }).mapEmpty();
                 } else {
+                    if (session.getChatId() != null) {
+                        profileRepository.findByUserId(userId).onSuccess(profile -> {
+                            String name = (profile != null) ? profile.getName() : "Someone";
+                            createAndBroadcastSystemMessage(session.getChatId(), "{marker} marked this session as completed.", sessionId, userId, null, null);
+                        });
+                    }
                     emitSessionEvent(sessionId, "COMPLETION_REQUESTED", new JsonObject().put("requestedBy", userId));
                     return Future.succeededFuture();
                 }
@@ -209,12 +232,67 @@ public class SessionService {
                 return Future.failedFuture("Cannot cancel a session once completion confirmation has been started");
             }
 
-            JsonObject updates = new JsonObject().put("status", SessionStatus.CANCELLED.name());
-            return repository.updateSessionFields(sessionId, updates).onSuccess(v -> {
-                sendNotification(session.getTeacherId(), com.campusskills.shared.constants.NotificationType.SESSION_CANCELLED, "Session Cancelled", "The session has been cancelled. Reason: " + reason, "SESSION", sessionId);
-                sendNotification(session.getStudentId(), com.campusskills.shared.constants.NotificationType.SESSION_CANCELLED, "Session Cancelled", "The session has been cancelled. Reason: " + reason, "SESSION", sessionId);
-                emitSessionEvent(sessionId, "SESSION_CANCELLED", new JsonObject().put("reason", reason));
+            JsonObject updates = new JsonObject()
+                .put("status", SessionStatus.CANCELLED.name())
+                .put("cancelledBy", userId)
+                .put("cancellationReason", reason);
+            return repository.updateSessionFields(sessionId, updates).compose(v -> {
+                com.campusskills.modules.users.repositories.UserProfileRepository profileRepo = new com.campusskills.modules.users.repositories.UserProfileRepository();
+                return profileRepo.findByUserId(session.getTeacherId()).compose(teacherProfile -> {
+                    String teacherName = teacherProfile != null ? teacherProfile.getName() : "Teacher";
+                    return profileRepo.findByUserId(session.getStudentId()).compose(studentProfile -> {
+                        String studentName = studentProfile != null ? studentProfile.getName() : "Student";
+                        String topic = session.getTopic() != null ? session.getTopic() : "Session";
+                        
+                        boolean isTeacherCancelling = userId.equals(session.getTeacherId());
+                        String cancellerForTeacher = isTeacherCancelling ? "You" : studentName;
+                        String cancellerForStudent = isTeacherCancelling ? teacherName : "You";
+                        
+                        String msgToTeacher = topic + " Session with " + studentName + " was cancelled.\n" +
+                                              "Cancelled by: " + cancellerForTeacher + "\n" +
+                                              "Reason: " + (reason != null ? reason : "Other");
+                                              
+                        String msgToStudent = topic + " Session with " + teacherName + " was cancelled.\n" +
+                                              "Cancelled by: " + cancellerForStudent + "\n" +
+                                              "Reason: " + (reason != null ? reason : "Other");
+                        
+                        sendNotification(session.getTeacherId(), com.campusskills.shared.constants.NotificationType.SESSION_CANCELLED, "Session Cancelled", msgToTeacher, "SESSION", sessionId);
+                        sendNotification(session.getStudentId(), com.campusskills.shared.constants.NotificationType.SESSION_CANCELLED, "Session Cancelled", msgToStudent, "SESSION", sessionId);
+                        emitSessionEvent(sessionId, "SESSION_CANCELLED", new JsonObject().put("reason", reason));
+                        return Future.succeededFuture();
+                    });
+                });
             }).mapEmpty();
+        });
+    }
+
+    private void createAndBroadcastSystemMessage(String chatId, String text, String sessionId, String markerId, Long sessionScheduledStart, String sessionTopic) {
+        if (chatId == null || chatId.trim().isEmpty()) return;
+        com.campusskills.modules.messages.repositories.MessageRepository msgRepo = new com.campusskills.modules.messages.repositories.MessageRepository();
+        com.campusskills.modules.messages.models.Message message = new com.campusskills.modules.messages.models.Message();
+        message.setChatId(chatId);
+        message.setSenderId("system");
+        message.setMessage(text);
+        message.setType(com.campusskills.shared.constants.MessageType.SYSTEM);
+        message.setSessionId(sessionId);
+        message.setMarkerId(markerId);
+        message.setSessionScheduledStart(sessionScheduledStart);
+        message.setSessionTopic(sessionTopic);
+        message.setCreatedAt(System.currentTimeMillis());
+        message.setIsRead(false);
+        message.setIsDelivered(true);
+
+        msgRepo.createMessage(message).onSuccess(id -> {
+            message.setId(id);
+            msgRepo.getChatById(chatId).onSuccess(chat -> {
+                if (chat != null) {
+                    io.vertx.core.json.JsonArray participantsArray = chat.getJsonArray("participants");
+                    java.util.List<String> participantList = participantsArray.stream()
+                        .map(Object::toString)
+                        .collect(java.util.stream.Collectors.toList());
+                    com.campusskills.web.websockets.MessageBroadcaster.broadcastNewMessage(message, participantList);
+                }
+            });
         });
     }
 }

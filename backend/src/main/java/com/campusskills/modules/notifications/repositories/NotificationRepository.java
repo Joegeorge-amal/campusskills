@@ -17,6 +17,19 @@ public class NotificationRepository {
 
     public NotificationRepository() {
         this.client = MongoManager.getClient();
+        
+        // Migration: rename "read" to "isRead" if any old documents exist
+        JsonObject migrationQuery = new JsonObject().put("read", new JsonObject().put("$exists", true));
+        JsonObject migrationUpdate = new JsonObject().put("$rename", new JsonObject().put("read", "isRead"));
+        this.client.updateCollectionWithOptions(COLLECTION, migrationQuery, migrationUpdate, 
+            new io.vertx.ext.mongo.UpdateOptions().setMulti(true))
+            .onComplete(ar -> {
+                if (ar.succeeded()) {
+                    System.out.println("Notification migration (read -> isRead) completed. Modified count: " + ar.result().getDocModified());
+                } else {
+                    System.err.println("Notification migration failed: " + ar.cause().getMessage());
+                }
+            });
     }
 
     public Future<String> create(Notification notification) {
@@ -50,7 +63,7 @@ public class NotificationRepository {
     public Future<Notification> findUnreadChatNotification(String userId, String chatId) {
         JsonObject query = new JsonObject()
             .put("userId", userId)
-            .put("type", NotificationType.NEW_CHAT_ACTIVITY.name())
+            .put("type", NotificationType.NEW_MESSAGE.name())
             .put("sourceType", "CHAT")
             .put("sourceId", chatId)
             .put("isRead", false);
@@ -90,6 +103,21 @@ public class NotificationRepository {
         return client.updateCollection(COLLECTION, query, update).map(res -> res.getDocModified() > 0);
     }
     
+    public Future<Long> markChatNotificationsAsRead(String userId, String chatId) {
+        JsonObject query = new JsonObject()
+            .put("userId", userId)
+            .put("sourceType", "CHAT")
+            .put("sourceId", chatId)
+            .put("isRead", false);
+            
+        JsonObject update = new JsonObject().put("$set", new JsonObject()
+            .put("isRead", true)
+            .put("updatedAt", System.currentTimeMillis()));
+
+        io.vertx.ext.mongo.UpdateOptions options = new io.vertx.ext.mongo.UpdateOptions().setMulti(true);
+        return client.updateCollectionWithOptions(COLLECTION, query, update, options).map(res -> res.getDocModified());
+    }
+    
     public Future<Long> markAllAsRead(String userId) {
         JsonObject query = new JsonObject()
             .put("userId", userId)
@@ -99,7 +127,8 @@ public class NotificationRepository {
             .put("isRead", true)
             .put("updatedAt", System.currentTimeMillis()));
 
-        return client.updateCollection(COLLECTION, query, update).map(res -> res.getDocModified());
+        io.vertx.ext.mongo.UpdateOptions options = new io.vertx.ext.mongo.UpdateOptions().setMulti(true);
+        return client.updateCollectionWithOptions(COLLECTION, query, update, options).map(res -> res.getDocModified());
     }
 
     public Future<List<Notification>> fetchUserNotifications(String userId, int skip, int limit) {
@@ -187,6 +216,7 @@ public class NotificationRepository {
             .put("isRead", true)
             .put("updatedAt", System.currentTimeMillis()));
 
-        return client.updateCollection(COLLECTION, query, update).map(res -> res.getDocModified());
+        io.vertx.ext.mongo.UpdateOptions options = new io.vertx.ext.mongo.UpdateOptions().setMulti(true);
+        return client.updateCollectionWithOptions(COLLECTION, query, update, options).map(res -> res.getDocModified());
     }
 }

@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
+import { useLocation } from 'react-router-dom';
 import { useAppData } from '../context/AppDataContext';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
@@ -31,6 +32,41 @@ const Sessions = () => {
   const [isSoonOpen, setIsSoonOpen] = useState(true);
   const [isAllOpen, setIsAllOpen] = useState(true);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+
+  const location = useLocation();
+  const highlightedSessionId = location.state?.highlightSessionId;
+  const [activeHighlightId, setActiveHighlightId] = useState(null);
+
+  useEffect(() => {
+    if (highlightedSessionId && sessionsData && sessionsData.length > 0) {
+      setExpandedSessionId(highlightedSessionId);
+      setActiveHighlightId(highlightedSessionId);
+      
+      const session = sessionsData.find(s => s.id === highlightedSessionId);
+      if (session) {
+        const isHistory = session.status === 'COMPLETED' || session.status === 'CANCELLED';
+        if (isHistory) {
+          setIsHistoryOpen(true);
+        } else {
+          setIsSoonOpen(true);
+          setIsAllOpen(true);
+        }
+        
+        setTimeout(() => {
+          const el = document.getElementById(`session-${highlightedSessionId}`);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 150);
+
+        // Fade out highlight after 1.8 seconds
+        const timer = setTimeout(() => {
+          setActiveHighlightId(null);
+        }, 1800);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [highlightedSessionId, sessionsData]);
 
   // Reschedule Modal state
   const [rescheduleSession, setRescheduleSession] = useState(null);
@@ -249,14 +285,15 @@ const Sessions = () => {
     return (
       <div 
         key={s.id || idx}
+        id={`session-${s.id}`}
         style={{
-          background: '#ffffff',
-          border: '1px solid #e5e7eb',
+          background: s.id === activeHighlightId ? '#f0f7ff' : '#ffffff',
+          border: s.id === activeHighlightId ? '2px solid #3b82f6' : '1px solid #e5e7eb',
           borderRadius: '12px',
           padding: '16px',
           marginBottom: '12px',
-          boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.05)',
-          transition: 'all 0.2s ease',
+          boxShadow: s.id === activeHighlightId ? '0 4px 14px rgba(59, 130, 246, 0.15)' : '0 1px 3px 0 rgba(0, 0, 0, 0.05)',
+          transition: 'all 0.5s ease',
           display: 'flex',
           flexDirection: 'column'
         }}
@@ -350,6 +387,31 @@ const Sessions = () => {
               <div style={{ marginBottom: '16px' }}>
                 <div style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase' }}>Notes</div>
                 <div style={{ fontSize: '13px', color: '#4b5563', marginTop: '4px', whiteSpace: 'pre-wrap' }}>{s.rawSession.notes}</div>
+              </div>
+            )}
+
+            {isCancelled && (
+              <div style={{ 
+                marginBottom: '16px', 
+                padding: '12px 16px', 
+                background: '#fef2f2', 
+                borderLeft: '4px solid #ef4444', 
+                borderRadius: '8px' 
+              }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                  <div>
+                    <div style={{ fontSize: '11px', color: '#b91c1c', fontWeight: 600, textTransform: 'uppercase' }}>Cancelled By</div>
+                    <div style={{ fontSize: '13px', color: '#7f1d1d', marginTop: '2px', fontWeight: 600 }}>
+                      {s.rawSession.cancelledBy === user?.userId ? 'You' : (s.rawSession.cancelledBy === 'admin' ? 'Admin' : s.name)}
+                    </div>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '11px', color: '#b91c1c', fontWeight: 600, textTransform: 'uppercase' }}>Reason</div>
+                    <div style={{ fontSize: '13px', color: '#7f1d1d', marginTop: '2px', fontWeight: 600 }}>
+                      {s.rawSession.cancellationReason || 'Other'}
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
 

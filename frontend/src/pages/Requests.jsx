@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useAppData } from '../context/AppDataContext';
 import RequestsCardV2 from '../components/common/RequestsCardV2';
@@ -27,6 +28,41 @@ const Requests = () => {
   const [isIncomingOpen, setIsIncomingOpen] = useState(true);
   const [isSentOpen, setIsSentOpen] = useState(true);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+
+  const location = useLocation();
+  const highlightedRequestId = location.state?.highlightRequestId;
+  const [activeHighlightId, setActiveHighlightId] = useState(null);
+
+  useEffect(() => {
+    if (highlightedRequestId && requestsData && requestsData.length > 0) {
+      setActiveHighlightId(highlightedRequestId);
+      const req = requestsData.find(r => r.id === highlightedRequestId);
+      if (req) {
+        const historyStatuses = ['accepted', 'confirmed', 'declined', 'rejected', 'cancelled', 'completed'];
+        const isHistory = historyStatuses.includes(req.status);
+        if (isHistory) {
+          setIsHistoryOpen(true);
+        } else if (req.direction === 'incoming') {
+          setIsIncomingOpen(true);
+        } else if (req.direction === 'outgoing') {
+          setIsSentOpen(true);
+        }
+        
+        setTimeout(() => {
+          const el = document.getElementById(`request-${highlightedRequestId}`);
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 150);
+
+        // Fade out highlight after 1.8 seconds
+        const timer = setTimeout(() => {
+          setActiveHighlightId(null);
+        }, 1800);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [highlightedRequestId, requestsData]);
 
   const handleAccept = async (reqId, hideToast = false, payload = {}) => {
     if (processingId) return;
@@ -140,29 +176,41 @@ const Requests = () => {
             {isIncomingOpen && (
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 {incomingRequests.map(req => (
-                  <RequestsCardV2
+                  <div 
                     key={req.id}
-                    avatarProps={{ initials: req.init, bg: req.bg, color: req.col, backgroundImage: req.otherUser?.avatarImg || req.otherUser?.profilePicture, size: '32px', fontSize: '12px' }}
-                    title={req.title}
-                    subtitle={req.sub}
-                    tagText={req.type}
-                    tagType={req.typeCls === 'c-code' ? 'success' : 'primary'}
-                    status={req.status}
-                    type="incoming"
-                    onAccept={() => {
-                      if (req.type === 'Skill swap request') {
-                        setSwapModalRequest(req);
-                      } else {
-                        handleAccept(req.id);
-                      }
+                    id={`request-${req.id}`}
+                    style={{
+                      background: req.id === activeHighlightId ? '#f0f7ff' : 'transparent',
+                      borderRadius: '16px',
+                      padding: req.id === activeHighlightId ? '6px' : '0',
+                      border: req.id === activeHighlightId ? '2px solid #3b82f6' : 'none',
+                      transition: 'all 0.5s ease',
+                      marginBottom: '12px'
                     }}
-                    onDecline={() => handleDeclineClick(req.id)}
-                    reqDetails={req.rawReq}
-                    otherUser={req.otherUser}
-                    otherUserStats={req.otherUserStats}
-                    otherUserExtras={req.otherUserExtras}
-                    actionLoading={processingId === req.id ? processingAction : null}
-                  />
+                  >
+                    <RequestsCardV2
+                      avatarProps={{ initials: req.init, bg: req.bg, color: req.col, backgroundImage: req.otherUser?.avatarImg || req.otherUser?.profilePicture, size: '32px', fontSize: '12px' }}
+                      title={req.title}
+                      subtitle={req.sub}
+                      tagText={req.type}
+                      tagType={req.typeCls === 'c-code' ? 'success' : 'primary'}
+                      status={req.status}
+                      type="incoming"
+                      onAccept={() => {
+                        if (req.type === 'Skill swap request') {
+                          setSwapModalRequest(req);
+                        } else {
+                          handleAccept(req.id);
+                        }
+                      }}
+                      onDecline={() => handleDeclineClick(req.id)}
+                      reqDetails={req.rawReq}
+                      otherUser={req.otherUser}
+                      otherUserStats={req.otherUserStats}
+                      otherUserExtras={req.otherUserExtras}
+                      actionLoading={processingId === req.id ? processingAction : null}
+                    />
+                  </div>
                 ))}
                 
                 {incomingRequests.length === 0 && (
@@ -185,20 +233,32 @@ const Requests = () => {
             {isSentOpen && (
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 {outgoingRequests.map(req => (
-                  <RequestsCardV2
+                  <div 
                     key={req.id}
-                    avatarProps={{ initials: req.init, bg: req.bg, color: req.col, backgroundImage: req.otherUser?.avatarImg || req.otherUser?.profilePicture, size: '32px', fontSize: '12px' }}
-                    title={req.title}
-                    subtitle={req.sub}
-                    status={req.status}
-                    type="outgoing"
-                    reqDetails={req.rawReq}
-                    otherUser={req.otherUser}
-                    otherUserStats={req.otherUserStats}
-                    otherUserExtras={req.otherUserExtras}
-                    onCancel={() => handleCancel(req.id)}
-                    actionLoading={processingId === req.id ? processingAction : null}
-                  />
+                    id={`request-${req.id}`}
+                    style={{
+                      background: req.id === activeHighlightId ? '#f0f7ff' : 'transparent',
+                      borderRadius: '16px',
+                      padding: req.id === activeHighlightId ? '6px' : '0',
+                      border: req.id === activeHighlightId ? '2px solid #3b82f6' : 'none',
+                      transition: 'all 0.5s ease',
+                      marginBottom: '12px'
+                    }}
+                  >
+                    <RequestsCardV2
+                      avatarProps={{ initials: req.init, bg: req.bg, color: req.col, backgroundImage: req.otherUser?.avatarImg || req.otherUser?.profilePicture, size: '32px', fontSize: '12px' }}
+                      title={req.title}
+                      subtitle={req.sub}
+                      status={req.status}
+                      type="outgoing"
+                      reqDetails={req.rawReq}
+                      otherUser={req.otherUser}
+                      otherUserStats={req.otherUserStats}
+                      otherUserExtras={req.otherUserExtras}
+                      actionLoading={processingId === req.id ? processingAction : null}
+                      onCancel={() => handleCancel(req.id)}
+                    />
+                  </div>
                 ))}
 
                 {outgoingRequests.length === 0 && (
@@ -221,20 +281,32 @@ const Requests = () => {
             {isHistoryOpen && (
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 {historyRequests.map(req => (
-                  <RequestsCardV2
+                  <div 
                     key={req.id}
-                    avatarProps={{ initials: req.init, bg: req.bg, color: req.col, backgroundImage: req.otherUser?.avatarImg || req.otherUser?.profilePicture, size: '32px', fontSize: '12px' }}
-                    title={req.title}
-                    subtitle={req.sub}
-                    tagText={req.type}
-                    tagType={req.typeCls === 'c-code' ? 'success' : 'primary'}
-                    status={req.status}
-                    type={req.direction}
-                    reqDetails={req.rawReq}
-                    otherUser={req.otherUser}
-                    otherUserStats={req.otherUserStats}
-                    otherUserExtras={req.otherUserExtras}
-                  />
+                    id={`request-${req.id}`}
+                    style={{
+                      background: req.id === activeHighlightId ? '#f0f7ff' : 'transparent',
+                      borderRadius: '16px',
+                      padding: req.id === activeHighlightId ? '6px' : '0',
+                      border: req.id === activeHighlightId ? '2px solid #3b82f6' : 'none',
+                      transition: 'all 0.5s ease',
+                      marginBottom: '12px'
+                    }}
+                  >
+                    <RequestsCardV2
+                      avatarProps={{ initials: req.init, bg: req.bg, color: req.col, backgroundImage: req.otherUser?.avatarImg || req.otherUser?.profilePicture, size: '32px', fontSize: '12px' }}
+                      title={req.title}
+                      subtitle={req.sub}
+                      tagText={req.type}
+                      tagType={req.typeCls === 'c-code' ? 'success' : 'primary'}
+                      status={req.status}
+                      type={req.direction}
+                      reqDetails={req.rawReq}
+                      otherUser={req.otherUser}
+                      otherUserStats={req.otherUserStats}
+                      otherUserExtras={req.otherUserExtras}
+                    />
+                  </div>
                 ))}
                 
                 {historyRequests.length === 0 && (

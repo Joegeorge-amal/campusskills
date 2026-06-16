@@ -113,22 +113,28 @@ public class ListingService {
     public Future<io.vertx.core.json.JsonObject> searchListings(io.vertx.core.json.JsonObject filters, int page, int limit) {
         String requesterId = filters.getString("requesterId");
         
-        Future<java.util.Set<String>> blockedUsersFuture;
+        Future<java.util.List<String>> blockedUsersFuture;
         if (requesterId != null) {
             com.campusskills.modules.users.repositories.UserProfileRepository userProfileRepository = new com.campusskills.modules.users.repositories.UserProfileRepository();
-            blockedUsersFuture = userProfileRepository.findByUserId(requesterId).map(profile -> {
-                if (profile != null) {
-                    return profile.getBlockedUsers();
+            blockedUsersFuture = userProfileRepository.findByUserId(requesterId).compose(profile -> {
+                java.util.List<String> blockedUsers = new java.util.ArrayList<>();
+                if (profile != null && profile.getBlockedUsers() != null) {
+                    blockedUsers.addAll(profile.getBlockedUsers());
                 }
-                return java.util.Collections.emptySet();
+                return userProfileRepository.getBlockedByUsers(requesterId).map(blockedBy -> {
+                    for (String b : blockedBy) {
+                        if (!blockedUsers.contains(b)) blockedUsers.add(b);
+                    }
+                    return blockedUsers;
+                });
             });
         } else {
-            blockedUsersFuture = Future.succeededFuture(java.util.Collections.emptySet());
+            blockedUsersFuture = Future.succeededFuture(java.util.Collections.emptyList());
         }
 
         return blockedUsersFuture.compose(blockedUsers -> {
             if (blockedUsers != null && !blockedUsers.isEmpty()) {
-                filters.put("blockedUsers", new io.vertx.core.json.JsonArray(new java.util.ArrayList<>(blockedUsers)));
+                filters.put("blockedUsers", new io.vertx.core.json.JsonArray(blockedUsers));
             }
 
             return listingRepository.countSearch(filters).compose(total -> {

@@ -57,6 +57,19 @@ public class UserHandler {
         }
     }
 
+    public void searchUsers(RoutingContext ctx) {
+        String q = ctx.queryParam("q").isEmpty() ? "" : ctx.queryParam("q").get(0);
+        String requesterId = ctx.get("authenticatedUserId");
+        int limit = 3;
+        try {
+            if (!ctx.queryParam("limit").isEmpty()) limit = Integer.parseInt(ctx.queryParam("limit").get(0));
+        } catch (Exception ignored) {}
+
+        userService.searchUsers(q, limit, requesterId)
+            .onSuccess(users -> ApiResponse.ok(ctx, new JsonObject().put("users", users)))
+            .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
+    }
+
     public void verifyEmail(RoutingContext ctx) {
         String userId = ctx.get("authenticatedUserId");
         if (userId == null) {

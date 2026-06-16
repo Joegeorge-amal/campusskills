@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { IconMenu2, IconSearch, IconFilter, IconBell } from '@tabler/icons-react';
+import { IconMenu2, IconFilter, IconBell } from '@tabler/icons-react';
 import Avatar from '../Avatar';
 import logo from '../../../assets/kju_campus_logo.png';
-import NotificationPanel from './NotificationPanel';
+import NotificationDropdown from '../../notifications/NotificationDropdown';
+import GlobalSearch from '../GlobalSearch/GlobalSearch';
 import './AppHeader.css';
 
 const AppHeader = ({
@@ -50,16 +51,7 @@ const AppHeader = ({
       {/* Title removed per user request */}
       
       {showSearch && (
-        <div className="topbar-center-search">
-          <div className="search-input-wrapper-yt">
-            <IconSearch className="search-icon" size={18} color="#666" />
-            <input 
-              type="text" 
-              placeholder="Search" 
-              className="search-input-yt"
-            />
-          </div>
-        </div>
+        <GlobalSearch />
       )}
 
       <div className="topbar-actions">
@@ -88,24 +80,7 @@ const AppHeader = ({
 
 
 
-        <div 
-          className="header-icon-box" 
-          onClick={() => setIsNotificationOpen(!isNotificationOpen)}
-        >
-          <IconBell size={20} color="#6b7280" stroke={2} />
-          {notificationCount > 0 && <div className="notification-badge">{notificationCount}</div>}
-        </div>
-
-        {isNotificationOpen && (
-          <NotificationPanel 
-            notifications={notifications || []} 
-            onClose={() => setIsNotificationOpen(false)}
-            onMarkAllRead={() => {
-              if (markAllAsRead) markAllAsRead();
-              setIsNotificationOpen(false);
-            }}
-          />
-        )}
+        <NotificationDropdown />
 
         {avatarData && (
           <div className="header-icon-box" onClick={onAvatarClick}>

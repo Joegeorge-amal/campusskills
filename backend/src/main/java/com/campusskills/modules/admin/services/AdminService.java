@@ -70,6 +70,17 @@ public class AdminService {
         return adminRepository.searchDisputes(q, status, page, limit);
     }
 
+    public Future<JsonObject> searchReports(String q, String status, int page, int limit) {
+        return adminRepository.searchReports(q, status, page, limit);
+    }
+
+    public Future<Boolean> updateReportStatus(String reportId, String status, String adminNotes) {
+        if (reportId == null || reportId.trim().isEmpty() || status == null || status.trim().isEmpty()) {
+            return Future.failedFuture("Report ID and status are required");
+        }
+        return adminRepository.updateReportStatus(reportId, status, adminNotes);
+    }
+
     public Future<JsonObject> searchSessions(String q, String status, int page, int limit) {
         return adminRepository.searchSessions(q, status, page, limit);
     }

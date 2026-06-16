@@ -257,6 +257,122 @@ public class AdminRepository {
             });
     }
 
+    public Future<JsonObject> searchReports(String q, String status, int page, int limit) {
+        int skip = (page - 1) * limit;
+
+        JsonArray pipeline = new JsonArray();
+
+        // 1. Initial Match (report statuses + optional filter)
+        JsonObject matchStage = new JsonObject();
+        if (status != null && !status.trim().isEmpty()) {
+            matchStage.put("status", status.trim());
+        }
+
+        if (q != null && !q.trim().isEmpty()) {
+            matchStage.put("reason", new JsonObject().put("$regex", q.trim()).put("$options", "i"));
+        }
+
+        if (!matchStage.isEmpty()) {
+            pipeline.add(new JsonObject().put("$match", matchStage));
+        }
+
+        // 2. Lookup user profiles for reporter
+        pipeline.add(new JsonObject().put("$lookup", new JsonObject()
+            .put("from", "user_profiles")
+            .put("localField", "reporterId")
+            .put("foreignField", "userId")
+            .put("as", "reporterProfile")
+        ));
+        
+        // 3. Lookup user profiles for reported
+        pipeline.add(new JsonObject().put("$lookup", new JsonObject()
+            .put("from", "user_profiles")
+            .put("localField", "reportedUserId")
+            .put("foreignField", "userId")
+            .put("as", "reportedProfile")
+        ));
+
+        // 4. Facet for pagination
+        JsonArray dataFacet = new JsonArray()
+            .add(new JsonObject().put("$sort", new JsonObject().put("createdAt", -1)))
+            .add(new JsonObject().put("$skip", skip))
+            .add(new JsonObject().put("$limit", limit));
+
+        JsonArray countFacet = new JsonArray()
+            .add(new JsonObject().put("$count", "total"));
+
+        pipeline.add(new JsonObject().put("$facet", new JsonObject()
+            .put("data", dataFacet)
+            .put("metadata", countFacet)
+        ));
+
+        io.vertx.ext.mongo.AggregateOptions options = new io.vertx.ext.mongo.AggregateOptions();
+        return client.aggregateWithOptions("reports", pipeline, options)
+            .collect(java.util.stream.Collectors.toList())
+            .map(results -> {
+                if (results.isEmpty()) {
+                    return new JsonObject()
+                        .put("data", new JsonArray())
+                        .put("pagination", new JsonObject().put("total", 0).put("page", page).put("limit", limit).put("totalPages", 0));
+                }
+
+                JsonObject result = results.get(0);
+                JsonArray data = result.getJsonArray("data", new JsonArray());
+                JsonArray metadata = result.getJsonArray("metadata", new JsonArray());
+                
+                long total = metadata.isEmpty() ? 0 : metadata.getJsonObject(0).getInteger("total", 0);
+                int totalPages = (int) Math.ceil((double) total / limit);
+
+                JsonArray formattedData = new JsonArray();
+                for (int i = 0; i < data.size(); i++) {
+                    JsonObject d = data.getJsonObject(i);
+                    JsonArray repProfiles = d.getJsonArray("reporterProfile", new JsonArray());
+                    JsonArray rptProfiles = d.getJsonArray("reportedProfile", new JsonArray());
+                    
+                    String reporterName = repProfiles.isEmpty() ? "Unknown" : repProfiles.getJsonObject(0).getString("name", "Unknown");
+                    String reportedName = rptProfiles.isEmpty() ? "Unknown" : rptProfiles.getJsonObject(0).getString("name", "Unknown");
+
+                    formattedData.add(new JsonObject()
+                        .put("id", d.getString("_id"))
+                        .put("status", d.getString("status", "OPEN"))
+                        .put("reporterId", d.getString("reporterId"))
+                        .put("reporterName", reporterName)
+                        .put("reportedUserId", d.getString("reportedUserId"))
+                        .put("reportedName", reportedName)
+                        .put("sessionId", d.getString("sessionId"))
+                        .put("reason", d.getString("reason", "Unknown Reason"))
+                        .put("details", d.getString("details", ""))
+                        .put("adminNotes", d.getString("adminNotes", ""))
+                        .put("updatedAt", d.getLong("updatedAt"))
+                        .put("createdAt", d.getLong("createdAt"))
+                    );
+                }
+
+                return new JsonObject()
+                    .put("data", formattedData)
+                    .put("pagination", new JsonObject()
+                        .put("total", total)
+                        .put("page", page)
+                        .put("limit", limit)
+                        .put("totalPages", totalPages)
+                    );
+            });
+    }
+
+    public Future<Boolean> updateReportStatus(String reportId, String status, String adminNotes) {
+        JsonObject query = new JsonObject().put("_id", reportId);
+        JsonObject setFields = new JsonObject()
+            .put("status", status)
+            .put("updatedAt", System.currentTimeMillis());
+            
+        if (adminNotes != null && !adminNotes.trim().isEmpty()) {
+            setFields.put("adminNotes", adminNotes);
+        }
+        
+        JsonObject update = new JsonObject().put("$set", setFields);
+        return client.updateCollection("reports", query, update).map(res -> res.getDocModified() > 0);
+    }
+
     public Future<JsonObject> searchSessions(String q, String status, int page, int limit) {
         int skip = (page - 1) * limit;
 
@@ -383,6 +499,8 @@ public class AdminRepository {
         JsonObject query = new JsonObject().put("_id", sessionId);
         JsonObject update = new JsonObject().put("$set", new JsonObject()
             .put("status", "CANCELLED")
+            .put("cancelledBy", "admin")
+            .put("cancellationReason", "Cancelled by Admin")
             .put("updatedAt", System.currentTimeMillis()));
         return client.updateCollection("sessions", query, update).map(res -> res.getDocModified() > 0);
     }

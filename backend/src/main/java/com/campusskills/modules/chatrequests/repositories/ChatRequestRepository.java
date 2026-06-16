@@ -55,10 +55,16 @@ public class ChatRequestRepository {
         return client.updateCollection(COLLECTION, query, update).map(res -> res.getDocModified() > 0);
     }
 
-    public Future<List<ChatRequest>> fetchUserRequests(String userId, int skip, int limit) {
+    public Future<List<ChatRequest>> fetchUserRequests(String userId, java.util.Set<String> blockedUsers, int skip, int limit) {
         JsonObject query = new JsonObject().put("$or", new io.vertx.core.json.JsonArray()
             .add(new JsonObject().put("senderId", userId))
             .add(new JsonObject().put("receiverId", userId)));
+        
+        if (blockedUsers != null && !blockedUsers.isEmpty()) {
+            io.vertx.core.json.JsonArray blockedArr = new io.vertx.core.json.JsonArray(new java.util.ArrayList<>(blockedUsers));
+            query.put("senderId", new JsonObject().put("$nin", blockedArr));
+            query.put("receiverId", new JsonObject().put("$nin", blockedArr));
+        }
         
         io.vertx.ext.mongo.FindOptions options = new io.vertx.ext.mongo.FindOptions()
                 .setSort(new JsonObject().put("updatedAt", -1))
@@ -69,10 +75,16 @@ public class ChatRequestRepository {
                 .map(list -> list.stream().map(json -> json.mapTo(ChatRequest.class)).collect(Collectors.toList()));
     }
     
-    public Future<Long> countUserRequests(String userId) {
+    public Future<Long> countUserRequests(String userId, java.util.Set<String> blockedUsers) {
         JsonObject query = new JsonObject().put("$or", new io.vertx.core.json.JsonArray()
             .add(new JsonObject().put("senderId", userId))
             .add(new JsonObject().put("receiverId", userId)));
+            
+        if (blockedUsers != null && !blockedUsers.isEmpty()) {
+            io.vertx.core.json.JsonArray blockedArr = new io.vertx.core.json.JsonArray(new java.util.ArrayList<>(blockedUsers));
+            query.put("senderId", new JsonObject().put("$nin", blockedArr));
+            query.put("receiverId", new JsonObject().put("$nin", blockedArr));
+        }
         return client.count(COLLECTION, query);
     }
 

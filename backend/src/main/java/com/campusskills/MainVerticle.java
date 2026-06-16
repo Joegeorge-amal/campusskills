@@ -70,6 +70,7 @@ public class MainVerticle extends AbstractVerticle {
         // Start Background Jobs
 
         new com.campusskills.modules.users.jobs.UserCleanupJob().start(vertx);
+        new com.campusskills.modules.sessions.jobs.SessionReminderJob().start(vertx);
 
         // 6. Start HTTP Server
         HttpServer server = vertx.createHttpServer();

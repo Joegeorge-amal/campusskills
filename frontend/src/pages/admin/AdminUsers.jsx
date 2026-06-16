@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { IconSearch, IconAdjustmentsHorizontal, IconChevronDown, IconLoader2 } from '@tabler/icons-react';
 import adminService from '../../services/adminService';
+import { useAuth } from '../../context/AuthContext';
 import '../../styles/admin.css';
 
 const bgColors = ['#f0fdf4', '#eff6ff', '#fdf2f8', '#fffbeb', '#fef2f2'];
@@ -11,6 +12,7 @@ const getAvatarProps = (name) => {
 };
 
 const AdminUsers = () => {
+  const { user: currentUser } = useAuth();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -62,6 +64,19 @@ const AdminUsers = () => {
     } catch (err) {
       console.error('Failed to toggle status:', err);
       alert('Failed to update user status.');
+    }
+  };
+
+  const handleRoleChange = async (user, newRole) => {
+    if (!window.confirm(`Are you sure you want to change ${user.displayName}'s role to ${newRole}?`)) {
+      return;
+    }
+    try {
+      await adminService.updateUserRole(user.id, newRole);
+      fetchUsers();
+    } catch (err) {
+      console.error('Failed to change role:', err);
+      alert('Failed to update user role.');
     }
   };
 
@@ -128,7 +143,7 @@ const AdminUsers = () => {
                     {init}
                   </div>
                   <div className="au-info">
-                    <div className="au-name">{user.displayName}</div>
+                    <div className="au-name">{user.displayName} <span style={{fontSize:'0.7rem', color:'#6b7280', marginLeft:'8px'}}>{user.role}</span></div>
                     <div className="au-meta">
                       {user.email} · {user.course || 'No course'}
                     </div>
@@ -146,7 +161,14 @@ const AdminUsers = () => {
                       <span className="au-pill suspended">suspended</span>
                     )}
                   </div>
-                  <div className="au-action">
+                  <div className="au-action" style={{ display: 'flex', gap: '8px' }}>
+                    {currentUser?.role === 'super_admin' && user.role !== 'SUPER_ADMIN' && (
+                      user.role === 'ADMIN' ? (
+                        <button className="au-btn-suspend" onClick={() => handleRoleChange(user, 'USER')}>Demote</button>
+                      ) : (
+                        <button className="au-btn-reinstate" onClick={() => handleRoleChange(user, 'ADMIN')}>Promote</button>
+                      )
+                    )}
                     {isActive ? (
                       <button 
                         className="au-btn-suspend"

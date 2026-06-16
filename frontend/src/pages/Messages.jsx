@@ -29,7 +29,14 @@ const Messages = () => {
   const { lastMessage, sendMessage: sendSocketEvent } = useWebSocket();
   
   const [searchQuery, setSearchQuery] = useState('');
+  const [chatFilter, setChatFilter] = useState('all'); // 'all', 'unread', 'read'
   const messagesEndRef = useRef(null);
+
+  useEffect(() => {
+    const handleNavigate = () => navigate('/app/sessions');
+    document.addEventListener('navigateToSessions', handleNavigate);
+    return () => document.removeEventListener('navigateToSessions', handleNavigate);
+  }, [navigate]);
 
   const { 
     chats, setChats, 
@@ -242,9 +249,14 @@ const Messages = () => {
     }
   }, [lastMessage, activeChatId]);
 
-  const filteredChats = chats.filter(c => 
-    (c.name || '').toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredChats = chats.filter(c => {
+    const matchesSearch = (c.name || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const isUnread = c.unread > 0;
+    if (!matchesSearch) return false;
+    if (chatFilter === 'unread' && !isUnread) return false;
+    if (chatFilter === 'read' && isUnread) return false;
+    return true;
+  });
 
   const activeChat = chats.find(c => c.id === activeChatId);
   const activeChatMsgs = chatMessages[activeChatId] || [];
@@ -474,6 +486,30 @@ const Messages = () => {
                 style={{ width: '100%', padding: '8px 12px 8px 30px', borderRadius: '100px', border: '1px solid var(--cs-border)', background: '#f3f4f6', fontSize: '13px', outline: 'none', color: 'var(--cs-text-main)' }}
               />
             </div>
+            
+            {/* Filter Pills */}
+            <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+              {['all', 'unread', 'read'].map(filter => (
+                <button
+                  key={filter}
+                  onClick={() => setChatFilter(filter)}
+                  style={{
+                    padding: '4px 12px',
+                    borderRadius: '100px',
+                    border: '1px solid',
+                    borderColor: chatFilter === filter ? 'var(--cs-primary)' : 'var(--cs-border)',
+                    background: chatFilter === filter ? 'var(--cs-primary-light)' : 'var(--cs-bg-white)',
+                    color: chatFilter === filter ? 'var(--cs-primary)' : 'var(--cs-text-inactive)',
+                    fontSize: '11px',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    textTransform: 'capitalize'
+                  }}
+                >
+                  {filter}
+                </button>
+              ))}
+            </div>
           </div>
           
           <div style={{ flex: 1, overflowY: 'auto', padding: '12px' }}>
@@ -617,6 +653,23 @@ const Messages = () => {
                     {isOtherUserTyping ? 'Typing...' : 'Offline'}
                   </div>
                 </div>
+                <button 
+                  onClick={async () => {
+                    if (window.confirm('Are you sure you want to block this user?')) {
+                      try {
+                        await userService.blockUser(activeChat.otherId);
+                        triggerToast('User blocked successfully');
+                        navigate('/app/messages');
+                        window.location.reload();
+                      } catch (e) {
+                        triggerToast('Failed to block user');
+                      }
+                    }
+                  }}
+                  style={{ width: '36px', height: '36px', borderRadius: '100px', border: 'none', background: '#fee2e2', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', title: 'Block User' }}
+                >
+                  <span style={{ fontSize: '14px', fontWeight: 'bold' }}>🚫</span>
+                </button>
                 <button 
                   onClick={() => setShowDeleteModal(true)}
                   style={{ width: '36px', height: '36px', borderRadius: '100px', border: 'none', background: '#fee2e2', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', title: 'Delete Chat' }}

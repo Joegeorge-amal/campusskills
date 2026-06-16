@@ -51,7 +51,10 @@ public class Notification {
     public String getSourceId() { return sourceId; }
     public void setSourceId(String sourceId) { this.sourceId = sourceId; }
 
+    @com.fasterxml.jackson.annotation.JsonProperty("isRead")
     public boolean isRead() { return isRead; }
+
+    @com.fasterxml.jackson.annotation.JsonProperty("isRead")
     public void setRead(boolean read) { isRead = read; }
 
     public Long getCreatedAt() { return createdAt; }

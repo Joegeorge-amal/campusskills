@@ -1,4 +1,6 @@
 import React, { memo, useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { useAppData } from '../../context/AppDataContext';
 import { Clock, Check, CheckCheck, AlertCircle, Reply } from 'lucide-react';
 import { motion } from 'framer-motion';
 import './ChatMessageBubble.css';
@@ -6,6 +8,7 @@ import './ChatMessageBubble.css';
 const ChatMessageBubble = ({
   isMe,
   avatarProps,
+  partnerName,
   payload,
   onAccept,
   onDecline,
@@ -15,9 +18,118 @@ const ChatMessageBubble = ({
   onDelete,
   replyToMessage
 }) => {
-  const msgType = payload.type || 'text';
+  const msgType = payload.type || payload.messageType || 'text';
   const status = payload.status;
   const [showMobileActions, setShowMobileActions] = useState(false);
+
+  if (msgType === 'SYSTEM') {
+    const { user } = useAuth();
+    const { sessionsData } = useAppData();
+    const sessionObj = sessionsData?.find(s => s.id === payload.sessionId);
+    const isSessionActive = sessionObj ? sessionObj.status === 'SCHEDULED' : true;
+
+    const isOpenSession = payload.message && payload.message.includes("starts in 30 minutes");
+    const isSessionScheduledNow = payload.message && payload.message.includes("is scheduled now");
+    const isConfirmCompletion = payload.message && payload.message.includes("marked this session as completed");
+
+    let text = payload.t || payload.message || '';
+    text = text.replace("{partner}", partnerName || 'your partner');
+    
+    if (payload.markerId) {
+      const markerName = payload.markerId === user?.userId ? 'You' : (partnerName || 'Partner');
+      text = text.replace("{marker}", markerName);
+    }
+
+    const showConfirmButton = isConfirmCompletion && isSessionActive && payload.markerId !== user?.userId;
+    const showScheduledNowActions = isSessionScheduledNow && isSessionActive;
+
+    return (
+      <div className="msg-system-row">
+        <div className="msg-system-bubble">
+          <div className="msg-system-header">
+            CampusSkills
+          </div>
+          <div className="msg-system-body">
+            {text}
+          </div>
+          
+          <div className="msg-system-actions">
+            {isOpenSession && (
+              <button 
+                className="msg-system-btn msg-system-btn-primary"
+                onClick={() => {
+                  document.dispatchEvent(new CustomEvent('navigateToSessions'));
+                }}
+              >
+                Open Session
+              </button>
+            )}
+
+            {showScheduledNowActions && (
+              <>
+                <button 
+                  className="msg-system-btn msg-system-btn-primary"
+                  onClick={(e) => {
+                    e.currentTarget.disabled = true;
+                    e.currentTarget.innerText = "Started";
+                  }}
+                >
+                  Started
+                </button>
+                <button 
+                  className="msg-system-btn msg-system-btn-secondary"
+                  onClick={(e) => {
+                    e.currentTarget.disabled = true;
+                  }}
+                >
+                  Not Yet
+                </button>
+                <button 
+                  className="msg-system-btn msg-system-btn-secondary"
+                  onClick={() => {
+                    const session = {
+                      id: payload.sessionId,
+                      topic: payload.sessionTopic || 'Session',
+                      name: partnerName || 'Partner',
+                      rawSession: {
+                        scheduledStart: payload.sessionScheduledStart || Date.now()
+                      }
+                    };
+                    document.dispatchEvent(new CustomEvent('openReschedule', { detail: session }));
+                  }}
+                >
+                  Propose Postponement
+                </button>
+              </>
+            )}
+
+            {showConfirmButton && (
+              <button 
+                className="msg-system-btn msg-system-btn-primary"
+                onClick={async (e) => {
+                  const btn = e.currentTarget;
+                  btn.disabled = true;
+                  btn.innerText = "Confirming...";
+                  try {
+                    const { sessionService } = await import('../../services/sessionService');
+                    await sessionService.markCompletion(payload.sessionId);
+                    btn.innerText = "Confirmed";
+                    document.dispatchEvent(new CustomEvent('refreshSessionsData'));
+                  } catch (err) {
+                    btn.disabled = false;
+                    btn.innerText = "Confirm Completion";
+                    alert(err.message || "Failed to confirm completion");
+                  }
+                }}
+              >
+                Confirm Completion
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
   
   const renderStatus = () => {
     if (!isMe || !status) return null;

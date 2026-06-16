@@ -220,8 +220,21 @@ public class ChatRequestService {
     public Future<JsonObject> getUserRequests(String authId, int page, int limit) {
         int skip = (page - 1) * limit;
         com.campusskills.modules.users.repositories.UserProfileRepository userProfileRepository = new com.campusskills.modules.users.repositories.UserProfileRepository();
-        return repository.countUserRequests(authId).compose(total -> 
-            repository.fetchUserRequests(authId, skip, limit).compose(list -> {
+        
+        Future<java.util.Set<String>> blockedUsersFuture = userProfileRepository.findByUserId(authId).compose(profile -> {
+            java.util.Set<String> blockedUsers = new java.util.HashSet<>();
+            if (profile != null && profile.getBlockedUsers() != null) {
+                blockedUsers.addAll(profile.getBlockedUsers());
+            }
+            return userProfileRepository.getBlockedByUsers(authId).map(blockedBy -> {
+                blockedUsers.addAll(blockedBy);
+                return blockedUsers;
+            });
+        });
+
+        return blockedUsersFuture.compose(blockedUsers -> {
+            return repository.countUserRequests(authId, blockedUsers).compose(total -> 
+                repository.fetchUserRequests(authId, blockedUsers, skip, limit).compose(list -> {
                 if (list.isEmpty()) {
                     return Future.succeededFuture(new JsonObject()
                         .put("items", new io.vertx.core.json.JsonArray())
@@ -266,6 +279,7 @@ public class ChatRequestService {
                     .put("limit", limit)
                     .put("total", total));
             })
-        );
+            );
+        });
     }
 }

@@ -37,7 +37,8 @@ public class MessageService {
                 return Future.failedFuture("CHAT_NOT_FOUND");
             }
             io.vertx.core.json.JsonArray participantsArray = chat.getJsonArray("participants");
-            if (participantsArray == null || !participantsArray.contains(message.getSenderId())) {
+            boolean isSystem = "system".equals(message.getSenderId());
+            if (!isSystem && (participantsArray == null || !participantsArray.contains(message.getSenderId()))) {
                 return Future.failedFuture("UNAUTHORIZED_SENDER");
             }
             
@@ -57,18 +58,37 @@ public class MessageService {
                 typingService.clearTypingState(message.getChatId(), message.getSenderId(), participantList);
                 
                 if (eventBus != null) {
-                    for (String participantId : participantList) {
-                        if (!participantId.equals(message.getSenderId())) {
-                            io.vertx.core.json.JsonObject payload = new io.vertx.core.json.JsonObject()
-                                .put("userId", participantId)
-                                .put("type", "NEW_MESSAGE")
-                                .put("title", "New Message")
-                                .put("message", "You have a new message.")
-                                .put("sourceType", "CHAT")
-                                .put("sourceId", message.getChatId());
-                            eventBus.send("internal.notification.create", payload);
-                        }
-                    }
+                    new com.campusskills.modules.users.repositories.UserProfileRepository().findByUserId(message.getSenderId())
+                        .onSuccess(senderProfile -> {
+                            String senderName = senderProfile != null ? senderProfile.getName() : "Someone";
+                            for (String participantId : participantList) {
+                                if (!participantId.equals(message.getSenderId())) {
+                                    io.vertx.core.json.JsonObject payload = new io.vertx.core.json.JsonObject()
+                                        .put("userId", participantId)
+                                        .put("type", "NEW_MESSAGE")
+                                        .put("title", "New Message")
+                                        .put("message", "You have a new message.")
+                                        .put("sourceType", "CHAT")
+                                        .put("sourceId", message.getChatId())
+                                        .put("senderName", senderName);
+                                    eventBus.send("internal.notification.create", payload);
+                                }
+                            }
+                        })
+                        .onFailure(err -> {
+                            for (String participantId : participantList) {
+                                if (!participantId.equals(message.getSenderId())) {
+                                    io.vertx.core.json.JsonObject payload = new io.vertx.core.json.JsonObject()
+                                        .put("userId", participantId)
+                                        .put("type", "NEW_MESSAGE")
+                                        .put("title", "New Message")
+                                        .put("message", "You have a new message.")
+                                        .put("sourceType", "CHAT")
+                                        .put("sourceId", message.getChatId());
+                                    eventBus.send("internal.notification.create", payload);
+                                }
+                            }
+                        });
                 }
             });
         });
@@ -281,8 +301,18 @@ public class MessageService {
 
             Long readAt = System.currentTimeMillis();
             return repository.markChatMessagesAsRead(chatId, authId, readAt).compose(v -> {
-                // Return success immediately, no broadcast needed since the UI handles unread counts locally
-                return Future.succeededFuture();
+                // Clear unread notifications for this chat for the current user
+                return new com.campusskills.modules.notifications.repositories.NotificationRepository()
+                    .markChatNotificationsAsRead(authId, chatId)
+                    .map(modifiedCount -> {
+                        log.info("[MessageService] Cleared " + modifiedCount + " notifications for chat " + chatId + " for user " + authId);
+                        return (Void) null;
+                    })
+                    .recover(err -> {
+                        log.warn("[MessageService] Failed to clear notifications for chat " + chatId, err);
+                        return Future.succeededFuture();
+                    })
+                    .mapEmpty();
             });
         });
     }

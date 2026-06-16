@@ -43,8 +43,8 @@ public class AuthRouter {
         );
         AuthHandler handler = new AuthHandler(service);
 
-        router.post("/signup").handler(handler::signup);
-        router.post("/login").handler(handler::login);
+        router.post("/signup").handler(com.campusskills.web.middleware.RateLimitMiddleware.create()).handler(handler::signup);
+        router.post("/login").handler(com.campusskills.web.middleware.RateLimitMiddleware.create()).handler(handler::login);
         router.post("/refresh").handler(handler::refresh);
         router.post("/logout").handler(handler::logout);
 

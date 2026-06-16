@@ -34,7 +34,7 @@ public class NotificationService {
     }
 
     private void handleNotificationCreation(Notification notification, String senderName) {
-        if (notification.getType() == NotificationType.NEW_CHAT_ACTIVITY && "CHAT".equals(notification.getSourceType())) {
+        if (notification.getType() == NotificationType.NEW_MESSAGE && "CHAT".equals(notification.getSourceType())) {
             repository.findUnreadChatNotification(notification.getUserId(), notification.getSourceId()).onSuccess(existing -> {
                 if (existing != null) {
                     // Aggregate
@@ -43,28 +43,28 @@ public class NotificationService {
                     String name = senderName != null ? senderName : "Someone";
                     
                     if (existingMsg != null) {
-                        if (existingMsg.startsWith("New message from ")) {
-                            name = existingMsg.substring("New message from ".length());
-                        } else if (existingMsg.contains(" • ") && existingMsg.contains(" unread messages")) {
-                            int dotIndex = existingMsg.indexOf(" • ");
-                            if (dotIndex > 0) {
-                                name = existingMsg.substring(0, dotIndex);
-                                String numStr = existingMsg.substring(dotIndex + 3, existingMsg.indexOf(" unread messages"));
-                                try { 
-                                    count = Integer.parseInt(numStr.trim()) + 1; 
-                                } catch (Exception ignored) { }
-                            }
+                        if (existingMsg.contains(" new message from ")) {
+                            name = existingMsg.substring(existingMsg.indexOf(" new message from ") + " new message from ".length());
+                            count = 2;
+                        } else if (existingMsg.contains(" new messages from ")) {
+                            name = existingMsg.substring(existingMsg.indexOf(" new messages from ") + " new messages from ".length());
+                            String countStr = existingMsg.substring(0, existingMsg.indexOf(" new messages from "));
+                            try {
+                                count = Integer.parseInt(countStr.trim()) + 1;
+                            } catch (Exception ignored) {}
                         }
                     }
                     
-                    String newMessage = name + " • " + count + " unread messages";
+                    String newMessage = count + " new messages from " + name;
                     repository.updateMessageAndTimestamp(existing.getId(), newMessage).onSuccess(updated -> {
                         existing.setMessage(newMessage);
                         existing.setUpdatedAt(System.currentTimeMillis());
                         NotificationBroadcaster.broadcastNewNotification(existing);
                     });
                 } else {
-                    // Create new
+                    // Create new notification for the first message
+                    String name = senderName != null ? senderName : "Someone";
+                    notification.setMessage("1 new message from " + name);
                     repository.create(notification).onSuccess(id -> {
                         NotificationBroadcaster.broadcastNewNotification(notification);
                     });

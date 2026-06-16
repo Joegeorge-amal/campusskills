@@ -16,11 +16,7 @@ import Requests from '../pages/Requests';
 import Sessions from '../pages/Sessions';
 
 import History from '../pages/History';
-import Payment from '../pages/Payment';
-import Withdraw from '../pages/Withdraw';
-import AddMoney from '../pages/AddMoney';
 import SwapRequest from '../pages/SwapRequest';
-import AddBank from '../pages/AddBank';
 import Profile from '../pages/Profile';
 import PublicProfile from '../pages/PublicProfile';
 import EditProfile from '../pages/EditProfile';
@@ -31,6 +27,7 @@ import AdminOverview from '../pages/admin/AdminOverview';
 import AdminListings from '../pages/admin/AdminListings';
 import AdminUsers from '../pages/admin/AdminUsers';
 import AdminDisputes from '../pages/admin/AdminDisputes';
+import AdminReports from '../pages/admin/AdminReports';
 import AdminSessions from '../pages/admin/AdminSessions';
 import AdminAnalytics from '../pages/admin/AdminAnalytics';
 import AdminPayments from '../pages/admin/AdminPayments';
@@ -83,11 +80,7 @@ const AppRoutes = () => {
         <Route path="requests" element={<Requests />} />
         <Route path="sessions" element={<Sessions />} />
         <Route path="history" element={<History />} />
-        <Route path="payment" element={<Payment />} />
-        <Route path="withdraw" element={<Withdraw />} />
-        <Route path="add-money" element={<AddMoney />} />
         <Route path="swap-request" element={<SwapRequest />} />
-        <Route path="add-bank" element={<AddBank />} />
         <Route path="profile" element={<Profile />} />
         <Route path="user/:rollNo" element={<PublicProfile />} />
         <Route path="edit-profile" element={<EditProfile />} />
@@ -105,6 +98,7 @@ const AppRoutes = () => {
         <Route path="dashboard" element={<AdminOverview />} />
         <Route path="listings" element={<AdminListings />} />
         <Route path="users" element={<AdminUsers />} />
+        <Route path="user-reports" element={<AdminReports />} />
         <Route path="reports" element={<AdminDisputes />} />
         <Route path="sessions" element={<AdminSessions />} />
         <Route path="analytics" element={<AdminAnalytics />} />

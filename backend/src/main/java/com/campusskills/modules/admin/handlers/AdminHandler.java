@@ -47,6 +47,43 @@ public class AdminHandler {
             .onFailure(err -> ApiResponse.internalError(ctx, "Failed to fetch disputes: " + err.getMessage()));
     }
 
+    public void getReports(RoutingContext ctx) {
+        String q = ctx.request().getParam("q");
+        String status = ctx.request().getParam("status");
+        
+        int page = 1;
+        int limit = 20;
+        try {
+            if (ctx.request().getParam("page") != null) page = Integer.parseInt(ctx.request().getParam("page"));
+            if (ctx.request().getParam("limit") != null) limit = Integer.parseInt(ctx.request().getParam("limit"));
+        } catch (NumberFormatException ignored) {}
+
+        adminService.searchReports(q, status, page, limit)
+            .onSuccess(data -> ApiResponse.ok(ctx, data))
+            .onFailure(err -> ApiResponse.internalError(ctx, "Failed to fetch reports: " + err.getMessage()));
+    }
+
+    public void updateReportStatus(RoutingContext ctx) {
+        String id = ctx.request().getParam("id");
+        JsonObject body = ctx.body().asJsonObject();
+        if (body == null || !body.containsKey("status")) {
+            ApiResponse.badRequest(ctx, "Missing status in body");
+            return;
+        }
+        String status = body.getString("status");
+        String adminNotes = body.getString("adminNotes");
+        
+        adminService.updateReportStatus(id, status, adminNotes)
+            .onSuccess(updated -> {
+                if (updated) {
+                    ApiResponse.ok(ctx, new JsonObject().put("message", "Report status updated"));
+                } else {
+                    ApiResponse.notFound(ctx, "Report not found");
+                }
+            })
+            .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
+    }
+
     public void getSessions(RoutingContext ctx) {
         String q = ctx.request().getParam("q");
         String status = ctx.request().getParam("status");

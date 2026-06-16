@@ -1,36 +1,48 @@
 import React from 'react';
-import { IconCheck, IconCurrencyRupee, IconX, IconCalendarEvent, IconFlag } from '@tabler/icons-react';
-import { useNavigate } from 'react-router-dom';
+import { IconCheck, IconX, IconCalendarEvent, IconBell, IconMessage } from '@tabler/icons-react';
 import './NotificationPanel.css';
 
 const getIconForType = (type) => {
   switch (type) {
-    case 'accepted':
-    case 'swap_accepted':
-      return { icon: <IconCheck size={18} stroke={2.5} />, bg: '#ecfdf5', color: '#10b981' }; // Green
-    case 'payment':
-      return { icon: <IconCurrencyRupee size={18} stroke={2.5} />, bg: '#f1f5f9', color: '#1d4ed8' }; // Light grey with blue icon
-    case 'declined':
-      return { icon: <IconX size={18} stroke={2.5} />, bg: '#fef2f2', color: '#ef4444' }; // Red
-    case 'booked':
-      return { icon: <IconCalendarEvent size={18} stroke={2.5} />, bg: '#eff6ff', color: '#1d4ed8' }; // Light blue with blue icon
-    case 'report':
-      return { icon: <IconFlag size={18} stroke={2.5} />, bg: '#fef9c3', color: '#eab308' }; // Yellow
+    case 'NEW_MESSAGE':
+      return { icon: <IconMessage size={18} stroke={2} />, bg: '#f0f7ff', color: '#3b82f6' }; // Blue
+    case 'SESSION_ACCEPTED':
+    case 'SESSION_COMPLETED':
+    case 'EXCHANGE_REQUEST_ACCEPTED':
+    case 'CHAT_REQUEST_ACCEPTED':
+      return { icon: <IconCheck size={18} stroke={2} />, bg: '#ecfdf5', color: '#10b981' }; // Green
+    case 'SESSION_CANCELLED':
+    case 'SESSION_REJECTED':
+    case 'EXCHANGE_REQUEST_REJECTED':
+      return { icon: <IconX size={18} stroke={2} />, bg: '#fef2f2', color: '#ef4444' }; // Red
+    case 'EXCHANGE_REQUEST_RECEIVED':
+    case 'CHAT_REQUEST_RECEIVED':
+    case 'SESSION_PROPOSED':
+    case 'SESSION_COMPLETION_PENDING':
+      return { icon: <IconCalendarEvent size={18} stroke={2} />, bg: '#fffbeb', color: '#f59e0b' }; // Amber/Yellow
     default:
-      return { icon: <IconCheck size={18} stroke={2.5} />, bg: '#f3f4f6', color: '#374151' }; // Grey
+      return { icon: <IconBell size={18} stroke={2} />, bg: '#f3f4f6', color: '#4b5563' }; // Grey
   }
 };
 
-const NotificationPanel = ({ notifications, onClose, onMarkAllRead }) => {
-  const navigate = useNavigate();
-  const unreadCount = notifications.filter(n => n.unread).length;
+const formatTimeAgo = (timestamp) => {
+  if (!timestamp) return 'Just now';
+  const seconds = Math.floor((new Date() - new Date(timestamp)) / 1000);
+  let interval = seconds / 31536000;
+  if (interval > 1) return Math.floor(interval) + " years ago";
+  interval = seconds / 2592000;
+  if (interval > 1) return Math.floor(interval) + " months ago";
+  interval = seconds / 86400;
+  if (interval > 1) return Math.floor(interval) + " days ago";
+  interval = seconds / 3600;
+  if (interval > 1) return Math.floor(interval) + " hr ago";
+  interval = seconds / 60;
+  if (interval >= 1) return Math.floor(interval) + " min ago";
+  return Math.floor(seconds) + " sec ago";
+};
 
-  const handleActionClick = (url) => {
-    if (url) {
-      navigate(url);
-      onClose();
-    }
-  };
+const NotificationPanel = ({ notifications, onClose, onMarkAllRead, onNotificationClick }) => {
+  const unreadCount = notifications.filter(n => n.isRead === false || n.read === false || n.unread === true).length;
 
   return (
     <div className="notif-panel-overlay" onClick={onClose}>
@@ -38,7 +50,7 @@ const NotificationPanel = ({ notifications, onClose, onMarkAllRead }) => {
         {/* Header */}
         <div className="notif-header">
           <div className="notif-header-text">
-            <h3>Notifications</h3>
+            <h3>Notification History</h3>
             <span className="notif-unread-count">{unreadCount} unread</span>
           </div>
           <button className="notif-close-btn" onClick={onClose}>
@@ -54,33 +66,31 @@ const NotificationPanel = ({ notifications, onClose, onMarkAllRead }) => {
                 <IconCheck size={32} />
               </div>
               <h4>You're all caught up</h4>
-              <p>No new notifications right now.</p>
+              <p>No notifications right now.</p>
             </div>
           ) : (
             <div className="notif-list">
               {notifications.map((notif) => {
                 const { icon, bg, color } = getIconForType(notif.type);
+                const isUnread = notif.isRead === false || notif.read === false || notif.unread === true;
                 return (
-                  <div key={notif.id} className={`notif-item ${notif.unread ? 'unread' : ''}`}>
+                  <div 
+                    key={notif.id} 
+                    className={`notif-item ${isUnread ? 'unread' : ''}`}
+                    onClick={() => onNotificationClick && onNotificationClick(notif)}
+                    style={{ cursor: 'pointer' }}
+                  >
                     <div className="notif-icon-wrapper" style={{ backgroundColor: bg, color: color }}>
                       {icon}
                     </div>
                     <div className="notif-content">
                       <div className="notif-title-row">
                         <div className="notif-title">{notif.title}</div>
-                        {notif.unread && <div className="notif-unread-dot"></div>}
+                        {isUnread && <div className="notif-unread-dot"></div>}
                       </div>
                       <div className="notif-message">{notif.message}</div>
                       <div className="notif-meta">
-                        <span className="notif-time">{notif.timestamp}</span>
-                        {notif.actionUrl && notif.actionLabel && (
-                          <button 
-                            className="notif-action-btn"
-                            onClick={() => handleActionClick(notif.actionUrl)}
-                          >
-                            {notif.actionLabel} &rarr;
-                          </button>
-                        )}
+                        <span className="notif-time">{formatTimeAgo(notif.createdAt)}</span>
                       </div>
                     </div>
                   </div>
@@ -91,7 +101,7 @@ const NotificationPanel = ({ notifications, onClose, onMarkAllRead }) => {
         </div>
 
         {/* Footer */}
-        {notifications.length > 0 && (
+        {unreadCount > 0 && (
           <div className="notif-footer" onClick={onMarkAllRead}>
             Mark all as read
           </div>

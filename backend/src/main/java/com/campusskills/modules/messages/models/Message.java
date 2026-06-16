@@ -26,6 +26,9 @@ public class Message {
     private Long editedAt;
     private Long deletedAt;
     private String tempId;
+    private String markerId;
+    private Long sessionScheduledStart;
+    private String sessionTopic;
 
     public Message() {}
 
@@ -156,4 +159,13 @@ public class Message {
     public void setTempId(String tempId) {
         this.tempId = tempId;
     }
+
+    public String getMarkerId() { return markerId; }
+    public void setMarkerId(String markerId) { this.markerId = markerId; }
+
+    public Long getSessionScheduledStart() { return sessionScheduledStart; }
+    public void setSessionScheduledStart(Long sessionScheduledStart) { this.sessionScheduledStart = sessionScheduledStart; }
+
+    public String getSessionTopic() { return sessionTopic; }
+    public void setSessionTopic(String sessionTopic) { this.sessionTopic = sessionTopic; }
 }
