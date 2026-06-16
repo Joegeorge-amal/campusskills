@@ -42,6 +42,11 @@
     display: flex !important;
   }
 
+  /* More space between right-side icons on mobile */
+  .topbar-actions {
+    gap: 12px;
+  }
+
   /* Action buttons: identical sizing */
   .header-icon-box,
   .mobile-search-btn {
@@ -378,7 +383,7 @@
   }
 
   .topbar-actions {
-    gap: 4px;
+    gap: 8px;
   }
 
   /* ─── HEADER: FURTHER COMPACT AT 430px ─── */
@@ -408,7 +413,7 @@
   }
 
   .topbar-actions {
-    gap: 2px;
+    gap: 6px;
   }
 
   /* ─── SIDEBAR: WIDER ON SMALL SCREENS ─── */
@@ -595,5 +600,9 @@
   .header-icon-box {
     width: 30px;
     height: 30px;
+  }
+
+  .topbar-actions {
+    gap: 6px;
   }
 }
