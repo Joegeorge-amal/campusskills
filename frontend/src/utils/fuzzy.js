@@ -66,6 +66,32 @@ export function getBestMatch(query, list, maxDistance = 2) {
   return bestMatch;
 }
 
+export function getBestFuzzyMatch(query, list, threshold = 0.85) {
+  if (!query || typeof query !== 'string') return null;
+  const trimmed = query.trim();
+  if (trimmed.length < 2) return null;
+
+  const q = trimmed.toLowerCase();
+  let best = null;
+  let bestSim = 0;
+
+  for (const item of list) {
+    const itemLower = item.toLowerCase();
+    if (itemLower === q) return { item, similarity: 1 };
+
+    const distance = levenshteinDistance(q, itemLower);
+    const maxLen = Math.max(q.length, itemLower.length);
+    const similarity = 1 - (distance / maxLen);
+
+    if (similarity > bestSim) {
+      bestSim = similarity;
+      best = { item, similarity };
+    }
+  }
+
+  return best && bestSim >= threshold ? best : null;
+}
+
 export function getSuggestions(query, list, maxResults = 5) {
   if (!query || query.trim() === '') return list.slice(0, maxResults);
   
