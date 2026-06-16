@@ -74,6 +74,9 @@ const Requests = () => {
       setProcessingId(reqId);
       setProcessingAction('accept');
       const req = requestsData.find(r => r.id === reqId);
+      if (!req) {
+        throw new Error('Request not found in current data');
+      }
       if (req.type === 'Chat request') {
         await chatRequestService.acceptRequest(reqId);
       } else {
@@ -82,7 +85,9 @@ const Requests = () => {
       if (!hideToast) triggerToast('Request accepted successfully!');
       fetchInitialData();
     } catch (err) {
-      triggerToast('Failed to accept request');
+      const msg = err?.response?.data?.error || err?.message || 'Failed to accept request';
+      triggerToast(msg);
+      console.error('Accept error:', err);
       throw err;
     } finally {
       setProcessingId(null);
