@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { IconMenu2, IconFilter, IconBell } from '@tabler/icons-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { IconMenu2, IconFilter, IconBell, IconSearch, IconX } from '@tabler/icons-react';
 import Avatar from '../Avatar';
 import logo from '../../../assets/kju_campus_logo.png';
 import NotificationDropdown from '../../notifications/NotificationDropdown';
@@ -25,6 +25,30 @@ const AppHeader = ({
   onAvatarClick
 }) => {
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [mobileSearchQuery, setMobileSearchQuery] = useState('');
+  const searchInputRef = useRef(null);
+
+  const openMobileSearch = useCallback(() => {
+    setIsMobileSearchOpen(true);
+    setMobileSearchQuery('');
+    setTimeout(() => searchInputRef.current?.focus(), 100);
+  }, []);
+
+  const closeMobileSearch = useCallback(() => {
+    setIsMobileSearchOpen(false);
+    setMobileSearchQuery('');
+  }, []);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isMobileSearchOpen) {
+        closeMobileSearch();
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isMobileSearchOpen, closeMobileSearch]);
 
   return (
     <div className="topbar">
@@ -78,7 +102,15 @@ const AppHeader = ({
           </div>
         ))}
 
-
+        {showSearch && (
+          <button
+            className="mobile-search-btn header-icon-box"
+            onClick={openMobileSearch}
+            aria-label="Search"
+          >
+            <IconSearch size={20} />
+          </button>
+        )}
 
         <NotificationDropdown />
 
@@ -100,6 +132,44 @@ const AppHeader = ({
           </div>
         )}
       </div>
+
+      {/* ─── MOBILE FULLSCREEN SEARCH OVERLAY ─── */}
+      {isMobileSearchOpen && (
+        <div className="mobile-search-overlay" onClick={closeMobileSearch}>
+          <div className="mobile-search-modal" onClick={e => e.stopPropagation()}>
+            <div className="mobile-search-header">
+              <div className="mobile-search-input-wrap">
+                <IconSearch size={20} className="mobile-search-input-icon" />
+                <input
+                  ref={searchInputRef}
+                  type="text"
+                  className="mobile-search-input"
+                  placeholder="Search CampusSkills..."
+                  value={mobileSearchQuery}
+                  onChange={e => setMobileSearchQuery(e.target.value)}
+                />
+              </div>
+              <button className="mobile-search-close" onClick={closeMobileSearch}>
+                <IconX size={22} />
+              </button>
+            </div>
+            {!mobileSearchQuery.trim() && (
+              <div className="mobile-search-hints">
+                <div className="mobile-search-hint-section">
+                  <div className="mobile-search-hint-label">Popular skills</div>
+                  <div className="mobile-search-hint-chips">
+                    {['Web Dev', 'UI/UX', 'Python', 'Data Science', 'Design', 'Mobile Dev'].map(s => (
+                      <button key={s} className="mobile-search-hint-chip" onClick={() => { setMobileSearchQuery(s); }}>
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
