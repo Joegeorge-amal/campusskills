@@ -107,24 +107,39 @@ const Dashboard = () => {
           color: '#ffffff', 
           boxShadow: '0 4px 16px rgba(47, 95, 233, 0.15)', 
           flexShrink: 0, 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center', 
           padding: '16px 20px' 
         }}>
-          <div className="hero-top-row">
-            <span className="hero-welcome">Welcome back</span>
-            <span className="hero-user-name">{user?.name || 'User'}</span>
+          <div>
+            <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.55)', marginBottom: '2px', fontWeight: 500 }}>Welcome back</div>
+            <div style={{ fontSize: '18px', fontWeight: 700, marginBottom: '2px', letterSpacing: '-0.2px' }}>{user?.name || 'User'}</div>
+            <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.8)', fontWeight: 400 }}>{user?.year ? `${user.year} · ${user.programme || ''}` : ''}</div>
           </div>
-          <div className="hero-body">
-            <div className="hero-trust-col">
-              <IconStarFilled size={20} color="#facc15" />
-              <span className="hero-score-number">{stats.trustScore}</span>
-              <span className="hero-score-label">Trust Score</span>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
+            <div style={{ 
+              background: 'rgba(255, 255, 255, 0.1)', 
+              border: '1px solid rgba(255, 255, 255, 0.2)', 
+              borderRadius: '10px', 
+              padding: '6px 14px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '18px', fontWeight: 700, marginBottom: '1px' }}>
+                {stats.trustScore} <IconStarFilled size={14} style={{ color: '#facc15' }} />
+              </div>
+              <div style={{ fontSize: '9px', color: 'rgba(255, 255, 255, 0.8)', fontWeight: 500 }}>
+                Trust score
+              </div>
             </div>
-            <div className="hero-info-col">
-              <div className="hero-degree">{user?.year ? `${user.year} · ${user.programme || ''}` : ''}</div>
-              <button className="hero-cta" onClick={() => setIsCreateSessionOpen(true)}>
-                + Create Listing
-              </button>
-            </div>
+            <button 
+              onClick={() => setIsCreateSessionOpen(true)}
+              style={{ padding: '6px 16px', background: '#ffffff', color: '#1e40af', border: 'none', borderRadius: '10px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+            >
+              + Create Listing
+            </button>
           </div>
         </div>
 
