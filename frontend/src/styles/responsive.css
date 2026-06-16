@@ -2,7 +2,8 @@
 
 /* Hide mobile-only elements on desktop (defined first so mobile rules override) */
 .mobile-menu-btn,
-.mobile-search-btn {
+.mobile-search-btn,
+.mobile-hero {
   display: none !important;
 }
 
@@ -226,43 +227,6 @@
     to { opacity: 1; }
   }
 
-  /* ─── HERO CARD: SUBTLER ON MOBILE ─── */
-  .dashboard-hero {
-    background: #ffffff !important;
-    border: 1px solid #e5e7eb !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
-  }
-
-  .dashboard-hero > div:first-child > div:first-child {
-    color: #64748b !important;
-  }
-
-  .dashboard-hero > div:first-child > div:nth-child(2) {
-    color: #0f172a !important;
-  }
-
-  .dashboard-hero > div:first-child > div:nth-child(3) {
-    color: #64748b !important;
-  }
-
-  .dashboard-hero > div:last-child > div:first-child {
-    background: #f8fafc !important;
-    border-color: #e2e8f0 !important;
-  }
-
-  .dashboard-hero > div:last-child > div:first-child > div:first-child {
-    color: #0f172a !important;
-  }
-
-  .dashboard-hero > div:last-child > div:first-child > div:nth-child(2) {
-    color: #64748b !important;
-  }
-
-  .dashboard-hero > div:last-child > button {
-    background: #2563eb !important;
-    color: #ffffff !important;
-  }
-
   /* ─── SIDEBAR (z-index handled in Sidebar.css) ─── */
   .mobile-menu-btn {
     display: flex !important;
@@ -281,6 +245,95 @@
     border-right: none !important;
     border-bottom: 0.5px solid rgba(0, 0, 0, 0.08);
     height: auto !important;
+  }
+
+  /* ─── MOBILE HERO CARD ─── */
+  .desktop-hero {
+    display: none !important;
+  }
+
+  .mobile-hero {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 14px;
+  }
+
+  .hero-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .hero-welcome {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.55);
+    font-weight: 500;
+  }
+
+  .hero-user-name {
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.2px;
+    color: #ffffff;
+  }
+
+  .hero-body {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .hero-trust-col {
+    flex: 0 0 35%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+  }
+
+  .hero-trust-col svg {
+    margin-bottom: 2px;
+  }
+
+  .hero-score-number {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: #ffffff;
+  }
+
+  .hero-score-label {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.65);
+    font-weight: 500;
+  }
+
+  .hero-info-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    justify-content: center;
+  }
+
+  .hero-degree {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 400;
+  }
+
+  .hero-cta {
+    align-self: flex-start;
+    padding: 8px 20px;
+    background: #ffffff;
+    color: #1e40af;
+    border: none;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
 }
 
@@ -451,21 +504,6 @@
   /* ─── SIDEBAR: WIDER ON SMALL SCREENS ─── */
   .sb {
     width: 260px;
-  }
-
-  /* ─── DASHBOARD HERO: STACK VERTICALLY ─── */
-  .dashboard-hero {
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    padding: 16px !important;
-    gap: 12px;
-  }
-
-  .dashboard-hero > div:last-child {
-    width: 100% !important;
-    flex-direction: row !important;
-    justify-content: space-between !important;
-    align-items: center !important;
   }
 
   /* ─── DASHBOARD STAT CARDS: 2+1 LAYOUT, COMPACT ─── */

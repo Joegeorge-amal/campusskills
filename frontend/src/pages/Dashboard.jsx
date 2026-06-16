@@ -57,13 +57,13 @@ const Dashboard = () => {
       <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
         <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#1e40af', margin: '0 0 24px 8px', letterSpacing: '-0.5px' }}>Dashboard</h1>
         {/* Hero Banner */}
-        <div className="dashboard-hero" style={{ 
-          background: 'linear-gradient(105deg, #1e3a8a 0%, #3b82f6 55%, #1e3a8a 100%)', 
+        <div className="dashboard-hero desktop-hero" style={{ 
+          background: 'linear-gradient(135deg, #2f5fe9 0%, #3d7cf6 55%, #3f43d8 100%)', 
           borderRadius: '12px', 
           padding: '20px 28px', 
           marginBottom: '16px', 
           color: '#ffffff', 
-          boxShadow: '0 4px 20px rgba(37, 99, 235, 0.15)', 
+          boxShadow: '0 4px 16px rgba(47, 95, 233, 0.15)', 
           flexShrink: 0, 
           display: 'flex', 
           justifyContent: 'space-between', 
@@ -97,6 +97,34 @@ const Dashboard = () => {
             >
               + Create Listing
             </button>
+          </div>
+        </div>
+
+        <div className="dashboard-hero mobile-hero" style={{ 
+          background: 'linear-gradient(135deg, #2f5fe9 0%, #3d7cf6 55%, #3f43d8 100%)', 
+          borderRadius: '12px', 
+          marginBottom: '16px', 
+          color: '#ffffff', 
+          boxShadow: '0 4px 16px rgba(47, 95, 233, 0.15)', 
+          flexShrink: 0, 
+          padding: '16px 20px' 
+        }}>
+          <div className="hero-top-row">
+            <span className="hero-welcome">Welcome back</span>
+            <span className="hero-user-name">{user?.name || 'User'}</span>
+          </div>
+          <div className="hero-body">
+            <div className="hero-trust-col">
+              <IconStarFilled size={20} color="#facc15" />
+              <span className="hero-score-number">{stats.trustScore}</span>
+              <span className="hero-score-label">Trust Score</span>
+            </div>
+            <div className="hero-info-col">
+              <div className="hero-degree">{user?.year ? `${user.year} · ${user.programme || ''}` : ''}</div>
+              <button className="hero-cta" onClick={() => setIsCreateSessionOpen(true)}>
+                + Create Listing
+              </button>
+            </div>
           </div>
         </div>
 
