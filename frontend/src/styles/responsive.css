@@ -647,22 +647,22 @@
     align-items: center !important;
     justify-content: center !important;
     text-align: center !important;
-    gap: 6px !important;
-    padding: 24px 16px !important;
+    gap: 4px !important;
+    padding: 20px 16px !important;
     min-height: 100px !important;
   }
 
   #home .grid-3 div.ts-card .tsc-icon {
-    margin-bottom: 2px !important;
+    margin-bottom: 0 !important;
   }
 
   #home .grid-3 div.ts-card .tsc-body {
     display: flex !important;
     flex-direction: row !important;
-    flex-wrap: nowrap !important;
+    flex-wrap: wrap !important;
     justify-content: center !important;
     align-items: baseline !important;
-    gap: 8px !important;
+    gap: 2px 8px !important;
   }
 
   #home .grid-3 div.ts-card .tsc-score {
@@ -672,6 +672,8 @@
   }
 
   #home .grid-3 div.ts-card .tsc-label {
+    flex: 0 0 100% !important;
+    text-align: center !important;
     font-size: 11px !important;
     margin: 0 !important;
   }
