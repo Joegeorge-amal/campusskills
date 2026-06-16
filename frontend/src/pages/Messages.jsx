@@ -23,12 +23,10 @@ const getInitials = (name) => {
 
 const Messages = () => {
   const { user } = useAuth();
-  const { triggerToast } = useAppData();
+  const { triggerToast, searchQuery, setSearchQuery } = useAppData();
   const { chatId: activeChatId } = useParams();
   const navigate = useNavigate();
   const { lastMessage, sendMessage: sendSocketEvent } = useWebSocket();
-  
-  const [searchQuery, setSearchQuery] = useState('');
   const [chatFilter, setChatFilter] = useState('all'); // 'all', 'unread', 'read'
   const messagesEndRef = useRef(null);
 
