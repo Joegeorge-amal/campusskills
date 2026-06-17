@@ -3,10 +3,12 @@ import { IconBell, IconUsers, IconCalendarEvent, IconCurrencyRupee, IconAlertTri
 import adminService from '../../services/adminService';
 import { APP_CONFIG } from '../../config';
 import { useWebSocket } from '../../context/WebSocketContext';
+import NotificationPanel from '../common/AppHeader/NotificationPanel';
 import '../../styles/admin.css';
 
 const AdminNotifications = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -188,8 +190,28 @@ const AdminNotifications = () => {
               ))
             )}
           </div>
+          {notifications.length > 0 && (
+            <div className="admin-notif-footer" style={{ borderTop: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>
+              <button 
+                onClick={() => { setIsOpen(false); setIsSidePanelOpen(true); }} 
+                style={{ background: 'none', border: 'none', color: '#2563eb', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
+              >
+                View all
+              </button>
+            </div>
+          )}
         </div>
         </>
+      )}
+
+      {isSidePanelOpen && (
+        <NotificationPanel 
+          isOpen={isSidePanelOpen} 
+          onClose={() => setIsSidePanelOpen(false)} 
+          notifications={notifications}
+          onMarkRead={(id) => markAsRead(id, false)}
+          onMarkAllRead={() => markAllRead()}
+        />
       )}
     </div>
   );

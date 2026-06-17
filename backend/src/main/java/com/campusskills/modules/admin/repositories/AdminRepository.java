@@ -758,13 +758,10 @@ public class AdminRepository {
 
     public Future<JsonObject> getCategoryPerformance() {
         JsonArray pipeline = new JsonArray()
-            .add(new JsonObject().put("$addFields", new JsonObject()
-                .put("listingObjectId", new JsonObject().put("$toObjectId", "$listingId"))
-            ))
             .add(new JsonObject().put("$lookup", new JsonObject()
                 .put("from", "skill_listings")
-                .put("localField", "listingObjectId")
-                .put("foreignField", "_id")
+                .put("let", new JsonObject().put("lId", "$listingId"))
+                .put("pipeline", new JsonArray().add(new JsonObject().put("$match", new JsonObject().put("$expr", new JsonObject().put("$eq", new JsonArray().add(new JsonObject().put("$toString", "$_id")).add("$$lId"))))))
                 .put("as", "listing")
             ))
             .add(new JsonObject().put("$unwind", new JsonObject()
