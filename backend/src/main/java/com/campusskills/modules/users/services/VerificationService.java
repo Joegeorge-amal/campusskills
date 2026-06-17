@@ -175,7 +175,7 @@ public class VerificationService {
     private Future<Void> updateUserProfile(String userId, String skill) {
         JsonObject query = new JsonObject().put("userId", userId);
         JsonObject update = new JsonObject().put("$addToSet", new JsonObject().put("verifiedSkills", skill));
-        return mongoClient.updateCollection("users", query, update).mapEmpty();
+        return mongoClient.updateCollection("user_profiles", query, update).mapEmpty();
     }
 
     public Future<List<SkillVerification>> getMyRequests(String userId) {

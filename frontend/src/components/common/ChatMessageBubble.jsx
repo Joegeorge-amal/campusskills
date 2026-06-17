@@ -136,11 +136,11 @@ const ChatMessageBubble = ({
     
     return (
       <span className="msg-status">
-        {status === 'sending' && <Clock size={10} color="#cbd5e1" />}
-        {status === 'sent' && <Check size={12} color="#cbd5e1" />}
-        {status === 'delivered' && <CheckCheck size={12} color="#cbd5e1" />}
-        {status === 'read' && <CheckCheck size={12} className="msg-status-read" />}
-        {status === 'failed' && <AlertCircle size={12} className="msg-status-failed" />}
+        {status === 'sending' && <Clock size={10} color="#94a3b8" />}
+        {status === 'sent' && <Check size={12} color="#94a3b8" />}
+        {status === 'delivered' && <CheckCheck size={12} color="#94a3b8" />}
+        {status === 'read' && <CheckCheck size={12} color="#3b82f6" />}
+        {status === 'failed' && <AlertCircle size={12} color="#ef4444" />}
       </span>
     );
   };

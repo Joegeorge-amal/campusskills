@@ -226,7 +226,15 @@ const Messages = () => {
         const chatMsgs = prev[chatId] || [];
         return {
           ...prev,
-          [chatId]: chatMsgs.map(m => m._id === messageId || m.id === messageId ? { ...m, isDelivered: true, status: m.isRead ? 'read' : 'delivered' } : m)
+          [chatId]: chatMsgs.map(m => {
+            const matches = messageId ? (m._id === messageId || m.id === messageId) : true;
+            if (!matches) return m;
+            return {
+              ...m,
+              isDelivered: true,
+              status: m.isRead ? 'read' : 'delivered'
+            };
+          })
         };
       });
     } else if (type === 'MESSAGE_READ') {
@@ -242,7 +250,7 @@ const Messages = () => {
               ...m,
               isRead: true,
               isDelivered: true,
-              status: m.isDelivered ? 'read' : m.status
+              status: 'read'
             };
           })
         };
