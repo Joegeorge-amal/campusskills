@@ -19,6 +19,7 @@ public class SessionRouter {
         router.post("/:sessionId/reschedule/propose").handler(handler::proposeReschedule);
         router.post("/:sessionId/reschedule/respond").handler(handler::respondToReschedule);
         router.post("/:sessionId/pay").handler(handler::markPaid);
+        router.post("/:sessionId/pay/confirm").handler(handler::confirmPayment);
         router.get("/:sessionId/payment-info").handler(handler::getPaymentInfo);
         router.post("/:sessionId/cancel").handler(handler::cancelSession);
 

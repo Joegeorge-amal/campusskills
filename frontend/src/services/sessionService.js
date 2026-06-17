@@ -41,6 +41,11 @@ export const sessionService = {
     return response.data;
   },
 
+  confirmPayment: async (sessionId) => {
+    const response = await api.post(`/sessions/${sessionId}/pay/confirm`);
+    return response.data;
+  },
+
   getPaymentInfo: async (sessionId) => {
     const response = await api.get(`/sessions/${sessionId}/payment-info`);
     return response.data;
