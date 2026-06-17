@@ -1,25 +1,31 @@
 package com.campusskills.modules.users.handlers;
 
+import java.util.List;
 import com.campusskills.modules.users.repositories.UserProfileRepository;
+import com.campusskills.modules.sessions.models.Session;
 import com.campusskills.web.response.ApiResponse;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
 import com.campusskills.modules.users.repositories.UserStatsRepository;
+import com.campusskills.modules.sessions.repositories.SessionRepository;
 import com.campusskills.modules.listings.repositories.ListingRepository;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonArray;
+import io.vertx.core.CompositeFuture;
 
 public class ProfileHandler {
 
     private final UserProfileRepository userProfileRepository;
     private final UserStatsRepository userStatsRepository;
     private final ListingRepository listingRepository;
+    private final SessionRepository sessionRepository;
 
-    public ProfileHandler(UserProfileRepository userProfileRepository, UserStatsRepository userStatsRepository, ListingRepository listingRepository) {
+    public ProfileHandler(UserProfileRepository userProfileRepository, UserStatsRepository userStatsRepository, ListingRepository listingRepository, SessionRepository sessionRepository) {
         this.userProfileRepository = userProfileRepository;
         this.userStatsRepository = userStatsRepository;
         this.listingRepository = listingRepository;
+        this.sessionRepository = sessionRepository;
     }
 
     public void getPublicProfile(RoutingContext ctx) {
@@ -84,35 +90,60 @@ public class ProfileHandler {
             return;
         }
 
-        userProfileRepository.findByUserId(userId)
-            .compose(profile -> {
-                if (profile == null) {
-                    return Future.failedFuture("PROFILE_NOT_FOUND");
-                }
+        Future<UserProfile> profileFut = userProfileRepository.findByUserId(userId);
+        Future<JsonObject> statsFut = userStatsRepository.findByUserId(userId)
+            .map(stats -> stats != null ? JsonObject.mapFrom(stats) : new JsonObject());
+        Future<List<Session>> sessionsFut = sessionRepository.findCompletedSessionsByUser(userId);
 
-                JsonObject json = JsonObject.mapFrom(profile);
-                json.remove("_id");
-
-                com.campusskills.modules.users.repositories.SkillVerificationRepository verifRepo =
-                    new com.campusskills.modules.users.repositories.SkillVerificationRepository();
-                return verifRepo.findByUserId(userId).map(verifications -> {
-                    JsonObject scores = new JsonObject();
-                    for (com.campusskills.modules.users.models.SkillVerification v : verifications) {
-                        if (v.getPassed() != null && v.getPassed() && v.getConfidenceScore() != null) {
-                            String skill = v.getSkill();
-                            Double existing = scores.getDouble(skill);
-                            if (existing == null || v.getConfidenceScore() > existing) {
-                                scores.put(skill, v.getConfidenceScore());
-                            }
-                        }
+        com.campusskills.modules.users.repositories.SkillVerificationRepository verifRepo =
+            new com.campusskills.modules.users.repositories.SkillVerificationRepository();
+        Future<JsonObject> verifFut = verifRepo.findByUserId(userId).map(verifications -> {
+            JsonObject scores = new JsonObject();
+            for (com.campusskills.modules.users.models.SkillVerification v : verifications) {
+                if (v.getPassed() != null && v.getPassed() && v.getConfidenceScore() != null) {
+                    String skill = v.getSkill();
+                    Double existing = scores.getDouble(skill);
+                    if (existing == null || v.getConfidenceScore() > existing) {
+                        scores.put(skill, v.getConfidenceScore());
                     }
-                    json.put("verificationScores", scores);
-                    return json;
-                });
-            })
+                }
+            }
+            return scores;
+        });
+
+        Future.all(profileFut, statsFut, verifFut, sessionsFut).map(composite -> {
+            UserProfile profile = profileFut.result();
+            if (profile == null) {
+                throw new RuntimeException("PROFILE_NOT_FOUND");
+            }
+
+            List<Session> completedSessions = sessionsFut.result();
+            int actualCount = completedSessions != null ? completedSessions.size() : 0;
+            long actualMinutes = 0;
+            if (completedSessions != null) {
+                for (Session s : completedSessions) {
+                    if (s.getScheduledEnd() != null && s.getScheduledStart() != null) {
+                        actualMinutes += (s.getScheduledEnd() - s.getScheduledStart()) / 60000;
+                    }
+                }
+            }
+
+            JsonObject statsJson = statsFut.result();
+            statsJson.put("sessionsCompleted", actualCount);
+            statsJson.put("totalMinutes", (int) actualMinutes);
+
+            JsonObject profileJson = JsonObject.mapFrom(profile);
+            profileJson.remove("_id");
+            profileJson.put("verificationScores", verifFut.result());
+
+            return new JsonObject()
+                .put("user", new JsonObject().put("userId", userId))
+                .put("profile", profileJson)
+                .put("stats", statsJson);
+        })
             .onSuccess(json -> ApiResponse.ok(ctx, json))
             .onFailure(err -> {
-                if ("PROFILE_NOT_FOUND".equals(err.getMessage())) {
+                if ("PROFILE_NOT_FOUND".equals(err.getMessage()) || "PROFILE_NOT_FOUND".equals(err.getCause() != null ? err.getCause().getMessage() : null)) {
                     ApiResponse.notFound(ctx, "Profile not found");
                 } else {
                     ApiResponse.internalError(ctx, err.getMessage());

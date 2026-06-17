@@ -20,7 +20,8 @@ const StatsCards = ({ user, stats }) => {
 
   const rating = stats?.ratingAvg || stats?.averageRating || 0;
   const sessionsDone = stats?.sessionsCompleted || stats?.totalSessionsCompleted || 0;
-  const hoursDone = stats?.totalHours || sessionsDone || 0;
+  const totalMinutes = stats?.totalMinutes || 0;
+  const hoursDone = totalMinutes > 0 ? (totalMinutes / 60).toFixed(1) : '0.0';
   
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
@@ -41,7 +42,7 @@ const StatsCards = ({ user, stats }) => {
       </div>
       <div className="glossy-card" style={cardStyle}>
         <div style={{ fontSize: '13px', color: '#6b7280', fontWeight: 600, marginBottom: '8px' }}>Hours</div>
-        <div style={{ fontSize: '24px', fontWeight: 800, color: '#111827' }}>{stats?.totalHours || 0}<span style={{ fontSize: '14px', color: '#6b7280', fontWeight: 600, marginLeft: '4px' }}>hrs</span></div>
+        <div style={{ fontSize: '24px', fontWeight: 800, color: '#111827' }}>{hoursDone}<span style={{ fontSize: '14px', color: '#6b7280', fontWeight: 600, marginLeft: '4px' }}>hrs</span></div>
       </div>
       <div className="glossy-card" style={{ ...cardStyle, background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>

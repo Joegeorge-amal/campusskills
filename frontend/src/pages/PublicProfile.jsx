@@ -52,6 +52,7 @@ const PublicProfile = () => {
       if (data.ratingAvg !== undefined) next.ratingAvg = data.ratingAvg;
       if (data.ratingCount !== undefined) next.ratingCount = data.ratingCount;
       if (data.sessionsCompleted !== undefined) next.sessionsCompleted = data.sessionsCompleted;
+      if (data.totalMinutes !== undefined) next.totalMinutes = data.totalMinutes;
       return next;
     });
 

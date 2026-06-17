@@ -15,6 +15,7 @@ public class UserStats {
     private Integer ratingCount;
     private Integer sessionsCompleted;
     private Integer sessionsAttended;
+    private Integer totalMinutes = 0;
     private Long createdAt;
     private Long updatedAt;
     private Map<String, Integer> dailyActivityCounts = new HashMap<>();
@@ -38,6 +39,9 @@ public class UserStats {
 
     public Integer getSessionsAttended() { return sessionsAttended; }
     public void setSessionsAttended(Integer sessionsAttended) { this.sessionsAttended = sessionsAttended; }
+
+    public Integer getTotalMinutes() { return totalMinutes; }
+    public void setTotalMinutes(Integer totalMinutes) { this.totalMinutes = totalMinutes; }
 
     public Long getCreatedAt() { return createdAt; }
     public void setCreatedAt(Long createdAt) { this.createdAt = createdAt; }
