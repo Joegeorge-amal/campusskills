@@ -39,7 +39,7 @@ public class JwtAuthMiddleware {
                                 return;
                             }
                             
-                            if (foundUser.containsKey("isActive") && !foundUser.getBoolean("isActive", true)) {
+                            if (foundUser.getIsActive() != null && !foundUser.getIsActive()) {
                                 ctx.response().setStatusCode(403).putHeader("content-type", "application/json").end(new JsonObject().put("error", "Your account has been suspended").encode());
                                 return;
                             }
@@ -90,7 +90,7 @@ public class JwtAuthMiddleware {
                     userRepository.findById(userId)
                         .onSuccess(foundUser -> {
                             if (foundUser != null) {
-                                if (foundUser.containsKey("isActive") && !foundUser.getBoolean("isActive", true)) {
+                                if (foundUser.getIsActive() != null && !foundUser.getIsActive()) {
                                     // User is suspended, treat as unauthenticated for optional endpoints
                                 } else {
                                     ctx.put("authenticatedUserId", userId);
