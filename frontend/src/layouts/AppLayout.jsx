@@ -50,8 +50,6 @@ const AppLayout = () => {
       config.showSearch = false;
     } else if (path.includes('/app/marketplace')) {
       config.showSearch = true;
-    } else if (path.includes('/app/sessions')) {
-      config.chips = ['All', 'Upcoming', 'Completed', 'Cancelled'];
     }
     
     // Set default active chip

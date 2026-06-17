@@ -16,11 +16,13 @@ import { userService } from '../services/userService';
 import { listingService } from '../services/listingService';
 import { getTopics } from '../services/topicService';
 import { chatService } from '../services/chatService';
+import { chatRequestService } from '../services/chatRequestService';
+import InitialMessageModal from '../components/modals/InitialMessageModal';
 
 const PublicProfile = () => {
   const { rollNo } = useParams();
   const navigate = useNavigate();
-  const { triggerToast } = useAppData();
+  const { chats, triggerToast } = useAppData();
   const { user: currentUser } = useAuth();
 
   const [loading, setLoading] = useState(true);
@@ -31,20 +33,20 @@ const PublicProfile = () => {
   const [topicMap, setTopicMap] = useState({});
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isChatting, setIsChatting] = useState(false);
+  const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
 
-  const handleChatClick = async () => {
+  const handleChatClick = () => {
     if (!profileData?.userId) return;
-    setIsChatting(true);
-    try {
-      const res = await chatService.createChat({ participants: [profileData.userId] });
-      const chatId = res.id || res._id;
-      navigate(`/app/messages/${chatId}`);
-    } catch (err) {
-      triggerToast('Failed to start chat. Please try again later.');
-    } finally {
-      setIsChatting(false);
+    
+    // Check if an active chat already exists
+    const existingChat = chats.find(c => c.otherUser?.userId === profileData.userId || c.userId === profileData.userId);
+    if (existingChat) {
+      navigate(`/app/messages/${existingChat.id || existingChat._id}`);
+      return;
     }
+    
+    // Otherwise open request modal
+    setIsMessageModalOpen(true);
   };
 
   const handleBlockUser = async () => {
@@ -68,15 +70,14 @@ const PublicProfile = () => {
     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', position: 'relative' }}>
       <button 
         onClick={handleChatClick}
-        disabled={isChatting}
         style={{ 
           background: '#2563eb', color: '#fff', border: 'none', 
           padding: '8px 16px', borderRadius: '8px', fontWeight: 600, 
-          cursor: isChatting ? 'not-allowed' : 'pointer', display: 'flex', 
-          alignItems: 'center', gap: '6px', opacity: isChatting ? 0.7 : 1
+          cursor: 'pointer', display: 'flex', 
+          alignItems: 'center', gap: '6px'
         }}
       >
-        <IconMessageCircle size={18} /> {isChatting ? 'Starting...' : 'Chat with User'}
+        <IconMessageCircle size={18} /> Chat with User
       </button>
 
       <button 
@@ -279,6 +280,33 @@ const PublicProfile = () => {
         onClose={() => setIsReportModalOpen(false)} 
         userName={profileData.name} 
       />
+
+      {isMessageModalOpen && (
+        <InitialMessageModal 
+          selectedTutor={profileData?.name || 'Unknown User'}
+          onClose={() => setIsMessageModalOpen(false)}
+          onSend={async (messageText) => {
+            try {
+              await chatRequestService.createRequest({
+                receiverId: profileData.userId,
+                message: messageText
+              });
+              triggerToast('Message request sent successfully!');
+            } catch (err) {
+              const serverError = err.response?.data?.error || err.message || '';
+              if (serverError.includes('FORBIDDEN')) {
+                triggerToast('Cannot send message request to this user.');
+              } else if (serverError.includes('already pending')) {
+                 triggerToast('A message request already exists.');
+              } else if (serverError.includes('already have an active chat')) {
+                 triggerToast('You already have an active chat with this user.');
+              } else {
+                 triggerToast(serverError || 'Failed to send request.');
+              }
+            }
+          }}
+        />
+      )}
     </div>
   );
 };
