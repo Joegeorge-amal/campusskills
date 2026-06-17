@@ -204,7 +204,8 @@ const PublicProfile = () => {
     };
 
     fetchData();
-  }, [rollNo, navigate, triggerToast]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rollNo, navigate]);
 
   if (loading || !profileData) {
     return (
