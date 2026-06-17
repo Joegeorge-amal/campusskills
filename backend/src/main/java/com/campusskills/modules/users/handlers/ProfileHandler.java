@@ -85,18 +85,39 @@ public class ProfileHandler {
         }
 
         userProfileRepository.findByUserId(userId)
-            .onSuccess(profile -> {
+            .compose(profile -> {
                 if (profile == null) {
-                    ApiResponse.notFound(ctx, "Profile not found");
-                    return;
+                    return Future.failedFuture("PROFILE_NOT_FOUND");
                 }
 
                 JsonObject json = JsonObject.mapFrom(profile);
                 json.remove("_id");
 
-                ApiResponse.ok(ctx, json);
+                com.campusskills.modules.users.repositories.SkillVerificationRepository verifRepo =
+                    new com.campusskills.modules.users.repositories.SkillVerificationRepository();
+                return verifRepo.findByUserId(userId).map(verifications -> {
+                    JsonObject scores = new JsonObject();
+                    for (com.campusskills.modules.users.models.SkillVerification v : verifications) {
+                        if (v.getPassed() != null && v.getPassed() && v.getConfidenceScore() != null) {
+                            String skill = v.getSkill();
+                            Double existing = scores.getDouble(skill);
+                            if (existing == null || v.getConfidenceScore() > existing) {
+                                scores.put(skill, v.getConfidenceScore());
+                            }
+                        }
+                    }
+                    json.put("verificationScores", scores);
+                    return json;
+                });
             })
-            .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
+            .onSuccess(json -> ApiResponse.ok(ctx, json))
+            .onFailure(err -> {
+                if ("PROFILE_NOT_FOUND".equals(err.getMessage())) {
+                    ApiResponse.notFound(ctx, "Profile not found");
+                } else {
+                    ApiResponse.internalError(ctx, err.getMessage());
+                }
+            });
     }
 
     public void updateMe(RoutingContext ctx) {
