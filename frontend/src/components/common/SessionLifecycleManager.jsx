@@ -5,6 +5,7 @@ import { sessionService } from '../../services/sessionService';
 import GlobalNotificationPopup from './GlobalNotificationPopup';
 import ReviewModal from '../modals/ReviewModal';
 import ConfirmModal from '../modals/ConfirmModal';
+import PaymentModal from '../modals/PaymentModal';
 
 const SessionLifecycleManager = () => {
   const { user } = useAuth();
@@ -280,14 +281,11 @@ const SessionLifecycleManager = () => {
       )}
 
       {activePopup && activePopup.type === 'PAYMENT_NEEDED' && (
-        <ConfirmModal
+        <PaymentModal
           isOpen={true}
-          title="Payment Required"
-          message={`Session completed successfully. Please navigate to the Sessions tab to view UPI details and submit your payment for "${activePopup.session.topic}".`}
-          confirmText="I've Paid"
-          cancelText="Later"
-          onConfirm={() => handleMarkPaid(activePopup.session.id)}
+          session={activePopup.session}
           onClose={() => setActivePopup(null)}
+          onMarkPaid={handleMarkPaid}
         />
       )}
 
