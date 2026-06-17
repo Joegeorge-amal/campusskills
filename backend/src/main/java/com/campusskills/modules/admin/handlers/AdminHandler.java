@@ -152,8 +152,8 @@ public class AdminHandler {
 
     public void forceCompleteSession(RoutingContext ctx) {
         String id = ctx.pathParam("id");
-        JsonObject user = ctx.get("user");
-        String adminId = user.getString("userId");
+        com.campusskills.modules.users.models.User user = ctx.get("user");
+        String adminId = user.getId();
 
         adminService.forceCompleteSession(id, adminId)
             .onSuccess(success -> ApiResponse.ok(ctx, new JsonObject().put("success", success).put("message", "Session forcefully completed")))
@@ -336,8 +336,8 @@ public class AdminHandler {
             return;
         }
 
-        JsonObject user = ctx.get("user");
-        String updatedBy = user != null ? user.getString("id") : "system";
+        com.campusskills.modules.users.models.User user = ctx.get("user");
+        String updatedBy = user != null ? user.getId() : "system";
 
         adminService.updateSettings(body, updatedBy)
             .onSuccess(data -> ApiResponse.ok(ctx, data))
