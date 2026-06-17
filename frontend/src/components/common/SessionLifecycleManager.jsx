@@ -20,6 +20,61 @@ const SessionLifecycleManager = () => {
   const [activePopup, setActivePopup] = useState(null);
   const [reviewModalData, setReviewModalData] = useState(null);
 
+  // Monitor for pending states on load or data refresh (handles reloads where WS events are lost)
+  useEffect(() => {
+    if (!sessionsData || !user?.userId) return;
+
+    // Check for COMPLETION_REQUESTED
+    const pendingCompletion = sessionsData.find(s => {
+      if (s.status !== 'SCHEDULED') return false;
+      const isTeacher = s.rawSession.teacherId === user.userId;
+      const isStudent = s.rawSession.studentId === user.userId;
+      const tConf = s.rawSession.teacherConfirmedCompletion;
+      const sConf = s.rawSession.studentConfirmedCompletion;
+      
+      // If the OTHER person confirmed but WE haven't
+      if (isTeacher && sConf && !tConf) return true;
+      if (isStudent && tConf && !sConf) return true;
+      return false;
+    });
+
+    if (pendingCompletion) {
+      setActivePopup({
+        type: 'COMPLETION_REQUESTED',
+        session: { id: pendingCompletion.id, topic: pendingCompletion.topic }
+      });
+      return;
+    }
+
+    // Check for PAYMENT_NEEDED (Student) or PAYMENT_SUBMITTED_TEACHER (Teacher)
+    const pendingPayment = sessionsData.find(s => {
+      if (s.status !== 'COMPLETED' || !!s.rawSession.swapGroupId) return false;
+      const isTeacher = s.rawSession.teacherId === user.userId;
+      const isStudent = s.rawSession.studentId === user.userId;
+      
+      if (isStudent && !s.rawSession.studentMarkedPaid) return true; // Student needs to pay
+      if (isTeacher && s.rawSession.studentMarkedPaid && !s.rawSession.teacherConfirmedPayment) return true; // Teacher needs to verify
+      return false;
+    });
+
+    if (pendingPayment) {
+      const isTeacher = pendingPayment.rawSession.teacherId === user.userId;
+      if (isTeacher) {
+        setActivePopup({
+          type: 'PAYMENT_SUBMITTED_TEACHER',
+          session: { id: pendingPayment.id, topic: pendingPayment.topic, studentName: pendingPayment.rawSession.studentName }
+        });
+      } else {
+        setActivePopup({
+          type: 'PAYMENT_NEEDED',
+          session: { id: pendingPayment.id, topic: pendingPayment.topic }
+        });
+      }
+      return;
+    }
+
+  }, [sessionsData, user]);
+
   // Monitor for 'Session End Reached' locally since backend doesn't broadcast it currently
   useEffect(() => {
     if (!sessionsData || !user?.userId) return;

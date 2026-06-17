@@ -121,7 +121,7 @@ public class SessionService {
                             createAndBroadcastSystemMessage(session.getChatId(), "{marker} marked this session as completed.", sessionId, userId, null, null);
                         });
                     }
-                    com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent(com.campusskills.shared.constants.WebSocketEventType.COMPLETION_REQUESTED, session);
+                    com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent(com.campusskills.shared.constants.WebSocketEventType.COMPLETION_REQUESTED, updatedSession);
                     profileRepository.findByUserId(userId).onSuccess(profile -> {
                         String name = (profile != null) ? profile.getName() : "Someone";
                         String otherUserId = userId.equals(session.getTeacherId()) ? session.getStudentId() : session.getTeacherId();
