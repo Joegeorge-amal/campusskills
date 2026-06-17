@@ -1,6 +1,7 @@
 package com.campusskills.modules.users.handlers;
 
 import java.util.List;
+import com.campusskills.modules.users.models.UserProfile;
 import com.campusskills.modules.users.repositories.UserProfileRepository;
 import com.campusskills.modules.sessions.models.Session;
 import com.campusskills.web.response.ApiResponse;
