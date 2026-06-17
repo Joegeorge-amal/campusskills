@@ -39,6 +39,11 @@ public class JwtAuthMiddleware {
                                 return;
                             }
                             
+                            if (foundUser.containsKey("isActive") && !foundUser.getBoolean("isActive", true)) {
+                                ctx.response().setStatusCode(403).putHeader("content-type", "application/json").end(new JsonObject().put("error", "Your account has been suspended").encode());
+                                return;
+                            }
+                            
                             ctx.put("authenticatedUserId", userId);
                             if (role != null) {
                                 ctx.put("authenticatedUserRole", role);
@@ -85,14 +90,18 @@ public class JwtAuthMiddleware {
                     userRepository.findById(userId)
                         .onSuccess(foundUser -> {
                             if (foundUser != null) {
-                                ctx.put("authenticatedUserId", userId);
-                                if (role != null) {
-                                    ctx.put("authenticatedUserRole", role);
+                                if (foundUser.containsKey("isActive") && !foundUser.getBoolean("isActive", true)) {
+                                    // User is suspended, treat as unauthenticated for optional endpoints
+                                } else {
+                                    ctx.put("authenticatedUserId", userId);
+                                    if (role != null) {
+                                        ctx.put("authenticatedUserRole", role);
+                                    }
+                                    if (principal.containsKey("twoFactorVerified")) {
+                                        ctx.put("twoFactorVerified", principal.getBoolean("twoFactorVerified"));
+                                    }
+                                    ctx.put("user", foundUser);
                                 }
-                                if (principal.containsKey("twoFactorVerified")) {
-                                    ctx.put("twoFactorVerified", principal.getBoolean("twoFactorVerified"));
-                                }
-                                ctx.put("user", foundUser);
                             }
                             ctx.next();
                         })

@@ -53,6 +53,8 @@ public class AuthHandler {
                 .onFailure(err -> {
                     if ("INVALID_CREDENTIALS".equals(err.getMessage())) {
                         ApiResponse.sendError(ctx, 401, "Invalid email or password");
+                    } else if ("ACCOUNT_SUSPENDED".equals(err.getMessage())) {
+                        ApiResponse.sendError(ctx, 403, "Your account has been suspended. Please contact an administrator.");
                     } else {
                         ApiResponse.badRequest(ctx, err.getMessage());
                     }
