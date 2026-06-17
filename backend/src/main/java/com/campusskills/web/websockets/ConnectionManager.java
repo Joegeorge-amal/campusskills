@@ -22,13 +22,23 @@ public class ConnectionManager {
     private static final ConcurrentHashMap<String, UserConnection> connections = new ConcurrentHashMap<>();
 
     public static void addConnection(String userId, String role, ServerWebSocket ws) {
-        connections.put(userId, new UserConnection(userId, role, ws));
+        // Atomically replace and close any previous connection for this user.
+        // Prevents multiple sockets per user and ensures stale sockets are cleaned up.
+        UserConnection old = connections.put(userId, new UserConnection(userId, role, ws));
+        if (old != null && !old.socket.isClosed()) {
+            old.socket.close();
+        }
     }
 
     public static void removeConnection(String userId) {
         if (userId != null) {
             connections.remove(userId);
         }
+    }
+
+    public static UserConnection getConnection(String userId) {
+        if (userId == null) return null;
+        return connections.get(userId);
     }
 
     public static boolean isUserOnline(String userId) {
