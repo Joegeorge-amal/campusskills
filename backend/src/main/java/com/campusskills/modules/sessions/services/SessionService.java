@@ -102,14 +102,14 @@ public class SessionService {
                                 String studentName = studentProfile != null ? studentProfile.getName() : "Student";
                                 String topic = session.getTopic() != null ? session.getTopic() : "Session";
                                 
-                                String msgToTeacher = topic + " Session with " + studentName + " was completed.";
-                                String msgToStudent = topic + " Session with " + teacherName + " was completed.";
+                                String msgToTeacher = topic + " Session with " + studentName + " was completed.\nPayment is pending from " + studentName + ".";
+                                String msgToStudent = topic + " Session with " + teacherName + " was completed.\nPlease complete payment.";
                                 
                                 sendNotification(session.getTeacherId(), com.campusskills.shared.constants.NotificationType.SESSION_COMPLETED, "Session Completed", msgToTeacher, "SESSION", sessionId);
                                 sendNotification(session.getStudentId(), com.campusskills.shared.constants.NotificationType.SESSION_COMPLETED, "Session Completed", msgToStudent, "SESSION", sessionId);
                                 statsRepository.recordActivity(session.getTeacherId());
                                 statsRepository.recordActivity(session.getStudentId());
-                                emitSessionEvent(sessionId, "SESSION_COMPLETED", null);
+                                com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent(com.campusskills.shared.constants.WebSocketEventType.SESSION_BOTH_CONFIRMED, updatedSession);
                                 return Future.succeededFuture();
                             });
                         });
@@ -121,7 +121,13 @@ public class SessionService {
                             createAndBroadcastSystemMessage(session.getChatId(), "{marker} marked this session as completed.", sessionId, userId, null, null);
                         });
                     }
-                    emitSessionEvent(sessionId, "COMPLETION_REQUESTED", new JsonObject().put("requestedBy", userId));
+                    com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent(com.campusskills.shared.constants.WebSocketEventType.COMPLETION_REQUESTED, session);
+                    profileRepository.findByUserId(userId).onSuccess(profile -> {
+                        String name = (profile != null) ? profile.getName() : "Someone";
+                        String otherUserId = userId.equals(session.getTeacherId()) ? session.getStudentId() : session.getTeacherId();
+                        String topic = session.getTopic() != null ? session.getTopic() : "Session";
+                        sendNotification(otherUserId, com.campusskills.shared.constants.NotificationType.COMPLETION_REQUESTED, "Completion Requested", name + " marked " + topic + " as completed.\nPlease confirm.", "SESSION", sessionId);
+                    });
                     return Future.succeededFuture();
                 }
             });
@@ -191,8 +197,41 @@ public class SessionService {
             }
 
             JsonObject updates = new JsonObject().put("studentMarkedPaid", true);
-            return repository.updateSessionFields(sessionId, updates).onSuccess(v -> {
-                emitSessionEvent(sessionId, "MARKED_PAID", null);
+            return repository.updateSessionFields(sessionId, updates).compose(v -> repository.getSessionById(sessionId)).onSuccess(updatedSession -> {
+                com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent(com.campusskills.shared.constants.WebSocketEventType.PAYMENT_SUBMITTED, updatedSession);
+                profileRepository.findByUserId(session.getTeacherId()).onSuccess(profile -> {
+                    String studentName = profile != null ? profile.getName() : "Student";
+                    String topic = session.getTopic() != null ? session.getTopic() : "Session";
+                    sendNotification(session.getTeacherId(), com.campusskills.shared.constants.NotificationType.MARKED_PAID, "Payment Claimed", studentName + " claims payment for " + topic + ".\nDid you receive it?", "SESSION", sessionId);
+                });
+            }).mapEmpty();
+        });
+    }
+
+    public Future<Void> confirmPayment(String sessionId, String userId) {
+        return repository.getSessionById(sessionId).compose(session -> {
+            if (session == null) return Future.failedFuture("Session not found");
+            if (!userId.equals(session.getTeacherId())) {
+                return Future.failedFuture("Only the teacher can confirm payment");
+            }
+            if (session.getStatus() != SessionStatus.COMPLETED) {
+                return Future.failedFuture("Session must be COMPLETED to confirm payment");
+            }
+            if (!Boolean.TRUE.equals(session.getStudentMarkedPaid())) {
+                return Future.failedFuture("Student has not marked payment yet");
+            }
+
+            JsonObject updates = new JsonObject().put("teacherConfirmedPayment", true);
+            return repository.updateSessionFields(sessionId, updates).compose(v -> repository.getSessionById(sessionId)).onSuccess(updatedSession -> {
+                com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent(com.campusskills.shared.constants.WebSocketEventType.PAYMENT_CONFIRMED, updatedSession);
+                profileRepository.findByUserId(session.getTeacherId()).onSuccess(teacherProfile -> {
+                    String teacherName = teacherProfile != null ? teacherProfile.getName() : "Teacher";
+                    String topic = session.getTopic() != null ? session.getTopic() : "Session";
+                    String msgToTeacher = "Payment confirmed for " + topic + ".\nPlease leave a review.";
+                    String msgToStudent = teacherName + " confirmed payment for " + topic + ".\nPlease leave a review.";
+                    sendNotification(session.getTeacherId(), com.campusskills.shared.constants.NotificationType.PAYMENT_CONFIRMED, "Payment Complete", msgToTeacher, "SESSION", sessionId);
+                    sendNotification(session.getStudentId(), com.campusskills.shared.constants.NotificationType.PAYMENT_CONFIRMED, "Payment Complete", msgToStudent, "SESSION", sessionId);
+                });
             }).mapEmpty();
         });
     }

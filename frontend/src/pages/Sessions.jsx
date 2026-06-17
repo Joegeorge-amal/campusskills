@@ -80,7 +80,7 @@ const BackloggdStarSelector = ({ value, onChange }) => {
 
 const Sessions = () => {
   const { user } = useAuth();
-  const { sessionsData, requestsData, isSessionsLoading, triggerToast, fetchInitialData, searchQuery } = useAppData();
+  const { sessionsData, requestsData, isSessionsLoading, triggerToast, fetchInitialData, searchQuery, sessionEvent, setSessionEvent } = useAppData();
   const [expandedSessionId, setExpandedSessionId] = useState(null);
   const [paymentInfos, setPaymentInfos] = useState({});
   const [loadingPaymentId, setLoadingPaymentId] = useState(null);
@@ -124,6 +124,63 @@ const Sessions = () => {
       }
     }
   }, [highlightedSessionId, sessionsData]);
+
+  // Auto-guide effect: react to session WS events with proactive modals
+  useEffect(() => {
+    if (!sessionEvent) return;
+    const raw = sessionEvent.session;
+    if (!raw) return;
+
+    const sessionId = raw._id || raw.id;
+    if (!sessionId) return;
+
+    // Auto-expand — find in local data first, fall back to raw id
+    const localSession = sessionsData.find(s => s.id === sessionId);
+    const myId = user?.userId;
+    if (!myId) return;
+
+    const isTeacher = raw.teacherId === myId;
+    const myRole = isTeacher ? 'Teaching' : 'Learning';
+
+    setExpandedSessionId(sessionId);
+
+    if (sessionEvent.type === 'SESSION_BOTH_CONFIRMED') {
+      setIsHistoryOpen(true);
+      triggerToast('Session completed! ' + (myRole === 'Learning' ? 'Please complete payment.' : 'Waiting for payment from student.'));
+    } else if (sessionEvent.type === 'PAYMENT_SUBMITTED') {
+      setIsHistoryOpen(true);
+      if (isTeacher) {
+        triggerToast('Payment claimed by ' + (raw.studentName || 'student') + '. Please confirm receipt.');
+      } else {
+        triggerToast('Payment submitted. Waiting for teacher to confirm.');
+      }
+    } else if (sessionEvent.type === 'PAYMENT_CONFIRMED') {
+      setIsHistoryOpen(true);
+      triggerToast('Payment confirmed! Please leave a review.');
+      // Build a stub session object for the review modal
+      const stubSession = localSession || {
+        id: sessionId,
+        rawSession: raw,
+        topic: raw.topic || 'Skill Session',
+        name: isTeacher ? (raw.studentName || 'Student') : (raw.teacherName || 'Teacher'),
+        role: myRole,
+        status: 'COMPLETED'
+      };
+      setSelectedSessionForReview(stubSession);
+      setModalRating(5.0);
+      setModalComment('');
+      setReviewModalOpen(true);
+    } else if (sessionEvent.type === 'COMPLETION_REQUESTED') {
+      setIsHistoryOpen(true);
+      const requesterIsTeacher = raw.teacherConfirmedCompletion;
+      if ((myRole === 'Learning' && requesterIsTeacher) || (myRole === 'Teaching' && !requesterIsTeacher)) {
+        triggerToast('Session marked as completed. Please confirm.');
+      }
+    }
+
+    const timer = setTimeout(() => setSessionEvent(null), 500);
+    return () => clearTimeout(timer);
+  }, [sessionEvent, sessionsData, user, triggerToast, setSessionEvent]);
 
   // Reschedule Modal state
   const [rescheduleSession, setRescheduleSession] = useState(null);
@@ -609,14 +666,55 @@ const Sessions = () => {
                       </div>
                     )
                   ) : (
-                    // We are the teacher waiting for payment
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: s.rawSession.studentMarkedPaid ? '#059669' : '#b45309', fontSize: '13px', fontWeight: 600, marginBottom: '16px' }}>
-                      {s.rawSession.studentMarkedPaid ? (
-                        <><IconCheck size={18} /> Payment Completed by Student</>
-                      ) : (
-                        <>Waiting for student to mark session as paid</>
-                      )}
-                    </div>
+                    // We are the teacher
+                    s.rawSession.studentMarkedPaid && !s.rawSession.teacherConfirmedPayment ? (
+                      <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '12px', padding: '16px', marginBottom: '16px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#92400e', fontSize: '13px', fontWeight: 600, marginBottom: '12px' }}>
+                          <IconCheck size={18} /> {s.name} claims payment was made.
+                        </div>
+                        <div style={{ fontSize: '12px', color: '#92400e', marginBottom: '12px' }}>
+                          Did you receive the payment? Confirm only after verifying in your UPI app.
+                        </div>
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            onClick={async () => {
+                              try {
+                                setProcessingSessionId(s.id);
+                                setProcessingAction('confirmPayment');
+                                await sessionService.confirmPayment(s.id);
+                                triggerToast('Payment confirmed!');
+                                fetchInitialData();
+                              } catch (err) {
+                                triggerToast(err.message || 'Failed to confirm payment');
+                              } finally {
+                                setProcessingSessionId(null);
+                                setProcessingAction(null);
+                              }
+                            }}
+                            disabled={!!processingSessionId}
+                            style={{ flex: 1, padding: '10px', background: '#059669', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, fontSize: '13px', cursor: processingSessionId ? 'not-allowed' : 'pointer', opacity: processingSessionId ? 0.6 : 1 }}
+                          >
+                            {processingSessionId === s.id && processingAction === 'confirmPayment' ? 'Confirming...' : 'Yes, Received'}
+                          </button>
+                          <button
+                            onClick={() => handleReport(s.topic + ' · ' + s.name)}
+                            style={{ flex: 1, padding: '10px', background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca', borderRadius: '8px', fontWeight: 600, fontSize: '13px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
+                          >
+                            <IconFlag size={14} /> Raise Dispute
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: s.rawSession.teacherConfirmedPayment ? '#059669' : '#b45309', fontSize: '13px', fontWeight: 600, marginBottom: '16px' }}>
+                        {s.rawSession.teacherConfirmedPayment ? (
+                          <><IconCheck size={18} /> Payment Completed</>
+                        ) : s.rawSession.studentMarkedPaid ? (
+                          <><IconCheck size={18} /> Payment Completed by Student</>
+                        ) : (
+                          <>Waiting for student to mark session as paid</>
+                        )}
+                      </div>
+                    )
                   )
                 ) : null}
 

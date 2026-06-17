@@ -150,13 +150,13 @@ public class MessageBroadcaster {
         }
     }
 
-    public static void broadcastSessionEvent(String eventType, Session session) {
+    public static void broadcastSessionEvent(WebSocketEventType eventType, Session session) {
         try {
-            JsonObject event = new JsonObject()
-                    .put("type", eventType)
-                    .put("payload", JsonObject.mapFrom(session));
+            JsonObject event = new WebSocketMessageBuilder()
+                    .type(eventType)
+                    .payload(JsonObject.mapFrom(session))
+                    .build();
             
-            // Broadcast to teacher and student
             if (session.getTeacherId() != null) {
                 ConnectionManager.sendMessage(session.getTeacherId(), event);
             }

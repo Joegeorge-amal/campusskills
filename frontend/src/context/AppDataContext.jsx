@@ -27,6 +27,7 @@ export const AppDataProvider = ({ children }) => {
 
   const [notifications, setNotifications] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [sessionEvent, setSessionEvent] = useState(null);
 
   const triggerToast = (msg) => {
     setToastMessage(msg);
@@ -540,6 +541,17 @@ export const AppDataProvider = ({ children }) => {
       setChats(prevChats => prevChats.map(c => 
         (c.id === msg.chatId) ? { ...c, preview: c.preview } : c
       )); // Could update preview but keeping it simple for now
+    } else if (
+      lastMessage.type === 'SESSION_COMPLETED' ||
+      lastMessage.type === 'SESSION_BOTH_CONFIRMED' ||
+      lastMessage.type === 'COMPLETION_REQUESTED' ||
+      lastMessage.type === 'PAYMENT_SUBMITTED' ||
+      lastMessage.type === 'PAYMENT_CONFIRMED' ||
+      lastMessage.type === 'SESSION_UPDATE' ||
+      lastMessage.type === 'SESSION_BOOKED'
+    ) {
+      setSessionEvent({ type: lastMessage.type, session: lastMessage.payload });
+      fetchInitialData();
     }
   }, [lastMessage, user?.userId, fetchInitialData]);
 
@@ -569,7 +581,9 @@ export const AppDataProvider = ({ children }) => {
         unreadMessagesCount,
         pendingRequestsCount,
         searchQuery,
-        setSearchQuery
+        setSearchQuery,
+        sessionEvent,
+        setSessionEvent
       }}
     >
       {children}
