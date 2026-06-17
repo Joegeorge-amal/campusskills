@@ -78,6 +78,11 @@ const adminService = {
     return response.data;
   },
 
+  deleteNotification: async (id) => {
+    const response = await api.delete(`/admin/notifications/${id}`);
+    return response.data;
+  },
+
   getOverview: async () => {
     const response = await api.get('/admin/overview');
     return response.data;

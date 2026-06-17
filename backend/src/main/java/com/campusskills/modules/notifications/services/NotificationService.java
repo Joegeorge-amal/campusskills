@@ -103,4 +103,13 @@ public class NotificationService {
     public Future<Long> markAllAsRead(String userId) {
         return repository.markAllAsRead(userId);
     }
+
+    public Future<Boolean> deleteNotification(String notificationId, String userId) {
+        return repository.deleteNotification(notificationId, userId).compose(deleted -> {
+            if (deleted) {
+                return Future.succeededFuture(true);
+            }
+            return Future.failedFuture("NOTIFICATION_NOT_FOUND");
+        });
+    }
 }

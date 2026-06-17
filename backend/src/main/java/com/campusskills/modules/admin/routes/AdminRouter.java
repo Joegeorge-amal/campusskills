@@ -51,6 +51,7 @@ public class AdminRouter {
 
         router.get("/notifications").handler(handler::getNotifications);
         router.patch("/notifications/read").handler(handler::markNotificationsRead);
+        router.delete("/notifications/:id").handler(handler::deleteNotification);
 
         router.get("/settings").handler(handler::getSettings);
         router.put("/settings").handler(handler::updateSettings);

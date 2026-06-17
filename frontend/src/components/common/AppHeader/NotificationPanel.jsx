@@ -1,5 +1,5 @@
 import React from 'react';
-import { IconCheck, IconX, IconCalendarEvent, IconBell, IconMessage } from '@tabler/icons-react';
+import { IconCheck, IconX, IconCalendarEvent, IconBell, IconMessage, IconTrash } from '@tabler/icons-react';
 import './NotificationPanel.css';
 
 const getIconForType = (type) => {
@@ -41,7 +41,7 @@ const formatTimeAgo = (timestamp) => {
   return Math.floor(seconds) + " sec ago";
 };
 
-const NotificationPanel = ({ notifications, onClose, onMarkAllRead, onNotificationClick }) => {
+const NotificationPanel = ({ notifications, onClose, onMarkAllRead, onNotificationClick, onDeleteNotification }) => {
   const unreadCount = notifications.filter(n => n.isRead === false || n.read === false || n.unread === true).length;
 
   return (
@@ -93,6 +93,30 @@ const NotificationPanel = ({ notifications, onClose, onMarkAllRead, onNotificati
                         <span className="notif-time">{formatTimeAgo(notif.createdAt)}</span>
                       </div>
                     </div>
+                    {onDeleteNotification && (
+                      <button 
+                        className="notif-delete-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDeleteNotification(notif.id);
+                        }}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#9ca3af',
+                          cursor: 'pointer',
+                          padding: '4px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          borderRadius: '4px',
+                          marginLeft: '8px'
+                        }}
+                        title="Delete notification"
+                      >
+                        <IconTrash size={16} />
+                      </button>
+                    )}
                   </div>
                 );
               })}

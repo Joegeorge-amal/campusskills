@@ -24,7 +24,7 @@ public class AdminRepository {
         
         // 1. Initial Match (if status is provided, plus exclude ADMIN users)
         JsonObject matchStage = new JsonObject();
-        matchStage.put("role", new JsonObject().put("$ne", "ADMIN"));
+        matchStage.put("role", new JsonObject().put("$nin", new JsonArray().add("ADMIN").add("SUPER_ADMIN")));
         
         if (status != null && !status.trim().isEmpty()) {
             matchStage.put("isActive", "ACTIVE".equalsIgnoreCase(status.trim()));
@@ -53,7 +53,7 @@ public class AdminRepository {
         pipeline.add(new JsonObject().put("$lookup", new JsonObject()
             .put("from", "user_stats")
             .put("localField", "userIdStr")
-            .put("foreignField", "_id")
+            .put("foreignField", "userId")
             .put("as", "stats")
         ));
         pipeline.add(new JsonObject().put("$unwind", new JsonObject()
@@ -276,6 +276,10 @@ public class AdminRepository {
             pipeline.add(new JsonObject().put("$match", matchStage));
         }
 
+        pipeline.add(new JsonObject().put("$addFields", new JsonObject()
+            .put("idStr", new JsonObject().put("$toString", "$_id"))
+        ));
+
         // 2. Lookup user profiles for reporter
         pipeline.add(new JsonObject().put("$lookup", new JsonObject()
             .put("from", "user_profiles")
@@ -333,7 +337,7 @@ public class AdminRepository {
                     String reportedName = rptProfiles.isEmpty() ? "Unknown" : rptProfiles.getJsonObject(0).getString("name", "Unknown");
 
                     formattedData.add(new JsonObject()
-                        .put("id", d.getString("_id"))
+                        .put("id", d.getString("idStr", d.getString("_id")))
                         .put("status", d.getString("status", "OPEN"))
                         .put("reporterId", d.getString("reporterId"))
                         .put("reporterName", reporterName)
@@ -341,7 +345,7 @@ public class AdminRepository {
                         .put("reportedName", reportedName)
                         .put("sessionId", d.getString("sessionId"))
                         .put("reason", d.getString("reason", "Unknown Reason"))
-                        .put("details", d.getString("details", ""))
+                        .put("details", d.getString("description", ""))
                         .put("adminNotes", d.getString("adminNotes", ""))
                         .put("updatedAt", d.getLong("updatedAt"))
                         .put("createdAt", d.getLong("createdAt"))

@@ -102,6 +102,22 @@ const AdminNotifications = () => {
     }
   };
 
+  const handleDeleteNotification = async (id) => {
+    try {
+      await adminService.deleteNotification(id);
+      setNotifications(prev => prev.filter(n => n.id !== id));
+      setUnreadCount(prev => {
+        const notif = notifications.find(n => n.id === id);
+        if (notif && (!notif.isRead && !notif.read && !notif.unread)) {
+            return Math.max(0, prev - 1);
+        }
+        return prev;
+      });
+    } catch (err) {
+      console.error('Failed to delete notification', err);
+    }
+  };
+
   const getIcon = (type) => {
     switch (type) {
       case 'ADMIN_NEW_STUDENT': return <IconUsers size={16} color="#3b82f6" />;
@@ -211,6 +227,7 @@ const AdminNotifications = () => {
           notifications={notifications}
           onMarkRead={(id) => markAsRead(id, false)}
           onMarkAllRead={() => markAllRead()}
+          onDeleteNotification={handleDeleteNotification}
         />
       )}
     </div>

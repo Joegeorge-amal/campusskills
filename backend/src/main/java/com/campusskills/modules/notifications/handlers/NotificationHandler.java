@@ -107,4 +107,30 @@ public class NotificationHandler {
             })
             .onFailure(err -> ApiResponse.internalError(ctx, "Failed to mark all notifications as read: " + err.getMessage()));
     }
+
+    public void deleteNotification(RoutingContext ctx) {
+        String authId = ctx.get("authenticatedUserId");
+        if (authId == null) {
+            ApiResponse.forbidden(ctx, "Unauthorized");
+            return;
+        }
+
+        String notificationId = ctx.pathParam("id");
+        if (notificationId == null || notificationId.trim().isEmpty()) {
+            ApiResponse.badRequest(ctx, "Notification ID is required");
+            return;
+        }
+
+        notificationService.deleteNotification(notificationId, authId)
+            .onSuccess(v -> {
+                ApiResponse.ok(ctx, new JsonObject().put("message", "Notification deleted"));
+            })
+            .onFailure(err -> {
+                if ("NOTIFICATION_NOT_FOUND".equals(err.getMessage())) {
+                    ApiResponse.notFound(ctx, "Notification not found or unauthorized");
+                } else {
+                    ApiResponse.internalError(ctx, "Failed to delete notification: " + err.getMessage());
+                }
+            });
+    }
 }
