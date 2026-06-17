@@ -18,13 +18,15 @@ const StatsCards = ({ user, stats }) => {
     return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   };
 
-  const rating = stats?.averageRating || 0;
+  const rating = stats?.ratingAvg || stats?.averageRating || 0;
+  const sessionsDone = stats?.sessionsCompleted || stats?.totalSessionsCompleted || 0;
+  const hoursDone = stats?.totalHours || sessionsDone || 0;
   
   return (
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
       <div className="glossy-card" style={cardStyle}>
         <div style={{ fontSize: '13px', color: '#6b7280', fontWeight: 600, marginBottom: '8px' }}>Sessions</div>
-        <div style={{ fontSize: '24px', fontWeight: 800, color: '#111827' }}>{stats?.totalSessionsCompleted || 0}</div>
+        <div style={{ fontSize: '24px', fontWeight: 800, color: '#111827' }}>{sessionsDone}</div>
       </div>
       <div className="glossy-card" style={cardStyle}>
         <div style={{ fontSize: '13px', color: '#6b7280', fontWeight: 600, marginBottom: '8px' }}>Rating</div>
