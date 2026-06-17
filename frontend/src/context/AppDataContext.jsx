@@ -365,7 +365,7 @@ export const AppDataProvider = ({ children }) => {
     }
   }, [user, fetchInitialData]);
 
-  const { lastMessage } = useWebSocket();
+  const { lastMessage, sendMessage } = useWebSocket();
 
   const processedMessageRef = useRef(null);
 
