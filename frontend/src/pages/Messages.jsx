@@ -702,8 +702,8 @@ const Messages = () => {
                   <Avatar initials={activeChat.init} bg={activeChat.bg} color={activeChat.col} backgroundImage={activeChat.avatar} size="36px" fontSize="14px" />
                   <div>
                     <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--cs-text-main)' }}>{activeChat.name}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--cs-text-inactive)', marginTop: '2px' }}>
-                      {isOtherUserTyping ? 'Typing...' : 'Offline'}
+                    <div style={{ fontSize: '12px', color: activeChat.isOnline ? '#10b981' : 'var(--cs-text-inactive)', marginTop: '2px' }}>
+                      {isOtherUserTyping ? 'Typing...' : (activeChat.isOnline ? 'Online' : 'Offline')}
                     </div>
                   </div>
                 </div>

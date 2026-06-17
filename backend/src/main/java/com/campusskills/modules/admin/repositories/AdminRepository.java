@@ -777,12 +777,22 @@ public class AdminRepository {
             
         Future<List<JsonObject>> catStatsFut = client.aggregateWithOptions("sessions", pipeline, new io.vertx.ext.mongo.AggregateOptions()).collect(java.util.stream.Collectors.toList());
         
-        JsonArray tutorsPipeline = new JsonArray()
-            .add(new JsonObject().put("$match", new JsonObject().put("status", "COMPLETED")))
-            .add(new JsonObject().put("$group", new JsonObject().put("_id", "$teacherId")));
-        
-        Future<Long> activeTutorsFut = client.aggregateWithOptions("sessions", tutorsPipeline, new io.vertx.ext.mongo.AggregateOptions()).collect(java.util.stream.Collectors.toList())
-            .map(results -> (long) results.size());
+        java.util.Set<String> onlineUserIds = com.campusskills.web.websockets.ConnectionManager.getOnlineUserIds();
+        Future<Long> activeTutorsFut;
+        if (onlineUserIds == null || onlineUserIds.isEmpty()) {
+            activeTutorsFut = Future.succeededFuture(0L);
+        } else {
+            JsonArray onlineIdsArray = new JsonArray(new java.util.ArrayList<>(onlineUserIds));
+            JsonArray tutorsPipeline = new JsonArray()
+                .add(new JsonObject().put("$match", new JsonObject()
+                    .put("status", "ACTIVE")
+                    .put("ownerId", new JsonObject().put("$in", onlineIdsArray))
+                ))
+                .add(new JsonObject().put("$group", new JsonObject().put("_id", "$ownerId")));
+            
+            activeTutorsFut = client.aggregateWithOptions("skill_listings", tutorsPipeline, new io.vertx.ext.mongo.AggregateOptions()).collect(java.util.stream.Collectors.toList())
+                .map(results -> (long) results.size());
+        }
             
         JsonArray reviewsPipeline = new JsonArray()
             .add(new JsonObject().put("$group", new JsonObject()
