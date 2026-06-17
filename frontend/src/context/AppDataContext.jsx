@@ -87,6 +87,7 @@ export const AppDataProvider = ({ children }) => {
           preview: previewText,
           unread: c.unreadCount || 0,
           time: c.lastMessageAt ? new Date(c.lastMessageAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '',
+          isOnline: c.isOnline || false,
         };
       });
       setChats(mappedChats);
@@ -480,6 +481,14 @@ export const AppDataProvider = ({ children }) => {
     } else if (lastMessage.type === 'NEW_MESSAGE') {
       const msg = lastMessage.payload;
       
+      // Global delivery acknowledgement
+      if (msg.senderId !== user?.userId) {
+        // use setTimeout to ensure websocket is ready if needed, though it usually is
+        setTimeout(() => {
+          sendMessage('MESSAGE_DELIVERED', { messageId: msg._id || msg.id, chatId: msg.chatId });
+        }, 100);
+      }
+      
       setChatMessages(prev => {
         const existing = prev[msg.chatId] || [];
         if (existing.find(m => m.id === msg.id || m._id === msg.id)) return prev;
@@ -528,6 +537,16 @@ export const AppDataProvider = ({ children }) => {
       // Optionally update preview if it was the last message
       setChats(prevChats => prevChats.map(c => 
         (c.id === msg.chatId && c.preview) ? { ...c, preview: msg.message } : c
+      ));
+    } else if (lastMessage && lastMessage.type === 'USER_ONLINE') {
+      const { userId } = lastMessage.payload;
+      setChats(prevChats => prevChats.map(c => 
+        (c.otherId === userId) ? { ...c, isOnline: true } : c
+      ));
+    } else if (lastMessage && lastMessage.type === 'USER_OFFLINE') {
+      const { userId } = lastMessage.payload;
+      setChats(prevChats => prevChats.map(c => 
+        (c.otherId === userId) ? { ...c, isOnline: false } : c
       ));
     } else if (lastMessage && lastMessage.type === 'MESSAGE_DELETED') {
       const msg = lastMessage.payload;

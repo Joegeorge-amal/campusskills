@@ -146,10 +146,8 @@ const Messages = () => {
         return c;
       }));
 
-      // Acknowledge delivery for incoming messages
-      if (!isOwnMessage) {
-        sendSocketEvent('MESSAGE_DELIVERED', { messageId: msg._id || msg.id, chatId: msg.chatId });
-      }
+      // Acknowledge delivery for incoming messages (now handled globally in AppDataContext)
+      
 
       if (activeChatId === chatId) {
         messageService.markAsRead(chatId).catch(console.error);

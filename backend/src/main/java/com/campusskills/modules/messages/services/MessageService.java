@@ -306,6 +306,13 @@ public class MessageService {
                     .markChatNotificationsAsRead(authId, chatId)
                     .map(modifiedCount -> {
                         log.info("[MessageService] Cleared " + modifiedCount + " notifications for chat " + chatId + " for user " + authId);
+                        
+                        // Broadcast chat read to all participants so sender gets blue ticks
+                        java.util.List<String> participantList = participantsArray.stream()
+                                .map(Object::toString)
+                                .collect(java.util.stream.Collectors.toList());
+                        com.campusskills.web.websockets.MessageBroadcaster.broadcastMessageRead(null, chatId, authId, readAt, participantList);
+
                         return (Void) null;
                     })
                     .recover(err -> {

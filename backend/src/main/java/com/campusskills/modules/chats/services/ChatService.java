@@ -183,6 +183,7 @@ public class ChatService {
                                         }
                                     }
                                     chatJson.put("participantProfile", profileData);
+                                    chatJson.put("isOnline", com.campusskills.web.websockets.ConnectionManager.isUserOnline(otherParticipantId));
                                 }
                                 return null;
                             });

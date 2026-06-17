@@ -31,6 +31,12 @@ public class ConnectionManager {
         }
     }
 
+    public static boolean isUserOnline(String userId) {
+        if (userId == null) return false;
+        UserConnection conn = connections.get(userId);
+        return conn != null && !conn.socket.isClosed();
+    }
+
     public static void sendMessage(String userId, JsonObject payload) {
         if (userId != null) {
             UserConnection conn = connections.get(userId);
@@ -48,6 +54,15 @@ public class ConnectionManager {
         for (UserConnection conn : connections.values()) {
             if ("ADMIN".equals(conn.role) && !conn.socket.isClosed()) {
                 conn.socket.writeTextMessage(payload.encode());
+            }
+        }
+    }
+
+    public static void broadcastToAll(JsonObject payload) {
+        String encoded = payload.encode();
+        for (UserConnection conn : connections.values()) {
+            if (!conn.socket.isClosed()) {
+                conn.socket.writeTextMessage(encoded);
             }
         }
     }

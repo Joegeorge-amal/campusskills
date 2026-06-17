@@ -92,11 +92,17 @@ public class WebSocketHandler implements Handler<ServerWebSocket> {
                 ws.closeHandler(v -> {
                     log.debug("WebSocket connection closed for user: {}", userId);
                     ConnectionManager.removeConnection(userId);
+                    ConnectionManager.broadcastToAll(new io.vertx.core.json.JsonObject()
+                        .put("type", WebSocketEventType.USER_OFFLINE.name())
+                        .put("payload", new io.vertx.core.json.JsonObject().put("userId", userId)));
                 });
                 
                 ws.exceptionHandler(err -> {
                     log.error("WebSocket error for user: {}", userId, err);
                     ConnectionManager.removeConnection(userId);
+                    ConnectionManager.broadcastToAll(new io.vertx.core.json.JsonObject()
+                        .put("type", WebSocketEventType.USER_OFFLINE.name())
+                        .put("payload", new io.vertx.core.json.JsonObject().put("userId", userId)));
                 });
                 
                 ws.accept();
