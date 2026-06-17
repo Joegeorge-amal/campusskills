@@ -27,7 +27,7 @@ import { getTopics } from '../services/topicService';
 import AutocompleteInput from '../components/AutocompleteInput';
 
 const Profile = () => {
-  const { user, updateProfile } = useAuth();
+  const { user, updateProfile, fetchProfile } = useAuth();
   const { triggerToast } = useAppData();
   const navigate = useNavigate();
   const location = useLocation();
@@ -237,6 +237,7 @@ const Profile = () => {
     updateProfile({
       verifiedSkills: Array.from(new Set([...verifiedSkills, skill]))
     }).then(() => {
+      fetchProfile();
       setActiveQuizSkill(null);
       triggerToast(`${skill} has been verified successfully!`);
       

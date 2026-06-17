@@ -11,6 +11,7 @@ import com.campusskills.modules.users.repositories.UserProfileRepository;
 import com.campusskills.modules.users.repositories.UserStatsRepository;
 import com.campusskills.modules.users.repositories.UserWalletRepository;
 import com.campusskills.modules.users.repositories.RefreshTokenRepository;
+import com.campusskills.modules.users.repositories.SkillVerificationRepository;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.json.JsonObject;
@@ -313,11 +314,15 @@ public class UserService {
         Future<UserStats> statsFut = statsRepository.findByUserId(userId);
         Future<UserWallet> walletFut = walletRepository.findByUserId(userId);
 
-        return CompositeFuture.all(userFut, profileFut, statsFut, walletFut).map(cf -> {
+        SkillVerificationRepository verifRepo = new SkillVerificationRepository();
+        Future<List<com.campusskills.modules.users.models.SkillVerification>> verifFut = verifRepo.findByUserId(userId);
+
+        return CompositeFuture.all(userFut, profileFut, statsFut, walletFut, verifFut).map(cf -> {
             User user = cf.resultAt(0);
             UserProfile profile = cf.resultAt(1);
             UserStats stats = cf.resultAt(2);
             UserWallet wallet = cf.resultAt(3);
+            List<com.campusskills.modules.users.models.SkillVerification> verifications = cf.resultAt(4);
 
             if (user == null) {
                 log.warn("[AUTH] Failed to fetch profile. User not found for ID: {}", userId);
@@ -330,7 +335,22 @@ public class UserService {
             userJson.remove("passwordHash");
             response.put("user", userJson);
             
-            if (profile != null) response.put("profile", JsonObject.mapFrom(profile));
+            if (profile != null) {
+                JsonObject profileJson = JsonObject.mapFrom(profile);
+                // Build verificationScores from the most recent passed verifications
+                JsonObject scores = new JsonObject();
+                for (com.campusskills.modules.users.models.SkillVerification v : verifications) {
+                    if (v.getPassed() != null && v.getPassed() && v.getConfidenceScore() != null) {
+                        String skill = v.getSkill();
+                        Double existing = scores.getDouble(skill);
+                        if (existing == null || v.getConfidenceScore() > existing) {
+                            scores.put(skill, v.getConfidenceScore());
+                        }
+                    }
+                }
+                profileJson.put("verificationScores", scores);
+                response.put("profile", profileJson);
+            }
             if (stats != null) response.put("stats", JsonObject.mapFrom(stats));
             if (wallet != null) response.put("wallet", JsonObject.mapFrom(wallet));
 
