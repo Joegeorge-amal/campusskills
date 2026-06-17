@@ -155,6 +155,20 @@ public class MessageBroadcaster {
         }
     }
 
+    public static void broadcastProfileUpdate(String profileUserId, JsonObject profileData) {
+        try {
+            JsonObject event = new WebSocketMessageBuilder()
+                    .type(WebSocketEventType.PROFILE_UPDATED)
+                    .payload(new JsonObject()
+                        .put("userId", profileUserId)
+                        .put("data", profileData))
+                    .build();
+            ConnectionManager.broadcastToAll(event);
+        } catch (Exception e) {
+            log.error("[BROADCAST WARN] Failed to broadcast PROFILE_UPDATED for user {}", profileUserId, e);
+        }
+    }
+
     public static void broadcastSessionEvent(WebSocketEventType eventType, Session session) {
         try {
             JsonObject event = new WebSocketMessageBuilder()

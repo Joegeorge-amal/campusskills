@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAppData } from '../context/AppDataContext';
 import { useAuth } from '../context/AuthContext';
+import { useWebSocket } from '../context/WebSocketContext';
 import { IconMapPin, IconCalendarMonth, IconMessageCircle, IconDotsVertical } from '@tabler/icons-react';
 
 import ProfileHeader from '../components/profile/ProfileHeader';
@@ -24,11 +25,43 @@ const PublicProfile = () => {
   const navigate = useNavigate();
   const { chats, triggerToast } = useAppData();
   const { user: currentUser } = useAuth();
+  const { lastMessage } = useWebSocket();
 
   const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState(null);
   const [statsData, setStatsData] = useState(null);
   const [listings, setListings] = useState([]);
+
+  // Deduplicate WS events so we don't process the same lastMessage twice
+  const processedWsRef = useRef(null);
+
+  // Listen for realtime profile stat updates
+  useEffect(() => {
+    if (!lastMessage || lastMessage.type !== 'PROFILE_UPDATED') return;
+    if (processedWsRef.current === lastMessage) return;
+    processedWsRef.current = lastMessage;
+
+    const { userId, data } = lastMessage.payload || {};
+    if (!userId || !data) return;
+    // Only update if this profile is currently displayed
+    if (userId !== profileData?.userId) return;
+
+    setStatsData(prev => {
+      if (!prev) return prev;
+      const next = { ...prev };
+      if (data.ratingAvg !== undefined) next.ratingAvg = data.ratingAvg;
+      if (data.ratingCount !== undefined) next.ratingCount = data.ratingCount;
+      if (data.sessionsCompleted !== undefined) next.sessionsCompleted = data.sessionsCompleted;
+      return next;
+    });
+
+    if (data.verifiedSkills) {
+      setProfileData(prev => {
+        if (!prev) return prev;
+        return { ...prev, verifiedSkills: Array.isArray(data.verifiedSkills) ? data.verifiedSkills : prev.verifiedSkills };
+      });
+    }
+  }, [lastMessage, profileData?.userId]);
   
   const [topicMap, setTopicMap] = useState({});
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);

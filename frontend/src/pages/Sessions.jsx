@@ -143,7 +143,6 @@ const Sessions = () => {
   const [processingAction, setProcessingAction] = useState(null);
 
   // Review states
-  const [submittedReviews, setSubmittedReviews] = useState({});
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [selectedSessionForReview, setSelectedSessionForReview] = useState(null);
 
@@ -661,7 +660,7 @@ const Sessions = () => {
                 {(isSwap || s.rawSession.studentMarkedPaid || s.role === 'Teaching') ? (
                   <div style={{ background: '#f9fafb', borderRadius: '8px', padding: '12px', border: '1px solid #f3f4f6' }}>
                     
-                    {submittedReviews[s.id] ? (
+                    {s.rawSession.hasReviewed ? (
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#059669', fontSize: '12px', fontWeight: 600 }}>
                         <IconCheck size={16} /> Review Submitted! Thank you.
                       </div>
@@ -933,11 +932,10 @@ const Sessions = () => {
         session={selectedSessionForReview}
         onSubmit={() => {
           if (selectedSessionForReview) {
-            setSubmittedReviews(prev => ({ ...prev, [selectedSessionForReview.id]: true }));
+            selectedSessionForReview.rawSession.hasReviewed = true;
           }
           setReviewModalOpen(false);
           setSelectedSessionForReview(null);
-          fetchInitialData();
         }}
       />
     </div>

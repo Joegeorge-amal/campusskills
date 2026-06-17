@@ -173,9 +173,19 @@ public class VerificationService {
     }
 
     private Future<Void> updateUserProfile(String userId, String skill) {
-        JsonObject query = new JsonObject().put("userId", userId);
-        JsonObject update = new JsonObject().put("$addToSet", new JsonObject().put("verifiedSkills", skill));
-        return mongoClient.updateCollection("user_profiles", query, update).mapEmpty();
+        com.campusskills.modules.users.repositories.UserProfileRepository profileRepo = new com.campusskills.modules.users.repositories.UserProfileRepository();
+        return profileRepo.addVerifiedSkill(userId, skill).compose(updated -> {
+            if (updated) {
+                return profileRepo.findByUserId(userId).compose(profile -> {
+                    java.util.List<String> verified = profile != null && profile.getVerifiedSkills() != null
+                        ? profile.getVerifiedSkills() : new java.util.ArrayList<>();
+                    com.campusskills.web.websockets.MessageBroadcaster.broadcastProfileUpdate(userId,
+                        new io.vertx.core.json.JsonObject().put("verifiedSkills", io.vertx.core.json.JsonArray.of(verified.toArray())));
+                    return Future.succeededFuture();
+                });
+            }
+            return Future.succeededFuture();
+        });
     }
 
     public Future<List<SkillVerification>> getMyRequests(String userId) {

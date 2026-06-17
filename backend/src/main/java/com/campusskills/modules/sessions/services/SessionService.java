@@ -1,15 +1,20 @@
 package com.campusskills.modules.sessions.services;
 
+import com.campusskills.modules.reviews.repositories.ReviewRepository;
 import com.campusskills.modules.sessions.models.RescheduleProposal;
 import com.campusskills.modules.sessions.models.Session;
 import com.campusskills.modules.sessions.repositories.SessionRepository;
 import com.campusskills.shared.constants.SessionStatus;
 import io.vertx.core.Future;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class SessionService {
 
     private final SessionRepository repository;
+    private final ReviewRepository reviewRepository;
     private final io.vertx.core.eventbus.EventBus eventBus;
     private final com.campusskills.modules.users.repositories.UserStatsRepository statsRepository;
     private final com.campusskills.modules.users.repositories.UserProfileRepository profileRepository;
@@ -17,6 +22,7 @@ public class SessionService {
 
     public SessionService(io.vertx.core.eventbus.EventBus eventBus) {
         this.repository = new SessionRepository();
+        this.reviewRepository = new ReviewRepository();
         this.statsRepository = new com.campusskills.modules.users.repositories.UserStatsRepository();
         this.profileRepository = new com.campusskills.modules.users.repositories.UserProfileRepository();
         this.listingRepository = new com.campusskills.modules.listings.repositories.ListingRepository();
@@ -44,15 +50,25 @@ public class SessionService {
 
     public Future<JsonObject> getUserSessions(String userId, int page, int limit) {
         int skip = (page - 1) * limit;
-        return repository.countUserSessions(userId).compose(total -> 
-            repository.fetchUserSessions(userId, skip, limit).map(list -> {
-                io.vertx.core.json.JsonArray items = new io.vertx.core.json.JsonArray();
-                list.forEach(req -> items.add(JsonObject.mapFrom(req)));
-                return new JsonObject()
-                    .put("items", items)
-                    .put("page", page)
-                    .put("limit", limit)
-                    .put("total", total);
+        return repository.countUserSessions(userId).compose(total ->
+            repository.fetchUserSessions(userId, skip, limit).compose(list -> {
+                List<Future<JsonObject>> enriched = list.stream().map(session -> {
+                    JsonObject json = JsonObject.mapFrom(session);
+                    String revieweeId = userId.equals(session.getTeacherId()) ? session.getStudentId() : session.getTeacherId();
+                    return reviewRepository.hasReviewed(session.getId(), userId, revieweeId)
+                        .map(hasReviewed -> json.put("hasReviewed", hasReviewed));
+                }).collect(Collectors.toList());
+                return Future.all(enriched).map(all -> {
+                    JsonArray items = new JsonArray();
+                    for (int i = 0; i < all.size(); i++) {
+                        items.add((JsonObject) all.resultAt(i));
+                    }
+                    return new JsonObject()
+                        .put("items", items)
+                        .put("page", page)
+                        .put("limit", limit)
+                        .put("total", total);
+                });
             })
         );
     }
@@ -224,13 +240,30 @@ public class SessionService {
             JsonObject updates = new JsonObject().put("teacherConfirmedPayment", true);
             return repository.updateSessionFields(sessionId, updates).compose(v -> repository.getSessionById(sessionId)).onSuccess(updatedSession -> {
                 com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent(com.campusskills.shared.constants.WebSocketEventType.PAYMENT_CONFIRMED, updatedSession);
-                profileRepository.findByUserId(session.getTeacherId()).onSuccess(teacherProfile -> {
+                
+                // Increment sessionsCompleted for both teacher and student, then broadcast profile update
+                statsRepository.incrementSessionsCompleted(session.getTeacherId());
+                statsRepository.incrementSessionsCompleted(session.getStudentId());
+                profileRepository.findByUserId(session.getTeacherId()).compose(teacherProfile -> {
                     String teacherName = teacherProfile != null ? teacherProfile.getName() : "Teacher";
                     String topic = session.getTopic() != null ? session.getTopic() : "Session";
                     String msgToTeacher = "Payment confirmed for " + topic + ".\nPlease leave a review.";
                     String msgToStudent = teacherName + " confirmed payment for " + topic + ".\nPlease leave a review.";
                     sendNotification(session.getTeacherId(), com.campusskills.shared.constants.NotificationType.PAYMENT_CONFIRMED, "Payment Complete", msgToTeacher, "SESSION", sessionId);
                     sendNotification(session.getStudentId(), com.campusskills.shared.constants.NotificationType.PAYMENT_CONFIRMED, "Payment Complete", msgToStudent, "SESSION", sessionId);
+                    
+                    // Load updated stats to broadcast
+                    statsRepository.findByUserId(session.getTeacherId()).onSuccess(teacherStats -> {
+                        int tSessions = teacherStats != null && teacherStats.getSessionsCompleted() != null ? teacherStats.getSessionsCompleted() : 0;
+                        com.campusskills.web.websockets.MessageBroadcaster.broadcastProfileUpdate(session.getTeacherId(),
+                            new io.vertx.core.json.JsonObject().put("sessionsCompleted", tSessions));
+                    });
+                    statsRepository.findByUserId(session.getStudentId()).onSuccess(studentStats -> {
+                        int sSessions = studentStats != null && studentStats.getSessionsCompleted() != null ? studentStats.getSessionsCompleted() : 0;
+                        com.campusskills.web.websockets.MessageBroadcaster.broadcastProfileUpdate(session.getStudentId(),
+                            new io.vertx.core.json.JsonObject().put("sessionsCompleted", sSessions));
+                    });
+                    return io.vertx.core.Future.succeededFuture();
                 });
             }).mapEmpty();
         });
