@@ -571,7 +571,8 @@ const Profile = () => {
           ) : (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
               {verifiedSkills.map((skill, i) => {
-                const meta = { domain: topicMap[skill] || 'General', confidence: 100 };
+                const score = user?.verificationScores?.[skill];
+                const meta = { domain: topicMap[skill] || 'General', confidence: score ?? 100 };
                 return (
                   <div key={i} className="glossy-card" style={{ ...cardStyle, border: '1px solid #e5e7eb' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
