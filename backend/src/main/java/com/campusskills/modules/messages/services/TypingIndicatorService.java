@@ -47,9 +47,8 @@ public class TypingIndicatorService {
                 Long existingTimerId = activeTypingTimers.get(key);
                 if (existingTimerId != null) {
                     vertx.cancelTimer(existingTimerId);
-                } else {
-                    MessageBroadcaster.broadcastTypingEvent("TYPING_STARTED", chatId, userId, participantList);
                 }
+                MessageBroadcaster.broadcastTypingEvent("TYPING_STARTED", chatId, userId, participantList);
                 
                 long newTimerId = vertx.setTimer(TYPING_TIMEOUT_MS, id -> {
                     activeTypingTimers.remove(key);

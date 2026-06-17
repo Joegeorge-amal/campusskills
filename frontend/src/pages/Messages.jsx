@@ -59,7 +59,13 @@ const Messages = () => {
   const [showScrollBottom, setShowScrollBottom] = useState(false);
   const [unreadNewMessages, setUnreadNewMessages] = useState(0);
 
-
+  // Refs to avoid stale closures in the WebSocket handler and prevent duplicate processing
+  const activeChatIdRef = useRef(activeChatId);
+  useEffect(() => {
+    console.log('[Messages] chat switched:', activeChatId);
+    activeChatIdRef.current = activeChatId;
+  }, [activeChatId]);
+  const processedWsRef = useRef(null);
 
   // Load historical messages when active chat changes
   useEffect(() => {
@@ -98,8 +104,14 @@ const Messages = () => {
 
   // Handle incoming WebSocket messages
   // Backend sends { type, timestamp, payload } — NOT { event, data }
+  // Only depends on lastMessage (NOT activeChatId) to avoid stale re-processing on chat switch.
+  // activeChatIdRef provides the current chat context without triggering re-runs.
   useEffect(() => {
     if (!lastMessage || !lastMessage.type) return;
+    if (processedWsRef.current === lastMessage) return;
+    processedWsRef.current = lastMessage;
+
+    const currentChatId = activeChatIdRef.current;
     const { type, payload } = lastMessage;
 
     if (type === 'NEW_MESSAGE') {
@@ -108,7 +120,7 @@ const Messages = () => {
       const isOwnMessage = msg.senderId === user?.userId;
 
       let isAtBottom = false;
-      if (activeChatId === chatId) {
+      if (currentChatId === chatId) {
         const container = messagesContainerRef.current;
         if (container) {
           isAtBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150;
@@ -141,7 +153,7 @@ const Messages = () => {
             ...c,
             preview: isMe ? 'You: ' + msg.message : msg.message,
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            unread: (activeChatId !== chatId) ? (c.unread || 0) + 1 : 0
+            unread: (currentChatId !== chatId) ? (c.unread || 0) + 1 : 0
           };
         }
         return c;
@@ -150,7 +162,7 @@ const Messages = () => {
       // Acknowledge delivery for incoming messages (now handled globally in AppDataContext)
       
 
-      if (activeChatId === chatId) {
+      if (currentChatId === chatId) {
         messageService.markAsRead(chatId).catch(console.error);
         window.dispatchEvent(new CustomEvent('markNotificationAsRead', { detail: { sourceType: 'CHAT', sourceId: chatId } }));
         if (isOwnMessage) {
@@ -180,7 +192,7 @@ const Messages = () => {
         };
       });
       // Scroll to bottom if near bottom
-      if (activeChatId === chatId) {
+      if (currentChatId === chatId) {
         const container = messagesContainerRef.current;
         if (container && container.scrollHeight - container.scrollTop - container.clientHeight < 150) {
           setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
@@ -201,7 +213,7 @@ const Messages = () => {
         };
       });
       // Scroll to bottom if near bottom
-      if (activeChatId === chatId) {
+      if (currentChatId === chatId) {
         const container = messagesContainerRef.current;
         if (container && container.scrollHeight - container.scrollTop - container.clientHeight < 150) {
           setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
@@ -241,7 +253,7 @@ const Messages = () => {
       if (userId !== user?.userId) {
         setTypingUsers(prev => ({ ...prev, [`${chatId}_${userId}`]: true }));
         // Scroll to show typing bubble if already near bottom
-        if (activeChatId === chatId) {
+        if (currentChatId === chatId) {
           const container = messagesContainerRef.current;
           if (container && container.scrollHeight - container.scrollTop - container.clientHeight < 150) {
             setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
@@ -256,7 +268,7 @@ const Messages = () => {
       const { chatId, userId } = payload;
       setTypingUsers(prev => ({ ...prev, [`${chatId}_${userId}`]: false }));
     }
-  }, [lastMessage, activeChatId]);
+  }, [lastMessage]);
 
   const filteredChats = chats.filter(c => {
     const matchesSearch = (c.name || '').toLowerCase().includes(searchQuery.toLowerCase());

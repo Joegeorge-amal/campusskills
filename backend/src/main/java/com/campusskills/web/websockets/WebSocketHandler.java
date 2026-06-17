@@ -48,8 +48,12 @@ public class WebSocketHandler implements Handler<ServerWebSocket> {
                     return;
                 }
 
-                log.debug("New WebSocket connection for user: {} with role: {}", userId, role);
+                log.info("[WS] user connected [userId={}]", userId);
                 ConnectionManager.addConnection(userId, role, ws);
+                
+                ConnectionManager.broadcastToAll(new JsonObject()
+                    .put("type", WebSocketEventType.USER_ONLINE.name())
+                    .put("payload", new JsonObject().put("userId", userId)));
                 
                 ws.handler(buffer -> {
                     try {
@@ -91,30 +95,28 @@ public class WebSocketHandler implements Handler<ServerWebSocket> {
                 });
                 
                 ws.closeHandler(v -> {
-                    log.debug("WebSocket connection closed for user: {}", userId);
-                    // Only remove if this exact socket is still the active connection.
-                    // Prevents a stale closeHandler from deleting a newer reconnection.
                     UserConnection activeConn = ConnectionManager.getConnection(userId);
                     if (activeConn != null && activeConn.socket == ws) {
+                        log.info("[WS] socket disconnected [userId={}] reason=client", userId);
                         ConnectionManager.removeConnection(userId);
-                        ConnectionManager.broadcastToAll(new io.vertx.core.json.JsonObject()
+                        ConnectionManager.broadcastToAll(new JsonObject()
                             .put("type", WebSocketEventType.USER_OFFLINE.name())
-                            .put("payload", new io.vertx.core.json.JsonObject().put("userId", userId)));
+                            .put("payload", new JsonObject().put("userId", userId)));
                     } else {
-                        log.debug("Ignoring stale closeHandler for user {} (socket was already replaced)", userId);
+                        log.info("[WS] socket disconnected (stale) [userId={}]", userId);
                     }
                 });
                 
                 ws.exceptionHandler(err -> {
-                    log.error("WebSocket error for user: {}", userId, err);
-                    UserConnection activeConn = ConnectionManager.getConnection(userId);
-                    if (activeConn != null && activeConn.socket == ws) {
+                    UserConnection activeConn2 = ConnectionManager.getConnection(userId);
+                    if (activeConn2 != null && activeConn2.socket == ws) {
+                        log.info("[WS] socket disconnected [userId={}] reason=error: {}", userId, err.getMessage());
                         ConnectionManager.removeConnection(userId);
-                        ConnectionManager.broadcastToAll(new io.vertx.core.json.JsonObject()
+                        ConnectionManager.broadcastToAll(new JsonObject()
                             .put("type", WebSocketEventType.USER_OFFLINE.name())
-                            .put("payload", new io.vertx.core.json.JsonObject().put("userId", userId)));
+                            .put("payload", new JsonObject().put("userId", userId)));
                     } else {
-                        log.debug("Ignoring stale exceptionHandler for user {} (socket was already replaced)", userId);
+                        log.info("[WS] socket disconnected (stale) [userId={}] reason=error: {}", userId, err.getMessage());
                     }
                 });
                 
