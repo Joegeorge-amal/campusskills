@@ -230,7 +230,7 @@ const Marketplace = () => {
                 )}
               </AnimatePresence>
 
-              {!selectedSkill && filter === 'All' && (
+              {!selectedSkill && filter === 'All' && !searchQuery && (
                 <div style={{ marginBottom: '24px' }}>
                   <div style={{ fontSize: '18px', fontWeight: 800, color: '#111827', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Most Requested
@@ -248,7 +248,7 @@ const Marketplace = () => {
                 </div>
               )}
               
-              {!selectedSkill && filter === 'All' && regularSkills.length > 0 && (
+              {!selectedSkill && filter === 'All' && !searchQuery && regularSkills.length > 0 && (
                 <div style={{ fontSize: '18px', fontWeight: 800, color: '#111827', marginBottom: '16px' }}>
                   All Listings
                 </div>
