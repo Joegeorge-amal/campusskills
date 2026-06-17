@@ -84,6 +84,7 @@ const Messages = () => {
       });
 
       messageService.markAsRead(activeChatId).catch(console.error);
+      window.dispatchEvent(new CustomEvent('markNotificationAsRead', { detail: { sourceType: 'CHAT', sourceId: activeChatId } }));
       setChats(prevChats => prevChats.map(c => c.id === activeChatId ? { ...c, unread: 0 } : c));
 
       // Scroll to bottom
@@ -151,6 +152,7 @@ const Messages = () => {
 
       if (activeChatId === chatId) {
         messageService.markAsRead(chatId).catch(console.error);
+        window.dispatchEvent(new CustomEvent('markNotificationAsRead', { detail: { sourceType: 'CHAT', sourceId: chatId } }));
         if (isOwnMessage) {
           // Always scroll to bottom when YOU send a message
           setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
