@@ -623,12 +623,29 @@ public class AdminRepository {
         
         JsonArray revenuePipeline = new JsonArray()
             .add(new JsonObject().put("$match", new JsonObject().put("status", "COMPLETED")))
-            .add(new JsonObject().put("$group", new JsonObject().put("_id", null).put("total", new JsonObject().put("$sum", "$amount"))));
+            .add(new JsonObject().put("$lookup", new JsonObject()
+                .put("from", "skill_listings")
+                .put("let", new JsonObject().put("lId", "$listingId"))
+                .put("pipeline", new JsonArray().add(new JsonObject().put("$match", new JsonObject().put("$expr", new JsonObject().put("$eq", new JsonArray().add(new JsonObject().put("$toString", "$_id")).add("$$lId"))))))
+                .put("as", "listing")
+            ))
+            .add(new JsonObject().put("$unwind", new JsonObject().put("path", "$listing").put("preserveNullAndEmptyArrays", true)))
+            .add(new JsonObject().put("$project", new JsonObject()
+                .put("price", new JsonObject().put("$ifNull", new JsonArray().add("$listing.price").add(0)))
+                .put("durationHours", new JsonObject().put("$divide", new JsonArray()
+                    .add(new JsonObject().put("$subtract", new JsonArray().add("$scheduledEnd").add("$scheduledStart")))
+                    .add(3600000)
+                ))
+            ))
+            .add(new JsonObject().put("$group", new JsonObject()
+                .put("_id", null)
+                .put("total", new JsonObject().put("$sum", new JsonObject().put("$multiply", new JsonArray().add("$price").add("$durationHours"))))
+            ));
             
         Future<Long> revenueFuture = client.aggregateWithOptions("sessions", revenuePipeline, new io.vertx.ext.mongo.AggregateOptions()).collect(java.util.stream.Collectors.toList())
             .map(results -> {
                 if (results.isEmpty()) return 0L;
-                return results.get(0).getLong("total", 0L);
+                return results.get(0).getDouble("total", 0.0).longValue();
             });
 
         return io.vertx.core.CompositeFuture.all(studentsCount, sessionsCount, disputesCount, revenueFuture)
