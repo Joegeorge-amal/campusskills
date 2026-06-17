@@ -51,18 +51,18 @@ public class VerificationService {
     public Future<SkillVerification> submitVerification(String userId, JsonObject payload) {
         try {
             String skill = payload != null ? payload.getString("skill") : "UNKNOWN_SKILL";
-            
+
             JsonObject answers = new JsonObject();
             if (payload != null && payload.getValue("answers") instanceof JsonObject) {
                 answers = payload.getJsonObject("answers");
             }
-            
+
             Boolean failedDueToTabSwitch = false;
             try { failedDueToTabSwitch = payload != null ? payload.getBoolean("failedDueToTabSwitch", false) : false; } catch (Exception e) {}
-            
+
             Integer warningCount = 0;
             try { warningCount = payload != null ? payload.getInteger("warningCount", 0) : 0; } catch (Exception e) {}
-            
+
             Long startedAt = System.currentTimeMillis();
             if (payload != null) {
                 try {
@@ -80,18 +80,31 @@ public class VerificationService {
                 return saveAttempt(userId, skill, 0.0, 0.0, false, warningCount, true, startedAt, completedAt, "FAILED_TAB_SWITCH", "Tab switch failed");
             }
 
-            JsonObject query = new JsonObject().put("skill", skill);
+            // Count unique answered questions from the answers map.
+            // The frontend sends TWO keys per question (question text + _id),
+            // so we count keys that look like question text (contain spaces or are long).
+            int answeredCount = 0;
+            for (String key : answers.fieldNames()) {
+                if (key.length() > 24 || key.contains(" ")) {
+                    answeredCount++;
+                }
+            }
+            if (answeredCount == 0) {
+                // Fallback: divide total keys by 2 if heuristic fails
+                answeredCount = answers.fieldNames().size() / 2;
+            }
+            final int total = answeredCount > 0 ? answeredCount : 10;
 
             final JsonObject finalAnswers = answers;
             final Long finalStartedAt = startedAt;
             final Integer finalWarningCount = warningCount;
-            return mongoClient.find("question_banks", query).compose(docs -> {
-                int total = docs != null && docs.size() > 0 ? docs.size() : 10;
+
+            return mongoClient.find("question_banks", new JsonObject().put("skill", skill)).compose(docs -> {
                 int correct = 0;
-                
                 StringBuilder debugStr = new StringBuilder();
                 debugStr.append("Payload answers keys: ").append(finalAnswers.fieldNames()).append(". ");
-                
+                debugStr.append("Answered question count: ").append(total).append(". ");
+
                 if (docs != null) {
                     for (JsonObject q : docs) {
                         try {
@@ -110,24 +123,40 @@ public class VerificationService {
                                 if (providedObj instanceof Number) {
                                     provided = ((Number) providedObj).intValue();
                                 } else if (providedObj != null) {
-                                    provided = Integer.parseInt(providedObj.toString());
+                                    try {
+                                        provided = Integer.parseInt(providedObj.toString());
+                                    } catch (Exception e) {}
                                 }
-                                
-                                Integer actual = q.getInteger("correctAnswer");
-                                debugStr.append("Q:").append(qText != null ? qText.substring(0, Math.min(10, qText.length())) : "null")
+
+                                // Handle correctAnswer as any numeric type (Integer, Long, Double)
+                                Integer actual = null;
+                                Object actualObj = q.getValue("correctAnswer");
+                                if (actualObj instanceof Number) {
+                                    actual = ((Number) actualObj).intValue();
+                                } else if (actualObj != null) {
+                                    try {
+                                        actual = Integer.parseInt(actualObj.toString());
+                                    } catch (Exception e) {}
+                                }
+
+                                debugStr.append("Q:").append(qText != null ? qText.substring(0, Math.min(15, qText.length())) : "null")
                                         .append(" P:").append(provided).append(" A:").append(actual).append(" | ");
                                 if (provided != null && actual != null && provided.equals(actual)) {
                                     correct++;
                                 }
                             }
-                        } catch (Exception loopEx) {}
+                        } catch (Exception loopEx) {
+                            debugStr.append("LOOP_ERR:").append(loopEx.getMessage()).append(" | ");
+                        }
                     }
                 }
-                
+
                 double score = total > 0 ? ((double) correct / total * 100.0) : 0.0;
                 double confidenceScore = score;
                 boolean passed = score >= 60.0;
                 String status = passed ? "COMPLETED_PASS" : "COMPLETED_FAIL";
+
+                debugStr.append("Score: ").append(score).append("%. Correct: ").append(correct).append("/").append(total);
 
                 return saveAttempt(userId, skill, score, confidenceScore, passed, finalWarningCount, false, finalStartedAt, completedAt, status, debugStr.toString())
                     .compose(verification -> {
@@ -141,6 +170,7 @@ public class VerificationService {
                 fallback.setPassed(false);
                 fallback.setScore(0.0);
                 fallback.setConfidenceScore(0.0);
+                fallback.setDebug("RECOVER: " + err.getMessage());
                 return Future.succeededFuture(fallback);
             });
         } catch (Exception e) {
@@ -148,6 +178,7 @@ public class VerificationService {
             fallback.setPassed(false);
             fallback.setScore(0.0);
             fallback.setConfidenceScore(0.0);
+            fallback.setDebug("CATCH: " + e.getMessage());
             return Future.succeededFuture(fallback);
         }
     }
