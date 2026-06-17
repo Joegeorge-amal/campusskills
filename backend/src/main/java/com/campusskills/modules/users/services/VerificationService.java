@@ -57,7 +57,7 @@ public class VerificationService {
         Long completedAt = System.currentTimeMillis();
 
         if (failedDueToTabSwitch) {
-            return saveAttempt(userId, skill, 0.0, false, warningCount, true, startedAt, completedAt, "FAILED_TAB_SWITCH");
+            return saveAttempt(userId, skill, 0.0, false, warningCount, true, startedAt, completedAt, "FAILED_TAB_SWITCH", "");
         }
 
         JsonObject query = new JsonObject().put("skill", skill);
