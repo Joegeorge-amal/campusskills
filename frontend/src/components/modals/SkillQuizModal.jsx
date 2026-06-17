@@ -160,11 +160,14 @@ const SkillQuizModal = ({ isOpen, skillName, onClose, onComplete }) => {
       setDebugMsg(res.debug);
       setStep(res.passed ? 'pass' : 'fail');
       if (res.passed) {
-        onComplete(skillName, finalScore);
+        onComplete(skillName, res.score);
       }
     } catch (err) {
+      const msg = err?.response?.data?.message || err?.message || 'Failed to submit verification';
+      if (typeof alert !== 'undefined') {
+        setDebugMsg('FAILED: ' + msg + ' (check console for details)');
+      }
       console.error('Submit error:', err);
-      alert("NETWORK ERROR: Could not connect to the backend!\nIf you are seeing this, your Java backend is definitely running the OLD code or is turned off. Please run 'mvn clean package -DskipTests' and restart it!");
       setStep('fail');
     }
   };
@@ -172,9 +175,8 @@ const SkillQuizModal = ({ isOpen, skillName, onClose, onComplete }) => {
   const handleReturnToProfile = () => {
     if (step === 'pass') {
       onComplete(skillName, finalScore);
-    } else {
-      onClose();
     }
+    onClose();
   };
 
   const renderContent = () => {
