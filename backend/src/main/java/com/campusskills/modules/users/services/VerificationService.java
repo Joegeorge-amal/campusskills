@@ -65,12 +65,24 @@ public class VerificationService {
             int total = 10;
             int correct = 0;
             
+            StringBuilder debugStr = new StringBuilder();
+            debugStr.append("Payload answers keys: ").append(answers.fieldNames()).append(". ");
+            
             for (JsonObject q : docs) {
                 String qText = q.getString("question");
+                String qId = null;
+                Object idObj = q.getValue("_id");
+                if (idObj instanceof JsonObject && ((JsonObject) idObj).containsKey("$oid")) {
+                    qId = ((JsonObject) idObj).getString("$oid");
+                } else if (idObj != null) {
+                    qId = idObj.toString();
+                }
 
-                if (qText != null && answers.containsKey(qText)) {
-                    Integer provided = answers.getInteger(qText);
+                if ((qText != null && answers.containsKey(qText)) || (qId != null && answers.containsKey(qId))) {
+                    Integer provided = answers.containsKey(qText) ? answers.getInteger(qText) : answers.getInteger(qId);
                     Integer actual = q.getInteger("correctAnswer");
+                    debugStr.append("Q:").append(qText != null ? qText.substring(0, Math.min(10, qText.length())) : "null")
+                            .append(" P:").append(provided).append(" A:").append(actual).append(" | ");
                     if (provided != null && actual != null && provided.equals(actual)) {
                         correct++;
                     }
@@ -81,7 +93,7 @@ public class VerificationService {
             boolean passed = score >= 60.0;
             String status = passed ? "COMPLETED_PASS" : "COMPLETED_FAIL";
 
-            return saveAttempt(userId, skill, score, passed, warningCount, false, startedAt, completedAt, status)
+            return saveAttempt(userId, skill, score, passed, warningCount, false, startedAt, completedAt, status, debugStr.toString())
                 .compose(verification -> {
                     if (passed) {
                         return updateUserProfile(userId, skill).map(verification);
@@ -91,7 +103,7 @@ public class VerificationService {
         });
     }
 
-    private Future<SkillVerification> saveAttempt(String userId, String skill, Double score, Boolean passed, Integer warningCount, Boolean failedDueToTabSwitch, Long startedAt, Long completedAt, String status) {
+    private Future<SkillVerification> saveAttempt(String userId, String skill, Double score, Boolean passed, Integer warningCount, Boolean failedDueToTabSwitch, Long startedAt, Long completedAt, String status, String debug) {
         SkillVerification v = new SkillVerification();
         v.setUserId(userId);
         v.setSkill(skill);
@@ -102,6 +114,7 @@ public class VerificationService {
         v.setStartedAt(startedAt);
         v.setCompletedAt(completedAt);
         v.setStatus(status);
+        v.setDebug(debug);
 
         return repository.create(v).map(id -> {
             v.setId(id);

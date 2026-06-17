@@ -16,8 +16,12 @@ public class SkillVerification {
     private Long startedAt;
     private Long completedAt;
     private String status; // e.g. "COMPLETED", "FAILED_TAB_SWITCH", "TIMEOUT"
+    private String debug;
 
     public SkillVerification() {}
+
+    public String getDebug() { return debug; }
+    public void setDebug(String debug) { this.debug = debug; }
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
