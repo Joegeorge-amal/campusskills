@@ -6,6 +6,7 @@ import { WebSocketProvider } from './context/WebSocketContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { ErrorBoundary } from './ErrorBoundary';
 import AppRoutes from './routes/AppRoutes';
+import GlobalNotificationListener from './components/common/GlobalNotificationListener';
 
 const App = () => {
   return (
@@ -15,6 +16,7 @@ const App = () => {
           <WebSocketProvider>
             <ThemeProvider>
             <AppDataProvider>
+              <GlobalNotificationListener />
               <AppRoutes />
             </AppDataProvider>
             </ThemeProvider>
