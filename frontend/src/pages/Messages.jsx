@@ -332,9 +332,10 @@ const Messages = () => {
           triggerToast(err?.response?.data?.error || err?.response?.data?.message || 'Failed to edit message');
         }
       } else {
+        let newMessageObj = null;
         try {
           const replyId = replyingTo ? (replyingTo._id || replyingTo.id) : null;
-          const newMessageObj = {
+          newMessageObj = {
             tempId: Date.now().toString(),
             chatId: activeChatId,
             senderId: user?.userId,

@@ -39,7 +39,7 @@ const PublicProfile = () => {
     if (!profileData?.userId) return;
     
     // Check if an active chat already exists
-    const existingChat = chats.find(c => c.otherUser?.userId === profileData.userId || c.userId === profileData.userId);
+    const existingChat = chats.find(c => c.otherId === profileData.userId);
     if (existingChat) {
       navigate(`/app/messages/${existingChat.id || existingChat._id}`);
       return;
