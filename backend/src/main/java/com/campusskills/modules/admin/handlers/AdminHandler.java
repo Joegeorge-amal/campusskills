@@ -213,6 +213,24 @@ public class AdminHandler {
         }
     }
 
+    public void deleteNotification(RoutingContext ctx) {
+        String notificationId = ctx.pathParam("id");
+        if (notificationId == null || notificationId.trim().isEmpty()) {
+            ApiResponse.badRequest(ctx, "Notification ID is required");
+            return;
+        }
+
+        notificationRepository.deleteAdminNotification(notificationId)
+            .onSuccess(deleted -> {
+                if (deleted) {
+                    ApiResponse.ok(ctx, new JsonObject().put("message", "Notification deleted"));
+                } else {
+                    ApiResponse.notFound(ctx, "Notification not found");
+                }
+            })
+            .onFailure(err -> ApiResponse.internalError(ctx, "Failed to delete notification: " + err.getMessage()));
+    }
+
     public void updateDisputeStatus(RoutingContext ctx) {
         String id = ctx.request().getParam("id");
         JsonObject body = ctx.body().asJsonObject();

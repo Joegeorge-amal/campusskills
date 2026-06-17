@@ -25,7 +25,8 @@ const BlockedUsersModal = ({ onClose }) => {
         const profiles = await Promise.all(
           blockedIds.map(async (id) => {
             try {
-              return await userService.getPublicProfile(id);
+              const res = await userService.getPublicProfile(id);
+              return res.data || res;
             } catch (err) {
               return { userId: id, name: 'Unknown User' };
             }

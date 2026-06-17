@@ -131,6 +131,13 @@ public class NotificationRepository {
         return client.updateCollectionWithOptions(COLLECTION, query, update, options).map(res -> res.getDocModified());
     }
 
+    public Future<Boolean> deleteNotification(String notificationId, String userId) {
+        JsonObject query = new JsonObject()
+            .put("_id", notificationId)
+            .put("userId", userId);
+        return client.removeDocument(COLLECTION, query).map(res -> res.getRemovedCount() > 0);
+    }
+
     public Future<List<Notification>> fetchUserNotifications(String userId, int skip, int limit) {
         JsonObject query = new JsonObject().put("userId", userId);
         
@@ -218,5 +225,12 @@ public class NotificationRepository {
 
         io.vertx.ext.mongo.UpdateOptions options = new io.vertx.ext.mongo.UpdateOptions().setMulti(true);
         return client.updateCollectionWithOptions(COLLECTION, query, update, options).map(res -> res.getDocModified());
+    }
+
+    public Future<Boolean> deleteAdminNotification(String notificationId) {
+        JsonObject query = new JsonObject()
+            .put("_id", notificationId)
+            .put("recipientType", NotificationAudience.ADMIN.name());
+        return client.removeDocument(COLLECTION, query).map(res -> res.getRemovedCount() > 0);
     }
 }

@@ -19,6 +19,7 @@ public class NotificationRouter {
         router.get("/unread").handler(handler::getUnreadNotifications);
         router.patch("/read-all").handler(handler::markAllAsRead);
         router.patch("/:id/read").handler(handler::markAsRead);
+        router.delete("/:id").handler(handler::deleteNotification);
 
         return router;
     }

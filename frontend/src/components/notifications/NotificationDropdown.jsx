@@ -152,6 +152,24 @@ const NotificationDropdown = () => {
     }
   };
 
+  const handleDeleteNotification = async (id) => {
+    try {
+      await notificationService.deleteNotification(id);
+      setNotifications(prev => prev.filter(n => n.id !== id));
+      setUnreadCount(prev => {
+        const notif = notifications.find(n => n.id === id);
+        if (notif && (!notif.isRead && !notif.read && !notif.unread)) {
+            return Math.max(0, prev - 1);
+        }
+        return prev;
+      });
+    } catch (err) {
+      console.error('Failed to delete notification', err);
+    }
+  };
+
+
+
   const getIcon = (type) => {
     switch (type) {
       case 'NEW_MESSAGE': return <IconMessage size={16} color="#3b82f6" />;
@@ -287,6 +305,7 @@ const NotificationDropdown = () => {
             handleNotificationClick(notif);
             setIsSidePanelOpen(false);
           }}
+          onDeleteNotification={handleDeleteNotification}
         />
       )}
     </div>
