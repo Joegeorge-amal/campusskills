@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { IconCheck, IconX, IconCalendarEvent, IconBell, IconMessage, IconTrash } from '@tabler/icons-react';
+import { IconCheck, IconX, IconCalendarEvent, IconBell, IconMessage, IconTrash, IconListCheck } from '@tabler/icons-react';
 import './NotificationPanel.css';
 
 const getIconForType = (type) => {
@@ -43,29 +43,38 @@ const formatTimeAgo = (timestamp) => {
 
 const NotificationPanel = ({ notifications, onClose, onMarkAllRead, onNotificationClick, onDeleteNotification, onDeleteMultipleNotifications }) => {
   const [selectedIds, setSelectedIds] = useState(new Set());
+  const [isSelectionModeActive, setIsSelectionModeActive] = useState(false);
   
   const unreadCount = notifications.filter(n => n.isRead === false || n.read === false || n.unread === true).length;
 
-  const handleSelectAll = (e) => {
-    if (e.target.checked) {
-      setSelectedIds(new Set(notifications.map(n => n.id)));
-    } else {
+  const toggleSelectionMode = () => {
+    setIsSelectionModeActive(!isSelectionModeActive);
+    if (isSelectionModeActive) {
+      setSelectedIds(new Set()); // Clear selection when exiting
+    }
+  };
+
+  const handleSelectAll = () => {
+    if (selectedIds.size === notifications.length && notifications.length > 0) {
       setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(notifications.map(n => n.id)));
     }
   };
 
   const handleSelectItem = (e, id) => {
     e.stopPropagation();
     const newSet = new Set(selectedIds);
-    if (e.target.checked) {
-      newSet.add(id);
-    } else {
+    if (newSet.has(id)) {
       newSet.delete(id);
+    } else {
+      newSet.add(id);
     }
     setSelectedIds(newSet);
   };
 
   const handleBulkDelete = () => {
+    if (selectedIds.size === 0) return;
     if (window.confirm(`Are you sure you want to delete ${selectedIds.size} notifications?`)) {
       if (onDeleteMultipleNotifications) {
         onDeleteMultipleNotifications(Array.from(selectedIds));
@@ -73,56 +82,55 @@ const NotificationPanel = ({ notifications, onClose, onMarkAllRead, onNotificati
         Array.from(selectedIds).forEach(id => onDeleteNotification(id));
       }
       setSelectedIds(new Set());
+      setIsSelectionModeActive(false);
     }
   };
-
-  const isSelectionMode = selectedIds.size > 0;
 
   return (
     <div className="notif-panel-overlay" onClick={onClose}>
       <div className="notif-panel" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
-        <div className="notif-header">
-          {isSelectionMode ? (
-            <div className="notif-selection-header" style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <input 
-                  type="checkbox" 
-                  checked={selectedIds.size === notifications.length && notifications.length > 0}
-                  ref={input => {
-                    if (input) {
-                      input.indeterminate = selectedIds.size > 0 && selectedIds.size < notifications.length;
-                    }
-                  }}
-                  onChange={handleSelectAll}
-                  style={{ cursor: 'pointer', width: '16px', height: '16px' }}
-                />
-                <span style={{ fontWeight: 600, fontSize: '14px', color: '#111827' }}>
-                  {selectedIds.size} selected
-                </span>
+        <div className="notif-header" style={{ transition: 'background 0.3s' }}>
+          {isSelectionModeActive ? (
+            <div style={{ display: 'flex', flexDirection: 'column', width: '100%', gap: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <h3 style={{ margin: '0 0 4px 0', fontSize: '18px', fontWeight: 600 }}>Selection Mode</h3>
+                  <span style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.8)' }}>{selectedIds.size} selected</span>
+                </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                 <button 
-                  onClick={handleBulkDelete}
+                  onClick={handleSelectAll}
                   style={{
-                    background: '#ef4444',
-                    border: 'none',
-                    color: '#fff',
-                    cursor: 'pointer',
-                    padding: '6px 12px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px',
-                    borderRadius: '4px',
-                    fontSize: '13px',
-                    fontWeight: 500
+                    background: 'rgba(255, 255, 255, 0.2)', border: 'none', color: '#fff', cursor: 'pointer',
+                    padding: '6px 12px', borderRadius: '6px', fontSize: '13px', fontWeight: 500
                   }}
                 >
-                  <IconTrash size={14} />
-                  Delete Selected
+                  {selectedIds.size === notifications.length && notifications.length > 0 ? 'Deselect All' : 'Select All'}
                 </button>
-                <button className="notif-close-btn" onClick={() => setSelectedIds(new Set())}>
-                  <IconX size={20} />
+                <button 
+                  onClick={handleBulkDelete}
+                  disabled={selectedIds.size === 0}
+                  style={{
+                    background: selectedIds.size > 0 ? '#ef4444' : 'rgba(255, 255, 255, 0.1)', 
+                    border: 'none', color: selectedIds.size > 0 ? '#fff' : 'rgba(255, 255, 255, 0.4)', 
+                    cursor: selectedIds.size > 0 ? 'pointer' : 'not-allowed',
+                    padding: '6px 12px', display: 'flex', alignItems: 'center', gap: '6px',
+                    borderRadius: '6px', fontSize: '13px', fontWeight: 500, transition: 'background 0.2s'
+                  }}
+                >
+                  <IconTrash size={14} /> Delete Selected
+                </button>
+                <button 
+                  onClick={toggleSelectionMode}
+                  style={{
+                    background: 'transparent', border: '1px solid rgba(255, 255, 255, 0.3)', color: '#fff', 
+                    cursor: 'pointer', padding: '6px 12px', borderRadius: '6px', fontSize: '13px', 
+                    fontWeight: 500, marginLeft: 'auto'
+                  }}
+                >
+                  Cancel
                 </button>
               </div>
             </div>
@@ -132,9 +140,26 @@ const NotificationPanel = ({ notifications, onClose, onMarkAllRead, onNotificati
                 <h3>Notification History</h3>
                 <span className="notif-unread-count">{unreadCount} unread</span>
               </div>
-              <button className="notif-close-btn" onClick={onClose}>
-                <IconX size={20} />
-              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {notifications.length > 0 && (onDeleteMultipleNotifications || onDeleteNotification) && (
+                  <button 
+                    onClick={toggleSelectionMode}
+                    style={{
+                      background: 'rgba(255,255,255,0.15)', border: 'none', color: '#fff', 
+                      cursor: 'pointer', padding: '6px 12px', borderRadius: '6px', 
+                      fontSize: '13px', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '4px',
+                      transition: 'background 0.2s'
+                    }}
+                    onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,0.25)'}
+                    onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
+                  >
+                    <IconListCheck size={16} /> Select
+                  </button>
+                )}
+                <button className="notif-close-btn" onClick={onClose}>
+                  <IconX size={20} />
+                </button>
+              </div>
             </>
           )}
         </div>
@@ -158,23 +183,19 @@ const NotificationPanel = ({ notifications, onClose, onMarkAllRead, onNotificati
                 return (
                   <div 
                     key={notif.id} 
-                    className={`notif-item ${isUnread ? 'unread' : ''} ${isSelected ? 'selected' : ''}`}
-                    onClick={() => {
-                      if (isSelectionMode) {
-                        handleSelectItem({ target: { checked: !isSelected }, stopPropagation: () => {} }, notif.id);
+                    className={`notif-item ${isUnread ? 'unread' : ''} ${isSelected && isSelectionModeActive ? 'selected' : ''}`}
+                    onClick={(e) => {
+                      if (isSelectionModeActive) {
+                        handleSelectItem(e, notif.id);
                       } else if (onNotificationClick) {
                         onNotificationClick(notif);
                       }
                     }}
                     style={{ 
                       cursor: 'pointer', 
-                      backgroundColor: isSelected ? '#f8fafc' : undefined,
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px'
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center' }} onClick={e => e.stopPropagation()}>
+                    <div className={`notif-checkbox-container ${isSelectionModeActive ? 'visible' : ''}`} onClick={e => e.stopPropagation()}>
                       <input 
                         type="checkbox"
                         checked={isSelected}
@@ -195,7 +216,7 @@ const NotificationPanel = ({ notifications, onClose, onMarkAllRead, onNotificati
                         <span className="notif-time">{formatTimeAgo(notif.createdAt)}</span>
                       </div>
                     </div>
-                    {onDeleteNotification && !isSelectionMode && (
+                    {onDeleteNotification && !isSelectionModeActive && (
                       <button 
                         className="notif-delete-btn"
                         onClick={(e) => {
@@ -227,7 +248,7 @@ const NotificationPanel = ({ notifications, onClose, onMarkAllRead, onNotificati
         </div>
 
         {/* Footer */}
-        {!isSelectionMode && unreadCount > 0 && (
+        {!isSelectionModeActive && unreadCount > 0 && (
           <div className="notif-footer" onClick={onMarkAllRead}>
             Mark all as read
           </div>
