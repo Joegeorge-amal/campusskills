@@ -168,6 +168,25 @@ const NotificationDropdown = () => {
     }
   };
 
+  const handleDeleteMultipleNotifications = async (ids) => {
+    try {
+      await Promise.all(ids.map(id => notificationService.deleteNotification(id)));
+      setNotifications(prev => prev.filter(n => !ids.includes(n.id)));
+      setUnreadCount(prev => {
+        let deletedUnreadCount = 0;
+        ids.forEach(id => {
+          const notif = notifications.find(n => n.id === id);
+          if (notif && (!notif.isRead && !notif.read && !notif.unread)) {
+            deletedUnreadCount++;
+          }
+        });
+        return Math.max(0, prev - deletedUnreadCount);
+      });
+    } catch (err) {
+      console.error('Failed to delete multiple notifications', err);
+    }
+  };
+
 
 
   const getIcon = (type) => {
@@ -306,6 +325,7 @@ const NotificationDropdown = () => {
             setIsSidePanelOpen(false);
           }}
           onDeleteNotification={handleDeleteNotification}
+          onDeleteMultipleNotifications={handleDeleteMultipleNotifications}
         />
       )}
     </div>
