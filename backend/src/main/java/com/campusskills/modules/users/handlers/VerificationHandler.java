@@ -1,5 +1,6 @@
 package com.campusskills.modules.users.handlers;
 
+import com.campusskills.modules.users.models.User;
 import com.campusskills.modules.users.services.VerificationService;
 import com.campusskills.web.response.ApiResponse;
 import io.vertx.core.json.JsonObject;
@@ -28,8 +29,12 @@ public class VerificationHandler {
     }
 
     public void submitVerification(RoutingContext ctx) {
-        JsonObject user = ctx.get("user");
-        String userId = user.getString("userId");
+        User user = ctx.get("user");
+        if (user == null) {
+            ApiResponse.forbidden(ctx, "Unauthorized");
+            return;
+        }
+        String userId = user.getId();
         
         JsonObject body = ctx.body().asJsonObject();
         if (body == null || !body.containsKey("skill")) {
@@ -39,12 +44,16 @@ public class VerificationHandler {
         
         service.submitVerification(userId, body)
             .onSuccess(verification -> ApiResponse.ok(ctx, JsonObject.mapFrom(verification)))
-            .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
+            .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
     }
 
     public void getMyRequests(RoutingContext ctx) {
-        JsonObject user = ctx.get("user");
-        String userId = user.getString("userId");
+        User user = ctx.get("user");
+        if (user == null) {
+            ApiResponse.forbidden(ctx, "Unauthorized");
+            return;
+        }
+        String userId = user.getId();
         
         service.getMyRequests(userId)
             .onSuccess(list -> {
