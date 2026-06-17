@@ -685,15 +685,21 @@ const Messages = () => {
                   >
                     <IconArrowLeft size={20} />
                   </button>
-                  <Avatar initials={activeChat.init} bg={activeChat.bg} color={activeChat.col} backgroundImage={activeChat.avatar} size="36px" fontSize="14px" />
                 </div>
                 
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--cs-text-main)' }}>{activeChat.name}</div>
-                  <div style={{ fontSize: '12px', color: 'var(--cs-text-inactive)', marginTop: '2px' }}>
-                    {isOtherUserTyping ? 'Typing...' : 'Offline'}
+                <div 
+                  onClick={() => navigate(`/app/user/${activeChat.otherId}`)}
+                  style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', flex: 1 }}
+                >
+                  <Avatar initials={activeChat.init} bg={activeChat.bg} color={activeChat.col} backgroundImage={activeChat.avatar} size="36px" fontSize="14px" />
+                  <div>
+                    <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--cs-text-main)' }}>{activeChat.name}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--cs-text-inactive)', marginTop: '2px' }}>
+                      {isOtherUserTyping ? 'Typing...' : 'Offline'}
+                    </div>
                   </div>
                 </div>
+
                 <button 
                   onClick={async () => {
                     if (window.confirm('Are you sure you want to block this user?')) {
