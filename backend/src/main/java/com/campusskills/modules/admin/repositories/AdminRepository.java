@@ -842,10 +842,25 @@ public class AdminRepository {
     public Future<JsonArray> getTopTutors() {
         JsonArray pipeline = new JsonArray()
             .add(new JsonObject().put("$match", new JsonObject().put("status", "COMPLETED")))
+            .add(new JsonObject().put("$lookup", new JsonObject()
+                .put("from", "skill_listings")
+                .put("let", new JsonObject().put("lId", "$listingId"))
+                .put("pipeline", new JsonArray().add(new JsonObject().put("$match", new JsonObject().put("$expr", new JsonObject().put("$eq", new JsonArray().add(new JsonObject().put("$toString", "$_id")).add("$$lId"))))))
+                .put("as", "listing")
+            ))
+            .add(new JsonObject().put("$unwind", new JsonObject().put("path", "$listing").put("preserveNullAndEmptyArrays", true)))
+            .add(new JsonObject().put("$project", new JsonObject()
+                .put("teacherId", 1)
+                .put("price", new JsonObject().put("$ifNull", new JsonArray().add("$listing.price").add(0)))
+                .put("durationHours", new JsonObject().put("$divide", new JsonArray()
+                    .add(new JsonObject().put("$subtract", new JsonArray().add("$scheduledEnd").add("$scheduledStart")))
+                    .add(3600000)
+                ))
+            ))
             .add(new JsonObject().put("$group", new JsonObject()
                 .put("_id", "$teacherId")
                 .put("sessions", new JsonObject().put("$sum", 1))
-                .put("earnings", new JsonObject().put("$sum", "$amount"))
+                .put("earnings", new JsonObject().put("$sum", new JsonObject().put("$multiply", new JsonArray().add("$price").add(new JsonObject().put("$max", new JsonArray().add("$durationHours").add(1))))))
             ))
             .add(new JsonObject().put("$sort", new JsonObject().put("sessions", -1)))
             .add(new JsonObject().put("$limit", 5))
@@ -869,13 +884,16 @@ public class AdminRepository {
                     if (profile == null) profile = new JsonObject();
                     
                     String name = profile.getString("name", "Unknown Tutor");
+                    double rating = profile.getDouble("averageRating", 0.0);
+                    double roundedRating = Math.round(rating * 10.0) / 10.0;
+                    
                     arr.add(new JsonObject()
                         .put("id", r.getString("_id"))
                         .put("name", name)
                         .put("initial", name.isEmpty() ? "T" : name.substring(0, 1).toUpperCase())
                         .put("dept", profile.getString("department", "General"))
                         .put("sessions", r.getInteger("sessions", 0))
-                        .put("rating", profile.getDouble("averageRating", 0.0)) 
+                        .put("rating", roundedRating) 
                         .put("earnings", String.valueOf(r.getInteger("earnings", 0)))
                         .put("rank", i + 1)
                     );
