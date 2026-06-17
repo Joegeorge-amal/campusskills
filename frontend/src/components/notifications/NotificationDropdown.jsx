@@ -39,6 +39,29 @@ const NotificationDropdown = () => {
 
   useEffect(() => {
     fetchNotifications();
+
+    const handleMarkEvent = (e) => {
+      const { sourceType, sourceId } = e.detail;
+      setNotifications(prev => {
+        let changed = false;
+        const next = prev.map(n => {
+          if (n.sourceType === sourceType && n.sourceId === sourceId && (!n.isRead && !n.read)) {
+            changed = true;
+            notificationService.markAsRead(n.id).catch(console.error);
+            return { ...n, isRead: true, read: true, unread: false };
+          }
+          return n;
+        });
+        if (changed) {
+           const newUnreadCount = next.filter(n => n.isRead === false || n.read === false || n.unread === true).length;
+           setUnreadCount(newUnreadCount);
+        }
+        return changed ? next : prev;
+      });
+    };
+
+    window.addEventListener('markNotificationAsRead', handleMarkEvent);
+    return () => window.removeEventListener('markNotificationAsRead', handleMarkEvent);
   }, []);
 
   useEffect(() => {

@@ -15,6 +15,7 @@ const GlobalNotificationPopup = ({
   onPrimaryClick,
   onSecondaryClick,
   onClose,
+  onClick,
   autoCloseMs = 0,
   children
 }) => {
@@ -34,7 +35,8 @@ const GlobalNotificationPopup = ({
     };
   }, [autoCloseMs, onClose, title]); // Reset when title changes (new popup)
 
-  const handleClose = () => {
+  const handleClose = (e) => {
+    if (e) e.stopPropagation();
     setIsVisible(false);
     if (onClose) onClose();
   };
@@ -49,7 +51,9 @@ const GlobalNotificationPopup = ({
           to { transform: translateX(0); opacity: 1; }
         }
       `}</style>
-      <div style={{
+      <div 
+        onClick={onClick}
+        style={{
         position: 'fixed',
         top: '80px',
         right: '24px',
@@ -60,7 +64,8 @@ const GlobalNotificationPopup = ({
         padding: '20px',
         zIndex: 9998,
         border: '1px solid #f3f4f6',
-        animation: 'slideInRightPopup 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+        animation: 'slideInRightPopup 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+        cursor: onClick ? 'pointer' : 'default'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -110,7 +115,7 @@ const GlobalNotificationPopup = ({
               fontSize: '14px',
               fontWeight: 700,
               cursor: 'pointer'
-            }} onClick={onPrimaryClick}>
+            }} onClick={(e) => { if(e) e.stopPropagation(); onPrimaryClick(); }}>
               {primaryButtonText}
             </button>
           )}
@@ -125,7 +130,7 @@ const GlobalNotificationPopup = ({
               fontSize: '14px',
               fontWeight: 700,
               cursor: 'pointer'
-            }} onClick={onSecondaryClick}>
+            }} onClick={(e) => { if(e) e.stopPropagation(); onSecondaryClick(); }}>
               {secondaryButtonText}
             </button>
           )}
