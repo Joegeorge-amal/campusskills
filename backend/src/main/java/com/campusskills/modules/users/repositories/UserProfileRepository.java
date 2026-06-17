@@ -58,11 +58,20 @@ public class UserProfileRepository {
     }
 
     public Future<Boolean> addVerifiedSkill(String userId, String skillName) {
-        JsonObject query = new JsonObject().put("userId", userId);
-        JsonObject updateDoc = new JsonObject()
-            .put("$addToSet", new JsonObject().put("verifiedSkills", skillName))
-            .put("$set", new JsonObject().put("updatedAt", System.currentTimeMillis()));
-        return client.updateCollection(COLLECTION, query, updateDoc).map(res -> res.getDocModified() > 0);
+        // Initialize verifiedSkills to empty array if it's null (handles existing profiles)
+        JsonObject initQuery = new JsonObject().put("userId", userId).put("verifiedSkills", (String) null);
+        JsonObject initUpdate = new JsonObject()
+            .put("$set", new JsonObject().put("verifiedSkills", new io.vertx.core.json.JsonArray())
+                .put("updatedAt", System.currentTimeMillis()));
+        
+        return client.updateCollection(COLLECTION, initQuery, initUpdate)
+            .compose(res -> {
+                JsonObject query = new JsonObject().put("userId", userId);
+                JsonObject updateDoc = new JsonObject()
+                    .put("$addToSet", new JsonObject().put("verifiedSkills", skillName))
+                    .put("$set", new JsonObject().put("updatedAt", System.currentTimeMillis()));
+                return client.updateCollection(COLLECTION, query, updateDoc).map(res2 -> res2.getDocModified() > 0);
+            });
     }
 
     public Future<Boolean> blockUser(String userId, String targetUserId) {

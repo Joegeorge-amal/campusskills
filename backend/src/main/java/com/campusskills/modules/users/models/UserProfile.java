@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.campusskills.shared.models.SkillProfile;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -28,7 +29,7 @@ public class UserProfile {
     private String upi;
     private List<SkillProfile> skillsOffered;
     private List<String> skillsWanted;
-    private List<String> verifiedSkills;
+    private List<String> verifiedSkills = new ArrayList<>();
     private List<String> preferredTimes;
     private String sessionPreference;
     private String exchangePreference;
