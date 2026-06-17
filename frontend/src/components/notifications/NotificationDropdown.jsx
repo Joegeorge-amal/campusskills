@@ -97,7 +97,7 @@ const NotificationDropdown = () => {
   const markAllRead = async () => {
     try {
       await notificationService.markAllAsRead();
-      setNotifications(notifications.map(n => ({ ...n, isRead: true, read: true, unread: false })));
+      setNotifications(prev => prev.map(n => ({ ...n, isRead: true, read: true, unread: false })));
       setUnreadCount(0);
     } catch (err) {
       console.error('Failed to mark all read', err);
@@ -105,11 +105,11 @@ const NotificationDropdown = () => {
   };
 
   const markAsRead = async (id, isReadVal) => {
-    const isAlreadyRead = isReadVal === true || isReadVal === 'true';
+    const isAlreadyRead = isReadVal === true || isReadVal === 'true' || isReadVal === 1;
     if (isAlreadyRead) return;
     try {
       await notificationService.markAsRead(id);
-      setNotifications(notifications.map(n => n.id === id ? { ...n, isRead: true, read: true, unread: false } : n));
+      setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true, read: true, unread: false } : n));
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (err) {
       console.error('Failed to mark read', err);

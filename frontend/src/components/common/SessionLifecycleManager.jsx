@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useAppData } from '../../context/AppDataContext';
 import { useAuth } from '../../context/AuthContext';
 import { sessionService } from '../../services/sessionService';
+import { chatRequestService } from '../../services/chatRequestService';
+import { exchangeService } from '../../services/exchangeService';
 import GlobalNotificationPopup from './GlobalNotificationPopup';
 import ReviewModal from '../modals/ReviewModal';
 import ConfirmModal from '../modals/ConfirmModal';
@@ -13,13 +15,12 @@ const SessionLifecycleManager = () => {
     sessionEvent, 
     sessionsData, 
     requestsData,
-    fetchInitialData,
-    acceptRequest,
-    declineRequest
+    fetchInitialData
   } = useAppData();
   
   const [activePopup, setActivePopup] = useState(null);
   const [reviewModalData, setReviewModalData] = useState(null);
+  const [dismissedRequests, setDismissedRequests] = useState([]);
 
   // Monitor for pending states on load or data refresh (handles reloads where WS events are lost)
   useEffect(() => {
@@ -216,7 +217,43 @@ const SessionLifecycleManager = () => {
     }
   };
 
-  const pendingRequests = requestsData?.filter(r => r.direction === 'incoming' && r.status === 'pending') || [];
+  const handleAcceptRequest = async (req) => {
+    try {
+      if (req.type === 'Chat request' || (req.type && req.type.toLowerCase().includes('chat'))) {
+        await chatRequestService.acceptRequest(req.id);
+      } else if (req.type === 'Skill swap request' || (req.type && req.type.toLowerCase().includes('swap'))) {
+        await exchangeService.acceptSwap(req.id);
+      } else {
+        await exchangeService.acceptRequest(req.id);
+      }
+      setDismissedRequests(prev => [...prev, req.id]);
+      fetchInitialData();
+    } catch (error) {
+      console.error('Failed to accept request:', error);
+    }
+  };
+
+  const handleDeclineRequest = async (req) => {
+    try {
+      if (req.type === 'Chat request' || (req.type && req.type.toLowerCase().includes('chat'))) {
+        await chatRequestService.rejectRequest(req.id);
+      } else if (req.type === 'Skill swap request' || (req.type && req.type.toLowerCase().includes('swap'))) {
+        await exchangeService.rejectExchange(req.id);
+      } else {
+        await exchangeService.rejectRequest(req.id);
+      }
+      setDismissedRequests(prev => [...prev, req.id]);
+      fetchInitialData();
+    } catch (error) {
+      console.error('Failed to decline request:', error);
+    }
+  };
+
+  const handleDismissRequestPopup = (reqId) => {
+    setDismissedRequests(prev => [...prev, reqId]);
+  };
+
+  const pendingRequests = requestsData?.filter(r => r.direction === 'incoming' && r.status === 'pending' && !dismissedRequests.includes(r.id)) || [];
   const activeRequest = pendingRequests.length > 0 ? pendingRequests[0] : null;
 
   if (!activePopup && !reviewModalData && !activeRequest) return null;
@@ -225,10 +262,12 @@ const SessionLifecycleManager = () => {
     <>
       {!activePopup && !reviewModalData && activeRequest && (() => {
         let reqType = 'Session Request';
+        let isChat = false;
         if (activeRequest.type?.toLowerCase().includes('swap')) {
           reqType = 'Swap Request';
         } else if (activeRequest.type?.toLowerCase().includes('chat')) {
           reqType = 'Chat Request';
+          isChat = true;
         } else if (activeRequest.otherUserExtras?.listingType === 'TEACH' || activeRequest.otherUserExtras?.listingType === 'TEACH_SWAP') {
           reqType = 'Teach Request';
         } else if (activeRequest.otherUserExtras?.listingType === 'LEARN' || activeRequest.otherUserExtras?.listingType === 'LEARN_SWAP') {
@@ -236,22 +275,23 @@ const SessionLifecycleManager = () => {
         }
         
         const listingTitle = activeRequest.otherUserExtras?.listingTitle || 'Skill Session';
+        const subtitleText = isChat ? 'Wants to chat with you' : `Wants to book ${listingTitle}`;
         const remainingCount = pendingRequests.length - 1;
 
         return (
           <GlobalNotificationPopup
             title={activeRequest.name || 'Unknown User'}
-            subtitle={`Wants to book ${listingTitle}`}
-            badge={`NEW REQUEST ${remainingCount > 0 ? `(+${remainingCount} more)` : ''}`}
+            subtitle={subtitleText}
+            badge={`NEW ${reqType.toUpperCase()} ${remainingCount > 0 ? `(+${remainingCount} more)` : ''}`}
             badgeColor="#1d4ed8"
             avatarInitials={activeRequest.init}
             avatarBg={activeRequest.bg}
             avatarColor={activeRequest.col}
             primaryButtonText="Accept"
-            secondaryButtonText="Dismiss"
-            onPrimaryClick={() => acceptRequest(activeRequest.id)}
-            onSecondaryClick={() => declineRequest(activeRequest.id)}
-            onClose={() => declineRequest(activeRequest.id)}
+            secondaryButtonText="Decline"
+            onPrimaryClick={() => handleAcceptRequest(activeRequest)}
+            onSecondaryClick={() => handleDeclineRequest(activeRequest)}
+            onClose={() => handleDismissRequestPopup(activeRequest.id)}
           />
         );
       })()}
