@@ -4,15 +4,10 @@ const ThemeContext = createContext();
 
 const THEME_KEY = 'campusskills_theme';
 
-const getSystemTheme = () => {
-  if (window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
-  return 'light';
-};
-
 const getSavedTheme = () => localStorage.getItem(THEME_KEY);
 
 export const ThemeProvider = ({ children }) => {
-  const [theme, setTheme] = useState(() => getSavedTheme() || getSystemTheme());
+  const [theme, setTheme] = useState(() => getSavedTheme() || 'light');
   const [followingSystem, setFollowingSystem] = useState(!getSavedTheme());
 
   const applyTheme = useCallback((t) => {

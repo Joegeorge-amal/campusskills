@@ -15,6 +15,7 @@ export const WebSocketProvider = ({ children }) => {
   }, []);
 
   const handleStatusChange = useCallback((newStatus) => {
+    console.log('[WebSocket] status:', newStatus);
     setStatus(newStatus);
     if (newStatus === 'disconnected') {
       // Trigger a silent API call to force Axios interceptor to refresh token if expired

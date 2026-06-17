@@ -11,6 +11,7 @@ public class MessageBroadcaster {
     private static final Logger log = LoggerFactory.getLogger(MessageBroadcaster.class);
 
     public static void broadcastNewMessage(Message message, java.util.List<String> participants) {
+        long start = System.currentTimeMillis();
         try {
             JsonObject eventPayload = new JsonObject()
                     .put("_id", message.getId())
@@ -39,6 +40,10 @@ public class MessageBroadcaster {
 
             for (String participant : participants) {
                 ConnectionManager.sendMessage(participant, event);
+            }
+            if (log.isInfoEnabled()) {
+                log.info("[WS] message emitted [chatId={}] [participants={}] [duration={}ms]",
+                    message.getChatId(), participants, System.currentTimeMillis() - start);
             }
         } catch (Exception e) {
             log.error("[BROADCAST WARN] Failed to broadcast NEW_MESSAGE", e);

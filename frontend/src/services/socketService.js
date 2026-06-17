@@ -2,7 +2,7 @@
 let wsConnection = null;
 let connectionGen = 0;
 let reconnectInterval = 1000;
-let maxReconnectInterval = 30000;
+const maxReconnectInterval = 30000;
 let reconnectTimer = null;
 let isExpectedClose = false;
 
@@ -19,6 +19,7 @@ export const socketService = {
       return;
     }
 
+    reconnectInterval = 1000;
     isExpectedClose = false;
     onStatusChange('connecting');
 
@@ -31,6 +32,7 @@ export const socketService = {
 
     const wsUrl = `${WS_BASE_URL}?token=${encodeURIComponent(token)}`;
 
+    console.log('[WS-Service] Connecting...', { url: wsUrl.replace(/token=.*/, 'token=***') });
     try {
       const currentGen = ++connectionGen;
       const conn = new WebSocket(wsUrl);
@@ -38,7 +40,7 @@ export const socketService = {
 
       conn.onopen = () => {
         if (connectionGen !== currentGen) return;
-        console.log('[WS-Service] WebSocket connection active.');
+        console.log('[WS-Service] socket connected');
         reconnectInterval = 1000; // Reset reconnect interval
         onStatusChange('connected');
       };
@@ -54,19 +56,22 @@ export const socketService = {
       };
 
       conn.onclose = (event) => {
-        if (connectionGen !== currentGen) return; // Stale connection — ignore
+        if (connectionGen !== currentGen) {
+          console.log('[WS-Service] socket disconnected (stale)');
+          return;
+        }
         wsConnection = null;
+        console.log('[WS-Service] socket disconnected');
         onStatusChange('disconnected');
 
         if (!isExpectedClose) {
-          console.warn(`[WS-Service] Closed unexpectedly. Attempting reconnect in ${reconnectInterval}ms...`);
+          console.warn(`[WS-Service] Attempting reconnect in ${reconnectInterval}ms...`);
           reconnectTimer = setTimeout(() => {
-            // Exponential backoff reconnect
             reconnectInterval = Math.min(reconnectInterval * 2, maxReconnectInterval);
             socketService.connect(tokenOrGetter, onMessage, onStatusChange);
           }, reconnectInterval);
         } else {
-          console.log('[WS-Service] Disconnected cleanly.');
+          console.log('[WS-Service] socket disconnected (expected)');
         }
       };
 
@@ -82,7 +87,7 @@ export const socketService = {
 
   send: (eventType, payload) => {
     if (!wsConnection || wsConnection.readyState !== WebSocket.OPEN) {
-      console.warn('[WS-Service] Cannot emit message. Socket state is offline.');
+      console.warn('[WS-Service] Cannot emit:', eventType, '(socket offline)');
       return false;
     }
 
@@ -104,6 +109,7 @@ export const socketService = {
       reconnectTimer = null;
     }
     if (wsConnection) {
+      console.log('[WS-Service] socket reused');
       wsConnection.close();
       wsConnection = null;
     }
