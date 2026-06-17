@@ -10,7 +10,19 @@ const GlobalNotificationListener = () => {
 
   useEffect(() => {
     if (lastMessage && lastMessage.type === 'NOTIFICATION') {
-      setActiveNotification(lastMessage.payload);
+      const payload = lastMessage.payload;
+      
+      // If the notification is for a new chat message, check if we're already in that chat
+      if (payload.type === 'NEW_MESSAGE' && payload.sourceType === 'CHAT') {
+        const currentPath = window.location.pathname;
+        const chatPath = `/app/messages/${payload.sourceId}`;
+        if (currentPath === chatPath || currentPath === `${chatPath}/`) {
+          // Do not show popup if already in the chat
+          return;
+        }
+      }
+
+      setActiveNotification(payload);
       setNotificationKey(prev => prev + 1);
     }
   }, [lastMessage]);
