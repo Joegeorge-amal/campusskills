@@ -199,7 +199,8 @@
   transform: translateY(-50%);
   display: flex;
   align-items: center;
-  width: 160px;
+  width: 200px;
+  min-width: fit-content;
   height: 40px;
   background: #ffffff;
   border: 1px solid #dbeafe;

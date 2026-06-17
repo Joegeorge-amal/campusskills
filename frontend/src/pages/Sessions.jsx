@@ -782,11 +782,13 @@ const Sessions = () => {
         </div>
         
         {isAllOpen && (
-          <div className="sessions-list">
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
             {activeSessions.map((s, idx) => renderSessionCard(s, idx))}
             
             {activeSessions.length === 0 && (
-              <div className="empty-state">No other active sessions.</div>
+              <div style={{ fontSize: '14px', color: '#6b7280', padding: '32px 0', textAlign: 'center', background: '#ffffff', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
+                No other active sessions.
+              </div>
             )}
           </div>
         )}
