@@ -10,6 +10,7 @@ public class SkillVerification {
     private String userId;
     private String skill;
     private Double score;
+    private Double confidenceScore;
     private Boolean passed;
     private Integer warningCount;
     private Boolean failedDueToTabSwitch;
@@ -34,6 +35,9 @@ public class SkillVerification {
 
     public Double getScore() { return score; }
     public void setScore(Double score) { this.score = score; }
+
+    public Double getConfidenceScore() { return confidenceScore; }
+    public void setConfidenceScore(Double confidenceScore) { this.confidenceScore = confidenceScore; }
 
     public Boolean getPassed() { return passed; }
     public void setPassed(Boolean passed) { this.passed = passed; }

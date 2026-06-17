@@ -49,65 +49,143 @@ public class VerificationService {
     }
 
     public Future<SkillVerification> submitVerification(String userId, JsonObject payload) {
-        String skill = payload.getString("skill");
-        JsonObject answers = payload.getJsonObject("answers", new JsonObject());
-        Boolean failedDueToTabSwitch = payload.getBoolean("failedDueToTabSwitch", false);
-        Integer warningCount = payload.getInteger("warningCount", 0);
-        Long startedAt = payload.getLong("startedAt", System.currentTimeMillis());
-        Long completedAt = System.currentTimeMillis();
-
-        if (failedDueToTabSwitch) {
-            return saveAttempt(userId, skill, 0.0, false, warningCount, true, startedAt, completedAt, "FAILED_TAB_SWITCH");
-        }
-
-        JsonObject query = new JsonObject().put("skill", skill);
-        return mongoClient.find("question_banks", query).compose(docs -> {
-            int total = 10;
-            int correct = 0;
+        try {
+            System.out.println("===== START SUBMIT VERIFICATION =====");
+            System.out.println("Payload received: " + (payload != null ? payload.encode() : "null"));
             
-            StringBuilder debugStr = new StringBuilder();
-            debugStr.append("Payload answers keys: ").append(answers.fieldNames()).append(". ");
+            String skill = payload != null ? payload.getString("skill") : "UNKNOWN_SKILL";
+            System.out.println("Skill: " + skill);
             
-            for (JsonObject q : docs) {
-                String qText = q.getString("question");
-                String qId = null;
-                Object idObj = q.getValue("_id");
-                if (idObj instanceof JsonObject && ((JsonObject) idObj).containsKey("$oid")) {
-                    qId = ((JsonObject) idObj).getString("$oid");
-                } else if (idObj != null) {
-                    qId = idObj.toString();
-                }
-
-                if ((qText != null && answers.containsKey(qText)) || (qId != null && answers.containsKey(qId))) {
-                    Integer provided = answers.containsKey(qText) ? answers.getInteger(qText) : answers.getInteger(qId);
-                    Integer actual = q.getInteger("correctAnswer");
-                    debugStr.append("Q:").append(qText != null ? qText.substring(0, Math.min(10, qText.length())) : "null")
-                            .append(" P:").append(provided).append(" A:").append(actual).append(" | ");
-                    if (provided != null && actual != null && provided.equals(actual)) {
-                        correct++;
+            JsonObject answers = new JsonObject();
+            if (payload != null && payload.getValue("answers") instanceof JsonObject) {
+                answers = payload.getJsonObject("answers");
+            } else {
+                System.out.println("WARNING: answers field is missing or not a JsonObject. Value: " + 
+                    (payload != null ? payload.getValue("answers") : "null"));
+            }
+            System.out.println("Answers array keys: " + answers.fieldNames());
+            
+            Boolean failedDueToTabSwitch = false;
+            try { failedDueToTabSwitch = payload != null ? payload.getBoolean("failedDueToTabSwitch", false) : false; } catch (Exception e) {}
+            
+            Integer warningCount = 0;
+            try { warningCount = payload != null ? payload.getInteger("warningCount", 0) : 0; } catch (Exception e) {}
+            
+            Long startedAt = System.currentTimeMillis();
+            if (payload != null) {
+                try {
+                    Object startedAtObj = payload.getValue("startedAt");
+                    if (startedAtObj instanceof Number) {
+                        startedAt = ((Number) startedAtObj).longValue();
+                    } else if (startedAtObj != null) {
+                        startedAt = Long.parseLong(startedAtObj.toString());
                     }
+                } catch (Exception e) {
+                    System.out.println("WARNING: Failed to parse startedAt. Using current time.");
+                    e.printStackTrace();
                 }
             }
+            Long completedAt = System.currentTimeMillis();
 
-            double score = (double) correct / total * 100.0;
-            boolean passed = score >= 60.0;
-            String status = passed ? "COMPLETED_PASS" : "COMPLETED_FAIL";
+            if (failedDueToTabSwitch) {
+                return saveAttempt(userId, skill, 0.0, 0.0, false, warningCount, true, startedAt, completedAt, "FAILED_TAB_SWITCH", "Tab switch failed");
+            }
 
-            return saveAttempt(userId, skill, score, passed, warningCount, false, startedAt, completedAt, status, debugStr.toString())
-                .compose(verification -> {
-                    if (passed) {
-                        return updateUserProfile(userId, skill).map(verification);
+            JsonObject query = new JsonObject().put("skill", skill);
+            System.out.println("Mongo query: " + query.encode());
+
+            final JsonObject finalAnswers = answers;
+            final Long finalStartedAt = startedAt;
+            final Integer finalWarningCount = warningCount;
+            return mongoClient.find("question_banks", query).compose(docs -> {
+                System.out.println("Retrieved question count from DB: " + (docs != null ? docs.size() : "null"));
+                
+                int total = docs != null && docs.size() > 0 ? docs.size() : 10;
+                int correct = 0;
+                
+                StringBuilder debugStr = new StringBuilder();
+                debugStr.append("Payload answers keys: ").append(finalAnswers.fieldNames()).append(". ");
+                
+                if (docs != null) {
+                    for (JsonObject q : docs) {
+                        try {
+                            String qText = q.getString("question");
+                            String qId = null;
+                            Object idObj = q.getValue("_id");
+                            if (idObj instanceof JsonObject && ((JsonObject) idObj).containsKey("$oid")) {
+                                qId = ((JsonObject) idObj).getString("$oid");
+                            } else if (idObj != null) {
+                                qId = idObj.toString();
+                            }
+
+                            if ((qText != null && finalAnswers.containsKey(qText)) || (qId != null && finalAnswers.containsKey(qId))) {
+                                Object providedObj = finalAnswers.containsKey(qText) ? finalAnswers.getValue(qText) : finalAnswers.getValue(qId);
+                                Integer provided = null;
+                                if (providedObj instanceof Number) {
+                                    provided = ((Number) providedObj).intValue();
+                                } else if (providedObj != null) {
+                                    provided = Integer.parseInt(providedObj.toString());
+                                }
+                                
+                                Integer actual = q.getInteger("correctAnswer");
+                                debugStr.append("Q:").append(qText != null ? qText.substring(0, Math.min(10, qText.length())) : "null")
+                                        .append(" P:").append(provided).append(" A:").append(actual).append(" | ");
+                                if (provided != null && actual != null && provided.equals(actual)) {
+                                    correct++;
+                                }
+                            }
+                        } catch (Exception loopEx) {
+                            System.out.println("Exception processing individual question: ");
+                            loopEx.printStackTrace();
+                        }
                     }
-                    return Future.succeededFuture(verification);
-                });
-        });
+                }
+
+                System.out.println("Calculated correct: " + correct + ", total: " + total);
+                
+                double score = total > 0 ? ((double) correct / total * 100.0) : 0.0;
+                double confidenceScore = score; // Placeholder confidence score
+                boolean passed = score >= 60.0;
+                String status = passed ? "COMPLETED_PASS" : "COMPLETED_FAIL";
+
+                System.out.println("Score calculation: " + score + ", Confidence: " + confidenceScore + ", Passed: " + passed);
+
+                return saveAttempt(userId, skill, score, confidenceScore, passed, finalWarningCount, false, finalStartedAt, completedAt, status, debugStr.toString())
+                    .compose(verification -> {
+                        System.out.println("Attempt saved to DB: " + verification.getId());
+                        if (passed) {
+                            return updateUserProfile(userId, skill).map(verification);
+                        }
+                        return Future.succeededFuture(verification);
+                    });
+            }).onFailure(err -> {
+                System.out.println("Exception in MongoClient find or save callback:");
+                err.printStackTrace();
+            }).recover(err -> {
+                System.out.println("Recovering from error, returning fallback JSON.");
+                SkillVerification fallback = new SkillVerification();
+                fallback.setPassed(false);
+                fallback.setScore(0.0);
+                fallback.setConfidenceScore(0.0);
+                return Future.succeededFuture(fallback);
+            });
+        } catch (Exception e) {
+            System.out.println("Exception caught in synchronous block of submitVerification:");
+            e.printStackTrace();
+            SkillVerification fallback = new SkillVerification();
+            fallback.setPassed(false);
+            fallback.setScore(0.0);
+            fallback.setConfidenceScore(0.0);
+            return Future.succeededFuture(fallback);
+        }
     }
 
-    private Future<SkillVerification> saveAttempt(String userId, String skill, Double score, Boolean passed, Integer warningCount, Boolean failedDueToTabSwitch, Long startedAt, Long completedAt, String status, String debug) {
+    private Future<SkillVerification> saveAttempt(String userId, String skill, Double score, Double confidenceScore, Boolean passed, Integer warningCount, Boolean failedDueToTabSwitch, Long startedAt, Long completedAt, String status, String debug) {
         SkillVerification v = new SkillVerification();
         v.setUserId(userId);
         v.setSkill(skill);
         v.setScore(score);
+        v.setConfidenceScore(confidenceScore);
         v.setPassed(passed);
         v.setWarningCount(warningCount);
         v.setFailedDueToTabSwitch(failedDueToTabSwitch);

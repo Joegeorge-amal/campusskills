@@ -498,5 +498,3061 @@
       "const [c1: 'red', c2: 'green'] = colors;"
     ],
     "correctAnswer": 0
+  },
+  {
+    "skill": "C++",
+    "question": "Which of the following is the correct syntax to print a message to the console in C++?",
+    "options": ["System.out.println(\"Hello\");", "cout << \"Hello\";", "print(\"Hello\");", "Console.WriteLine(\"Hello\");"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "C++",
+    "question": "What is the size of an 'int' data type in C++ on a typical 32-bit or 64-bit system?",
+    "options": ["1 byte", "2 bytes", "4 bytes", "8 bytes"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "C++",
+    "question": "Which operator is used to dynamically allocate memory for a single variable in C++?",
+    "options": ["malloc", "alloc", "new", "create"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "C++",
+    "question": "What does the 'virtual' keyword do when applied to a class method in C++?",
+    "options": ["It prevents the method from being overridden.", "It allows the method to be overridden in derived classes, enabling polymorphism.", "It makes the method inaccessible outside the class.", "It indicates that the method has no implementation in the base class."],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "C++",
+    "question": "In C++, what is a reference variable?",
+    "options": ["A pointer that holds the memory address of another variable.", "An alias for an already existing variable.", "A variable that cannot be modified once initialized.", "A copy of another variable's value."],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "C++",
+    "question": "Which of the following is NOT a valid access specifier in C++?",
+    "options": ["public", "private", "protected", "internal"],
+    "correctAnswer": 3
+  },
+  {
+    "skill": "C++",
+    "question": "How do you define a constant variable in C++?",
+    "options": ["constant int x = 10;", "final int x = 10;", "const int x = 10;", "let x = 10;"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "C++",
+    "question": "What is the purpose of a destructor in a C++ class?",
+    "options": ["To initialize object properties.", "To allocate memory for the object.", "To clean up resources and deallocate memory before the object is destroyed.", "To copy the contents of one object to another."],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "C++",
+    "question": "What is a pure virtual function in C++?",
+    "options": ["A function that has no parameters.", "A function declared with '= 0' that must be overridden by derived classes.", "A function that can only be called from within the same class.", "A function that returns no value."],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "C++",
+    "question": "Which standard library header is required to use the std::vector container?",
+    "options": ["<array>", "<list>", "<vector>", "<collections>"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "C",
+    "question": "Which of the following is the correct way to declare a pointer to an integer in C?",
+    "options": ["int ptr*;", "int *ptr;", "ptr *int;", "pointer int ptr;"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "C",
+    "question": "What is the return type of the malloc() function in C?",
+    "options": ["int*", "void*", "char*", "null*"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "C",
+    "question": "Which format specifier is used to print a string using printf() in C?",
+    "options": ["%c", "%d", "%s", "%f"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "C",
+    "question": "What does the 'sizeof' operator do in C?",
+    "options": ["Returns the value of a variable.", "Returns the memory address of a variable.", "Returns the size of a variable or data type in bytes.", "Returns the length of a string in characters."],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "C",
+    "question": "How do you access the value stored at a memory address held by a pointer?",
+    "options": ["Using the '&' operator (e.g., &ptr)", "Using the '*' operator (e.g., *ptr)", "Using the '->' operator (e.g., ptr->value)", "Using the '.' operator (e.g., ptr.value)"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "C",
+    "question": "Which header file is required to use functions like printf() and scanf() in C?",
+    "options": ["<stdlib.h>", "<conio.h>", "<stdio.h>", "<math.h>"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "C",
+    "question": "In C, what is the index of the first element in an array?",
+    "options": ["1", "0", "-1", "Depends on the array declaration"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "C",
+    "question": "What happens if you attempt to access an array element outside of its declared bounds in C?",
+    "options": ["The compiler throws a syntax error.", "The program throws an IndexOutOfBoundsException.", "The array is automatically resized.", "It results in undefined behavior and may cause a segmentation fault."],
+    "correctAnswer": 3
+  },
+  {
+    "skill": "C",
+    "question": "Which of the following is used to define a custom data type that groups multiple variables of different types under a single name?",
+    "options": ["array", "union", "struct", "class"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "C",
+    "question": "What is the purpose of the 'break' statement in a loop?",
+    "options": ["To pause the loop execution temporarily.", "To skip the current iteration and proceed to the next.", "To exit the loop immediately.", "To restart the loop from the beginning."],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "C#",
+    "question": "Which keyword is used to inherit from a base class in C#?",
+    "options": ["extends", "inherits", ":", "->"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "C#",
+    "question": "What is the entry point of a standard C# console application?",
+    "options": ["public void Start()", "static void Main()", "public static int main()", "private void Init()"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "C#",
+    "question": "In C#, what is the difference between 'String' and 'string'?",
+    "options": ["'String' is a class, 'string' is a struct.", "There is no difference; 'string' is an alias for 'System.String'.", "'String' is used for mutable text, 'string' is immutable.", "'string' can only hold ASCII characters."],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "C#",
+    "question": "Which interface must be implemented to support simple iteration over a collection using a 'foreach' loop in C#?",
+    "options": ["ICollection", "IList", "IEnumerable", "IEnumerator"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "C#",
+    "question": "What is the default access modifier for members of a class in C#?",
+    "options": ["public", "private", "protected", "internal"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "C#",
+    "question": "Which of the following modifiers makes a class unable to be inherited?",
+    "options": ["abstract", "sealed", "static", "readonly"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "C#",
+    "question": "What does the 'async' keyword do when modifying a method in C#?",
+    "options": ["It runs the method on a separate background thread automatically.", "It enables the use of the 'await' keyword within the method.", "It prevents the method from modifying any class variables.", "It makes the method execute synchronously."],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "C#",
+    "question": "How do you handle exceptions in C#?",
+    "options": ["try-catch blocks", "on error goto", "try-except blocks", "error-catch blocks"],
+    "correctAnswer": 0
+  },
+  {
+    "skill": "C#",
+    "question": "What is a 'delegate' in C#?",
+    "options": ["A variable that holds an object reference.", "A type that represents references to methods with a particular parameter list and return type.", "A class that manages background tasks.", "A keyword used to pass properties between classes."],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "C#",
+    "question": "Which LINQ method is used to filter a collection based on a condition?",
+    "options": ["Select", "Filter", "Where", "Find"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "TypeScript",
+    "question": "What is TypeScript primarily known for compared to JavaScript?",
+    "options": ["It runs faster in the browser.", "It adds optional static typing to JavaScript.", "It provides a built-in virtual DOM.", "It does not require compilation."],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "TypeScript",
+    "question": "How do you define an interface in TypeScript?",
+    "options": ["type User = { name: string; }", "interface User { name: string; }", "class User { name: string; }", "struct User { name: string; }"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "TypeScript",
+    "question": "Which keyword is used to specify that a variable can be of multiple specific types?",
+    "options": ["any", "mixed", "union (|)", "combine"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "TypeScript",
+    "question": "What does the 'any' type represent in TypeScript?",
+    "options": ["A type that accepts only boolean values.", "A type that opts out of type checking, allowing any value.", "A strict type that requires exhaustive checking.", "An empty type with no values."],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "TypeScript",
+    "question": "How do you indicate that a parameter is optional in a TypeScript interface or function?",
+    "options": ["By appending a '?' after the parameter name.", "By wrapping the parameter in brackets '[]'.", "By using the 'optional' keyword.", "By setting its default value to 'null'."],
+    "correctAnswer": 0
+  },
+  {
+    "skill": "TypeScript",
+    "question": "What is a generic type in TypeScript?",
+    "options": ["A type that applies to all variables globally.", "A way to create reusable components that can work over a variety of types rather than a single one.", "A default type assigned when no type is provided.", "A built-in class for generic algorithms."],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "TypeScript",
+    "question": "Which command is commonly used to compile a TypeScript file into JavaScript?",
+    "options": ["tsc", "ts-compile", "node", "ts-node"],
+    "correctAnswer": 0
+  },
+  {
+    "skill": "TypeScript",
+    "question": "What is the 'readonly' modifier used for in TypeScript?",
+    "options": ["To make a class immutable.", "To prevent a property from being modified after it is initialized.", "To define a constant variable.", "To stop methods from being overridden."],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "TypeScript",
+    "question": "What does 'typeof' do when used in a TypeScript type annotation?",
+    "options": ["Returns the JavaScript type of a variable at runtime.", "Extracts the type of a variable or property to use as a type definition.", "Converts a string into a primitive type.", "Checks if a variable is defined."],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "TypeScript",
+    "question": "What is a tuple in TypeScript?",
+    "options": ["An array with an unknown number of elements.", "A fixed-length array where the types of each element are known and do not have to be the same.", "An object with purely optional properties.", "A function that returns multiple values."],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Node.js",
+    "question": "What engine powers Node.js under the hood?",
+    "options": ["SpiderMonkey", "Chakra", "V8", "JavaScriptCore"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "Node.js",
+    "question": "Node.js is primarily designed for building what type of applications?",
+    "options": ["Desktop graphical interfaces", "Scalable network applications using an event-driven, non-blocking I/O model", "CPU-intensive mathematical processing scripts", "Client-side browser applications"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Node.js",
+    "question": "Which global object in Node.js provides information about the current executing process?",
+    "options": ["system", "global", "process", "env"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "Node.js",
+    "question": "What is 'npm'?",
+    "options": ["Node Process Manager", "Node Package Manager", "New Project Module", "Network Protocol Manager"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Node.js",
+    "question": "Which core module in Node.js is used to interact with the file system?",
+    "options": ["os", "path", "http", "fs"],
+    "correctAnswer": 3
+  },
+  {
+    "skill": "Node.js",
+    "question": "What is the purpose of the 'module.exports' object in Node.js?",
+    "options": ["To import modules from external libraries.", "To define variables that are exposed to other files that require this module.", "To compile the JavaScript code into binary.", "To start a local server."],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Node.js",
+    "question": "How do you import an installed package in a CommonJS Node.js script?",
+    "options": ["include('package_name')", "import package_name from 'package_name'", "require('package_name')", "load('package_name')"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "Node.js",
+    "question": "What is the 'Event Loop' in Node.js?",
+    "options": ["A continuous loop that parses incoming HTTP headers.", "A mechanism that handles asynchronous callbacks, moving them to the call stack when complete.", "A security feature that prevents infinite loops in JavaScript.", "A library used exclusively for scheduling cron jobs."],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Node.js",
+    "question": "Which core module is commonly used to create a basic web server in Node.js?",
+    "options": ["server", "express", "http", "url"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "Node.js",
+    "question": "What does the '__dirname' variable represent in a Node.js script?",
+    "options": ["The absolute path of the directory containing the currently executing file.", "The name of the main execution file.", "The directory where Node.js is installed.", "The current working directory from where the script was launched."],
+    "correctAnswer": 0
+  },
+  {
+    "skill": "Express.js",
+    "question": "What is Express.js?",
+    "options": ["A relational database management system.", "A front-end JavaScript framework.", "A minimal and flexible Node.js web application framework.", "A tool for compiling TypeScript into JavaScript."],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "Express.js",
+    "question": "How do you instantiate an Express application?",
+    "options": ["const app = express();", "const app = new Express();", "const app = createExpressApp();", "const app = require('express').init();"],
+    "correctAnswer": 0
+  },
+  {
+    "skill": "Express.js",
+    "question": "What is middleware in Express.js?",
+    "options": ["Software that connects the Express app to a database.", "Functions that have access to the request object, response object, and the next middleware function.", "A built-in module for rendering HTML templates.", "A specific route that handles errors."],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Express.js",
+    "question": "How do you define a route that handles GET requests to the '/users' endpoint in Express?",
+    "options": ["app.get('/users', (req, res) => { ... });", "app.route('/users', 'GET', (req, res) => { ... });", "app.handle('GET', '/users', (req, res) => { ... });", "app.receive('/users', (req, res) => { ... });"],
+    "correctAnswer": 0
+  },
+  {
+    "skill": "Express.js",
+    "question": "Which method is used to send a JSON response to the client?",
+    "options": ["res.sendJson()", "res.json()", "res.endJson()", "res.reply()"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Express.js",
+    "question": "How can you access URL parameters in an Express route (e.g., '/users/:id')?",
+    "options": ["req.params.id", "req.query.id", "req.body.id", "req.url.id"],
+    "correctAnswer": 0
+  },
+  {
+    "skill": "Express.js",
+    "question": "Which middleware is commonly used to parse incoming JSON payloads in Express?",
+    "options": ["body-parser", "json-parser", "express.json()", "express.parse()"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "Express.js",
+    "question": "How do you start a server to listen on port 3000 in Express?",
+    "options": ["app.start(3000)", "app.listen(3000)", "app.serve(3000)", "app.run(3000)"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Express.js",
+    "question": "What does the 'next()' function do in an Express middleware?",
+    "options": ["It ends the HTTP request.", "It passes control to the next middleware function in the stack.", "It restarts the server.", "It throws an error."],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Express.js",
+    "question": "How do you handle 404 errors for undefined routes in Express?",
+    "options": ["By defining a middleware function with app.use() at the very end of all route definitions.", "By setting app.set('404', handler).", "Express handles it automatically without any code.", "By throwing a new Error('404') inside the main app file."],
+    "correctAnswer": 0
+  },
+  {
+    "skill": "SQL",
+    "question": "What does SQL stand for?",
+    "options": ["Standard Query Language", "Structured Query Language", "System Query Language", "Simple Query Language"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "SQL",
+    "question": "Which SQL statement is used to extract data from a database?",
+    "options": ["EXTRACT", "SELECT", "GET", "PULL"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "SQL",
+    "question": "Which SQL clause is used to filter records based on a specified condition?",
+    "options": ["FILTER", "ORDER BY", "WHERE", "HAVING"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "SQL",
+    "question": "Which command is used to add new rows to a database table?",
+    "options": ["ADD ROW", "INSERT INTO", "UPDATE", "APPEND"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "SQL",
+    "question": "How do you select all columns from a table named 'Users'?",
+    "options": ["SELECT [all] FROM Users;", "SELECT Users;", "SELECT * FROM Users;", "SELECT ALL FROM Users;"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "SQL",
+    "question": "What is the primary purpose of a PRIMARY KEY in a SQL table?",
+    "options": ["To encrypt the table data.", "To automatically increment a number for each row.", "To uniquely identify each record in the table.", "To link the table to another table."],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "SQL",
+    "question": "Which SQL keyword is used to sort the result-set?",
+    "options": ["SORT BY", "ORDER BY", "GROUP BY", "ALIGN BY"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "SQL",
+    "question": "What does the JOIN clause do in SQL?",
+    "options": ["It combines rows from two or more tables, based on a related column between them.", "It merges two databases together.", "It adds a new column to a table.", "It concatenates two strings."],
+    "correctAnswer": 0
+  },
+  {
+    "skill": "SQL",
+    "question": "Which function is used to return the number of records that match a specified criterion?",
+    "options": ["SUM()", "COUNT()", "TOTAL()", "MAX()"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "SQL",
+    "question": "What is the difference between TRUNCATE and DELETE?",
+    "options": ["DELETE removes the table entirely, TRUNCATE just empties it.", "TRUNCATE removes all rows quickly without logging individual row deletions, DELETE removes rows one by one.", "There is no difference; they are synonyms.", "TRUNCATE requires a WHERE clause, DELETE does not."],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "MongoDB",
+    "question": "What type of database is MongoDB?",
+    "options": ["Relational Database (RDBMS)", "Graph Database", "NoSQL Document-Oriented Database", "Key-Value Store"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "MongoDB",
+    "question": "In MongoDB, what is the equivalent of a relational database 'Table'?",
+    "options": ["Collection", "Document", "Index", "Cluster"],
+    "correctAnswer": 0
+  },
+  {
+    "skill": "MongoDB",
+    "question": "What format does MongoDB use to store data?",
+    "options": ["XML", "BSON (Binary JSON)", "CSV", "YAML"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "MongoDB",
+    "question": "Which MongoDB shell command is used to insert a single document into a collection?",
+    "options": ["db.collection.add()", "db.collection.insert()", "db.collection.insertOne()", "db.collection.create()"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "MongoDB",
+    "question": "What is the primary key field automatically generated for every MongoDB document if not provided?",
+    "options": ["id", "_id", "primaryKey", "uid"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "MongoDB",
+    "question": "Which operator is used in MongoDB to find documents where a field is greater than a specific value?",
+    "options": ["$greater", "$gt", "$g", ">"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "MongoDB",
+    "question": "What does the MongoDB aggregation pipeline do?",
+    "options": ["It processes data records and returns computed results, similar to SQL GROUP BY.", "It connects multiple MongoDB instances together.", "It automatically creates backups of the database.", "It converts BSON documents into JSON."],
+    "correctAnswer": 0
+  },
+  {
+    "skill": "MongoDB",
+    "question": "How do you update a document in MongoDB?",
+    "options": ["db.collection.modify()", "db.collection.updateOne()", "db.collection.change()", "db.collection.set()"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "MongoDB",
+    "question": "What is the purpose of creating an index in MongoDB?",
+    "options": ["To encrypt the data in a collection.", "To automatically delete old documents.", "To improve the speed of search queries.", "To link two collections together."],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "MongoDB",
+    "question": "Which method is used to remove all documents from a collection without deleting the collection itself?",
+    "options": ["db.collection.removeAll()", "db.collection.deleteMany({})", "db.collection.drop()", "db.collection.truncate()"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Git & GitHub",
+    "question": "What is the primary difference between Git and GitHub?",
+    "options": ["Git is a programming language, GitHub is a compiler.", "Git is a version control system, GitHub is a cloud-based hosting service for Git repositories.", "They are exactly the same thing.", "Git is for Windows, GitHub is for Mac."],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Git & GitHub",
+    "question": "Which command initializes a new Git repository in the current directory?",
+    "options": ["git start", "git create", "git init", "git new"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "Git & GitHub",
+    "question": "How do you stage all modified files for a commit in Git?",
+    "options": ["git stage all", "git add .", "git commit all", "git add -all"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Git & GitHub",
+    "question": "Which command is used to save staged changes to the local repository?",
+    "options": ["git push", "git save", "git store", "git commit"],
+    "correctAnswer": 3
+  },
+  {
+    "skill": "Git & GitHub",
+    "question": "What does the 'git clone' command do?",
+    "options": ["It creates a copy of an existing remote repository on your local machine.", "It duplicates a file within the repository.", "It creates a new branch.", "It merges two branches together."],
+    "correctAnswer": 0
+  },
+  {
+    "skill": "Git & GitHub",
+    "question": "How do you create a new branch named 'feature' and switch to it immediately?",
+    "options": ["git branch feature", "git checkout -b feature", "git switch -new feature", "git new branch feature"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Git & GitHub",
+    "question": "What is a 'Merge Conflict'?",
+    "options": ["When GitHub's servers go offline.", "When two branches have competing changes on the same lines of a file and Git cannot automatically resolve them.", "When you forget to add a commit message.", "When you try to push code without internet access."],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Git & GitHub",
+    "question": "Which command fetches and merges changes from the remote repository to your local branch?",
+    "options": ["git fetch", "git pull", "git sync", "git download"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Git & GitHub",
+    "question": "What is a Pull Request (PR) on GitHub?",
+    "options": ["A request to download code to your local machine.", "A command to force the server to accept your code.", "A proposal to merge your pushed branch into another branch (usually main), allowing for code review.", "A feature to request help from GitHub support."],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "Git & GitHub",
+    "question": "How do you check the current state of the repository, including untracked and modified files?",
+    "options": ["git info", "git log", "git state", "git status"],
+    "correctAnswer": 3
+  },
+  {
+    "skill": "Docker",
+    "question": "What is Docker primarily used for?",
+    "options": ["Writing front-end UI code.", "Containerizing applications so they run consistently across different environments.", "Managing relational databases.", "Editing images and videos."],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Docker",
+    "question": "What is a Dockerfile?",
+    "options": ["A compressed backup of a container.", "A text document containing all the commands a user could call on the command line to assemble an image.", "The executable that runs the Docker engine.", "A file used to configure network routing in Docker."],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Docker",
+    "question": "Which command builds a Docker image from a Dockerfile in the current directory?",
+    "options": ["docker create .", "docker make .", "docker build -t my-image .", "docker compile ."],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "Docker",
+    "question": "What is the difference between a Docker Image and a Docker Container?",
+    "options": ["An image is a running instance of a container.", "An image is a read-only template, and a container is a runnable instance of that image.", "There is no difference.", "An image is for Linux, a container is for Windows."],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Docker",
+    "question": "Which command lists all running Docker containers?",
+    "options": ["docker list", "docker ps", "docker running", "docker containers"],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Docker",
+    "question": "How do you stop a running Docker container?",
+    "options": ["docker kill <id>", "docker halt <id>", "docker stop <id>", "docker terminate <id>"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "Docker",
+    "question": "What does 'docker-compose' do?",
+    "options": ["It formats Dockerfiles for better readability.", "It allows you to define and run multi-container Docker applications using a YAML file.", "It combines multiple Docker images into one massive image.", "It acts as a graphical user interface for Docker."],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Docker",
+    "question": "What is Docker Hub?",
+    "options": ["The central processing unit of Docker.", "A cloud-based registry service where you can find and share container images.", "The internal network created by Docker.", "A tool for orchestrating containers."],
+    "correctAnswer": 1
+  },
+  {
+    "skill": "Docker",
+    "question": "Which instruction in a Dockerfile specifies the base image?",
+    "options": ["BASE", "START", "FROM", "INIT"],
+    "correctAnswer": 2
+  },
+  {
+    "skill": "Docker",
+    "question": "How do you map port 8080 on your host machine to port 80 in a Docker container?",
+    "options": ["docker run -p 8080:80 my-image", "docker run -map 8080->80 my-image", "docker run --port 80:8080 my-image", "docker run -bind 8080=80 my-image"],
+    "correctAnswer": 0
+  },
+  {
+    "skill": "Kubernetes",
+    "question": "What is the primary role of a Kubernetes Pod?",
+    "options": [
+      "To provide load balancing across worker nodes.",
+      "To act as a persistent storage volume.",
+      "To host the control plane API components.",
+      "It is the smallest deployable unit that encapsulates one or more containers."
+    ],
+    "correctAnswer": 3,
+    "difficulty": "easy",
+    "explanation": "A Pod is the fundamental unit of execution in Kubernetes, wrapping one or more closely related containers that share storage and network resources."
+  },
+  {
+    "skill": "Kubernetes",
+    "question": "Which Kubernetes component acts as the primary brain of the cluster, maintaining its desired state?",
+    "options": ["kubelet", "kube-proxy", "Control Plane", "Node"],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "The Control Plane (formerly Master Node) manages the cluster, making global decisions like scheduling and responding to cluster events."
+  },
+  {
+    "skill": "Kubernetes",
+    "question": "What is the purpose of a Kubernetes Service?",
+    "options": [
+      "To run application code directly on the master node.",
+      "To expose an application running on a set of Pods as a network service.",
+      "To manage secret credentials.",
+      "To automatically scale the cluster nodes."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "A Service provides a stable IP address and DNS name to route traffic to ephemeral Pods, decoupling clients from Pod lifecycle."
+  },
+  {
+    "skill": "Kubernetes",
+    "question": "Which workload resource is best suited for managing stateless applications, ensuring a specified number of Pod replicas are running?",
+    "options": ["DaemonSet", "StatefulSet", "Deployment", "Job"],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "Deployments manage ReplicaSets, providing declarative updates and ensuring the desired number of identical stateless Pods are always running."
+  },
+  {
+    "skill": "Kubernetes",
+    "question": "What does a DaemonSet do?",
+    "options": [
+      "Ensures that all (or some) Nodes run a copy of a specific Pod.",
+      "Runs a batch task to completion and then terminates.",
+      "Manages persistent storage attachments.",
+      "Acts as a load balancer for external traffic."
+    ],
+    "correctAnswer": 0,
+    "difficulty": "hard",
+    "explanation": "DaemonSets are useful for cluster-wide background tasks, like log collection or node monitoring, ensuring one Pod runs on every eligible node."
+  },
+  {
+    "skill": "Kubernetes",
+    "question": "How do you securely pass sensitive information like passwords or API keys to a Pod in Kubernetes?",
+    "options": ["ConfigMaps", "Secrets", "Environment Variables", "Labels"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "Kubernetes Secrets are specifically designed to hold sensitive data safely, distinct from general configurations (ConfigMaps)."
+  },
+  {
+    "skill": "Kubernetes",
+    "question": "What is the role of the 'kubelet'?",
+    "options": [
+      "It distributes traffic across multiple nodes.",
+      "It stores the cluster's etcd state.",
+      "It is an agent running on each node that ensures containers are running in a Pod.",
+      "It provisions cloud infrastructure."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "The kubelet is the primary node agent that registers the node with the cluster and manages the lifecycle of Pods on that specific node."
+  },
+  {
+    "skill": "Kubernetes",
+    "question": "In Kubernetes, what is an Ingress?",
+    "options": [
+      "An internal IP addressing scheme.",
+      "A firewall rule that blocks outbound traffic.",
+      "An API object that manages external access to the services in a cluster, typically HTTP.",
+      "A script that runs when a container starts."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "Ingress exposes HTTP and HTTPS routes from outside the cluster to services within the cluster, often providing load balancing and SSL termination."
+  },
+  {
+    "skill": "Kubernetes",
+    "question": "Which tool is primarily used as the command-line interface for interacting with a Kubernetes cluster?",
+    "options": ["kube-cli", "docker-compose", "helm", "kubectl"],
+    "correctAnswer": 3,
+    "difficulty": "easy",
+    "explanation": "kubectl is the standard CLI tool used to run commands against Kubernetes clusters via the API server."
+  },
+  {
+    "skill": "Kubernetes",
+    "question": "What is the purpose of an Init Container?",
+    "options": [
+      "To automatically restart a failed application container.",
+      "To run specialized setup tasks before the main application containers start.",
+      "To provide an interactive terminal for debugging.",
+      "To monitor the memory usage of the Pod."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "Init containers run to completion before any app containers start, making them perfect for prerequisite setups like waiting for a database to become available."
+  },
+  {
+    "skill": "AWS",
+    "question": "Which AWS service provides scalable compute capacity (virtual servers) in the cloud?",
+    "options": ["Amazon S3", "Amazon EC2", "Amazon RDS", "AWS Lambda"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "Amazon Elastic Compute Cloud (EC2) provides secure, resizable compute capacity in the cloud as virtual servers."
+  },
+  {
+    "skill": "AWS",
+    "question": "What is Amazon S3 primarily used for?",
+    "options": ["Running relational databases.", "Object storage for storing and retrieving any amount of data.", "Executing serverless code functions.", "Routing domain names (DNS)."],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "Amazon Simple Storage Service (S3) is an object storage service offering industry-leading scalability, data availability, and security."
+  },
+  {
+    "skill": "AWS",
+    "question": "Which AWS service allows you to run code without provisioning or managing servers?",
+    "options": ["Amazon EC2", "AWS Elastic Beanstalk", "AWS Lambda", "Amazon ECS"],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "AWS Lambda is a serverless, event-driven compute service that lets you run code for virtually any type of application without server management."
+  },
+  {
+    "skill": "AWS",
+    "question": "What is the main function of Amazon IAM?",
+    "options": ["Identity and Access Management for securely controlling access to AWS resources.", "An interactive dashboard for billing management.", "An internal analytics engine for metrics.", "A firewall service to prevent DDoS attacks."],
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "AWS Identity and Access Management (IAM) helps you securely control access to AWS resources by creating users, groups, and roles."
+  },
+  {
+    "skill": "AWS",
+    "question": "Which service acts as a managed relational database service in AWS?",
+    "options": ["Amazon DynamoDB", "Amazon Redshift", "Amazon RDS", "Amazon Neptune"],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "Amazon Relational Database Service (RDS) makes it easy to set up, operate, and scale a relational database (like MySQL or PostgreSQL) in the cloud."
+  },
+  {
+    "skill": "AWS",
+    "question": "What is a VPC in AWS?",
+    "options": ["Virtual Private Cloud, a logically isolated section of the AWS Cloud.", "Virtual Processing Cluster, used for big data analytics.", "Video Processing Container, used for media streaming.", "Variable Pricing Contract, a billing discount tier."],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "Amazon Virtual Private Cloud (VPC) lets you provision a logically isolated section of the AWS Cloud where you can launch AWS resources in a defined virtual network."
+  },
+  {
+    "skill": "AWS",
+    "question": "Which AWS service is highly scalable, fast, and fully managed NoSQL database service?",
+    "options": ["Amazon Aurora", "Amazon RDS", "Amazon DynamoDB", "Amazon ElastiCache"],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "Amazon DynamoDB is a fully managed, serverless, key-value NoSQL database designed to run high-performance applications at any scale."
+  },
+  {
+    "skill": "AWS",
+    "question": "What is the purpose of an Auto Scaling Group in AWS?",
+    "options": ["To automatically increase your AWS billing limit.", "To automatically ensure you have the correct number of EC2 instances running to handle the load of your application.", "To automatically scale the storage size of an S3 bucket.", "To compress large files automatically to save space."],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Auto Scaling monitors your applications and automatically adjusts capacity to maintain steady, predictable performance at the lowest possible cost."
+  },
+  {
+    "skill": "AWS",
+    "question": "Which AWS service provides a highly available and scalable cloud Domain Name System (DNS) web service?",
+    "options": ["Amazon CloudFront", "AWS Direct Connect", "Amazon Route 53", "AWS API Gateway"],
+    "correctAnswer": 2,
+    "difficulty": "hard",
+    "explanation": "Amazon Route 53 is a highly available and scalable cloud DNS web service designed to route end users to Internet applications reliably."
+  },
+  {
+    "skill": "AWS",
+    "question": "What is Amazon CloudFront?",
+    "options": ["A container management service.", "A global content delivery network (CDN) service that securely delivers data with low latency.", "A service used to migrate databases to AWS.", "A machine learning model training platform."],
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "CloudFront is a CDN that caches content at edge locations worldwide to provide low-latency, high-transfer-speed content delivery."
+  },
+  {
+    "skill": "Android Development (Kotlin)",
+    "question": "Which function serves as the entry point of a Kotlin application?",
+    "options": ["start()", "run()", "main()", "init()"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "The main() function is the standard entry point for Kotlin applications, similar to Java and C++."
+  },
+  {
+    "skill": "Android Development (Kotlin)",
+    "question": "What is the primary difference between 'val' and 'var' in Kotlin?",
+    "options": ["'val' is for variables, 'var' is for values.", "'val' creates a mutable variable, 'var' creates a read-only variable.", "'val' creates a read-only (immutable) variable, 'var' creates a mutable variable.", "There is no difference; they are interchangeable."],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "'val' declares a read-only property (like final in Java), whereas 'var' declares a mutable variable whose value can be reassigned."
+  },
+  {
+    "skill": "Android Development (Kotlin)",
+    "question": "Which Android architectural component is designed to store and manage UI-related data in a lifecycle conscious way?",
+    "options": ["Activity", "ViewModel", "ContentProvider", "BroadcastReceiver"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "The ViewModel class allows data to survive configuration changes such as screen rotations, preventing memory leaks and data loss."
+  },
+  {
+    "skill": "Android Development (Kotlin)",
+    "question": "What is a Coroutine in Kotlin?",
+    "options": ["A lightweight thread used to write asynchronous, non-blocking code sequentially.", "A built-in UI component for displaying scrolling lists.", "A design pattern for dependency injection.", "A database query wrapper."],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "Coroutines simplify asynchronous programming by allowing you to write sequential-looking code that doesn't block the main thread."
+  },
+  {
+    "skill": "Android Development (Kotlin)",
+    "question": "In Android, what is the 'Manifest' file (AndroidManifest.xml) used for?",
+    "options": ["Writing the UI layout in XML.", "Storing string and color resources.", "Declaring application components, permissions, and metadata required by the Android system.", "Defining the build configurations and dependencies."],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "The Manifest describes essential information about your app to the Android build tools, Android operating system, and Google Play."
+  },
+  {
+    "skill": "Android Development (Kotlin)",
+    "question": "What does the 'suspend' modifier mean on a Kotlin function?",
+    "options": ["The function runs infinitely in the background.", "The function can be paused and resumed, allowing asynchronous operations without blocking a thread.", "The function prevents garbage collection.", "The function cannot be called from Java code."],
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "A suspend function marks a point where coroutine execution can be suspended, yielding the thread to other tasks until the result is ready."
+  },
+  {
+    "skill": "Android Development (Kotlin)",
+    "question": "Which Jetpack library is a modern toolkit for building native UI without using XML layouts?",
+    "options": ["Room", "DataBinding", "Jetpack Compose", "Navigation Component"],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "Jetpack Compose is Android's modern, declarative UI toolkit built entirely in Kotlin, eliminating the need for XML layouts."
+  },
+  {
+    "skill": "Android Development (Kotlin)",
+    "question": "What is 'Nullable' type handling in Kotlin?",
+    "options": ["A feature that forces all variables to be null by default.", "A built-in system that distinguishes between references that can hold null (Type?) and those that cannot (Type), preventing NullPointerExceptions.", "A garbage collection algorithm.", "An annotation used exclusively for Java interoperability."],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Kotlin's type system inherently tracks nullability, requiring explicit handling for nullable types (e.g., using the safe call operator '?') to prevent runtime crashes."
+  },
+  {
+    "skill": "Android Development (Kotlin)",
+    "question": "What is an Android Intent?",
+    "options": ["A messaging object used to request an action from another app component.", "An internal representation of the app's business logic.", "A visual transition animation between screens.", "A secure way to store user credentials."],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "Intents facilitate communication between components (like starting a new Activity) either within the same app or across different apps."
+  },
+  {
+    "skill": "Android Development (Kotlin)",
+    "question": "Which Jetpack library provides an abstraction layer over SQLite to allow for more robust database access?",
+    "options": ["Retrofit", "Room", "Glide", "SharedPreferences"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Room simplifies database access by mapping SQLite tables to Kotlin objects and providing compile-time query verification."
+  },
+  {
+    "skill": "iOS Development (Swift)",
+    "question": "Which keyword is used to define a constant in Swift?",
+    "options": ["var", "const", "let", "readonly"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "In Swift, 'let' is used to declare immutable constants, while 'var' is used for mutable variables."
+  },
+  {
+    "skill": "iOS Development (Swift)",
+    "question": "What is an Optional in Swift?",
+    "options": ["A framework for adding extra features.", "A type that represents either a wrapped value or nil (the absence of a value).", "A protocol that doesn't require implementation.", "An optional parameter in a function."],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Optionals are a powerful Swift feature used in situations where a value may be absent, safely forcing the developer to handle the nil case."
+  },
+  {
+    "skill": "iOS Development (Swift)",
+    "question": "Which modern UI framework was introduced by Apple to build user interfaces declaratively using Swift?",
+    "options": ["UIKit", "Interface Builder", "SwiftUI", "Cocoa Touch"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "SwiftUI is Apple's modern, declarative framework that allows developers to design UIs across all Apple platforms with less code."
+  },
+  {
+    "skill": "iOS Development (Swift)",
+    "question": "How do you safely unwrap an Optional in Swift without crashing if it contains nil?",
+    "options": ["Using the force unwrap operator '!'", "Using 'if let' or 'guard let' binding", "Using the 'try' keyword", "Casting it with 'as'"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Optional binding ('if let' or 'guard let') safely checks if an optional contains a value, and if so, extracts it into a temporary constant."
+  },
+  {
+    "skill": "iOS Development (Swift)",
+    "question": "What is the purpose of 'closures' in Swift?",
+    "options": ["To terminate the application safely.", "To hide private variables from other classes.", "They are self-contained blocks of functionality that can be passed around and used in your code, similar to lambdas.", "To close a database connection automatically."],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "Closures capture and store references to variables and constants from their surrounding context, making them useful for asynchronous callbacks."
+  },
+  {
+    "skill": "iOS Development (Swift)",
+    "question": "In Swift, what is a Protocol?",
+    "options": ["A set of rules for internet communication.", "A blueprint of methods, properties, and other requirements that suit a particular task, which classes or structs can adopt.", "An abstract base class that provides default implementations.", "A security standard for data encryption."],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Protocols define a standard interface that types (like structs and classes) must conform to, serving as the basis for Protocol-Oriented Programming."
+  },
+  {
+    "skill": "iOS Development (Swift)",
+    "question": "Which architecture pattern is heavily emphasized and native to SwiftUI?",
+    "options": ["MVC (Model-View-Controller)", "MVVM (Model-View-ViewModel)", "VIPER", "Singleton"],
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "SwiftUI's data binding mechanisms (like @State and @ObservedObject) make it a natural fit for the MVVM architecture."
+  },
+  {
+    "skill": "iOS Development (Swift)",
+    "question": "What does the '@State' property wrapper do in SwiftUI?",
+    "options": ["It manages the global state of the application.", "It allows a view to mutate a value, and automatically re-renders the view when the value changes.", "It stores data persistently on the device's hard drive.", "It connects the app to a remote database."],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "@State is the source of truth for simple, local UI states. When its value changes, SwiftUI invalidates and redraws the view."
+  },
+  {
+    "skill": "iOS Development (Swift)",
+    "question": "In Swift, structs are passed by _______, while classes are passed by _______.",
+    "options": ["reference, reference", "value, value", "reference, value", "value, reference"],
+    "correctAnswer": 3,
+    "difficulty": "hard",
+    "explanation": "Structs are value types (they are copied when assigned or passed), whereas classes are reference types (they share the same instance in memory)."
+  },
+  {
+    "skill": "iOS Development (Swift)",
+    "question": "What is the role of 'Grand Central Dispatch' (GCD)?",
+    "options": ["To manage UI layouts.", "To handle memory allocation natively.", "To perform asynchronous and concurrent task execution by managing thread pools.", "To handle push notifications from Apple's servers."],
+    "correctAnswer": 2,
+    "difficulty": "hard",
+    "explanation": "GCD is Apple's low-level API for executing tasks concurrently on multicore hardware by dispatching them to various queues."
+  },
+  {
+    "skill": "Machine Learning",
+    "question": "What is Supervised Learning?",
+    "options": [
+      "An algorithm that explores data without any labeled outputs.",
+      "An approach where the algorithm is trained on a labeled dataset, learning to map inputs to known outputs.",
+      "A technique where an agent learns through trial and error by receiving rewards.",
+      "A method of compressing data into smaller dimensions."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "Supervised learning uses pairs of input features and labeled target outputs to train the model to make predictions on unseen data."
+  },
+  {
+    "skill": "Machine Learning",
+    "question": "Which of the following is an example of an Unsupervised Learning algorithm?",
+    "options": ["Linear Regression", "Decision Tree", "K-Means Clustering", "Support Vector Machines (SVM)"],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "K-Means Clustering groups unlabeled data points into clusters based on similarity, which is a classic unsupervised learning task."
+  },
+  {
+    "skill": "Machine Learning",
+    "question": "What is 'Overfitting' in machine learning?",
+    "options": [
+      "When a model performs well on training data but poorly on unseen test data because it memorized the noise.",
+      "When a model is too simple to capture the underlying patterns in the data.",
+      "When the dataset is too large to fit in memory.",
+      "When an algorithm finishes training too quickly."
+    ],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "Overfitting occurs when a model learns the training data too well, including its noise, resulting in poor generalization to new data."
+  },
+  {
+    "skill": "Machine Learning",
+    "question": "What is a 'Loss Function'?",
+    "options": [
+      "A function that randomly drops data to prevent overfitting.",
+      "A mathematical way to measure how far off the model's predictions are from the actual truth.",
+      "A technique to reduce the number of features in a dataset.",
+      "The function used to clean missing values in a pandas DataFrame."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "The loss function evaluates the penalty for an incorrect prediction. Minimizing this function is the core objective during model training."
+  },
+  {
+    "skill": "Machine Learning",
+    "question": "Which algorithm is primarily designed for classification tasks rather than regression?",
+    "options": ["Linear Regression", "Logistic Regression", "Principal Component Analysis", "Mean Squared Error"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Despite the word 'regression' in its name, Logistic Regression is used to predict discrete categories (like True/False), making it a classification algorithm."
+  },
+  {
+    "skill": "Machine Learning",
+    "question": "What does a Neural Network's 'activation function' do?",
+    "options": [
+      "It turns on the GPU hardware for faster training.",
+      "It determines the learning rate automatically.",
+      "It introduces non-linearity into the network, allowing it to learn complex patterns.",
+      "It initializes the weights to zero."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "hard",
+    "explanation": "Without non-linear activation functions (like ReLU or Sigmoid), a neural network would just be a series of linear transformations, unable to solve complex problems."
+  },
+  {
+    "skill": "Machine Learning",
+    "question": "What is the purpose of cross-validation (e.g., k-fold cross-validation)?",
+    "options": [
+      "To combine multiple datasets into one.",
+      "To validate that the code compiles without errors.",
+      "To assess how the results of a statistical analysis will generalize to an independent dataset, reducing variance in evaluation.",
+      "To automatically select the best programming language for the model."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "hard",
+    "explanation": "Cross-validation splits the data into multiple folds to train and test the model repeatedly, providing a more robust estimate of its performance."
+  },
+  {
+    "skill": "Machine Learning",
+    "question": "In Reinforcement Learning, what does the 'Agent' do?",
+    "options": [
+      "It cleans the dataset before training.",
+      "It takes actions in an environment to maximize a cumulative reward.",
+      "It acts as a firewall protecting the model.",
+      "It classifies images into categories."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "The Agent is the learner or decision-maker in Reinforcement Learning that interacts with the environment and learns from the rewards or penalties it receives."
+  },
+  {
+    "skill": "Machine Learning",
+    "question": "Which metric is best for evaluating a classification model where the classes are highly imbalanced (e.g., 99% normal, 1% fraud)?",
+    "options": ["Accuracy", "Mean Absolute Error", "F1 Score", "R-squared"],
+    "correctAnswer": 2,
+    "difficulty": "hard",
+    "explanation": "Accuracy can be misleading on imbalanced datasets (e.g., predicting 'normal' always gives 99% accuracy). F1 Score balances Precision and Recall for a better measurement."
+  },
+  {
+    "skill": "Machine Learning",
+    "question": "What is Gradient Descent?",
+    "options": [
+    "difficulty": "medium",
+    "explanation": "In a balanced BST, each comparison allows the algorithm to skip about half of the remaining tree, resulting in logarithmic time complexity."
+  },
+  {
+    "skill": "Data Structures & Algorithms",
+    "question": "Which data structure operates on a Last-In, First-Out (LIFO) principle?",
+    "options": ["Queue", "Stack", "Linked List", "Array"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "A Stack follows LIFO, meaning the most recently added element is the first one to be removed."
+  },
+  {
+    "skill": "Data Structures & Algorithms",
+    "question": "What is the primary advantage of a Hash Table over an Array?",
+    "options": [
+      "Hash tables use less memory.",
+      "Hash tables keep elements sorted automatically.",
+      "Hash tables provide near O(1) average time complexity for lookups, insertions, and deletions.",
+      "Hash tables do not suffer from collisions."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "A hash table uses a hash function to compute an index, allowing for constant-time average access, which is much faster than searching an unsorted array."
+  },
+  {
+    "skill": "Data Structures & Algorithms",
+    "question": "Which sorting algorithm is generally considered the fastest for large datasets and has an average time complexity of O(n log n)?",
+    "options": ["Bubble Sort", "Insertion Sort", "Selection Sort", "Quick Sort"],
+    "correctAnswer": 3,
+    "difficulty": "medium",
+    "explanation": "Quick Sort is a divide-and-conquer algorithm that is highly efficient in practice, heavily outperforming O(n^2) algorithms like Bubble Sort."
+  },
+  {
+    "skill": "Data Structures & Algorithms",
+    "question": "What is a characteristic of a Doubly Linked List?",
+    "options": [
+      "Nodes only point to the next node.",
+      "Nodes contain a reference to both the next and the previous node.",
+      "It has a fixed size.",
+      "It is accessed via index in O(1) time."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "In a Doubly Linked List, each node holds data along with two pointers: one pointing to the next node and one pointing to the previous node."
+  },
+  {
+    "skill": "Data Structures & Algorithms",
+    "question": "What is Dynamic Programming?",
+    "options": [
+      "An algorithm design technique that solves complex problems by breaking them down into simpler overlapping subproblems and caching their results.",
+      "Writing code that changes its behavior at runtime.",
+      "A database management paradigm.",
+      "Allocating memory dynamically using pointers."
+    ],
+    "correctAnswer": 0,
+    "difficulty": "hard",
+    "explanation": "Dynamic Programming optimizes recursion by storing the results of overlapping subproblems (memoization or tabulation) so they are only computed once."
+  },
+  {
+    "skill": "Data Structures & Algorithms",
+    "question": "Which graph traversal algorithm explores as far as possible along each branch before backtracking?",
+    "options": ["Breadth-First Search (BFS)", "Depth-First Search (DFS)", "Dijkstra's Algorithm", "A* Search"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "DFS dives deep into a graph structure, reaching leaf nodes before backtracking, usually implemented using a Stack or recursion."
+  },
+  {
+    "skill": "Data Structures & Algorithms",
+    "question": "What is a 'collision' in a Hash Table?",
+    "options": [
+      "When the hash table runs out of memory.",
+      "When two distinct keys produce the same hash index.",
+      "When a lookup query fails to find a value.",
+      "When a linked list forms a cycle."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "A collision occurs when a hash function maps two different input keys to the exact same array index. This is typically handled via chaining or open addressing."
+  },
+  {
+    "skill": "Data Structures & Algorithms",
+    "question": "What is the worst-case time complexity of inserting an element at the beginning of an Array?",
+    "options": ["O(1)", "O(log n)", "O(n)", "O(n^2)"],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "Inserting at the beginning requires shifting all existing elements one position to the right, taking linear O(n) time."
+  },
+  {
+    "skill": "Data Structures & Algorithms",
+    "question": "Which algorithm is used to find the shortest path between nodes in a graph with non-negative edge weights?",
+    "options": ["Kruskal's Algorithm", "Prim's Algorithm", "Dijkstra's Algorithm", "Floyd-Warshall Algorithm"],
+    "correctAnswer": 2,
+    "difficulty": "hard",
+    "explanation": "Dijkstra's algorithm is the standard choice for finding the shortest path from a single source to all other nodes in a weighted graph without negative edges."
+  },
+  {
+    "skill": "Cybersecurity",
+    "question": "What is a Phishing attack?",
+    "options": [
+      "Overwhelming a server with traffic to cause a denial of service.",
+      "A social engineering attack where an attacker impersonates a trusted entity to trick victims into revealing sensitive information.",
+      "Exploiting a vulnerability in SQL databases.",
+      "Intercepting unencrypted Wi-Fi traffic."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "Phishing relies on deception (like fake emails or websites) to manipulate humans into handing over passwords or credit card numbers."
+  },
+  {
+    "skill": "Cybersecurity",
+    "question": "What does a Firewall do?",
+    "options": [
+      "Encrypts data stored on a hard drive.",
+      "Monitors and controls incoming and outgoing network traffic based on predetermined security rules.",
+      "Automatically updates anti-virus signatures.",
+      "Prevents physical access to server racks."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "A firewall acts as a barrier between a trusted internal network and an untrusted external network, filtering traffic according to rules."
+  },
+  {
+    "skill": "Cybersecurity",
+    "question": "What is Cross-Site Scripting (XSS)?",
+    "options": [
+      "An attack where malicious SQL statements are inserted into entry fields.",
+      "A vulnerability that allows an attacker to inject malicious client-side scripts into web pages viewed by other users.",
+      "A technique to bypass firewall rules.",
+      "An attack that decrypts SSL/TLS traffic."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "XSS allows attackers to execute scripts (usually JavaScript) in the victim's browser, potentially stealing cookies or session tokens."
+  },
+  {
+    "skill": "Cybersecurity",
+    "question": "Which of the following describes Symmetric Encryption?",
+    "options": [
+      "The same key is used for both encrypting and decrypting the data.",
+      "A public key encrypts data, and a private key decrypts it.",
+      "Data is hashed and cannot be reversed.",
+      "It requires a Certificate Authority to function."
+    ],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "In symmetric encryption algorithms (like AES), both the sender and receiver must share and use the identical secret key."
+  },
+  {
+    "skill": "Cybersecurity",
+    "question": "What is the purpose of Multi-Factor Authentication (MFA)?",
+    "options": [
+      "To require users to change their password every 30 days.",
+      "To grant users multiple levels of access privileges.",
+      "To require two or more pieces of evidence (factors) to verify a user's identity.",
+      "To encrypt passwords in the database using multiple algorithms."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "MFA drastically improves security by requiring something you know (password), something you have (phone), or something you are (fingerprint)."
+  },
+  {
+    "skill": "Cybersecurity",
+    "question": "What does 'Zero-Day Vulnerability' mean?",
+    "options": [
+      "A bug that takes zero days to fix.",
+      "A software flaw that is unknown to the vendor, meaning there is zero days of protection against it.",
+      "A virus that destroys a hard drive in less than a day.",
+      "A network that experiences zero downtime."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "A zero-day is a newly discovered vulnerability that attackers exploit before developers have had a chance to create a patch."
+  },
+  {
+    "skill": "Cybersecurity",
+    "question": "What is a DDoS (Distributed Denial of Service) attack?",
+    "options": [
+      "A targeted spear-phishing campaign.",
+      "An attack where multiple compromised systems attack a target, overwhelming it with traffic so it becomes unavailable to legitimate users.",
+      "A method of cracking passwords by guessing every possible combination.",
+      "A virus that replicates itself across local networks."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "DDoS attacks use botnets (networks of infected devices) to flood a target server or network with an unmanageable amount of traffic."
+  },
+  {
+    "skill": "Cybersecurity",
+    "question": "What is the Principle of Least Privilege?",
+    "options": [
+      "Users should only be granted the minimum level of access necessary to perform their job functions.",
+      "All employees must have administrative rights to bypass IT delays.",
+      "Passwords should be as short as possible to prevent forgetting them.",
+      "Software should have the fewest possible features."
+    ],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "Least Privilege limits potential damage (accidental or malicious) by ensuring entities cannot access resources they don't explicitly need."
+  },
+  {
+    "skill": "Cybersecurity",
+    "question": "Which of the following is a hashing algorithm commonly used to verify data integrity?",
+    "options": ["RSA", "AES", "SHA-256", "Diffie-Hellman"],
+    "correctAnswer": 2,
+    "difficulty": "hard",
+    "explanation": "SHA-256 (Secure Hash Algorithm 256-bit) is a cryptographic hash function that produces a fixed-size unique hash, ensuring data has not been altered."
+  },
+  {
+    "skill": "Cybersecurity",
+    "question": "What is the primary objective of Penetration Testing?",
+    "options": [
+      "To write secure source code for applications.",
+      "To simulate cyberattacks against a system to identify and report exploitable vulnerabilities before real attackers do.",
+      "To train employees on phishing awareness.",
+      "To install antivirus software on corporate laptops."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Pen testing involves ethical hackers actively attempting to break into a system to evaluate its security posture in a controlled manner."
+  },
+  {
+    "skill": "Linux",
+    "question": "What is the core component of the Linux operating system that manages hardware and system resources?",
+    "options": ["The Shell", "The Kernel", "The Bootloader", "The GUI"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "The Kernel is the central core of a computer operating system with complete control over everything in the system, acting as a bridge between applications and hardware."
+  },
+  {
+    "skill": "Linux",
+    "question": "Which command is used to list the contents of a directory in Linux?",
+    "options": ["cd", "pwd", "ls", "rm"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "The 'ls' command lists files and directories within the file system."
+  },
+  {
+    "skill": "Linux",
+    "question": "What does the 'chmod' command do?",
+    "options": [
+      "Changes the owner of a file.",
+      "Changes the permissions (read, write, execute) of a file or directory.",
+      "Creates a new user.",
+      "Deletes a file permanently."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "chmod stands for 'change mode' and allows administrators to modify the file mode bits, controlling who can read, write, or execute files."
+  },
+  {
+    "skill": "Linux",
+    "question": "What is the function of the 'grep' command?",
+    "options": [
+      "To search for specific text patterns within files.",
+      "To compress files into an archive.",
+      "To download files from the internet.",
+      "To monitor system processes."
+    ],
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "grep (Global Regular Expression Print) searches text or files for lines matching a specified pattern."
+  },
+  {
+    "skill": "Linux",
+    "question": "How do you display your current absolute directory path in the terminal?",
+    "options": ["path", "dir", "whereami", "pwd"],
+    "correctAnswer": 3,
+    "difficulty": "easy",
+    "explanation": "pwd stands for 'print working directory' and outputs the full pathname of the current directory."
+  },
+  {
+    "skill": "Linux",
+    "question": "What does the 'sudo' command allow a user to do?",
+    "options": [
+      "Switch to the root user permanently.",
+      "Execute commands with the security privileges of another user (usually the superuser/root).",
+      "Update the system packages.",
+      "Start a background process."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "sudo (superuser do) grants authorized users temporary root privileges to perform administrative tasks."
+  },
+  {
+    "skill": "Linux",
+    "question": "Which symbol is used to redirect the output of one command as the input to another command?",
+    "options": [">", "<", "|", "&"],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "The pipe operator (|) takes the standard output of the command on the left and passes it as standard input to the command on the right."
+  },
+  {
+    "skill": "Linux",
+    "question": "What is a 'daemon' in Linux?",
+    "options": [
+      "A malicious virus.",
+      "A background process that runs continuously without a controlling terminal.",
+      "A type of file system.",
+      "A text editor."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "Daemons are utility programs that run silently in the background, handling tasks like network requests (e.g., httpd) or system logging."
+  },
+  {
+    "skill": "Linux",
+    "question": "Which command displays the real-time resource usage of running processes (similar to Task Manager)?",
+    "options": ["top", "ps", "df", "free"],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "The 'top' command provides a dynamic, real-time view of running system processes, CPU usage, and memory consumption."
+  },
+  {
+    "skill": "Linux",
+    "question": "What does 'cron' do in Linux?",
+    "options": [
+      "It compiles source code.",
+      "It manages package installations.",
+      "It is a time-based job scheduler used to execute commands automatically at specified intervals.",
+      "It manages network interfaces."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "cron reads the crontab file and executes scheduled scripts or commands automatically at specific times or intervals."
+  },
+  {
+    "skill": "Computer Networks",
+    "question": "What does an IP address do?",
+    "options": [
+      "It physically connects a computer to a router.",
+      "It provides a unique identifier for a device communicating over a network.",
+      "It encrypts data sent over Wi-Fi.",
+      "It acts as a firewall."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "An IP (Internet Protocol) address uniquely identifies a device on a network, allowing data packets to be routed to the correct destination."
+  },
+  {
+    "skill": "Computer Networks",
+    "question": "Which protocol is responsible for securing data transferred between a web browser and a website?",
+    "options": ["HTTP", "FTP", "HTTPS", "SMTP"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "HTTPS (Hypertext Transfer Protocol Secure) encrypts HTTP requests and responses using SSL/TLS, ensuring data privacy and integrity."
+  },
+  {
+    "skill": "Computer Networks",
+    "question": "What is the function of the Domain Name System (DNS)?",
+    "options": [
+      "It translates human-readable domain names (like google.com) into IP addresses.",
+      "It assigns IP addresses to devices on a local network.",
+      "It filters malicious traffic.",
+      "It compresses data before transmission."
+    ],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "DNS acts as the phonebook of the internet, mapping easy-to-remember domain names to their underlying numerical IP addresses."
+  },
+  {
+    "skill": "Computer Networks",
+    "question": "Which OSI model layer is responsible for routing data packets across different networks?",
+    "options": ["Data Link Layer", "Network Layer", "Transport Layer", "Application Layer"],
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "The Network Layer (Layer 3) handles IP addressing and routing, determining the best path for packets to travel across interconnected networks."
+  },
+  {
+    "skill": "Computer Networks",
+    "question": "What is the primary difference between TCP and UDP?",
+    "options": [
+      "TCP is faster than UDP.",
+      "TCP is connection-oriented and ensures reliable delivery; UDP is connectionless and does not guarantee delivery.",
+      "TCP is used for local networks; UDP is used for the internet.",
+      "TCP only transmits text; UDP transmits video."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "TCP establishes a connection and acknowledges received packets (reliable), while UDP fires packets without checking if they arrive, making it faster but unreliable (used for streaming)."
+  },
+  {
+    "skill": "Computer Networks",
+    "question": "What is a MAC address?",
+    "options": [
+      "A temporary IP address given by an ISP.",
+      "A unique physical hardware address assigned to a network interface controller (NIC).",
+      "An address used specifically by Apple computers.",
+      "A protocol for transferring files."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "A MAC (Media Access Control) address is a permanent hardware identifier burned into a network card, used for communication on the local network segment (Layer 2)."
+  },
+  {
+    "skill": "Computer Networks",
+    "question": "What does a Router do?",
+    "options": [
+      "It connects devices within a single local network using MAC addresses.",
+      "It forwards data packets between different computer networks using IP addresses.",
+      "It converts analog signals to digital signals.",
+      "It provides power to Ethernet cables."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Routers operate at the Network layer, reading destination IP addresses and forwarding packets across different networks (e.g., connecting a home LAN to the Internet)."
+  },
+  {
+    "skill": "Computer Networks",
+    "question": "Which port is traditionally used for HTTP web traffic?",
+    "options": ["21", "22", "80", "443"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "Port 80 is the default port for unencrypted HTTP traffic, while port 443 is used for encrypted HTTPS traffic."
+  },
+  {
+    "skill": "Computer Networks",
+    "question": "What does DHCP stand for and what is its purpose?",
+    "options": [
+      "Dynamic Host Configuration Protocol; it automatically assigns IP addresses to devices on a network.",
+      "Domain Hypertext Control Protocol; it manages website domains.",
+      "Data Hardware Connection Port; it physically connects servers.",
+      "Digital Hash Cryptography Provider; it generates encryption keys."
+    ],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "DHCP servers dynamically lease IP addresses and network configuration parameters to client devices, eliminating the need to manually configure IPs."
+  },
+  {
+    "skill": "Computer Networks",
+    "question": "What is a subnet mask?",
+    "options": [
+      "A tool to hide your IP address from websites.",
+      "A number that defines the network portion and the host portion of an IP address.",
+      "A physical filter placed on fiber optic cables.",
+      "A password required to join a Wi-Fi network."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "A subnet mask is used alongside an IP address to determine which part of the address represents the network ID and which part represents the specific host."
+  },
+  {
+    "skill": "Calculus",
+    "question": "In calculus, what does the derivative of a function represent?",
+    "options": [
+      "The total area under the curve of the function.",
+      "The instantaneous rate of change or the slope of the tangent line to the curve at a point.",
+      "The highest point on the graph.",
+      "The average value of the function."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "The derivative measures how a function changes as its input changes, which geometrically corresponds to the slope of the tangent line at a specific point."
+  },
+  {
+    "skill": "Calculus",
+    "question": "What is the derivative of f(x) = x^n (the Power Rule)?",
+    "options": ["n * x^(n+1)", "x^(n-1)", "n * x^(n-1)", "x^n / n"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "According to the power rule, the derivative of x^n with respect to x is n*x^(n-1)."
+  },
+  {
+    "skill": "Calculus",
+    "question": "What is the integral of a function primarily used to compute?",
+    "options": [
+      "The slope of the function.",
+      "The limits of the function.",
+      "The area under the curve of the function.",
+      "The roots (x-intercepts) of the function."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "Definite integration computes the accumulated quantity or the area between the graph of the function and the x-axis."
+  },
+  {
+    "skill": "Calculus",
+    "question": "What does the Chain Rule allow us to do?",
+    "options": [
+      "Integrate polynomials easily.",
+      "Find the derivative of a composite function.",
+      "Find the limits of functions that approach infinity.",
+      "Solve differential equations."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "The Chain Rule is a formula for computing the derivative of the composition of two or more functions: d/dx f(g(x)) = f'(g(x)) * g'(x)."
+  },
+  {
+    "skill": "Calculus",
+    "question": "What is the derivative of e^x?",
+    "options": ["x * e^(x-1)", "ln(x)", "e^x", "1 / e^x"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "The natural exponential function, e^x, is unique because its derivative is exactly itself."
+  },
+  {
+    "skill": "Calculus",
+    "question": "According to the Fundamental Theorem of Calculus, integration and differentiation are:",
+    "options": ["Identical operations.", "Inverse operations of each other.", "Unrelated concepts.", "Only applicable to linear functions."],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "The Fundamental Theorem of Calculus establishes that differentiation and integration are inverse processes; integrating a rate of change gives the total change."
+  },
+  {
+    "skill": "Calculus",
+    "question": "If the second derivative of a function is positive at a point, what does this indicate about the graph at that point?",
+    "options": ["It is a local maximum.", "It is concave down.", "It is concave up.", "It is a point of inflection."],
+    "correctAnswer": 2,
+    "difficulty": "hard",
+    "explanation": "A positive second derivative means the slope (first derivative) is increasing, which geometrically means the curve is concave up (shaped like a cup)."
+  },
+  {
+    "skill": "Calculus",
+    "question": "What is a 'limit' in calculus?",
+    "options": [
+      "The maximum value a function can reach.",
+      "The value that a function approaches as the input approaches some value.",
+      "The boundary of an integral.",
+      "A restriction on the domain."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "A limit describes the behavior of a function as its input approaches a specific point, forming the foundational concept for both derivatives and integrals."
+  },
+  {
+    "skill": "Calculus",
+    "question": "What technique is used to find the limit of a fraction that results in an indeterminate form like 0/0 or infinity/infinity?",
+    "options": ["Product Rule", "L'Hôpital's Rule", "Integration by Parts", "Quotient Rule"],
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "L'Hôpital's Rule states that for indeterminate forms 0/0 or ∞/∞, the limit of a fraction is equal to the limit of the derivatives of its numerator and denominator."
+  },
+  {
+    "skill": "Calculus",
+    "question": "What is Integration by Parts?",
+    "options": [
+      "A rule for finding the derivative of a product.",
+      "A technique for integrating the product of two functions, derived from the product rule for differentiation.",
+      "A method to find partial derivatives in multivariable calculus.",
+      "A way to break a function into discrete sums."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "Integration by parts transforms the integral of a product of functions into another, hopefully simpler, integral using the formula ∫ u dv = uv - ∫ v du."
+  },
+  {
+    "skill": "Linear Algebra",
+    "question": "What does the determinant of a square matrix geometrically represent?",
+    "options": [
+      "The length of the longest eigenvector.",
+      "The scaling factor of the linear transformation described by the matrix (e.g., area or volume change).",
+      "The coordinates of the origin after transformation.",
+      "The angle of rotation applied to the basis vectors."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Geometrically, the absolute value of the determinant measures how much the linear transformation scales areas (in 2D) or volumes (in 3D). If the determinant is zero, space is squished into a lower dimension.",
+    "topic": "Matrices",
+    "tags": ["determinant", "linear transformation", "geometry"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Linear Algebra",
+    "question": "Which of the following is true if a system of linear equations is inconsistent?",
+    "options": [
+      "It has exactly one solution.",
+      "It has infinitely many solutions.",
+      "It has no solutions.",
+      "All variables are equal to zero."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "An inconsistent system means the equations contradict each other (e.g., parallel lines that never intersect), thus having no solutions.",
+    "topic": "Systems of Equations",
+    "tags": ["systems of equations", "consistency"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Linear Algebra",
+    "question": "What is an eigenvector of a linear transformation?",
+    "options": [
+      "A vector that becomes the zero vector after transformation.",
+      "A vector that changes direction but keeps its magnitude.",
+      "A non-zero vector that changes at most by a scalar factor when the transformation is applied.",
+      "A vector perpendicular to the basis vectors."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "An eigenvector only gets stretched, compressed, or reversed (scaled by its eigenvalue) during a linear transformation, without changing its span.",
+    "topic": "Eigenvalues and Eigenvectors",
+    "tags": ["eigenvector", "linear transformation"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Linear Algebra",
+    "question": "If matrix A is invertible, what must be true about its determinant?",
+    "options": [
+      "The determinant must be exactly 1.",
+      "The determinant must be greater than 0.",
+      "The determinant must be exactly 0.",
+      "The determinant must be non-zero."
+    ],
+    "correctAnswer": 3,
+    "difficulty": "easy",
+    "explanation": "A matrix is invertible (non-singular) if and only if its determinant is not zero. A zero determinant implies a loss of dimensionality, which cannot be reversed.",
+    "topic": "Matrices",
+    "tags": ["inverse", "determinant"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Linear Algebra",
+    "question": "What does it mean for a set of vectors to be linearly dependent?",
+    "options": [
+      "All vectors in the set have the same length.",
+      "They are all mutually orthogonal (perpendicular) to each other.",
+      "At least one vector in the set can be written as a linear combination of the others.",
+      "The dot product of any two vectors in the set is zero."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "Linear dependence means there is redundancy in the set; one vector adds no new dimensions because it lies entirely within the span of the other vectors.",
+    "topic": "Vector Spaces",
+    "tags": ["linear dependence", "vectors", "span"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Linear Algebra",
+    "question": "Which operation preserves the eigenvalues of a matrix A?",
+    "options": [
+      "Multiplying the matrix by a scalar k.",
+      "Taking the transpose of the matrix (A^T).",
+      "Adding the identity matrix (A + I).",
+      "Squaring the matrix (A^2)."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "A matrix and its transpose have the same characteristic polynomial, and therefore share the exact same eigenvalues.",
+    "topic": "Eigenvalues and Eigenvectors",
+    "tags": ["eigenvalues", "transpose", "properties"],
+    "estimatedTimeSeconds": 45
+  },
+  {
+    "skill": "Linear Algebra",
+    "question": "What is the rank of a matrix?",
+    "options": [
+      "The total number of rows in the matrix.",
+      "The sum of the diagonal elements (trace).",
+      "The dimension of the vector space generated by its columns (maximum number of linearly independent columns).",
+      "The number of zero entries in its reduced row echelon form."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "The rank represents the actual dimensionality of the output space of the transformation, equivalent to the number of linearly independent columns (or rows).",
+    "topic": "Vector Spaces",
+    "tags": ["rank", "linear independence", "dimension"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Linear Algebra",
+    "question": "In a vector space, what is a basis?",
+    "options": [
+      "The vector located at the origin.",
+      "A set of linearly independent vectors that span the entire space.",
+      "The longest vector in the space.",
+      "A matrix used to rotate vectors."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "A basis is an efficient coordinate system for a space: it must span the entire space (so every vector can be reached) and be linearly independent (no redundancy).",
+    "topic": "Vector Spaces",
+    "tags": ["basis", "span", "linear independence"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Linear Algebra",
+    "question": "What is the dot product of two orthogonal (perpendicular) non-zero vectors?",
+    "options": ["1", "Their magnitudes multiplied together", "-1", "0"],
+    "correctAnswer": 3,
+    "difficulty": "easy",
+    "explanation": "The dot product of two orthogonal vectors is always zero, because the cosine of 90 degrees (the angle between them) is zero.",
+    "topic": "Vectors",
+    "tags": ["dot product", "orthogonal", "geometry"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Linear Algebra",
+    "question": "Which of the following describes the Null Space (Kernel) of a matrix A?",
+    "options": [
+      "The set of all vectors x such that Ax = 0.",
+      "The set of all possible outputs Ax.",
+      "The set of eigenvectors corresponding to the eigenvalue 0.",
+      "The inverse of the matrix A."
+    ],
+    "correctAnswer": 0,
+    "difficulty": "hard",
+    "explanation": "The Null Space consists of all input vectors that get squished to the zero vector (the origin) by the linear transformation defined by A.",
+    "topic": "Vector Spaces",
+    "tags": ["null space", "kernel", "matrices"],
+    "estimatedTimeSeconds": 45
+  },
+  {
+    "skill": "Physics",
+    "question": "Newton's First Law of Motion (Inertia) states that:",
+    "options": [
+      "For every action, there is an equal and opposite reaction.",
+      "Force equals mass times acceleration (F=ma).",
+      "An object at rest stays at rest, and an object in motion stays in motion with the same speed and in the same direction, unless acted upon by an unbalanced force.",
+      "Energy cannot be created or destroyed, only transformed."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "This defines the concept of inertia—an object's resistance to changes in its state of motion.",
+    "topic": "Classical Mechanics",
+    "tags": ["newtons laws", "inertia", "motion"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Physics",
+    "question": "If you drop a feather and a bowling ball simultaneously in a perfect vacuum, what happens?",
+    "options": [
+      "The bowling ball hits the ground first because it is heavier.",
+      "The feather hits the ground first due to lack of air pressure.",
+      "They hit the ground at the exact same time.",
+      "They float indefinitely."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "In a vacuum, there is no air resistance. All objects accelerate downward at the exact same rate due to gravity (g), regardless of their mass.",
+    "topic": "Kinematics",
+    "tags": ["gravity", "free fall", "vacuum"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Physics",
+    "question": "What does the equation E=mc^2 imply?",
+    "options": [
+      "Energy and matter (mass) are interchangeable.",
+      "Electricity equals magnetism times the speed of light squared.",
+      "Energy moves at the speed of light.",
+      "Mass increases as an object's speed increases."
+    ],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "Einstein's mass-energy equivalence principle states that mass can be converted into energy and vice versa, meaning mass is essentially concentrated energy.",
+    "topic": "Relativity",
+    "tags": ["einstein", "energy", "mass"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Physics",
+    "question": "Which fundamental force is responsible for holding the nucleus of an atom together?",
+    "options": ["Gravity", "Electromagnetic Force", "Strong Nuclear Force", "Weak Nuclear Force"],
+    "correctAnswer": 2,
+    "difficulty": "hard",
+    "explanation": "The Strong Nuclear Force overcomes the electromagnetic repulsion between positively charged protons, binding protons and neutrons together in the nucleus.",
+    "topic": "Nuclear Physics",
+    "tags": ["fundamental forces", "nucleus", "strong force"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Physics",
+    "question": "What is the primary difference between speed and velocity?",
+    "options": [
+      "Speed is measured in m/s, velocity is measured in km/h.",
+      "Speed is a scalar quantity (magnitude only), while velocity is a vector quantity (magnitude and direction).",
+      "Velocity applies to objects falling, speed applies to objects moving horizontally.",
+      "There is no difference."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "Velocity tells you how fast an object is moving AND in which direction. Speed only tells you how fast.",
+    "topic": "Kinematics",
+    "tags": ["vectors", "scalars", "velocity"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Physics",
+    "question": "According to the Second Law of Thermodynamics, what happens to the entropy of an isolated system over time?",
+    "options": [
+      "It always decreases.",
+      "It remains completely constant.",
+      "It oscillates.",
+      "It always increases or remains constant, leading to greater disorder."
+    ],
+    "correctAnswer": 3,
+    "difficulty": "medium",
+    "explanation": "Entropy is a measure of disorder or randomness. The Second Law dictates that natural processes tend to move toward a state of maximum disorder.",
+    "topic": "Thermodynamics",
+    "tags": ["entropy", "thermodynamics", "disorder"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Physics",
+    "question": "What describes the phenomenon where a wave changes direction as it passes from one medium to another (e.g., air to water)?",
+    "options": ["Reflection", "Diffraction", "Refraction", "Interference"],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "Refraction occurs because a wave travels at different speeds in different mediums, causing it to bend as it crosses the boundary.",
+    "topic": "Optics and Waves",
+    "tags": ["waves", "refraction", "light"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Physics",
+    "question": "In a perfectly elastic collision between two objects, which of the following is conserved?",
+    "options": [
+      "Only momentum.",
+      "Only kinetic energy.",
+      "Both momentum and kinetic energy.",
+      "Neither momentum nor kinetic energy."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "hard",
+    "explanation": "Momentum is conserved in all isolated collisions, but ONLY in perfectly elastic collisions is the total kinetic energy also completely conserved (none is lost to heat or sound).",
+    "topic": "Classical Mechanics",
+    "tags": ["collisions", "momentum", "kinetic energy"],
+    "estimatedTimeSeconds": 45
+  },
+  {
+    "skill": "Physics",
+    "question": "What particle is proposed to carry the electromagnetic force?",
+    "options": ["Gluon", "Graviton", "Electron", "Photon"],
+    "correctAnswer": 3,
+    "difficulty": "hard",
+    "explanation": "In quantum field theory, the photon is the gauge boson that mediates the electromagnetic force between charged particles.",
+    "topic": "Particle Physics",
+    "tags": ["photon", "electromagnetism", "bosons"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Physics",
+    "question": "What is the principle behind the Doppler Effect?",
+    "options": [
+      "Light bends around massive objects due to gravity.",
+      "The observed frequency of a wave changes if the source and observer are moving relative to each other.",
+      "Electrons are emitted from a material when light shines on it.",
+      "Magnetic fields induce electric currents."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "The Doppler Effect explains why an ambulance siren sounds higher pitched as it approaches and lower pitched as it moves away; the sound waves are compressed, then stretched.",
+    "topic": "Optics and Waves",
+    "tags": ["doppler effect", "waves", "frequency"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Chemistry",
+    "question": "What does the atomic number of an element represent?",
+    "options": [
+      "The total number of protons and neutrons.",
+      "The total mass of the atom.",
+      "The number of protons in the nucleus.",
+      "The number of valence electrons."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "The atomic number is the defining trait of an element, representing the exact number of protons in its nucleus.",
+    "topic": "Atomic Structure",
+    "tags": ["atomic number", "protons", "periodic table"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Chemistry",
+    "question": "Which type of chemical bond involves the sharing of electron pairs between atoms?",
+    "options": ["Ionic bond", "Covalent bond", "Hydrogen bond", "Metallic bond"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "Covalent bonds form when nonmetal atoms share electrons to achieve a stable electron configuration, unlike ionic bonds where electrons are transferred.",
+    "topic": "Chemical Bonding",
+    "tags": ["covalent", "bonds", "electrons"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Chemistry",
+    "question": "What is an isotope?",
+    "options": [
+      "An atom that has gained or lost an electron, acquiring a charge.",
+      "A molecule with the same chemical formula but a different physical structure.",
+      "Atoms of the same element that have different numbers of neutrons.",
+      "A radioactive element."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "Isotopes are variants of a particular chemical element that share the same number of protons but have varying numbers of neutrons, resulting in different atomic masses.",
+    "topic": "Atomic Structure",
+    "tags": ["isotopes", "neutrons", "mass"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Chemistry",
+    "question": "In an exothermic reaction, what happens to energy?",
+    "options": [
+      "Energy is absorbed from the surroundings.",
+      "Energy is created from nothing.",
+      "Energy is released into the surroundings, usually as heat.",
+      "Energy is destroyed."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "Exothermic reactions (like combustion) release more energy when forming new bonds than they consume to break the old bonds, releasing net heat.",
+    "topic": "Thermodynamics",
+    "tags": ["exothermic", "reactions", "heat", "energy"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Chemistry",
+    "question": "What is Le Chatelier's Principle?",
+    "options": [
+      "Mass is always conserved in a chemical reaction.",
+      "Gases expand to fill their container.",
+      "If a dynamic equilibrium is disturbed by changing the conditions, the position of equilibrium shifts to counteract the change.",
+      "Acids donate protons while bases accept them."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "hard",
+    "explanation": "Le Chatelier's Principle predicts how a chemical system at equilibrium will respond to changes in concentration, temperature, or pressure by shifting to undo the disturbance.",
+    "topic": "Chemical Equilibrium",
+    "tags": ["equilibrium", "le chatelier", "reactions"],
+    "estimatedTimeSeconds": 45
+  },
+  {
+    "skill": "Chemistry",
+    "question": "According to the pH scale, what defines an acidic solution?",
+    "options": [
+      "A pH exactly equal to 7.",
+      "A pH less than 7, indicating a high concentration of H+ ions.",
+      "A pH greater than 7, indicating a high concentration of OH- ions.",
+      "A pH of 0."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "The pH scale ranges from 0 to 14. Values below 7 indicate acidity, with lower numbers representing exponentially stronger acids.",
+    "topic": "Acids and Bases",
+    "tags": ["ph", "acids", "bases"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Chemistry",
+    "question": "What is a catalyst?",
+    "options": [
+      "A substance that slows down a chemical reaction.",
+      "A product formed at the end of a reaction.",
+      "A substance that increases the rate of a chemical reaction without being consumed in the process.",
+      "A reactant that is entirely used up first."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "Catalysts speed up reactions by lowering the activation energy required, and they remain unchanged after the reaction completes.",
+    "topic": "Kinetics",
+    "tags": ["catalyst", "reaction rate", "activation energy"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Chemistry",
+    "question": "Which gas is the most abundant in the Earth's atmosphere?",
+    "options": ["Oxygen", "Carbon Dioxide", "Nitrogen", "Argon"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "Nitrogen makes up approximately 78% of the Earth's atmosphere, followed by Oxygen at about 21%.",
+    "topic": "Environmental Chemistry",
+    "tags": ["atmosphere", "nitrogen", "gases"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Chemistry",
+    "question": "What is a mole in chemistry?",
+    "options": [
+      "A tiny animal.",
+      "A unit measuring exactly one gram of an element.",
+      "A standard scientific unit for measuring large quantities of very small entities such as atoms, molecules, or other specified particles (Avogadro's number).",
+      "The amount of space a gas occupies."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "A mole represents 6.022 x 10^23 particles, acting as a bridge between the atomic world and the macroscopic world we can measure.",
+    "topic": "Stoichiometry",
+    "tags": ["mole", "avogadro", "measurement"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Chemistry",
+    "question": "What is oxidation in a redox reaction?",
+    "options": [
+      "The loss of electrons.",
+      "The gain of electrons.",
+      "The addition of water.",
+      "The lowering of temperature."
+    ],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "Remember the mnemonic 'OIL RIG': Oxidation Is Loss, Reduction Is Gain (of electrons).",
+    "topic": "Electrochemistry",
+    "tags": ["redox", "oxidation", "electrons"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Biology",
+    "question": "What is the primary function of mitochondria in a cell?",
+    "options": [
+      "Synthesizing proteins.",
+      "Storing genetic information (DNA).",
+      "Generating most of the cell's supply of adenosine triphosphate (ATP) through cellular respiration.",
+      "Breaking down cellular waste."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "Mitochondria are known as the 'powerhouses' of the cell because they produce ATP, the main energy currency used by cells.",
+    "topic": "Cell Biology",
+    "tags": ["mitochondria", "cell organelles", "energy"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Biology",
+    "question": "What process do plants use to convert light energy into chemical energy?",
+    "options": ["Cellular Respiration", "Photosynthesis", "Fermentation", "Transpiration"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "Photosynthesis is the process by which green plants and some other organisms use sunlight to synthesize nutrients from carbon dioxide and water.",
+    "topic": "Botany",
+    "tags": ["photosynthesis", "plants", "energy"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Biology",
+    "question": "What is the role of ribosomes in a cell?",
+    "options": [
+      "Lipid synthesis.",
+      "Protein synthesis (translation of mRNA into amino acid chains).",
+      "DNA replication.",
+      "Cell division."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Ribosomes read the messenger RNA (mRNA) sequence and translate that genetic code into a specified string of amino acids to build proteins.",
+    "topic": "Cell Biology",
+    "tags": ["ribosomes", "proteins", "translation"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Biology",
+    "question": "In genetics, what is the difference between genotype and phenotype?",
+    "options": [
+      "Genotype is plant genetics; phenotype is animal genetics.",
+      "Genotype is the physical appearance; phenotype is the genetic makeup.",
+      "Genotype is the genetic makeup of an organism; phenotype is its observable physical traits.",
+      "There is no difference; they are synonyms."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "The genotype is the internal DNA code (like having genes for blue and brown eyes), while the phenotype is the expression of that code (actually having brown eyes).",
+    "topic": "Genetics",
+    "tags": ["genotype", "phenotype", "traits"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Biology",
+    "question": "Which molecule carries genetic instructions for the development, functioning, growth, and reproduction of all known organisms?",
+    "options": ["RNA", "DNA", "ATP", "Enzymes"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "Deoxyribonucleic acid (DNA) is a double-helix molecule that contains the biological instructions that make each species unique.",
+    "topic": "Genetics",
+    "tags": ["dna", "genetics", "molecules"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Biology",
+    "question": "What is natural selection?",
+    "options": [
+      "The intentional breeding of plants and animals by humans.",
+      "A process where organisms better adapted to their environment tend to survive and produce more offspring.",
+      "The spontaneous mutation of genes over a single generation.",
+      "The physical movement of species from one habitat to another."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Natural selection, proposed by Charles Darwin, is the main mechanism of evolution where advantageous traits become more common over time.",
+    "topic": "Evolution",
+    "tags": ["natural selection", "darwin", "evolution"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Biology",
+    "question": "Which type of blood vessel carries blood away from the heart?",
+    "options": ["Veins", "Capillaries", "Arteries", "Venules"],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "Arteries are thick-walled blood vessels that carry oxygenated blood (usually) away from the heart to the rest of the body.",
+    "topic": "Human Anatomy",
+    "tags": ["arteries", "heart", "circulatory system"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Biology",
+    "question": "What is the process by which cells divide to form two genetically identical daughter cells?",
+    "options": ["Meiosis", "Mitosis", "Fertilization", "Osmosis"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Mitosis is somatic cell division resulting in identical cells for growth and repair. Meiosis, by contrast, creates genetically diverse sex cells.",
+    "topic": "Cell Biology",
+    "tags": ["mitosis", "cell division"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Biology",
+    "question": "What are enzymes?",
+    "options": [
+      "Carbohydrates that provide structural support to cells.",
+      "Lipids that store long-term energy.",
+      "Biological catalysts (mostly proteins) that speed up chemical reactions in living organisms.",
+      "Hormones that regulate blood sugar."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "Enzymes bind to specific substrates and lower the activation energy of biological reactions, allowing them to occur rapidly at body temperature.",
+    "topic": "Biochemistry",
+    "tags": ["enzymes", "catalysts", "proteins"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Biology",
+    "question": "What describes a symbiotic relationship where one organism benefits while the other is harmed?",
+    "options": ["Mutualism", "Commensalism", "Parasitism", "Competition"],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "In parasitism (e.g., a tick on a dog), the parasite derives nutrients at the host's expense, harming the host in the process.",
+    "topic": "Ecology",
+    "tags": ["symbiosis", "parasitism", "ecology"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Statistics",
+    "question": "What is the 'median' of a dataset?",
+    "options": [
+      "The arithmetic average of all the numbers.",
+      "The middle number when the data is sorted in ascending or descending order.",
+      "The number that appears most frequently.",
+      "The difference between the highest and lowest values."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "The median divides a sorted dataset exactly in half. It is a robust measure of central tendency because it is not heavily skewed by extreme outliers.",
+    "topic": "Descriptive Statistics",
+    "tags": ["median", "central tendency", "averages"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Statistics",
+    "question": "What does the standard deviation measure?",
+    "options": [
+      "The total sum of all data points.",
+      "The amount of variation or dispersion of a set of values from the mean.",
+      "The probability of an event occurring.",
+      "The correlation between two variables."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Standard deviation quantifies how spread out the data is. A low standard deviation means data points are clustered closely around the mean.",
+    "topic": "Descriptive Statistics",
+    "tags": ["standard deviation", "variance", "dispersion"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Statistics",
+    "question": "In a perfectly normal distribution (bell curve), what percentage of data falls within one standard deviation of the mean?",
+    "options": ["50%", "68%", "95%", "99.7%"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "According to the Empirical Rule (68-95-99.7 rule), approximately 68.27% of values lie within one standard deviation of the mean in a normal distribution.",
+    "topic": "Probability Distributions",
+    "tags": ["normal distribution", "empirical rule", "bell curve"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Statistics",
+    "question": "What is a 'p-value' in hypothesis testing?",
+    "options": [
+      "The probability that the alternative hypothesis is true.",
+      "The probability of obtaining test results at least as extreme as the results actually observed, assuming that the null hypothesis is true.",
+      "The probability of making a calculation error.",
+      "The percentage of the population sampled."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "The p-value helps determine the significance of results. A very low p-value (typically < 0.05) indicates that the observed data is highly unlikely under the null hypothesis.",
+    "topic": "Inferential Statistics",
+    "tags": ["p-value", "hypothesis testing", "significance"],
+    "estimatedTimeSeconds": 45
+  },
+  {
+    "skill": "Statistics",
+    "question": "What is correlation?",
+    "options": [
+      "Proof that one variable causes another to change.",
+      "A statistical measure that expresses the extent to which two variables are linearly related.",
+      "The average difference between the mean and the median.",
+      "The margin of error in a survey."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Correlation measures association, but importantly, 'correlation does not imply causation'. It simply shows how strongly two variables move together.",
+    "topic": "Inferential Statistics",
+    "tags": ["correlation", "variables", "relationships"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Statistics",
+    "question": "What is a Type I error (False Positive)?",
+    "options": [
+      "Failing to reject a false null hypothesis.",
+      "Rejecting a true null hypothesis.",
+      "Making an arithmetic error in calculating the mean.",
+      "Surveying a biased sample."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "A Type I error occurs when a test incorrectly concludes that an effect or relationship exists when in reality, it does not (e.g., convicting an innocent person).",
+    "topic": "Hypothesis Testing",
+    "tags": ["type i error", "false positive", "hypothesis"],
+    "estimatedTimeSeconds": 45
+  },
+  {
+    "skill": "Statistics",
+    "question": "If you flip a fair coin three times, what is the probability of getting exactly three heads?",
+    "options": ["1/2", "1/3", "1/6", "1/8"],
+    "correctAnswer": 3,
+    "difficulty": "medium",
+    "explanation": "Each flip is an independent event with a 1/2 probability. The combined probability is (1/2) * (1/2) * (1/2) = 1/8.",
+    "topic": "Probability",
+    "tags": ["probability", "independent events", "coin flip"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Statistics",
+    "question": "What does the Central Limit Theorem state?",
+    "options": [
+      "All datasets naturally form a normal distribution.",
+      "The mean of a dataset is always located in the exact center.",
+      "The distribution of sample means approaches a normal distribution as the sample size gets larger, regardless of the population's original distribution.",
+      "You must sample the entire population to get accurate results."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "hard",
+    "explanation": "The Central Limit Theorem is fundamental in statistics because it allows us to use normal distribution approximations for sample means, even if the underlying population is skewed.",
+    "topic": "Probability Theory",
+    "tags": ["central limit theorem", "sampling", "normal distribution"],
+    "estimatedTimeSeconds": 45
+  },
+  {
+    "skill": "Statistics",
+    "question": "Which of the following represents a categorical (qualitative) variable?",
+    "options": ["Height in centimeters", "Annual income in dollars", "Eye color", "Number of children in a household"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "Categorical variables describe qualities or characteristics (like colors, breeds, brands) rather than measurable numerical values.",
+    "topic": "Data Types",
+    "tags": ["categorical data", "qualitative", "variables"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Statistics",
+    "question": "What is an outlier?",
+    "options": [
+      "A data point that differs significantly from other observations in the dataset.",
+      "A mistake made by the researcher.",
+      "The middle value of a dataset.",
+      "A data point that lies exactly on the line of best fit."
+    ],
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "Outliers are extreme values that fall abnormally far from the rest of the data. They can heavily skew the mean but have little effect on the median.",
+    "topic": "Data Analysis",
+    "tags": ["outlier", "data points", "skew"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Economics",
+    "question": "What is the concept of 'Opportunity Cost'?",
+    "options": [
+      "The total amount of money required to start a business.",
+      "The potential benefit that is given up when you choose one alternative over another.",
+      "The cost of producing one additional unit of a good.",
+      "The difference between revenue and expenses."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Opportunity cost represents the value of the next best alternative that you sacrifice when making a decision (e.g., spending time studying instead of working).",
+    "topic": "Microeconomics",
+    "tags": ["opportunity cost", "decision making", "alternatives"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Economics",
+    "question": "According to the law of demand, assuming all else is equal, what happens when the price of a good increases?",
+    "options": [
+      "The quantity demanded increases.",
+      "The quantity demanded decreases.",
+      "The supply increases.",
+      "The demand curve shifts to the right."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "The law of demand states that there is an inverse relationship between price and quantity demanded; as price goes up, consumers buy less.",
+    "topic": "Supply and Demand",
+    "tags": ["demand", "price", "consumers"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Economics",
+    "question": "What does GDP (Gross Domestic Product) measure?",
+    "options": [
+      "The total wealth of all citizens in a country.",
+      "The total market value of all final goods and services produced within a country in a given period.",
+      "The total amount of government debt.",
+      "The average income per person."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "GDP is the standard measure of the value added created through the production of goods and services in a country during a certain period.",
+    "topic": "Macroeconomics",
+    "tags": ["gdp", "production", "economy"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Economics",
+    "question": "What is inflation?",
+    "options": [
+      "A general increase in prices and fall in the purchasing value of money.",
+      "A rapid increase in the stock market index.",
+      "A continuous decrease in the unemployment rate.",
+      "The intentional devaluation of a currency by the government."
+    ],
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "Inflation occurs when the average price level of goods and services rises, meaning each unit of currency buys fewer goods and services.",
+    "topic": "Macroeconomics",
+    "tags": ["inflation", "prices", "purchasing power"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Economics",
+    "question": "What happens in a perfectly competitive market?",
+    "options": [
+      "A single firm controls the entire market.",
+      "A few large firms dominate.",
+      "Many firms sell identical products and have no control over the market price.",
+      "Firms sell differentiated products with high brand loyalty."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "In perfect competition, firms are 'price takers' because the presence of many sellers offering homogeneous goods means consumers will simply buy from the cheapest.",
+    "topic": "Market Structures",
+    "tags": ["perfect competition", "markets", "price takers"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Economics",
+    "question": "What is the primary role of a Central Bank (like the Federal Reserve)?",
+    "options": [
+      "To provide personal loans to citizens.",
+      "To collect taxes for the government.",
+      "To manage a nation's money supply and interest rates to achieve economic stability.",
+      "To regulate the stock market."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "Central banks conduct monetary policy (adjusting interest rates, buying/selling government bonds) to control inflation and maximize employment.",
+    "topic": "Monetary Policy",
+    "tags": ["central bank", "monetary policy", "interest rates"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Economics",
+    "question": "What is Fiscal Policy?",
+    "options": [
+      "The management of the money supply by the central bank.",
+      "The use of government spending and taxation to influence the economy.",
+      "Regulations governing international trade.",
+      "The natural business cycle of boom and bust."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Fiscal policy involves the government's decisions regarding taxing and spending to stimulate or slow down economic growth.",
+    "topic": "Fiscal Policy",
+    "tags": ["government spending", "taxation", "policy"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Economics",
+    "question": "What describes a 'Negative Externality'?",
+    "options": [
+      "When a business goes bankrupt.",
+      "When the production or consumption of a good causes an unintended cost to a third party not involved in the transaction.",
+      "When a consumer refuses to buy a product.",
+      "When the government increases income taxes."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "A classic example is a factory causing air pollution. The local residents bear a health cost, but this cost isn't reflected in the price of the factory's goods.",
+    "topic": "Market Failures",
+    "tags": ["externalities", "costs", "market failure"],
+    "estimatedTimeSeconds": 45
+  },
+  {
+    "skill": "Economics",
+    "question": "What is comparative advantage in international trade?",
+    "options": [
+      "The ability of a country to produce a good using fewer resources than another country.",
+      "The ability of a country to produce a good at a lower opportunity cost than another country.",
+      "When a country imports more than it exports.",
+      "When a country has a monopoly on a specific resource."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "Even if Country A is better at producing everything (absolute advantage), trade is still beneficial if Country B has a lower opportunity cost for a specific good.",
+    "topic": "International Trade",
+    "tags": ["comparative advantage", "trade", "opportunity cost"],
+    "estimatedTimeSeconds": 45
+  },
+  {
+    "skill": "Economics",
+    "question": "What is the 'Tragedy of the Commons'?",
+    "options": [
+      "The inevitable failure of communist economies.",
+      "An economic theory showing how stock markets inevitably crash.",
+      "A situation where individuals with access to a shared resource deplete it by acting in their own self-interest, contrary to the common good.",
+      "The displacement of workers due to automation."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "When a resource is open to everyone (like overfishing in international waters), individuals have an incentive to consume as much as possible before others do, leading to the resource's destruction.",
+    "topic": "Behavioral Economics",
+    "tags": ["tragedy of the commons", "resources", "public goods"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "History",
+    "question": "Which ancient civilization built the pyramids of Giza?",
+    "options": ["Mesopotamians", "Romans", "Ancient Egyptians", "Mayans"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "The pyramids of Giza were constructed by the Ancient Egyptians during the Old Kingdom period as tombs for their pharaohs.",
+    "topic": "Ancient Civilizations",
+    "tags": ["egypt", "pyramids", "ancient"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "History",
+    "question": "What was the primary cause of the start of World War I in 1914?",
+    "options": [
+      "The invasion of Poland by Germany.",
+      "The assassination of Archduke Franz Ferdinand of Austria.",
+      "The bombing of Pearl Harbor.",
+      "The signing of the Treaty of Versailles."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "The assassination of Archduke Franz Ferdinand by a Serbian nationalist triggered a chain reaction of alliances that plunged Europe into war.",
+    "topic": "World War I",
+    "tags": ["wwi", "assassination", "alliances"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "History",
+    "question": "The Cold War was primarily a period of geopolitical tension between which two superpowers?",
+    "options": [
+      "United Kingdom and France",
+      "Germany and the Soviet Union",
+      "United States and the Soviet Union",
+      "United States and China"
+    ],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "Following WWII, the US (capitalist) and the Soviet Union (communist) engaged in a decades-long rivalry involving proxy wars, the space race, and nuclear proliferation.",
+    "topic": "Cold War",
+    "tags": ["cold war", "us", "ussr", "superpowers"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "History",
+    "question": "What was the Renaissance?",
+    "options": [
+      "A period of strict religious orthodoxy and decline in learning in Europe.",
+      "A fervent period of European cultural, artistic, political, and economic 'rebirth' following the Middle Ages.",
+      "The era of rapid industrialization using steam power.",
+      "A series of religious wars between Christians and Muslims."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Spanning roughly the 14th to the 17th centuries, the Renaissance revived interest in classical philosophy, literature, and art.",
+    "topic": "Renaissance",
+    "tags": ["renaissance", "europe", "rebirth"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "History",
+    "question": "Who was the primary author of the United States Declaration of Independence?",
+    "options": ["George Washington", "Alexander Hamilton", "Thomas Jefferson", "Benjamin Franklin"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "Thomas Jefferson was the principal author of the Declaration, which was adopted by the Continental Congress on July 4, 1776.",
+    "topic": "American History",
+    "tags": ["declaration of independence", "jefferson", "usa"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "History",
+    "question": "What was the Industrial Revolution?",
+    "options": [
+      "A violent uprising by factory workers seeking better wages.",
+      "The transition to new manufacturing processes, moving from hand production methods to machines.",
+      "A political movement to overthrow monarchies in Europe.",
+      "The discovery of electricity by Thomas Edison."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Beginning in Great Britain in the late 18th century, it marked a massive shift toward mechanized factory production, fundamentally changing society and the economy.",
+    "topic": "Industrial Revolution",
+    "tags": ["industrial revolution", "manufacturing", "history"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "History",
+    "question": "Which empire was ruled by figures such as Julius Caesar, Augustus, and Nero?",
+    "options": ["The Ottoman Empire", "The Roman Empire", "The Mongol Empire", "The Byzantine Empire"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "These leaders were key figures in the history of Ancient Rome, transitioning it from a Republic to a massive Empire.",
+    "topic": "Ancient Civilizations",
+    "tags": ["rome", "roman empire", "caesar"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "History",
+    "question": "What was the purpose of the Silk Road?",
+    "options": [
+      "A military defense wall to protect China from invaders.",
+      "A naval route circumnavigating the globe.",
+      "A network of Eurasian trade routes connecting the East and West.",
+      "A path built specifically for religious pilgrimages to Jerusalem."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "The Silk Road was central to economic, cultural, political, and religious interactions between regions spanning from China to the Mediterranean Sea.",
+    "topic": "Trade and Exploration",
+    "tags": ["silk road", "trade", "eurasia"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "History",
+    "question": "Who was the leader of the Soviet Union during the majority of World War II?",
+    "options": ["Vladimir Lenin", "Leon Trotsky", "Mikhail Gorbachev", "Joseph Stalin"],
+    "correctAnswer": 3,
+    "difficulty": "medium",
+    "explanation": "Joseph Stalin ruled the Soviet Union from the mid-1920s until his death in 1953, leading the country through the immense destruction and eventual victory of WWII.",
+    "topic": "World War II",
+    "tags": ["stalin", "ussr", "wwii"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "History",
+    "question": "What significance did the fall of the Berlin Wall have in 1989?",
+    "options": [
+      "It marked the beginning of World War II.",
+      "It symbolized the end of the Cold War and the reunification of Germany.",
+      "It established a new border between France and Germany.",
+      "It initiated the creation of the European Union."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "The fall of the Berlin Wall was a powerful symbol of the collapse of the Iron Curtain and communist regimes in Eastern Europe, leading shortly to the dissolution of the USSR.",
+    "topic": "Cold War",
+    "tags": ["berlin wall", "cold war", "germany"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Psychology",
+    "question": "What did Ivan Pavlov's famous experiment with dogs demonstrate?",
+    "options": [
+      "Operant conditioning (learning through rewards and punishments).",
+      "Classical conditioning (learning through association).",
+      "Observational learning.",
+      "Cognitive dissonance."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Pavlov demonstrated classical conditioning by training dogs to associate the sound of a bell (neutral stimulus) with food, eventually causing the dogs to salivate at the bell alone.",
+    "topic": "Learning and Behavior",
+    "tags": ["pavlov", "classical conditioning", "behaviorism"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Psychology",
+    "question": "In Freud's psychoanalytic theory, which component of the personality is responsible for dealing with reality and acting as a mediator?",
+    "options": ["The Id", "The Ego", "The Superego", "The Unconscious"],
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "The Ego operates on the reality principle, mediating between the primitive impulses of the Id and the moralistic demands of the Superego.",
+    "topic": "Personality Theories",
+    "tags": ["freud", "ego", "psychoanalysis"],
+    "estimatedTimeSeconds": 45
+  },
+  {
+    "skill": "Psychology",
+    "question": "What is cognitive dissonance?",
+    "options": [
+      "A mental disorder characterized by hallucinations.",
+      "The inability to remember short-term events.",
+      "The mental discomfort experienced by someone holding two or more contradictory beliefs, ideas, or values.",
+      "The process of learning complex skills."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "When people's actions contradict their beliefs (e.g., a smoker who knows smoking causes cancer), they experience cognitive dissonance and will often rationalize to reduce the psychological stress.",
+    "topic": "Social Psychology",
+    "tags": ["cognitive dissonance", "beliefs", "behavior"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Psychology",
+    "question": "What is the 'Bystander Effect'?",
+    "options": [
+      "People are more likely to help a victim when they are in a large crowd.",
+      "People are less likely to offer help to a victim when other people are present.",
+      "People observing an event will have wildly different memories of it.",
+      "People tend to copy the actions of bystanders to fit in."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "The Bystander Effect is a social psychological phenomenon driven by a 'diffusion of responsibility'—everyone assumes someone else will intervene.",
+    "topic": "Social Psychology",
+    "tags": ["bystander effect", "social psychology", "responsibility"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Psychology",
+    "question": "Which neurotransmitter is most heavily associated with the brain's reward and pleasure systems?",
+    "options": ["Serotonin", "Dopamine", "GABA", "Acetylcholine"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "Dopamine plays a major role in the motivational component of reward-motivated behavior, reinforcing actions that are beneficial or pleasurable.",
+    "topic": "Biological Psychology",
+    "tags": ["dopamine", "neurotransmitters", "brain"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Psychology",
+    "question": "What does Abraham Maslow's 'Hierarchy of Needs' suggest?",
+    "options": [
+      "People are primarily motivated by a desire for power.",
+      "Basic physiological and safety needs must be met before individuals can focus on higher-level needs like self-actualization.",
+      "Human behavior is entirely determined by genetics.",
+      "All humans naturally seek out conflict."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Maslow proposed a pyramid structure where fundamental needs (food, water, safety) form the base, and individuals must secure these before pursuing esteem or self-actualization.",
+    "topic": "Motivation and Emotion",
+    "tags": ["maslow", "needs", "motivation"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Psychology",
+    "question": "What is 'confirmation bias'?",
+    "options": [
+      "The tendency to search for, interpret, and favor information that confirms one's pre-existing beliefs.",
+      "The belief that other people share your opinions more than they actually do.",
+      "The tendency to blame external factors for failures but take personal credit for successes.",
+      "The act of recalling the first item in a list better than the rest."
+    ],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "Confirmation bias leads people to ignore contradictory evidence and embrace data that aligns with what they already think is true, often reinforcing prejudice.",
+    "topic": "Cognitive Psychology",
+    "tags": ["bias", "cognition", "beliefs"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Psychology",
+    "question": "In psychology, what is 'Nature vs. Nurture'?",
+    "options": [
+      "A debate concerning whether humans should live in cities or rural areas.",
+      "The debate over whether human behavior is determined by the environment (nurture) or by a person's genes (nature).",
+      "A theory regarding how animals raise their young.",
+      "The conflict between conscious and unconscious thoughts."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "This fundamental debate explores the extent to which genetics (nature) and learned experiences/environment (nurture) influence personality and behavior.",
+    "topic": "Developmental Psychology",
+    "tags": ["nature vs nurture", "genetics", "environment"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Psychology",
+    "question": "What is the focus of Cognitive Behavioral Therapy (CBT)?",
+    "options": [
+      "Analyzing childhood traumas and dreams.",
+      "Changing unhelpful or negative patterns of thinking and behavior to improve emotional regulation.",
+      "Administering medication to correct chemical imbalances.",
+      "Creating a purely empathetic, non-judgmental space without offering direct advice."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "CBT is a practical, goal-oriented psychotherapy that focuses on the interconnectedness of thoughts, feelings, and behaviors, aiming to break negative cycles.",
+    "topic": "Clinical Psychology",
+    "tags": ["cbt", "therapy", "cognition"],
+    "estimatedTimeSeconds": 45
+  },
+  {
+    "skill": "Psychology",
+    "question": "What is 'Neuroplasticity'?",
+    "options": [
+      "The hardening of brain tissue over time.",
+      "The brain's ability to reorganize itself by forming new neural connections throughout life.",
+      "The use of plastic implants in neurosurgery.",
+      "A disorder where neurons fire too rapidly."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Neuroplasticity allows the neurons in the brain to compensate for injury and disease and to adjust their activities in response to new situations or changes in their environment.",
+    "topic": "Biological Psychology",
+    "tags": ["neuroplasticity", "brain", "neurons"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Literature",
+    "question": "Who wrote '1984', a dystopian novel about totalitarianism and mass surveillance?",
+    "options": ["Aldous Huxley", "Ray Bradbury", "George Orwell", "F. Scott Fitzgerald"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "George Orwell published '1984' in 1949, introducing concepts like Big Brother, thoughtcrime, and Newspeak into the public consciousness.",
+    "topic": "20th Century Fiction",
+    "tags": ["1984", "orwell", "dystopia"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Literature",
+    "question": "What is a 'soliloquy' in drama?",
+    "options": [
+      "A humorous break in a serious play.",
+      "A speech where a character speaks their thoughts aloud when by themselves, revealing their inner feelings to the audience.",
+      "A dialogue between two opposing characters.",
+      "The final resolution of the plot."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Shakespeare famously used soliloquies (like Hamlet's 'To be, or not to be') to give the audience direct access to a character's internal conflict without other characters hearing.",
+    "topic": "Literary Devices",
+    "tags": ["soliloquy", "drama", "theater"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Literature",
+    "question": "Which ancient Greek poet is traditionally credited with authoring 'The Iliad' and 'The Odyssey'?",
+    "options": ["Sophocles", "Homer", "Virgil", "Euripides"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "Homer is the presumed author of these foundational epic poems of ancient Greek literature, detailing the Trojan War and its aftermath.",
+    "topic": "Classical Literature",
+    "tags": ["homer", "iliad", "greece", "epic"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Literature",
+    "question": "In literary analysis, what is an 'unreliable narrator'?",
+    "options": [
+      "A narrator who is frequently interrupted by other characters.",
+      "An author who misses publishing deadlines.",
+      "A first-person narrator whose credibility has been seriously compromised, either intentionally or unintentionally.",
+      "A narrator who speaks in an unknown language."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "An unreliable narrator (due to bias, mental illness, lying, or naivete) forces the reader to critically evaluate the story being told, rather than accepting it as absolute truth.",
+    "topic": "Literary Theory",
+    "tags": ["narrative", "unreliable narrator", "perspective"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Literature",
+    "question": "What literary period characterized by emotion, individualism, and the glorification of nature occurred roughly between 1800 and 1850?",
+    "options": ["The Enlightenment", "Romanticism", "Modernism", "Realism"],
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "Romanticism was a reaction against the scientific rationality of the Enlightenment, emphasizing strong emotion, imagination, and the sublime power of nature (e.g., Wordsworth, Shelley).",
+    "topic": "Literary Movements",
+    "tags": ["romanticism", "poetry", "history"],
+    "estimatedTimeSeconds": 45
+  },
+  {
+    "skill": "Literature",
+    "question": "What does 'foreshadowing' mean in a story?",
+    "options": [
+      "Jumping back in time to show a past event.",
+      "Providing a detailed description of the setting.",
+      "The author giving subtle hints or clues about what will happen later in the plot.",
+      "The emotional atmosphere of the story."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "Foreshadowing builds anticipation or tension, preparing the reader for upcoming twists or the climax without revealing it explicitly.",
+    "topic": "Literary Devices",
+    "tags": ["foreshadowing", "plot", "technique"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Literature",
+    "question": "Who is the tragic hero of Shakespeare's play 'Macbeth'?",
+    "options": ["Macduff", "Duncan", "Macbeth", "Banquo"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "Macbeth is the tragic hero whose fatal flaw of unchecked ambition, spurred by prophecies and his wife, leads him to murder the king and ultimately face his own doom.",
+    "topic": "Shakespeare",
+    "tags": ["macbeth", "shakespeare", "tragedy"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Literature",
+    "question": "What is the defining characteristic of a 'Haiku' poem?",
+    "options": [
+      "It must rhyme in an AABB pattern.",
+      "It consists of three lines with a 5-7-5 syllable structure.",
+      "It is an epic story told over hundreds of pages.",
+      "It must explicitly state a moral lesson at the end."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "A traditional Japanese Haiku consists of 17 syllables divided into three phrases of 5, 7, and 5 syllables, typically focusing on nature or a specific moment in time.",
+    "topic": "Poetry",
+    "tags": ["haiku", "poetry", "structure"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Literature",
+    "question": "What is a 'bildungsroman'?",
+    "options": [
+      "A romance novel set in the Middle Ages.",
+      "A novel focusing on the psychological and moral growth of its main character from youth to adulthood.",
+      "A political satire written as an allegory.",
+      "A mystery novel where the detective is the villain."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "A bildungsroman (a German term meaning 'novel of formation') is a coming-of-age story. Examples include 'To Kill a Mockingbird' or 'The Catcher in the Rye'.",
+    "topic": "Genres",
+    "tags": ["bildungsroman", "coming of age", "novel"],
+    "estimatedTimeSeconds": 45
+  },
+  {
+    "skill": "Literature",
+    "question": "In George Orwell's 'Animal Farm', what does the story operate as?",
+    "options": [
+      "A literal guide to farming.",
+      "An allegory representing the events leading up to the Russian Revolution and the Stalinist era.",
+      "A children's fairy tale with no deeper meaning.",
+      "A science fiction narrative about alien animals."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "The novel uses animals to symbolize key figures and concepts of the Russian Revolution, demonstrating how revolutionary ideals can be corrupted into tyranny.",
+    "topic": "Literary Analysis",
+    "tags": ["animal farm", "allegory", "orwell"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Discrete Mathematics",
+    "question": "In logic, what does the 'AND' operation (conjunction) require for the final result to be True?",
+    "options": [
+      "At least one of the propositions must be True.",
+      "Exactly one of the propositions must be True.",
+      "Both (or all) of the propositions must be True.",
+      "Both propositions must be False."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "A logical AND (P ∧ Q) only evaluates to True if P is True AND Q is True simultaneously.",
+    "topic": "Propositional Logic",
+    "tags": ["logic", "conjunction", "boolean"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Discrete Mathematics",
+    "question": "What is a 'Graph' in the context of discrete mathematics?",
+    "options": [
+      "A visual chart showing a line (e.g., a stock market trend).",
+      "A set of vertices (nodes) connected by edges (links).",
+      "A matrix containing only 0s and 1s.",
+      "A function that plots x against y."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "In graph theory, a graph is a mathematical structure used to model pairwise relations between objects, completely distinct from visual data charts.",
+    "topic": "Graph Theory",
+    "tags": ["graph theory", "vertices", "edges"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Discrete Mathematics",
+    "question": "If a set A has n elements, how many subsets does the power set of A contain?",
+    "options": ["n", "n^2", "2^n", "n!"],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "For each element in the set, there are two choices: include it in the subset or exclude it. Therefore, n elements yield 2^n possible combinations (subsets).",
+    "topic": "Set Theory",
+    "tags": ["sets", "power set", "combinations"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Discrete Mathematics",
+    "question": "What does a bijection (bijective function) guarantee about the mapping between set X and set Y?",
+    "options": [
+      "Every element in X maps to the exact same element in Y.",
+      "Multiple elements in X can map to the same element in Y.",
+      "Every element in X maps to a unique element in Y, and every element in Y is covered exactly once (it is both injective and surjective).",
+      "Some elements in Y have no mapping from X."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "hard",
+    "explanation": "A bijection establishes a perfect one-to-one correspondence between two sets, meaning they have the exact same cardinality (size) and the function has a perfect inverse.",
+    "topic": "Functions",
+    "tags": ["bijection", "functions", "mapping"],
+    "estimatedTimeSeconds": 45
+  },
+  {
+    "skill": "Discrete Mathematics",
+    "question": "What principle states that if n items are put into m containers, with n > m, then at least one container must contain more than one item?",
+    "options": ["The Inclusion-Exclusion Principle", "The Pigeonhole Principle", "De Morgan's Laws", "The Well-Ordering Principle"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "The Pigeonhole Principle is a simple but powerful counting argument. If you have 10 pigeons and 9 holes, at least one hole must contain 2 pigeons.",
+    "topic": "Combinatorics",
+    "tags": ["pigeonhole", "counting", "combinatorics"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Discrete Mathematics",
+    "question": "What is the result of 7 modulo 3 (7 mod 3)?",
+    "options": ["2", "1", "3", "4"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "The modulo operation finds the remainder after division. 7 divided by 3 is 2 with a remainder of 1. Therefore, 7 mod 3 = 1.",
+    "topic": "Number Theory",
+    "tags": ["modulo", "arithmetic", "remainder"],
+    "estimatedTimeSeconds": 20
+  },
+  {
+    "skill": "Discrete Mathematics",
+    "question": "In a complete graph with n vertices, how many edges are connected to each individual vertex?",
+    "options": ["n", "n - 1", "n / 2", "n^2"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "In a complete graph, every vertex is connected directly to every other vertex. Since a vertex cannot connect to itself, it connects to the (n - 1) other vertices.",
+    "topic": "Graph Theory",
+    "tags": ["complete graph", "edges", "vertices"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Discrete Mathematics",
+    "question": "Which of the following is the logical equivalent to the contrapositive of the implication 'If P, then Q' (P → Q)?",
+    "options": ["If Q, then P (Q → P)", "If not P, then not Q (~P → ~Q)", "If not Q, then not P (~Q → ~P)", "P and not Q (P ∧ ~Q)"],
+    "correctAnswer": 2,
+    "difficulty": "hard",
+    "explanation": "The contrapositive negates and swaps the hypothesis and conclusion. An implication and its contrapositive always have the same truth value.",
+    "topic": "Propositional Logic",
+    "tags": ["logic", "contrapositive", "implication"],
+    "estimatedTimeSeconds": 45
+  },
+  {
+    "skill": "Discrete Mathematics",
+    "question": "What is mathematical induction used for?",
+    "options": [
+      "To estimate the value of irrational numbers.",
+      "To prove that a statement is true for all natural numbers by proving a base case and an inductive step.",
+      "To find the shortest path in a weighted graph.",
+      "To solve differential equations."
+    ],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Induction is like knocking over dominoes: you prove the first one falls (base case), and prove that if one falls, the next one will fall too (inductive step).",
+    "topic": "Proof Techniques",
+    "tags": ["induction", "proofs", "natural numbers"],
+    "estimatedTimeSeconds": 30
+  },
+  {
+    "skill": "Discrete Mathematics",
+    "question": "What is the difference between a Permutation and a Combination?",
+    "options": [
+      "Permutations deal with sets; Combinations deal with graphs.",
+      "Permutations allow repetition; Combinations do not.",
+      "In Permutations, the order of elements matters; in Combinations, the order does not matter.",
+      "There is no difference; they are interchangeable terms."
+    ],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "A combination lock should really be called a 'permutation lock', because the order of the numbers (e.g., 1-2-3 vs 3-2-1) matters. If order doesn't matter, it's a combination.",
+    "topic": "Combinatorics",
+    "tags": ["permutations", "combinations", "counting"],
+    "estimatedTimeSeconds": 30
   }
 ]
