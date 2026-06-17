@@ -1,5 +1,6 @@
 // Isolated WebSocket connection utility supporting Vert.x endpoints
 let wsConnection = null;
+let connectionGen = 0;
 let reconnectInterval = 1000;
 let maxReconnectInterval = 30000;
 let reconnectTimer = null;
@@ -31,15 +32,18 @@ export const socketService = {
     const wsUrl = `${WS_BASE_URL}?token=${encodeURIComponent(token)}`;
 
     try {
-      wsConnection = new WebSocket(wsUrl);
+      const currentGen = ++connectionGen;
+      const conn = new WebSocket(wsUrl);
+      wsConnection = conn;
 
-      wsConnection.onopen = () => {
+      conn.onopen = () => {
+        if (connectionGen !== currentGen) return;
         console.log('[WS-Service] WebSocket connection active.');
         reconnectInterval = 1000; // Reset reconnect interval
         onStatusChange('connected');
       };
 
-      wsConnection.onmessage = (event) => {
+      conn.onmessage = (event) => {
         try {
           const parsedData = JSON.parse(event.data);
           onMessage(parsedData);
@@ -49,7 +53,8 @@ export const socketService = {
         }
       };
 
-      wsConnection.onclose = (event) => {
+      conn.onclose = (event) => {
+        if (connectionGen !== currentGen) return; // Stale connection — ignore
         wsConnection = null;
         onStatusChange('disconnected');
 
@@ -93,6 +98,7 @@ export const socketService = {
 
   disconnect: () => {
     isExpectedClose = true;
+    ++connectionGen; // Invalidate all future stale callbacks
     if (reconnectTimer) {
       clearTimeout(reconnectTimer);
       reconnectTimer = null;

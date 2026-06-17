@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useAppData } from '../context/AppDataContext';
@@ -50,6 +50,8 @@ const Messages = () => {
   const [replyingTo, setReplyingTo] = useState(null);
   const [editingMessage, setEditingMessage] = useState(null);
   const [deletingMessage, setDeletingMessage] = useState(null);
+  const typingThrottleRef = useRef(0);
+  const isTypingRef = useRef(false);
 
   const [loadingOlder, setLoadingOlder] = useState(false);
   const [hasMoreMessages, setHasMoreMessages] = useState({});
@@ -62,31 +64,32 @@ const Messages = () => {
   // Load historical messages when active chat changes
   useEffect(() => {
     if (activeChatId && activeChatId !== 'requests') {
-      if (!chatMessages[activeChatId]) {
-        messageService.getMessages(activeChatId, { page: 1, limit: 50 }).then(res => {
+      // Always fetch history from API (merges with any WS-pre-populated messages)
+      const isNewChat = !chatMessages[activeChatId];
+      messageService.getMessages(activeChatId, { page: 1, limit: 50 }).then(res => {
+        if (isNewChat) {
           setChatMessages(prev => ({ ...prev, [activeChatId]: res.items || [] }));
-          setHasMoreMessages(prev => ({ ...prev, [activeChatId]: res.items.length === 50 }));
-          messageService.markAsRead(activeChatId).catch(console.error);
-          
-          setChats(prevChats => prevChats.map(c => c.id === activeChatId ? { ...c, unread: 0 } : c));
-          
-          // Initial scroll to bottom (instant to prevent jarring slide down)
-          setTimeout(() => {
-             messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
-          }, 50);
-        }).catch(err => {
-          console.error(err);
-        });
-      } else {
-        // If already loaded, just mark as read
-        messageService.markAsRead(activeChatId).catch(console.error);
-        setChats(prevChats => prevChats.map(c => c.id === activeChatId ? { ...c, unread: 0 } : c));
-        
-        // Return to bottom on cache load
-        setTimeout(() => {
-             messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
-        }, 50);
-      }
+        } else {
+          setChatMessages(prev => {
+            const existing = prev[activeChatId] || [];
+            const existingIds = new Set(existing.map(m => m._id || m.id));
+            const newItems = (res.items || []).filter(m => !existingIds.has(m._id || m.id));
+            if (newItems.length === 0) return prev;
+            return { ...prev, [activeChatId]: [...newItems, ...existing] };
+          });
+        }
+        setHasMoreMessages(prev => ({ ...prev, [activeChatId]: res.items.length === 50 }));
+      }).catch(err => {
+        console.error(err);
+      });
+
+      messageService.markAsRead(activeChatId).catch(console.error);
+      setChats(prevChats => prevChats.map(c => c.id === activeChatId ? { ...c, unread: 0 } : c));
+
+      // Scroll to bottom
+      setTimeout(() => {
+         messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
+      }, 50);
       setShowScrollBottom(false);
       setUnreadNewMessages(0);
     }
@@ -372,9 +375,16 @@ const Messages = () => {
           }));
         }
       }
+      isTypingRef.current = false;
       sendSocketEvent('TYPING_STOPPED', { chatId: activeChatId });
     }
   };
+
+  // Reset typing state when switching chats
+  useEffect(() => {
+    isTypingRef.current = false;
+    typingThrottleRef.current = 0;
+  }, [activeChatId]);
 
   const handleDeleteMessage = (msg) => {
     setDeletingMessage(msg);
@@ -419,11 +429,23 @@ const Messages = () => {
     }
   };
 
-  const handleTyping = (isTyping) => {
-    if (activeChatId && activeChatId !== 'requests') {
-      sendSocketEvent(isTyping ? 'TYPING_STARTED' : 'TYPING_STOPPED', { chatId: activeChatId });
+  const handleTyping = useCallback((isTyping) => {
+    if (!activeChatId || activeChatId === 'requests') return;
+    const now = Date.now();
+    if (isTyping) {
+      if (!isTypingRef.current) {
+        isTypingRef.current = true;
+        sendSocketEvent('TYPING_STARTED', { chatId: activeChatId });
+        typingThrottleRef.current = now;
+      } else if (now - typingThrottleRef.current > 3000) {
+        sendSocketEvent('TYPING_STARTED', { chatId: activeChatId });
+        typingThrottleRef.current = now;
+      }
+    } else {
+      isTypingRef.current = false;
+      sendSocketEvent('TYPING_STOPPED', { chatId: activeChatId });
     }
-  };
+  }, [activeChatId, sendSocketEvent]);
 
   const handleAcceptRequest = async (id) => {
     try {
