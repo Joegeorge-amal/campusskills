@@ -204,12 +204,17 @@ const PublicProfile = () => {
     };
 
     fetchData();
-  }, [rollNo, navigate, triggerToast]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rollNo, navigate]);
 
   if (loading || !profileData) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
-        <div className="spinner">Loading...</div>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f8fafc' }}>
+        <svg width="32" height="32" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style={{ animation: 'spin 0.8s linear infinite' }}>
+          <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
+          <circle cx="12" cy="12" r="10" stroke="rgba(37, 99, 235, 0.15)" strokeWidth="3.5" fill="none" />
+          <path d="M12 2 a10 10 0 0 1 10 10" stroke="#2563eb" strokeWidth="3.5" strokeLinecap="round" fill="none" />
+        </svg>
       </div>
     );
   }
