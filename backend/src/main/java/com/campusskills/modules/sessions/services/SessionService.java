@@ -125,7 +125,21 @@ public class SessionService {
                                 sendNotification(session.getStudentId(), com.campusskills.shared.constants.NotificationType.SESSION_COMPLETED, "Session Completed", msgToStudent, "SESSION", sessionId);
                                 statsRepository.recordActivity(session.getTeacherId());
                                 statsRepository.recordActivity(session.getStudentId());
+                                statsRepository.incrementSessionsCompleted(session.getTeacherId());
+                                statsRepository.incrementSessionsCompleted(session.getStudentId());
                                 com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent(com.campusskills.shared.constants.WebSocketEventType.SESSION_BOTH_CONFIRMED, updatedSession);
+                                
+                                // Broadcast PROFILE_UPDATED for real-time UI update
+                                statsRepository.findByUserId(session.getTeacherId()).onSuccess(teacherStats -> {
+                                    int tSessions = teacherStats != null && teacherStats.getSessionsCompleted() != null ? teacherStats.getSessionsCompleted() : 0;
+                                    com.campusskills.web.websockets.MessageBroadcaster.broadcastProfileUpdate(session.getTeacherId(),
+                                        new io.vertx.core.json.JsonObject().put("sessionsCompleted", tSessions));
+                                });
+                                statsRepository.findByUserId(session.getStudentId()).onSuccess(studentStats -> {
+                                    int sSessions = studentStats != null && studentStats.getSessionsCompleted() != null ? studentStats.getSessionsCompleted() : 0;
+                                    com.campusskills.web.websockets.MessageBroadcaster.broadcastProfileUpdate(session.getStudentId(),
+                                        new io.vertx.core.json.JsonObject().put("sessionsCompleted", sSessions));
+                                });
                                 return Future.succeededFuture();
                             });
                         });
@@ -241,9 +255,7 @@ public class SessionService {
             return repository.updateSessionFields(sessionId, updates).compose(v -> repository.getSessionById(sessionId)).onSuccess(updatedSession -> {
                 com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent(com.campusskills.shared.constants.WebSocketEventType.PAYMENT_CONFIRMED, updatedSession);
                 
-                // Increment sessionsCompleted for both teacher and student, then broadcast profile update
-                statsRepository.incrementSessionsCompleted(session.getTeacherId());
-                statsRepository.incrementSessionsCompleted(session.getStudentId());
+                // Broadcast updated profile stats (sessionsCompleted was already incremented at completion time)
                 profileRepository.findByUserId(session.getTeacherId()).compose(teacherProfile -> {
                     String teacherName = teacherProfile != null ? teacherProfile.getName() : "Teacher";
                     String topic = session.getTopic() != null ? session.getTopic() : "Session";
