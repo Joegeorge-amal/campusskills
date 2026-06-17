@@ -490,11 +490,13 @@ export const AppDataProvider = ({ children }) => {
         const existingIndex = prevChats.findIndex(c => c.id === msg.chatId);
         if (existingIndex > -1) {
           const chat = prevChats[existingIndex];
+          const isCurrentlyInChat = window.location.pathname === `/app/messages/${msg.chatId}` || window.location.pathname === `/app/messages/${msg.chatId}/`;
+          
           const updatedChat = {
             ...chat,
             preview: msg.message,
             time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-            unread: msg.senderId !== user?.userId ? (chat.unread || 0) + 1 : chat.unread
+            unread: (msg.senderId !== user?.userId && !isCurrentlyInChat) ? (chat.unread || 0) + 1 : (isCurrentlyInChat ? 0 : chat.unread)
           };
           const newChats = [...prevChats];
           newChats.splice(existingIndex, 1);
