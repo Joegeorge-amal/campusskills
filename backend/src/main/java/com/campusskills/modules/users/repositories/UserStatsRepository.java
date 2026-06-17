@@ -44,6 +44,13 @@ public class UserStatsRepository {
         return client.updateCollection(COLLECTION, query, update).map(res -> res.getDocModified() > 0);
     }
 
+    public Future<Boolean> incrementSessionsCompleted(String userId) {
+        JsonObject query = new JsonObject().put("userId", userId);
+        JsonObject update = new JsonObject().put("$inc", new JsonObject().put("sessionsCompleted", 1))
+            .put("$set", new JsonObject().put("updatedAt", System.currentTimeMillis()));
+        return client.updateCollection(COLLECTION, query, update).map(res -> res.getDocModified() > 0);
+    }
+
     public Future<Boolean> updateStats(UserStats stats) {
         stats.setUpdatedAt(System.currentTimeMillis());
         JsonObject query = new JsonObject().put("_id", stats.getId());

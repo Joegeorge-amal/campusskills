@@ -29,7 +29,13 @@ const ReviewModal = ({ isOpen, onClose, session, onSubmit }) => {
       if (onSubmit) onSubmit();
       onClose();
     } catch (err) {
-      triggerToast('Failed to submit review');
+      if (err.message && (err.message.includes('CONFLICT') || err.message.includes('already reviewed'))) {
+        triggerToast('You already reviewed this session');
+        if (onSubmit) onSubmit();
+        onClose();
+      } else {
+        triggerToast('Failed to submit review');
+      }
     } finally {
       setIsSubmitting(false);
     }

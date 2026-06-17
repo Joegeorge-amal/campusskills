@@ -123,14 +123,23 @@ public class ReviewService {
         
         return reviewRepository.fetchUserReviews(userId, skip, limit).compose(list -> {
             List<Future<JsonObject>> futures = list.stream().map(r -> {
-                Future<UserProfile> profFut = userProfileRepository.findByUserId(r.getReviewerId());
-                Future<Session> sessFut = r.getSessionId() != null ? sessionRepository.getSessionById(r.getSessionId()) : Future.succeededFuture(null);
+                JsonObject json = JsonObject.mapFrom(r);
+                Future<UserProfile> profFut = userProfileRepository.findByUserId(r.getReviewerId())
+                    .otherwise(t -> {
+                        log.warn("Failed to fetch profile for review {}: {}", r.getId(), t.getMessage());
+                        return null;
+                    });
+                Future<Session> sessFut = r.getSessionId() != null
+                    ? sessionRepository.getSessionById(r.getSessionId())
+                        .otherwise(t -> {
+                            log.warn("Failed to fetch session for review {}: {}", r.getId(), t.getMessage());
+                            return null;
+                        })
+                    : Future.succeededFuture(null);
                 
                 return Future.join(profFut, sessFut).map(join -> {
                     UserProfile profile = join.resultAt(0);
                     Session session = join.resultAt(1);
-                    
-                    JsonObject json = JsonObject.mapFrom(r);
                     json.put("reviewerName", profile != null ? profile.getName() : "Unknown User");
                     json.put("sessionTitle", session != null ? session.getTopic() : "Skill Session");
                     return json;
@@ -194,7 +203,12 @@ public class ReviewService {
             io.vertx.core.Future<Boolean> profileUpdate = userProfileRepository.updateRatings(revieweeId, avg, count);
             io.vertx.core.Future<Boolean> statsUpdate = userStatsRepository.updateRatings(revieweeId, avg, count);
             
-            io.vertx.core.Future.all(profileUpdate, statsUpdate).onFailure(err -> {
+            io.vertx.core.Future.all(profileUpdate, statsUpdate).onSuccess(v -> {
+                com.campusskills.web.websockets.MessageBroadcaster.broadcastProfileUpdate(revieweeId,
+                    new io.vertx.core.json.JsonObject()
+                        .put("ratingAvg", avg)
+                        .put("ratingCount", count));
+            }).onFailure(err -> {
                 log.error("Failed to sync ratings for user {}", revieweeId, err);
             });
         });
