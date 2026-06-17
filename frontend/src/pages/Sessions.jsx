@@ -326,6 +326,40 @@ const Sessions = () => {
       !s.rawSession.teacherConfirmedCompletion && 
       !s.rawSession.studentConfirmedCompletion;
 
+    let guidanceText = null;
+    let guidanceStyle = {};
+
+    if (s.status === 'SCHEDULED') {
+      const tConf = s.rawSession.teacherConfirmedCompletion;
+      const sConf = s.rawSession.studentConfirmedCompletion;
+      if (tConf || sConf) {
+        guidanceText = "Waiting for completion confirmation";
+        guidanceStyle = { background: '#fffbeb', color: '#d97706', border: '1px solid #fde68a' };
+      }
+    } else if (s.status === 'COMPLETED') {
+      if (!isSwap) {
+        if (!s.rawSession.studentMarkedPaid) {
+          guidanceText = "Payment pending";
+          guidanceStyle = { background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca' };
+        } else if (!s.rawSession.teacherConfirmedPayment) {
+          guidanceText = "Waiting for payment confirmation";
+          guidanceStyle = { background: '#fffbeb', color: '#d97706', border: '1px solid #fde68a' };
+        } else {
+          const reviewExists = s.rawSession.reviews && s.rawSession.reviews.some(r => r.reviewerId === user?.userId);
+          if (!reviewExists) {
+            guidanceText = "Please leave a review";
+            guidanceStyle = { background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe' };
+          }
+        }
+      } else {
+        const reviewExists = s.rawSession.reviews && s.rawSession.reviews.some(r => r.reviewerId === user?.userId);
+        if (!reviewExists) {
+          guidanceText = "Please leave a review";
+          guidanceStyle = { background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe' };
+        }
+      }
+    }
+
     return (
       <div 
         key={s.id || idx}
@@ -367,7 +401,7 @@ const Sessions = () => {
 
           {/* Details Preview */}
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: '14px', fontWeight: 700, color: '#111827', marginBottom: '2px' }}>
+            <div style={{ fontSize: '14px', fontWeight: 700, color: '#111827', marginBottom: '2px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               {s.topic}
             </div>
             <div style={{ fontSize: '12px', color: '#6b7280' }}>
@@ -377,6 +411,17 @@ const Sessions = () => {
 
           {/* Status Badge & Chevron */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {guidanceText && (
+              <span style={{
+                fontSize: '11px',
+                fontWeight: 600,
+                padding: '4px 8px',
+                borderRadius: '6px',
+                ...guidanceStyle
+              }}>
+                {guidanceText}
+              </span>
+            )}
             <span style={{
               fontSize: '11px',
               fontWeight: 600,

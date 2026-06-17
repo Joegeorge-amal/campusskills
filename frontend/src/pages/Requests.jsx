@@ -83,6 +83,9 @@ const Requests = () => {
         await exchangeService.acceptExchange(reqId, payload);
       }
       if (!hideToast) triggerToast('Request accepted successfully!');
+      window.dispatchEvent(new CustomEvent('markNotificationAsRead', { 
+        detail: { sourceType: req.type === 'Chat request' ? 'CHAT_REQUEST' : 'EXCHANGE', sourceId: reqId } 
+      }));
       fetchInitialData();
     } catch (err) {
       const msg = err?.response?.data?.error || err?.message || 'Failed to accept request';
@@ -112,6 +115,9 @@ const Requests = () => {
         await exchangeService.rejectExchange(reqId);
       }
       triggerToast('Request declined.');
+      window.dispatchEvent(new CustomEvent('markNotificationAsRead', { 
+        detail: { sourceType: req.type === 'Chat request' ? 'CHAT_REQUEST' : 'EXCHANGE', sourceId: reqId } 
+      }));
       fetchInitialData();
     } catch (err) {
       triggerToast('Failed to decline request');

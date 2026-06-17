@@ -183,6 +183,9 @@ const SessionLifecycleManager = () => {
     setActivePopup(null);
     try {
       await sessionService.markCompletion(sessionId);
+      window.dispatchEvent(new CustomEvent('markNotificationAsRead', { 
+        detail: { sourceType: 'SESSION', sourceId: sessionId } 
+      }));
       fetchInitialData();
     } catch (err) {
       console.error('Failed to mark completion', err);
@@ -195,6 +198,9 @@ const SessionLifecycleManager = () => {
     setActivePopup(null);
     try {
       await sessionService.markPaid(sessionId);
+      window.dispatchEvent(new CustomEvent('markNotificationAsRead', { 
+        detail: { sourceType: 'SESSION', sourceId: sessionId } 
+      }));
       fetchInitialData();
       
       // Immediately jump to review modal
@@ -219,6 +225,9 @@ const SessionLifecycleManager = () => {
     setActivePopup(null);
     try {
       await sessionService.confirmPayment(sessionId);
+      window.dispatchEvent(new CustomEvent('markNotificationAsRead', { 
+        detail: { sourceType: 'SESSION', sourceId: sessionId } 
+      }));
       fetchInitialData();
       
       // Immediately jump to review modal
@@ -247,6 +256,9 @@ const SessionLifecycleManager = () => {
         await exchangeService.acceptRequest(req.id);
       }
       setDismissedRequests(prev => [...prev, req.id]);
+      window.dispatchEvent(new CustomEvent('markNotificationAsRead', { 
+        detail: { sourceType: req.type === 'Chat request' || (req.type && req.type.toLowerCase().includes('chat')) ? 'CHAT_REQUEST' : 'EXCHANGE', sourceId: req.id } 
+      }));
       fetchInitialData();
     } catch (error) {
       console.error('Failed to accept request:', error);
@@ -263,6 +275,9 @@ const SessionLifecycleManager = () => {
         await exchangeService.rejectRequest(req.id);
       }
       setDismissedRequests(prev => [...prev, req.id]);
+      window.dispatchEvent(new CustomEvent('markNotificationAsRead', { 
+        detail: { sourceType: req.type === 'Chat request' || (req.type && req.type.toLowerCase().includes('chat')) ? 'CHAT_REQUEST' : 'EXCHANGE', sourceId: req.id } 
+      }));
       fetchInitialData();
     } catch (error) {
       console.error('Failed to decline request:', error);
