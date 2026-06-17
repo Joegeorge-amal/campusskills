@@ -21,62 +21,7 @@ import {
   IconFlag
 } from '@tabler/icons-react';
 
-const BackloggdStarSelector = ({ value, onChange }) => {
-  const [hoverValue, setHoverValue] = useState(null);
-  const displayValue = hoverValue !== null ? hoverValue : value;
-  const stars = [1, 2, 3, 4, 5];
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', margin: '16px 0' }}>
-      <div style={{ display: 'flex', gap: '8px' }}>
-        {stars.map(starIndex => {
-          const leftVal = starIndex - 0.5;
-          const rightVal = starIndex;
-          const isLeftFilled = displayValue >= leftVal;
-          const isRightFilled = displayValue >= rightVal;
-
-          return (
-            <div 
-              key={starIndex} 
-              style={{ position: 'relative', width: '36px', height: '36px', display: 'inline-block' }}
-            >
-              {/* Left half clickable zone */}
-              <div 
-                onClick={() => onChange(leftVal)}
-                onMouseEnter={() => setHoverValue(leftVal)}
-                onMouseLeave={() => setHoverValue(null)}
-                style={{ position: 'absolute', left: 0, top: 0, width: '18px', height: '36px', zIndex: 5, cursor: 'pointer' }}
-              />
-              {/* Right half clickable zone */}
-              <div 
-                onClick={() => onChange(rightVal)}
-                onMouseEnter={() => setHoverValue(rightVal)}
-                onMouseLeave={() => setHoverValue(null)}
-                style={{ position: 'absolute', right: 0, top: 0, width: '18px', height: '36px', zIndex: 5, cursor: 'pointer' }}
-              />
-
-              <svg viewBox="0 0 24 24" style={{ width: '100%', height: '100%', pointerEvents: 'none' }}>
-                <defs>
-                  <linearGradient id={`modal-star-grad-${starIndex}-${displayValue}`}>
-                    <stop offset="50%" stopColor={isLeftFilled ? '#1d4ed8' : '#e5e7eb'} />
-                    <stop offset="50%" stopColor={isRightFilled ? '#1d4ed8' : '#e5e7eb'} />
-                  </linearGradient>
-                </defs>
-                <path 
-                  d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" 
-                  fill={`url(#modal-star-grad-${starIndex}-${displayValue})`}
-                />
-              </svg>
-            </div>
-          );
-        })}
-      </div>
-      <div style={{ fontSize: '15px', fontWeight: 800, color: '#1d4ed8' }}>
-        {displayValue > 0 ? `${displayValue.toFixed(1)} / 5.0 Stars` : 'Select a rating'}
-      </div>
-    </div>
-  );
-};
+import ReviewModal from '../components/modals/ReviewModal';
 
 const Sessions = () => {
   const { user } = useAuth();
@@ -101,7 +46,10 @@ const Sessions = () => {
       
       const session = sessionsData.find(s => s.id === highlightedSessionId);
       if (session) {
-        const isHistory = session.status === 'COMPLETED' || session.status === 'CANCELLED';
+        const isSwap = !!session.rawSession.swapGroupId;
+        const isHistory = session.status === 'CANCELLED' || 
+          (session.status === 'COMPLETED' && (isSwap || session.rawSession.teacherConfirmedPayment));
+          
         if (isHistory) {
           setIsHistoryOpen(true);
         } else {
@@ -167,8 +115,6 @@ const Sessions = () => {
         status: 'COMPLETED'
       };
       setSelectedSessionForReview(stubSession);
-      setModalRating(5.0);
-      setModalComment('');
       setReviewModalOpen(true);
     } else if (sessionEvent.type === 'COMPLETION_REQUESTED') {
       setIsHistoryOpen(true);
@@ -197,10 +143,7 @@ const Sessions = () => {
   const [processingAction, setProcessingAction] = useState(null);
 
   // Review states
-  const [submittingReviewId, setSubmittingReviewId] = useState(null);
   const [submittedReviews, setSubmittedReviews] = useState({});
-  const [modalRating, setModalRating] = useState(5.0);
-  const [modalComment, setModalComment] = useState('');
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [selectedSessionForReview, setSelectedSessionForReview] = useState(null);
 
@@ -302,24 +245,6 @@ const Sessions = () => {
     }
   };
 
-  const handleReviewSubmit = async (sessionId, receiverId) => {
-    const rating = modalRating;
-    const comment = modalComment.trim() || 'No written review.';
-    try {
-      setSubmittingReviewId(sessionId);
-      await api.post('/reviews', { sessionId, rating, comment });
-      setSubmittedReviews(prev => ({ ...prev, [sessionId]: true }));
-      triggerToast('Review submitted successfully!');
-      setReviewModalOpen(false);
-      setSelectedSessionForReview(null);
-      fetchInitialData();
-    } catch (err) {
-      triggerToast('Failed to submit review');
-    } finally {
-      setSubmittingReviewId(null);
-    }
-  };
-
   const handleReport = (title) => {
     const target = title.split('·')[1]?.trim();
     const context = title.split('·')[0]?.trim();
@@ -353,18 +278,32 @@ const Sessions = () => {
   });
 
   // Filter and sort sessions
-  const allScheduled = filteredSessions
-    .filter(s => s.status === 'SCHEDULED')
+  const activeSessions = filteredSessions
+    .filter(s => {
+      if (s.status === 'SCHEDULED') return true;
+      if (s.status === 'COMPLETED') {
+        const isSwap = !!s.rawSession.swapGroupId;
+        return !isSwap && !s.rawSession.teacherConfirmedPayment;
+      }
+      return false;
+    })
     .sort((a, b) => (a.rawSession.scheduledStart || 0) - (b.rawSession.scheduledStart || 0));
 
-  const upcomingSoon = allScheduled.filter(s => 
+  const upcomingSoon = activeSessions.filter(s => 
     s.rawSession.scheduledStart && 
     s.rawSession.scheduledStart <= soonLimit && 
     s.rawSession.scheduledStart >= now - 3600000 // up to 1 hour ago
   );
 
   const pastSessions = filteredSessions
-    .filter(s => s.status === 'COMPLETED' || s.status === 'CANCELLED')
+    .filter(s => {
+      if (s.status === 'CANCELLED') return true;
+      if (s.status === 'COMPLETED') {
+        const isSwap = !!s.rawSession.swapGroupId;
+        return isSwap || s.rawSession.teacherConfirmedPayment;
+      }
+      return false;
+    })
     .sort((a, b) => (b.rawSession.updatedAt || 0) - (a.rawSession.updatedAt || 0));
 
   const formatSessionFullTime = (start, end) => {
@@ -732,8 +671,6 @@ const Sessions = () => {
                         <button 
                           onClick={() => {
                             setSelectedSessionForReview(s);
-                            setModalRating(5.0);
-                            setModalComment('');
                             setReviewModalOpen(true);
                           }}
                           style={{ 
@@ -797,17 +734,15 @@ const Sessions = () => {
           style={{ fontSize: '12px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
           onClick={() => setIsAllOpen(!isAllOpen)}
         >
-          <span>{isAllOpen ? '▼' : '▶'}</span> All Scheduled Sessions ({allScheduled.length})
+          <span>{isAllOpen ? '▼' : '▶'}</span> All Scheduled Sessions ({activeSessions.length})
         </div>
         
         {isAllOpen && (
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {allScheduled.map((s, idx) => renderSessionCard(s, idx))}
+          <div className="sessions-list">
+            {activeSessions.map((s, idx) => renderSessionCard(s, idx))}
             
-            {allScheduled.length === 0 && (
-              <div style={{ fontSize: '14px', color: '#6b7280', padding: '32px 0', textAlign: 'center', background: '#ffffff', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
-                No scheduled sessions found.
-              </div>
+            {activeSessions.length === 0 && (
+              <div className="empty-state">No other active sessions.</div>
             )}
           </div>
         )}
@@ -989,90 +924,22 @@ const Sessions = () => {
         document.body
       )}
 
-      {/* Review Modal */}
-      {reviewModalOpen && selectedSessionForReview && ReactDOM.createPortal(
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(15, 23, 42, 0.6)',
-          backdropFilter: 'blur(4px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000,
-          padding: '16px'
-        }}>
-          <div style={{
-            backgroundColor: '#ffffff',
-            borderRadius: '16px',
-            padding: '24px',
-            maxWidth: '420px',
-            width: '100%',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-            boxSizing: 'border-box'
-          }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 800, color: '#111827' }}>Review Session</h3>
-              <button 
-                onClick={() => {
-                  setReviewModalOpen(false);
-                  setSelectedSessionForReview(null);
-                }} 
-                style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', padding: 0 }}
-              >
-                <IconX size={20} />
-              </button>
-            </div>
-            
-            <p style={{ fontSize: '13px', color: '#4b5563', margin: '0 0 16px', fontWeight: 500 }}>
-              Review for <strong>{selectedSessionForReview.topic}</strong> with <strong>{selectedSessionForReview.name}</strong>.
-            </p>
-
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ fontSize: '13px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '8px' }}>
-                Rating (Required)
-              </label>
-              <BackloggdStarSelector value={modalRating} onChange={setModalRating} />
-            </div>
-
-            <div style={{ marginBottom: '24px' }}>
-              <label style={{ fontSize: '13px', fontWeight: 700, color: '#374151', display: 'block', marginBottom: '8px' }}>
-                Written Review (Optional)
-              </label>
-              <textarea 
-                placeholder="Write feedback about this session (e.g. Explains concepts clearly)..." 
-                value={modalComment} 
-                onChange={(e) => setModalComment(e.target.value)}
-                style={{ width: '100%', minHeight: '80px', borderRadius: '8px', border: '1px solid #d1d5db', padding: '10px', fontSize: '13px', boxSizing: 'border-box', resize: 'vertical' }}
-              />
-            </div>
-
-            <div style={{ display: 'flex', gap: '8px' }}>
-              <button 
-                onClick={() => {
-                  setReviewModalOpen(false);
-                  setSelectedSessionForReview(null);
-                }}
-                disabled={submittingReviewId === selectedSessionForReview.id}
-                style={{ flex: 1, padding: '10px', background: '#e5e7eb', color: '#374151', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '13px' }}
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={() => handleReviewSubmit(selectedSessionForReview.id, selectedSessionForReview.rawSession.teacherId === user.userId ? selectedSessionForReview.rawSession.studentId : selectedSessionForReview.rawSession.teacherId)}
-                disabled={submittingReviewId === selectedSessionForReview.id}
-                style={{ flex: 1, padding: '10px', background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 700, fontSize: '13px', opacity: submittingReviewId === selectedSessionForReview.id ? 0.6 : 1 }}
-              >
-                {submittingReviewId === selectedSessionForReview.id ? 'Submitting...' : 'Submit Review'}
-              </button>
-            </div>
-          </div>
-        </div>,
-        document.body
-      )}
+      <ReviewModal 
+        isOpen={reviewModalOpen} 
+        onClose={() => {
+          setReviewModalOpen(false);
+          setSelectedSessionForReview(null);
+        }}
+        session={selectedSessionForReview}
+        onSubmit={() => {
+          if (selectedSessionForReview) {
+            setSubmittedReviews(prev => ({ ...prev, [selectedSessionForReview.id]: true }));
+          }
+          setReviewModalOpen(false);
+          setSelectedSessionForReview(null);
+          fetchInitialData();
+        }}
+      />
     </div>
   );
 };

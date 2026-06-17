@@ -7,6 +7,7 @@ import Sidebar from '../components/common/Sidebar/Sidebar';
 import AppHeader from '../components/common/AppHeader/AppHeader';
 import ConfirmModal from '../components/modals/ConfirmModal';
 import SessionReminderManager from '../components/modals/SessionReminderManager';
+import SessionLifecycleManager from '../components/common/SessionLifecycleManager';
 import {
   IconHome,
   IconLayoutGrid,
@@ -218,6 +219,7 @@ const AppLayout = () => {
       />
 
       <SessionReminderManager />
+      <SessionLifecycleManager />
     </div>
   );
 };

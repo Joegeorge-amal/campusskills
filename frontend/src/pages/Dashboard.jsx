@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useAppData } from '../context/AppDataContext';
-import SessionRequestPopup from '../components/common/SessionRequestPopup';
 import CreateListingModal from '../components/modals/CreateListingModal';
 import Avatar from '../components/common/Avatar';
 import { 
@@ -17,9 +16,7 @@ const Dashboard = () => {
   const { user } = useAuth();
   const { 
     sessionsData = [], 
-    requestsData = [],
-    acceptRequest,
-    declineRequest
+    requestsData = []
   } = useAppData();
   const navigate = useNavigate();
 
@@ -44,15 +41,6 @@ const Dashboard = () => {
 
   return (
     <div id="home" className="pg on" style={{ padding: '20px 24px', backgroundColor: 'var(--cs-bg-light)', backgroundImage: 'radial-gradient(rgba(15, 23, 42, 0.06) 1px, transparent 1px)', backgroundSize: '24px 24px', minHeight: '100%', boxSizing: 'border-box', position: 'relative', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
-      
-      {activeRequest && (
-        <SessionRequestPopup 
-          request={activeRequest}
-          remainingCount={pendingRequests.length - 1}
-          onAccept={() => acceptRequest(activeRequest.id)} 
-          onDecline={() => declineRequest(activeRequest.id)}
-        />
-      )}
 
       <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
         <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#1e40af', margin: '0 0 24px 8px', letterSpacing: '-0.5px' }}>Dashboard</h1>
