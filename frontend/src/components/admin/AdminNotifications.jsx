@@ -118,6 +118,25 @@ const AdminNotifications = () => {
     }
   };
 
+  const handleDeleteMultipleNotifications = async (ids) => {
+    try {
+      await Promise.all(ids.map(id => adminService.deleteNotification(id)));
+      setNotifications(prev => prev.filter(n => !ids.includes(n.id)));
+      setUnreadCount(prev => {
+        let deletedUnreadCount = 0;
+        ids.forEach(id => {
+          const notif = notifications.find(n => n.id === id);
+          if (notif && (!notif.isRead && !notif.read && !notif.unread)) {
+            deletedUnreadCount++;
+          }
+        });
+        return Math.max(0, prev - deletedUnreadCount);
+      });
+    } catch (err) {
+      console.error('Failed to delete multiple notifications', err);
+    }
+  };
+
   const getIcon = (type) => {
     switch (type) {
       case 'ADMIN_NEW_STUDENT': return <IconUsers size={16} color="#3b82f6" />;
@@ -228,6 +247,7 @@ const AdminNotifications = () => {
           onMarkRead={(id) => markAsRead(id, false)}
           onMarkAllRead={() => markAllRead()}
           onDeleteNotification={handleDeleteNotification}
+          onDeleteMultipleNotifications={handleDeleteMultipleNotifications}
         />
       )}
     </div>
