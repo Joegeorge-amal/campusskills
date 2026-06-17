@@ -178,60 +178,81 @@ public class ListingRepository {
         return query;
     }
 
+    private Future<io.vertx.core.json.JsonArray> getSuspendedUserIds() {
+        return client.find("users", new JsonObject().put("isActive", false))
+            .map(users -> {
+                io.vertx.core.json.JsonArray ids = new io.vertx.core.json.JsonArray();
+                for (JsonObject u : users) {
+                    ids.add(u.getString("_id"));
+                }
+                return ids;
+            });
+    }
+
     public Future<Long> countSearch(JsonObject filters) {
-        JsonObject query = buildSearchQuery(filters);
-        return client.count(COLLECTION, query);
+        return getSuspendedUserIds().compose(suspendedIds -> {
+            JsonObject query = buildSearchQuery(filters);
+            if (!suspendedIds.isEmpty()) {
+                query.put("ownerId", new JsonObject().put("$nin", suspendedIds));
+            }
+            return client.count(COLLECTION, query);
+        });
     }
 
     public Future<java.util.List<Listing>> search(JsonObject filters, int page, int limit) {
-        JsonObject query = buildSearchQuery(filters);
-        
-        JsonObject sortQuery = new JsonObject();
-        String sort = filters != null ? filters.getString("sort") : null;
-        if ("oldest".equals(sort)) {
-            sortQuery.put("createdAt", 1);
-        } else {
-            // Default to newest
-            sortQuery.put("createdAt", -1);
-        }
-
-        int skip = (page - 1) * limit;
-
-        io.vertx.core.json.JsonArray pipeline = new io.vertx.core.json.JsonArray()
-            .add(new JsonObject().put("$match", query))
-            .add(new JsonObject().put("$lookup", new JsonObject()
-                .put("from", "user_profiles")
-                .put("let", new JsonObject().put("oId", "$ownerId").put("tId", "$teacherId"))
-                .put("pipeline", new io.vertx.core.json.JsonArray().add(new JsonObject().put("$match", new JsonObject()
-                    .put("$expr", new JsonObject().put("$or", new io.vertx.core.json.JsonArray()
-                        .add(new JsonObject().put("$eq", new io.vertx.core.json.JsonArray().add("$userId").add("$$oId")))
-                        .add(new JsonObject().put("$eq", new io.vertx.core.json.JsonArray().add("$userId").add("$$tId")))
-                    ))
-                )))
-                .put("as", "owner_arr")
-            ))
-            .add(new JsonObject().put("$unwind", new JsonObject()
-                .put("path", "$owner_arr")
-                .put("preserveNullAndEmptyArrays", true)
-            ))
-            .add(new JsonObject().put("$addFields", new JsonObject()
-                .put("owner", "$owner_arr")
-            ))
-            .add(new JsonObject().put("$project", new JsonObject()
-                .put("owner.upi", 0)
-            ))
-            .add(new JsonObject().put("$sort", sortQuery))
-            .add(new JsonObject().put("$skip", skip))
-            .add(new JsonObject().put("$limit", limit));
-
-        io.vertx.ext.mongo.AggregateOptions options = new io.vertx.ext.mongo.AggregateOptions();
+        return getSuspendedUserIds().compose(suspendedIds -> {
+            JsonObject query = buildSearchQuery(filters);
+            if (!suspendedIds.isEmpty()) {
+                query.put("ownerId", new JsonObject().put("$nin", suspendedIds));
+            }
             
-        return client.aggregateWithOptions(COLLECTION, pipeline, options)
-            .collect(java.util.stream.Collectors.toList())
-            .map(docs -> {
-                return docs.stream()
-                    .map(this::mapToListing)
-                    .collect(java.util.stream.Collectors.toList());
-            });
+            JsonObject sortQuery = new JsonObject();
+            String sort = filters != null ? filters.getString("sort") : null;
+            if ("oldest".equals(sort)) {
+                sortQuery.put("createdAt", 1);
+            } else {
+                // Default to newest
+                sortQuery.put("createdAt", -1);
+            }
+
+            int skip = (page - 1) * limit;
+
+            io.vertx.core.json.JsonArray pipeline = new io.vertx.core.json.JsonArray()
+                .add(new JsonObject().put("$match", query))
+                .add(new JsonObject().put("$lookup", new JsonObject()
+                    .put("from", "user_profiles")
+                    .put("let", new JsonObject().put("oId", "$ownerId").put("tId", "$teacherId"))
+                    .put("pipeline", new io.vertx.core.json.JsonArray().add(new JsonObject().put("$match", new JsonObject()
+                        .put("$expr", new JsonObject().put("$or", new io.vertx.core.json.JsonArray()
+                            .add(new JsonObject().put("$eq", new io.vertx.core.json.JsonArray().add("$userId").add("$$oId")))
+                            .add(new JsonObject().put("$eq", new io.vertx.core.json.JsonArray().add("$userId").add("$$tId")))
+                        ))
+                    )))
+                    .put("as", "owner_arr")
+                ))
+                .add(new JsonObject().put("$unwind", new JsonObject()
+                    .put("path", "$owner_arr")
+                    .put("preserveNullAndEmptyArrays", true)
+                ))
+                .add(new JsonObject().put("$addFields", new JsonObject()
+                    .put("owner", "$owner_arr")
+                ))
+                .add(new JsonObject().put("$project", new JsonObject()
+                    .put("owner.upi", 0)
+                ))
+                .add(new JsonObject().put("$sort", sortQuery))
+                .add(new JsonObject().put("$skip", skip))
+                .add(new JsonObject().put("$limit", limit));
+
+            io.vertx.ext.mongo.AggregateOptions options = new io.vertx.ext.mongo.AggregateOptions();
+                
+            return client.aggregateWithOptions(COLLECTION, pipeline, options)
+                .collect(java.util.stream.Collectors.toList())
+                .map(docs -> {
+                    return docs.stream()
+                        .map(this::mapToListing)
+                        .collect(java.util.stream.Collectors.toList());
+                });
+        });
     }
 }

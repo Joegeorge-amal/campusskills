@@ -53,7 +53,7 @@ public class AdminRepository {
         pipeline.add(new JsonObject().put("$lookup", new JsonObject()
             .put("from", "user_stats")
             .put("localField", "userIdStr")
-            .put("foreignField", "userId")
+            .put("foreignField", "_id")
             .put("as", "stats")
         ));
         pipeline.add(new JsonObject().put("$unwind", new JsonObject()
@@ -901,7 +901,7 @@ public class AdminRepository {
                     .put("id", "reg_" + reg.getString("userId"))
                     .put("type", "registration")
                     .put("title", name + " registered")
-                    .put("subtitle", reg.getString("department", "Student"))
+                    .put("subtitle", reg.getString("programme", "Student"))
                     .put("createdAt", reg.getLong("createdAt", 0L))
                     .put("status", "success")
                 );

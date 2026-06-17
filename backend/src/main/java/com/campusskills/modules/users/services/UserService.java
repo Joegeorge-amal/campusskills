@@ -221,6 +221,10 @@ public class UserService {
                 return Future.failedFuture("INVALID_CREDENTIALS");
             }
 
+            if (user.getIsActive() != null && !user.getIsActive()) {
+                return Future.failedFuture("ACCOUNT_SUSPENDED");
+            }
+
             if (isSuperAdmin(user.getEmail()) && user.getRole() != UserRole.SUPER_ADMIN) {
                 user.setRole(UserRole.SUPER_ADMIN);
                 return userRepository.updateUserRole(user.getId(), UserRole.SUPER_ADMIN)
