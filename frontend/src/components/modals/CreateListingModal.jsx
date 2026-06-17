@@ -428,8 +428,8 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
                   onChange={val => setAvailability(val)}
                   options={[
                     { value: 'ONLINE', label: 'Online' },
-                    { value: 'IN_PERSON', label: 'In Person' },
-                    { value: 'EITHER', label: 'Either' }
+                    { value: 'OFFLINE', label: 'In Person' },
+                    { value: 'HYBRID', label: 'Either' }
                   ]}
                   placeholder="Select mode"
                 />
@@ -539,7 +539,7 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
                 <div style={{ fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '8px' }}>Availability</div>
                 <div style={{ fontSize: '13px', color: '#4b5563', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: availability === 'ONLINE' ? '#10b981' : '#f59e0b' }}></div>
-                  {availability === 'ONLINE' ? 'Online Mode' : availability === 'IN_PERSON' ? 'In-Person Mode' : 'Online or In-Person'}
+                  {availability === 'ONLINE' ? 'Online Mode' : availability === 'OFFLINE' ? 'In-Person Mode' : 'Online or In-Person'}
                 </div>
                 {slots.length > 0 && (
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
