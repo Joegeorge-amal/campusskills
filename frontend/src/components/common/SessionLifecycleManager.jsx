@@ -168,21 +168,13 @@ const SessionLifecycleManager = () => {
           session: { id: sessionId, topic, studentName: raw.studentName }
         });
       } else {
-        setActivePopup({
-          type: 'PAYMENT_SUBMITTED_STUDENT',
-          session: { id: sessionId, topic }
-        });
+        // As a student, after we submit payment, we should go straight to review
+        // But since handleMarkPaid already does this, we don't strictly need to do anything here.
+        // We'll clear the active popup just in case.
+        setActivePopup(null);
       }
     } else if (sessionEvent.type === 'PAYMENT_CONFIRMED') {
       setActivePopup(null);
-      setReviewModalData({
-        id: sessionId,
-        rawSession: raw,
-        topic,
-        name: isTeacher ? (raw.studentName || 'Student') : (raw.teacherName || 'Teacher'),
-        role: myRole,
-        status: 'COMPLETED'
-      });
     }
 
   }, [sessionEvent, user]);
@@ -198,20 +190,48 @@ const SessionLifecycleManager = () => {
   };
 
   const handleMarkPaid = async (sessionId) => {
+    // Find the session locally to populate the review modal
+    const sessionToReview = sessionsData?.find(s => s.id === sessionId);
     setActivePopup(null);
     try {
       await sessionService.markPaid(sessionId);
       fetchInitialData();
+      
+      // Immediately jump to review modal
+      if (sessionToReview) {
+        setReviewModalData({
+          id: sessionId,
+          rawSession: sessionToReview.rawSession,
+          topic: sessionToReview.topic,
+          name: sessionToReview.rawSession.teacherName || 'Teacher',
+          role: 'Learning',
+          status: 'COMPLETED'
+        });
+      }
     } catch (err) {
       console.error('Failed to mark paid', err);
     }
   };
 
   const handleConfirmPayment = async (sessionId) => {
+    // Find the session locally to populate the review modal
+    const sessionToReview = sessionsData?.find(s => s.id === sessionId);
     setActivePopup(null);
     try {
       await sessionService.confirmPayment(sessionId);
       fetchInitialData();
+      
+      // Immediately jump to review modal
+      if (sessionToReview) {
+        setReviewModalData({
+          id: sessionId,
+          rawSession: sessionToReview.rawSession,
+          topic: sessionToReview.topic,
+          name: sessionToReview.rawSession.studentName || 'Student',
+          role: 'Teaching',
+          status: 'COMPLETED'
+        });
+      }
     } catch (err) {
       console.error('Failed to confirm payment', err);
     }
@@ -354,18 +374,7 @@ const SessionLifecycleManager = () => {
         />
       )}
 
-      {activePopup && activePopup.type === 'PAYMENT_SUBMITTED_STUDENT' && (
-        <GlobalNotificationPopup
-          title="Payment submitted"
-          subtitle={`Waiting for the teacher to verify receipt for "${activePopup.session.topic}".`}
-          badge="VERIFYING PAYMENT"
-          badgeColor="#4f46e5"
-          secondaryButtonText="Dismiss"
-          onSecondaryClick={() => setActivePopup(null)}
-          onClose={() => setActivePopup(null)}
-          autoCloseMs={6000}
-        />
-      )}
+      {/* Student submitted payment popup removed as student now reviews instead */}
 
       {reviewModalData && (
         <ReviewModal
