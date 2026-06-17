@@ -153,6 +153,7 @@ public class UserService {
                 stats.setRatingCount(0);
                 stats.setSessionsCompleted(0);
                 stats.setSessionsAttended(0);
+                stats.setTotalMinutes(0);
 
                 UserWallet wallet = new UserWallet();
                 wallet.setUserId(userId);

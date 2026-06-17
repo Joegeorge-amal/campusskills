@@ -127,18 +127,32 @@ public class SessionService {
                                 statsRepository.recordActivity(session.getStudentId());
                                 statsRepository.incrementSessionsCompleted(session.getTeacherId());
                                 statsRepository.incrementSessionsCompleted(session.getStudentId());
+                                
+                                int sessionMinutes = 0;
+                                Long end = updatedSession.getScheduledEnd();
+                                Long start = updatedSession.getScheduledStart();
+                                if (end != null && start != null) {
+                                    sessionMinutes = (int)((end - start) / 60000);
+                                }
+                                if (sessionMinutes > 0) {
+                                    statsRepository.incrementSessionsTotalMinutes(session.getTeacherId(), sessionMinutes);
+                                    statsRepository.incrementSessionsTotalMinutes(session.getStudentId(), sessionMinutes);
+                                }
+                                
                                 com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent(com.campusskills.shared.constants.WebSocketEventType.SESSION_BOTH_CONFIRMED, updatedSession);
                                 
                                 // Broadcast PROFILE_UPDATED for real-time UI update
                                 statsRepository.findByUserId(session.getTeacherId()).onSuccess(teacherStats -> {
                                     int tSessions = teacherStats != null && teacherStats.getSessionsCompleted() != null ? teacherStats.getSessionsCompleted() : 0;
+                                    int tMinutes = teacherStats != null && teacherStats.getTotalMinutes() != null ? teacherStats.getTotalMinutes() : 0;
                                     com.campusskills.web.websockets.MessageBroadcaster.broadcastProfileUpdate(session.getTeacherId(),
-                                        new io.vertx.core.json.JsonObject().put("sessionsCompleted", tSessions));
+                                        new io.vertx.core.json.JsonObject().put("sessionsCompleted", tSessions).put("totalMinutes", tMinutes));
                                 });
                                 statsRepository.findByUserId(session.getStudentId()).onSuccess(studentStats -> {
                                     int sSessions = studentStats != null && studentStats.getSessionsCompleted() != null ? studentStats.getSessionsCompleted() : 0;
+                                    int sMinutes = studentStats != null && studentStats.getTotalMinutes() != null ? studentStats.getTotalMinutes() : 0;
                                     com.campusskills.web.websockets.MessageBroadcaster.broadcastProfileUpdate(session.getStudentId(),
-                                        new io.vertx.core.json.JsonObject().put("sessionsCompleted", sSessions));
+                                        new io.vertx.core.json.JsonObject().put("sessionsCompleted", sSessions).put("totalMinutes", sMinutes));
                                 });
                                 return Future.succeededFuture();
                             });
@@ -267,13 +281,15 @@ public class SessionService {
                     // Load updated stats to broadcast
                     statsRepository.findByUserId(session.getTeacherId()).onSuccess(teacherStats -> {
                         int tSessions = teacherStats != null && teacherStats.getSessionsCompleted() != null ? teacherStats.getSessionsCompleted() : 0;
+                        int tMinutes = teacherStats != null && teacherStats.getTotalMinutes() != null ? teacherStats.getTotalMinutes() : 0;
                         com.campusskills.web.websockets.MessageBroadcaster.broadcastProfileUpdate(session.getTeacherId(),
-                            new io.vertx.core.json.JsonObject().put("sessionsCompleted", tSessions));
+                            new io.vertx.core.json.JsonObject().put("sessionsCompleted", tSessions).put("totalMinutes", tMinutes));
                     });
                     statsRepository.findByUserId(session.getStudentId()).onSuccess(studentStats -> {
                         int sSessions = studentStats != null && studentStats.getSessionsCompleted() != null ? studentStats.getSessionsCompleted() : 0;
+                        int sMinutes = studentStats != null && studentStats.getTotalMinutes() != null ? studentStats.getTotalMinutes() : 0;
                         com.campusskills.web.websockets.MessageBroadcaster.broadcastProfileUpdate(session.getStudentId(),
-                            new io.vertx.core.json.JsonObject().put("sessionsCompleted", sSessions));
+                            new io.vertx.core.json.JsonObject().put("sessionsCompleted", sSessions).put("totalMinutes", sMinutes));
                     });
                     return io.vertx.core.Future.succeededFuture();
                 });

@@ -70,4 +70,17 @@ public class SessionRepository {
                 .map(res -> res.getDocModified() > 0);
     }
 
+    public Future<List<Session>> findCompletedSessionsByUser(String userId) {
+        JsonObject query = new JsonObject()
+            .put("status", "COMPLETED")
+            .put("$or", new JsonArray()
+                .add(new JsonObject().put("teacherId", userId))
+                .add(new JsonObject().put("studentId", userId))
+            );
+        return client.find(COLLECTION, query)
+            .map(list -> list.stream()
+                .map(json -> json.mapTo(Session.class))
+                .collect(Collectors.toList()));
+    }
+
 }

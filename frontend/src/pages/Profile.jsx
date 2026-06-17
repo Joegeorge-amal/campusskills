@@ -489,7 +489,7 @@ const Profile = () => {
             <div style={{ width: '40px', height: '40px', borderRadius: '14px', background: '#faf5ff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
               <IconSparkles size={20} strokeWidth={2} style={{ color: '#a855f7' }} />
             </div>
-            <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>{(user?.stats?.sessionsCompleted || 0) * 2}</div>
+            <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>{user?.stats?.totalMinutes ? (user.stats.totalMinutes / 60).toFixed(1) : '0.0'}</div>
             <div style={{ fontSize: '13px', color: '#6b7280', fontWeight: 500 }}>Hours</div>
           </div>
           <div className="glossy-card" style={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 20px' }}>
