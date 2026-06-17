@@ -28,7 +28,7 @@ import AutocompleteInput from '../components/AutocompleteInput';
 
 const Profile = () => {
   const { user, updateProfile, fetchProfile } = useAuth();
-  const { triggerToast } = useAppData();
+  const { triggerToast, sessionsData } = useAppData();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -56,6 +56,24 @@ const Profile = () => {
   const [listingToDelete, setListingToDelete] = useState(null);
   const [allTopicsList, setAllTopicsList] = useState([]);
   const [topicMap, setTopicMap] = useState({});
+
+  const completedSessions = React.useMemo(() =>
+    (sessionsData || []).filter(s => s.rawSession?.status === 'COMPLETED' || s.status === 'COMPLETED'),
+    [sessionsData]
+  );
+  const sessionsCount = completedSessions.length || user?.stats?.sessionsCompleted || 0;
+  const totalMinutes = React.useMemo(() => {
+    if (completedSessions.length > 0) {
+      return completedSessions.reduce((sum, s) => {
+        const sess = s.rawSession || s;
+        if (sess.scheduledEnd && sess.scheduledStart) {
+          return sum + (sess.scheduledEnd - sess.scheduledStart) / 60000;
+        }
+        return sum;
+      }, 0);
+    }
+    return user?.stats?.totalMinutes || 0;
+  }, [completedSessions, user?.stats?.totalMinutes]);
 
   useEffect(() => {
     getTopics().then(res => {
@@ -475,7 +493,7 @@ const Profile = () => {
             <div style={{ width: '40px', height: '40px', borderRadius: '14px', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
               <IconCalendarMonth size={20} strokeWidth={2} style={{ color: '#3b82f6' }} />
             </div>
-            <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>{user?.stats?.sessionsCompleted || 0}</div>
+            <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>{sessionsCount}</div>
             <div style={{ fontSize: '13px', color: '#6b7280', fontWeight: 500 }}>Sessions</div>
           </div>
           <div className="glossy-card" style={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 20px' }}>
@@ -489,7 +507,7 @@ const Profile = () => {
             <div style={{ width: '40px', height: '40px', borderRadius: '14px', background: '#faf5ff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
               <IconSparkles size={20} strokeWidth={2} style={{ color: '#a855f7' }} />
             </div>
-            <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>{user?.stats?.totalMinutes ? (user.stats.totalMinutes / 60).toFixed(1) : '0.0'}</div>
+            <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>{totalMinutes > 0 ? (totalMinutes / 60).toFixed(1) : '0.0'}</div>
             <div style={{ fontSize: '13px', color: '#6b7280', fontWeight: 500 }}>Hours</div>
           </div>
           <div className="glossy-card" style={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 20px' }}>
@@ -688,7 +706,7 @@ const Profile = () => {
                         price={listing.listingType === 'SWAP' ? 'Skill Swap' : (listing.price ? `₹${listing.price}/hr` : 'Free')}
                         user={{ name: user?.name || 'You', year: user?.year || 'Unknown', branch: user?.programme || 'Not specified' }}
                         rating={user?.stats?.ratingAvg?.toFixed(1) || '5.0'}
-                        sessionsCount={user?.stats?.sessionsCompleted || 0}
+                        sessionsCount={sessionsCount}
                         mode={listing.availability === 'ONLINE' ? 'Online' : 'In-person'}
                         isVerified={isVerified}
                       />
