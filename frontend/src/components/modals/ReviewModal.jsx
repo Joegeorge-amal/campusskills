@@ -23,6 +23,9 @@ const ReviewModal = ({ isOpen, onClose, session, onSubmit }) => {
       setIsSubmitting(true);
       await api.post('/reviews', { sessionId: session.id, rating, comment });
       triggerToast('Review submitted successfully!');
+      window.dispatchEvent(new CustomEvent('markNotificationAsRead', { 
+        detail: { sourceType: 'SESSION', sourceId: session.id } 
+      }));
       if (onSubmit) onSubmit();
       onClose();
     } catch (err) {
