@@ -60,6 +60,10 @@ public class ConnectionManager {
         return conn != null && !conn.socket.isClosed();
     }
 
+    public static java.util.Set<String> getOnlineUserIds() {
+        return connections.keySet();
+    }
+
     public static void sendMessage(String userId, JsonObject payload) {
         if (userId != null) {
             UserConnection conn = connections.get(userId);

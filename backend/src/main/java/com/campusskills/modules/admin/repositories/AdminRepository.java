@@ -758,13 +758,10 @@ public class AdminRepository {
 
     public Future<JsonObject> getCategoryPerformance() {
         JsonArray pipeline = new JsonArray()
-            .add(new JsonObject().put("$addFields", new JsonObject()
-                .put("listingObjectId", new JsonObject().put("$toObjectId", "$listingId"))
-            ))
             .add(new JsonObject().put("$lookup", new JsonObject()
                 .put("from", "skill_listings")
-                .put("localField", "listingObjectId")
-                .put("foreignField", "_id")
+                .put("let", new JsonObject().put("lId", "$listingId"))
+                .put("pipeline", new JsonArray().add(new JsonObject().put("$match", new JsonObject().put("$expr", new JsonObject().put("$eq", new JsonArray().add(new JsonObject().put("$toString", "$_id")).add("$$lId"))))))
                 .put("as", "listing")
             ))
             .add(new JsonObject().put("$unwind", new JsonObject()
@@ -778,8 +775,43 @@ public class AdminRepository {
             .add(new JsonObject().put("$sort", new JsonObject().put("sessions", -1)))
             .add(new JsonObject().put("$limit", 5));
             
-        return client.aggregateWithOptions("sessions", pipeline, new io.vertx.ext.mongo.AggregateOptions()).collect(java.util.stream.Collectors.toList())
+        Future<List<JsonObject>> catStatsFut = client.aggregateWithOptions("sessions", pipeline, new io.vertx.ext.mongo.AggregateOptions()).collect(java.util.stream.Collectors.toList());
+        
+        java.util.Set<String> onlineUserIds = com.campusskills.web.websockets.ConnectionManager.getOnlineUserIds();
+        Future<Long> activeTutorsFut;
+        if (onlineUserIds == null || onlineUserIds.isEmpty()) {
+            activeTutorsFut = Future.succeededFuture(0L);
+        } else {
+            JsonArray onlineIdsArray = new JsonArray(new java.util.ArrayList<>(onlineUserIds));
+            JsonArray tutorsPipeline = new JsonArray()
+                .add(new JsonObject().put("$match", new JsonObject()
+                    .put("status", "ACTIVE")
+                    .put("ownerId", new JsonObject().put("$in", onlineIdsArray))
+                ))
+                .add(new JsonObject().put("$group", new JsonObject().put("_id", "$ownerId")));
+            
+            activeTutorsFut = client.aggregateWithOptions("skill_listings", tutorsPipeline, new io.vertx.ext.mongo.AggregateOptions()).collect(java.util.stream.Collectors.toList())
+                .map(results -> (long) results.size());
+        }
+            
+        JsonArray reviewsPipeline = new JsonArray()
+            .add(new JsonObject().put("$group", new JsonObject()
+                .put("_id", null)
+                .put("avg", new JsonObject().put("$avg", "$rating"))
+            ));
+            
+        Future<Double> avgRatingFut = client.aggregateWithOptions("reviews", reviewsPipeline, new io.vertx.ext.mongo.AggregateOptions()).collect(java.util.stream.Collectors.toList())
             .map(results -> {
+                if (results.isEmpty()) return 0.0;
+                return results.get(0).getDouble("avg", 0.0);
+            });
+
+        return io.vertx.core.CompositeFuture.all(catStatsFut, activeTutorsFut, avgRatingFut)
+            .map(cf -> {
+                List<JsonObject> results = cf.resultAt(0);
+                Long activeTutors = cf.resultAt(1);
+                Double avgRating = cf.resultAt(2);
+                
                 JsonArray categories = new JsonArray();
                 int totalSessions = 0;
                 String[] colors = {"#3b82f6", "#1e3a8a", "#60a5fa", "#ef4444", "#9ca3af"};
@@ -798,10 +830,11 @@ public class AdminRepository {
                         .put("color", colors[i % colors.length])
                     );
                 }
+                double roundedRating = Math.round(avgRating * 10.0) / 10.0;
                 return new JsonObject()
                     .put("totalSessions", totalSessions)
-                    .put("activeTutors", 0) 
-                    .put("avgRating", 0.0)
+                    .put("activeTutors", activeTutors) 
+                    .put("avgRating", roundedRating)
                     .put("categories", categories);
             });
     }
