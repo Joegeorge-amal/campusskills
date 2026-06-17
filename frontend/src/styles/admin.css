@@ -789,6 +789,7 @@
 /* CATEGORY PERFORMANCE */
 .cat-perf-list {
   padding: 20px 24px;
+  flex-grow: 1;
 }
 
 .cat-perf-item {
