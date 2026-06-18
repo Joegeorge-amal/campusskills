@@ -17,10 +17,26 @@ const SessionLifecycleManager = () => {
   const [reviewModalData, setReviewModalData] = useState(null);
   const [dismissedRequests, setDismissedRequests] = useState([]);
 
-  // These refs are the ONLY guards against duplicate modals.
-  // They are always current (not subject to stale closures).
-  const shownReviewIds = useRef(new Set());          // session IDs where review was already triggered
-  const shownPaymentWaitingIds = useRef(new Set()); // teacher "waiting for payment" shown IDs
+  // Use sessionStorage to persist shown modals across page navigation/reloads
+  const getStoredSet = (key) => {
+    try { return new Set(JSON.parse(sessionStorage.getItem(key) || '[]')); }
+    catch { return new Set(); }
+  };
+  const saveStoredSet = (key, set) => {
+    sessionStorage.setItem(key, JSON.stringify([...set]));
+  };
+
+  const shownReviewIds = useRef(getStoredSet('shownReviewIds'));
+  const shownPaymentWaitingIds = useRef(getStoredSet('shownPaymentWaitingIds'));
+
+  const addShownReviewId = (id) => {
+    shownReviewIds.current.add(id);
+    saveStoredSet('shownReviewIds', shownReviewIds.current);
+  };
+  const addShownPaymentWaitingId = (id) => {
+    shownPaymentWaitingIds.current.add(id);
+    saveStoredSet('shownPaymentWaitingIds', shownPaymentWaitingIds.current);
+  };
 
   const [snoozedSessions, setSnoozedSessions] = useState(() => {
     try {
@@ -43,7 +59,7 @@ const SessionLifecycleManager = () => {
   // Open the review modal — single gateway, always checks shownReviewIds first
   const openReviewModal = (id, rawSession, topic, name, role) => {
     if (shownReviewIds.current.has(id)) return;
-    shownReviewIds.current.add(id);
+    addShownReviewId(id);
     // Use functional setter: if a review modal is already open, don't overwrite
     setReviewModalData(prev => prev ?? { id, rawSession, topic, name, role, status: 'COMPLETED' });
   };
@@ -109,7 +125,7 @@ const SessionLifecycleManager = () => {
       }
       if (iT && !sPaid && !shownPaymentWaitingIds.current.has(s.id)) {
         // Teacher waiting for student to pay — show once only
-        shownPaymentWaitingIds.current.add(s.id);
+        addShownPaymentWaitingId(s.id);
         paymentPopup = { type: 'PAYMENT_WAITING', session: { id: s.id, topic: s.topic } };
         break;
       }
@@ -149,7 +165,7 @@ const SessionLifecycleManager = () => {
         pendingReview.id,
         pendingReview.rawSession,
         pendingReview.topic,
-        iT ? (pendingReview.rawSession.studentName || 'Student') : (pendingReview.rawSession.teacherName || 'Teacher'),
+        pendingReview.name, // Use the actual name mapped in AppDataContext
         iT ? 'Teaching' : 'Learning'
       );
     }
@@ -234,7 +250,7 @@ const SessionLifecycleManager = () => {
       await sessionService.markPaid(sessionId);
       window.dispatchEvent(new CustomEvent('markNotificationAsRead', { detail: { sourceType: 'SESSION', sourceId: sessionId } }));
       fetchInitialData();
-      if (s) openReviewModal(sessionId, s.rawSession, s.topic, s.rawSession.teacherName || 'Teacher', 'Learning');
+      if (s) openReviewModal(sessionId, s.rawSession, s.topic, s.name || 'Teacher', 'Learning');
     } catch (err) { console.error('Failed to mark paid', err); }
   };
 
@@ -245,7 +261,7 @@ const SessionLifecycleManager = () => {
       await sessionService.confirmPayment(sessionId);
       window.dispatchEvent(new CustomEvent('markNotificationAsRead', { detail: { sourceType: 'SESSION', sourceId: sessionId } }));
       fetchInitialData();
-      if (s) openReviewModal(sessionId, s.rawSession, s.topic, s.rawSession.studentName || 'Student', 'Teaching');
+      if (s) openReviewModal(sessionId, s.rawSession, s.topic, s.name || 'Student', 'Teaching');
     } catch (err) { console.error('Failed to confirm payment', err); }
   };
 
