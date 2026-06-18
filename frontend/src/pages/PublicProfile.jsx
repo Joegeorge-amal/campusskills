@@ -133,8 +133,9 @@ const PublicProfile = () => {
           />
           <div style={{ 
             position: 'absolute', top: '100%', right: 0, marginTop: '8px', 
-            background: '#fff', border: '1px solid #e2e8f0', borderRadius: '8px', 
-            boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', minWidth: '150px', 
+            background: 'rgba(255, 255, 255, 0.85)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)',
+            border: '1px solid rgba(255, 255, 255, 0.5)', borderRadius: '12px', 
+            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.12)', minWidth: '150px', 
             zIndex: 100, overflow: 'hidden' 
           }}>
             <button 

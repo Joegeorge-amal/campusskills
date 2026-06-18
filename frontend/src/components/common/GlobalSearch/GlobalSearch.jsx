@@ -172,13 +172,15 @@ const GlobalSearch = () => {
           top: '110%',
           left: 0,
           right: 0,
-          backgroundColor: '#fff',
-          borderRadius: '8px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          backgroundColor: 'rgba(255, 255, 255, 0.85)',
+          backdropFilter: 'blur(16px)',
+          WebkitBackdropFilter: 'blur(16px)',
+          borderRadius: '12px',
+          boxShadow: '0 10px 40px rgba(0, 0, 0, 0.12)',
           zIndex: 1000,
           maxHeight: '400px',
           overflowY: 'auto',
-          border: '1px solid #e5e7eb'
+          border: '1px solid rgba(255, 255, 255, 0.5)'
         }}>
           {!isSearching && !hasResults ? (
             <div style={{ padding: '16px', textAlign: 'center', color: '#6b7280', fontSize: '13px' }}>
