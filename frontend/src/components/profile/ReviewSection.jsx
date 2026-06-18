@@ -75,7 +75,7 @@ const ReviewSection = ({ userId, averageRating, reviewCount }) => {
   };
 
   return (
-    <div id="reviews-section" style={{ background: '#ffffff', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', marginBottom: '32px', border: '1px solid #f3f4f6' }}>
+    <div id="reviews-section" style={{ background: '#ffffff', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', marginBottom: '32px', border: '1px solid #f3f4f6', scrollMarginTop: '100px' }}>
       <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#111827', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
         Ratings & Reviews
       </h2>
