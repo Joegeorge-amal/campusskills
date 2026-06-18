@@ -83,4 +83,12 @@ public class SessionRepository {
                 .collect(Collectors.toList()));
     }
 
+    public Future<List<Session>> findByExchangeId(String exchangeId) {
+        JsonObject query = new JsonObject().put("exchangeId", exchangeId);
+        return client.find(COLLECTION, query)
+            .map(list -> list.stream()
+                .map(json -> json.mapTo(Session.class))
+                .collect(Collectors.toList()));
+    }
+
 }
