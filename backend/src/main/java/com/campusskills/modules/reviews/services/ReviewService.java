@@ -59,9 +59,9 @@ public class ReviewService {
             log.warn("[Review DEBUG] FAILED — rating is null");
             return Future.failedFuture("rating is required");
         }
-        if (req.getRating() < 1.0 || req.getRating() > 5.0) {
+        if (req.getRating() < 0.5 || req.getRating() > 5.0) {
             log.warn("[Review DEBUG] FAILED — rating out of range: {}", req.getRating());
-            return Future.failedFuture("rating must be between 1.0 and 5.0");
+            return Future.failedFuture("rating must be between 0.5 and 5.0");
         }
         if ((req.getRating() * 10) % 5 != 0) {
             log.warn("[Review DEBUG] FAILED — rating not in 0.5 increments: {}", req.getRating());
@@ -183,8 +183,8 @@ public class ReviewService {
 
     public Future<Boolean> updateReview(String reviewId, String requesterId, Double rating, String comment) {
         if (rating == null) return Future.failedFuture("rating is required");
-        if (rating < 1.0 || rating > 5.0) return Future.failedFuture("rating must be between 1.0 and 5.0");
-        if ((rating * 10) % 5 != 0) return Future.failedFuture("rating must be in 0.5 increments (e.g. 1.0, 1.5, 2.0)");
+        if (rating < 0.5 || rating > 5.0) return Future.failedFuture("rating must be between 0.5 and 5.0");
+        if ((rating * 10) % 5 != 0) return Future.failedFuture("rating must be in 0.5 increments (e.g. 0.5, 1.0, 1.5)");
 
         return reviewRepository.findById(reviewId).compose(review -> {
             if (review == null) return Future.failedFuture("NOT_FOUND: Review not found");
