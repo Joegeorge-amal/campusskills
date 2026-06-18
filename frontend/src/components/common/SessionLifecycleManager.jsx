@@ -238,6 +238,13 @@ const SessionLifecycleManager = () => {
           return { type: 'COMPLETION_REQUESTED', session: { id: sessionId, topic } };
         });
       }
+    } else if (sessionEvent.type === 'PAYMENT_REMINDER') {
+      const remindedBy = raw.remindedBy || 'Someone';
+      triggerToast(remindedBy + ' reminded you to complete payment.');
+      // Clear any snooze so the polling effect re-shows the payment popup for this session
+      if (snoozedSessions.current.has(sessionId)) {
+        snoozedSessions.current.delete(sessionId);
+      }
     }
     // All other types (SESSION_BOTH_CONFIRMED, PAYMENT_SUBMITTED, PAYMENT_CONFIRMED, etc.)
     // are handled by the polling useEffect after fetchInitialData() refreshes sessionsData.

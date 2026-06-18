@@ -337,6 +337,54 @@ public class SessionService {
         });
     }
 
+    public Future<Void> sendPaymentReminder(String sessionId, String userId) {
+        return repository.getSessionById(sessionId).compose(session -> {
+            if (session == null) return Future.failedFuture("Session not found");
+            if (!userId.equals(session.getTeacherId()) && !userId.equals(session.getStudentId())) {
+                return Future.failedFuture("Not authorized");
+            }
+            if (session.getStatus() != SessionStatus.COMPLETED) {
+                return Future.failedFuture("Session must be COMPLETED");
+            }
+            Boolean reqPayment = session.getRequiresPayment();
+            if (reqPayment == null || !reqPayment) {
+                return Future.failedFuture("Session does not require payment");
+            }
+            if (Boolean.TRUE.equals(session.getStudentMarkedPaid())) {
+                return Future.failedFuture("Student has already marked payment");
+            }
+
+            // Rate limit check: max one reminder per 5 minutes
+            Long lastReminder = session.getLastPaymentReminderAt();
+            if (lastReminder != null && (System.currentTimeMillis() - lastReminder) < 300_000) {
+                return Future.failedFuture("Reminder already sent recently.");
+            }
+
+            Long now = System.currentTimeMillis();
+            JsonObject updates = new JsonObject().put("lastPaymentReminderAt", now);
+            return repository.updateSessionFields(sessionId, updates).onSuccess(v -> {
+                profileRepository.findByUserId(userId).onSuccess(profile -> {
+                    String senderName = profile != null ? profile.getName() : "Someone";
+                    String targetUserId = userId.equals(session.getTeacherId()) ? session.getStudentId() : session.getTeacherId();
+                    String topic = session.getTopic() != null ? session.getTopic() : "Session";
+
+                    sendNotification(targetUserId,
+                        com.campusskills.shared.constants.NotificationType.PAYMENT_CONFIRMED,
+                        "Payment Reminder",
+                        senderName + " reminded you to complete payment for " + topic + ".",
+                        "SESSION", sessionId);
+
+                    // Send WS event only to the target user with senderName in payload
+                    com.campusskills.web.websockets.ConnectionManager.sendMessage(targetUserId,
+                        new com.campusskills.web.websockets.WebSocketMessageBuilder()
+                            .type(com.campusskills.shared.constants.WebSocketEventType.PAYMENT_REMINDER)
+                            .payload(JsonObject.mapFrom(session).put("remindedBy", senderName))
+                            .build());
+                });
+            }).mapEmpty();
+        });
+    }
+
     public Future<Void> cancelSession(String sessionId, String userId, String reason) {
         return repository.getSessionById(sessionId).compose(session -> {
             if (session == null) return Future.failedFuture("Session not found");

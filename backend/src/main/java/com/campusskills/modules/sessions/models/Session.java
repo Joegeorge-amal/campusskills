@@ -34,6 +34,7 @@ public class Session {
     private Long updatedAt;
     private Boolean sent30MinChatReminder;
     private Boolean sentStartChatReminder;
+    private Long lastPaymentReminderAt;
     private String cancelledBy;
     private String cancellationReason;
 
@@ -111,6 +112,9 @@ public class Session {
 
     public Boolean getSentStartChatReminder() { return sentStartChatReminder; }
     public void setSentStartChatReminder(Boolean sentStartChatReminder) { this.sentStartChatReminder = sentStartChatReminder; }
+
+    public Long getLastPaymentReminderAt() { return lastPaymentReminderAt; }
+    public void setLastPaymentReminderAt(Long lastPaymentReminderAt) { this.lastPaymentReminderAt = lastPaymentReminderAt; }
 
     public String getCancelledBy() { return cancelledBy; }
     public void setCancelledBy(String cancelledBy) { this.cancelledBy = cancelledBy; }

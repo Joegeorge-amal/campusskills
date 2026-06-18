@@ -591,6 +591,7 @@ export const AppDataProvider = ({ children }) => {
       lastMessage.type === 'COMPLETION_REQUESTED' ||
       lastMessage.type === 'PAYMENT_SUBMITTED' ||
       lastMessage.type === 'PAYMENT_CONFIRMED' ||
+      lastMessage.type === 'PAYMENT_REMINDER' ||
       lastMessage.type === 'SESSION_UPDATE' ||
       lastMessage.type === 'SESSION_BOOKED' ||
       lastMessage.type === 'SESSION_CANCELLED'

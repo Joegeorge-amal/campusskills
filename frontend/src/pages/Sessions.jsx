@@ -383,9 +383,28 @@ const Sessions = () => {
                 fontWeight: 600,
                 padding: '4px 8px',
                 borderRadius: '6px',
-                ...guidanceStyle
+                ...guidanceStyle,
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px'
               }}>
                 {guidanceText}
+                {guidanceText === 'Payment pending' && s.role === 'Teaching' && (
+                  <span
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      try {
+                        await sessionService.sendPaymentReminder(s.id);
+                        triggerToast('Reminder sent to ' + s.name);
+                      } catch (err) {
+                        triggerToast(err?.response?.data?.message || err.message || 'Failed to send reminder');
+                      }
+                    }}
+                    style={{ color: '#2563eb', cursor: 'pointer', textDecoration: 'underline', fontWeight: 600 }}
+                  >
+                    Send Reminder
+                  </span>
+                )}
               </span>
             )}
             <span style={{
@@ -653,17 +672,33 @@ const Sessions = () => {
                           </button>
                         </div>
                       </div>
-                    ) : (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: s.rawSession.teacherConfirmedPayment ? '#059669' : '#b45309', fontSize: '13px', fontWeight: 600, marginBottom: '16px' }}>
-                        {s.rawSession.teacherConfirmedPayment ? (
-                          <><IconCheck size={18} /> Payment Completed</>
-                        ) : s.rawSession.studentMarkedPaid ? (
-                          <><IconCheck size={18} /> Payment Completed by Student</>
-                        ) : (
-                          <>Waiting for student to mark session as paid</>
-                        )}
-                      </div>
-                    )
+) : (
+  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: s.rawSession.teacherConfirmedPayment ? '#059669' : '#b45309', fontSize: '13px', fontWeight: 600, marginBottom: '16px' }}>
+    {s.rawSession.teacherConfirmedPayment ? (
+      <><IconCheck size={18} /> Payment Completed</>
+    ) : s.rawSession.studentMarkedPaid ? (
+      <><IconCheck size={18} /> Payment Completed by Student</>
+    ) : (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+        <span>Waiting for student to mark session as paid</span>
+        <button
+          onClick={async (e) => {
+            e.stopPropagation();
+            try {
+              await sessionService.sendPaymentReminder(s.id);
+              triggerToast('Reminder sent to ' + s.name);
+            } catch (err) {
+              triggerToast(err?.response?.data?.message || err.message || 'Failed to send reminder');
+            }
+          }}
+          style={{ background: 'none', border: 'none', color: '#2563eb', fontSize: '12px', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline', padding: '2px 4px' }}
+        >
+          Send Payment Reminder
+        </button>
+      </div>
+    )}
+  </div>
+)
                   )
                 ) : null}
 

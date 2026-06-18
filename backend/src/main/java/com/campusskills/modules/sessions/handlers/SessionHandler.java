@@ -115,6 +115,15 @@ public class SessionHandler {
             .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
     }
 
+    public void sendPaymentReminder(RoutingContext ctx) {
+        String sessionId = ctx.pathParam("sessionId");
+        String authId = ctx.get("authenticatedUserId");
+
+        sessionService.sendPaymentReminder(sessionId, authId)
+            .onSuccess(v -> ApiResponse.ok(ctx, new JsonObject().put("message", "Reminder sent")))
+            .onFailure(err -> ApiResponse.badRequest(ctx, err.getMessage()));
+    }
+
     public void cancelSession(RoutingContext ctx) {
         String sessionId = ctx.pathParam("sessionId");
         String authId = ctx.get("authenticatedUserId");
