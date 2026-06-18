@@ -25,7 +25,16 @@ public class ExchangeHandler {
             
             service.createExchange(request)
                 .onSuccess(id -> ApiResponse.created(ctx, new JsonObject().put("exchangeId", id)))
-                .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
+                .onFailure(err -> {
+                    String msg = err.getMessage();
+                    if (msg.startsWith("FORBIDDEN")) {
+                        ApiResponse.forbidden(ctx, msg);
+                    } else if (msg.contains("already have an active request")) {
+                        ApiResponse.conflict(ctx, msg);
+                    } else {
+                        ApiResponse.internalError(ctx, msg);
+                    }
+                });
         } catch (Exception e) {
             log.error("Invalid JSON format during exchange creation", e);
             ApiResponse.badRequest(ctx, "Invalid JSON format: " + e.getMessage());

@@ -139,9 +139,10 @@ const Requests = () => {
         await exchangeService.cancelExchange(reqId);
       }
       triggerToast('Request cancelled.');
-      fetchInitialData();
+      fetchInitialData().catch(e => console.error('[Cancel] fetchInitialData failed:', e));
     } catch (err) {
-      triggerToast('Failed to cancel request');
+      const msg = err?.response?.data?.error || err?.message || 'Failed to cancel request';
+      triggerToast(msg);
     } finally {
       setProcessingId(null);
       setProcessingAction(null);

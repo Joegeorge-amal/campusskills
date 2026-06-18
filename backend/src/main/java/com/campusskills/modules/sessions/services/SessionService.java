@@ -169,7 +169,7 @@ public class SessionService {
                                     com.campusskills.web.websockets.MessageBroadcaster.broadcastProfileUpdate(session.getStudentId(),
                                         new io.vertx.core.json.JsonObject().put("sessionsCompleted", sSessions).put("totalMinutes", sMinutes));
                                 });
-                                return Future.succeededFuture();
+                                return updateExchangeToCompletedIfReady(session.getExchangeId());
                             });
                         });
                     }).mapEmpty();
@@ -408,6 +408,21 @@ public class SessionService {
                     com.campusskills.web.websockets.MessageBroadcaster.broadcastNewMessage(message, participantList);
                 }
             });
+        });
+    }
+
+    private Future<Void> updateExchangeToCompletedIfReady(String exchangeId) {
+        if (exchangeId == null) {
+            return Future.succeededFuture();
+        }
+        return repository.findByExchangeId(exchangeId).compose(sessions -> {
+            boolean allCompleted = sessions.stream().allMatch(s -> s.getStatus() == SessionStatus.COMPLETED);
+            if (allCompleted) {
+                com.campusskills.modules.exchanges.repositories.ExchangeRepository exchangeRepo =
+                    new com.campusskills.modules.exchanges.repositories.ExchangeRepository();
+                return exchangeRepo.updateStatus(exchangeId, com.campusskills.shared.constants.ExchangeStatus.COMPLETED).mapEmpty();
+            }
+            return Future.succeededFuture();
         });
     }
 }
