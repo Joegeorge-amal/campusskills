@@ -333,7 +333,7 @@ const Dashboard = () => {
                   <IconArrowsRightLeft size={28} style={{ color: '#94a3b8', marginBottom: '8px' }} />
                   <div style={{ fontSize: '14px', fontWeight: 700, color: '#1e293b', marginBottom: '4px' }}>No pending requests</div>
                   <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '16px', maxWidth: '280px' }}>Your incoming skill requests and proposals will show up here.</div>
-                  <button onClick={() => setIsCreateSessionOpen(true)} style={{ padding: '8px 16px', borderRadius: '10px', background: '#10b981', color: '#fff', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Share a Skill</button>
+                  <button onClick={() => setIsCreateSessionOpen(true)} style={{ padding: '8px 16px', borderRadius: '10px', background: '#1d4ed8', color: '#fff', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Share a Skill</button>
                 </div>
               )}
             </div>
