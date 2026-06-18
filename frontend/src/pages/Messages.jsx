@@ -11,6 +11,7 @@ import { IconSearch, IconCheck, IconX, IconTrash, IconMessageCircle, IconArrowLe
 import { chatService } from '../services/chatService';
 import { chatRequestService } from '../services/chatRequestService';
 import { messageService } from '../services/messageService';
+import { userService } from '../services/userService';
 import { AnimatePresence } from 'framer-motion';
 import DeleteChatModal from '../components/modals/DeleteChatModal';
 
@@ -942,6 +943,7 @@ const Messages = () => {
                         window.location.reload();
                       }
                     } catch (e) {
+                      console.error('[Messages] Failed to block user:', e);
                       triggerToast('Failed to block user');
                     }
                   }} 
