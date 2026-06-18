@@ -69,34 +69,33 @@
     font-size: 9px;
   }
 
-  /* ─── DASHBOARD STAT CARDS: MOBILE (4 → 2 columns) ─── */
+  /* ─── DASHBOARD STAT CARDS: MOBILE (4 → 2 columns, shorter) ─── */
   #home .stats-grid {
-    max-width: 100% !important;
-    gap: 12px !important;
+    gap: 10px !important;
     grid-template-columns: repeat(2, 1fr) !important;
   }
 
   #home .stats-grid .glossy-card {
-    padding: 24px 12px !important;
-    min-height: 150px !important;
-    gap: 12px !important;
+    padding: 16px 10px !important;
+    min-height: 110px !important;
+    gap: 8px !important;
   }
 
   #home .stats-grid .glossy-card > div:first-child {
-    width: 38px !important;
-    height: 38px !important;
-    min-width: 38px !important;
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
     border-radius: 10px !important;
   }
 
   #home .stats-grid .glossy-card > div:first-child svg {
-    width: 18px !important;
-    height: 18px !important;
+    width: 16px !important;
+    height: 16px !important;
   }
 
   #home .stats-grid .glossy-card > div:last-child > div:first-child {
-    font-size: 26px !important;
-    margin-bottom: 4px !important;
+    font-size: 22px !important;
+    margin-bottom: 2px !important;
   }
 
   /* ─── MOBILE FULLSCREEN SEARCH OVERLAY ─── */
@@ -448,22 +447,27 @@
   }
 
 
+  #home .stats-grid {
+    gap: 10px !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
   #home .stats-grid .glossy-card {
-    padding: 24px 14px !important;
-    min-height: 160px !important;
-    gap: 12px !important;
+    padding: 16px 10px !important;
+    min-height: 110px !important;
+    gap: 8px !important;
   }
 
   #home .stats-grid .glossy-card > div:first-child {
-    width: 38px !important;
-    height: 38px !important;
-    min-width: 38px !important;
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px !important;
     border-radius: 10px !important;
   }
 
   #home .stats-grid .glossy-card > div:first-child svg {
-    width: 18px !important;
-    height: 18px !important;
+    width: 16px !important;
+    height: 16px !important;
   }
 
   #home .stats-grid .glossy-card > div:last-child > div:first-child {
