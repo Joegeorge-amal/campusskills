@@ -234,8 +234,12 @@ const BookSessionModal = ({
                 onClick={() => setSelectedSlotId(primarySlot.id)}
               >
                 <div className="bsm-date-box">
-                  <span className="bsm-date-num">{primarySlot.date.split(' ')[0]}</span>
-                  <span className="bsm-date-month">{primarySlot.date.split(' ')[1]}</span>
+                  <span className="bsm-date-num">
+                    {primarySlot.date.includes(' ') ? primarySlot.date.split(' ')[0] : primarySlot.date.substring(0, 3).toUpperCase()}
+                  </span>
+                  <span className="bsm-date-month">
+                    {primarySlot.date.includes(' ') ? primarySlot.date.split(' ')[1] : ''}
+                  </span>
                 </div>
                 <div className="bsm-time-info">
                   <div className="bsm-time">{primarySlot.time}</div>
@@ -256,8 +260,12 @@ const BookSessionModal = ({
                   onClick={() => setSelectedSlotId(slot.id)}
                 >
                   <div className="bsm-date-box">
-                    <span className="bsm-date-num">{slot.date.split(' ')[0]}</span>
-                    <span className="bsm-date-month">{slot.date.split(' ')[1]}</span>
+                    <span className="bsm-date-num">
+                      {slot.date.includes(' ') ? slot.date.split(' ')[0] : slot.date.substring(0, 3).toUpperCase()}
+                    </span>
+                    <span className="bsm-date-month">
+                      {slot.date.includes(' ') ? slot.date.split(' ')[1] : ''}
+                    </span>
                   </div>
                   <div className="bsm-time-info">
                     <div className="bsm-time">{slot.time}</div>
