@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useAppData } from '../context/AppDataContext';
+import { listingService } from '../services/listingService';
 import CreateListingModal from '../components/modals/CreateListingModal';
 import Avatar from '../components/common/Avatar';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -30,10 +31,23 @@ const Dashboard = () => {
   // Get completed sessions
   const completedSessions = sessionsData.filter(s => s.status === 'COMPLETED');
 
-  // Mock stats
+  // Fetch real active listing count
+  const [activeListingCount, setActiveListingCount] = useState(0);
+  useEffect(() => {
+    const userId = user?.userId || user?.id || user?._id;
+    if (userId) {
+      listingService.searchListings({ ownerId: userId })
+        .then(res => {
+          const listings = res?.listings || res?.data || (Array.isArray(res) ? res : []);
+          setActiveListingCount(listings.length);
+        })
+        .catch(() => setActiveListingCount(0));
+    }
+  }, [user?.userId, user?.id, user?._id]);
+
+  // Stats
   const stats = {
     trustScore: user?.stats?.ratingAvg?.toFixed(1) || '0.0',
-    skillsOffered: user?.skillsOffered?.length || 0,
     sessionsDone: completedSessions.length
   };
 
@@ -188,21 +202,21 @@ const Dashboard = () => {
         return (
         <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '24px', width: '100%' }}>
           
-          {/* Skills Offered */}
+          {/* Active Listings */}
           <div className="glossy-card" onClick={() => navigate('/app/marketplace')} style={{ background: '#ffffff', padding: '20px 12px', minHeight: '130px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: '10px', cursor: 'pointer' }}>
             <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#f0f6ff', color: '#1e3a8a', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 8px rgba(37, 99, 235, 0.12)' }}>
-              <IconSparkles size={20} strokeWidth={1.5} />
+              <IconSparkles size={22} strokeWidth={1.5} />
             </div>
             <div>
-              <div style={{ fontSize: '28px', fontWeight: 800, color: '#111827', lineHeight: 1.1, marginBottom: '4px' }}>{stats.skillsOffered}</div>
-              <div style={{ fontSize: '12px', color: '#4b5563', fontWeight: 700, lineHeight: 1.3 }}>Skills Offered</div>
+              <div style={{ fontSize: '28px', fontWeight: 800, color: '#111827', lineHeight: 1.1, marginBottom: '4px' }}>{activeListingCount}</div>
+              <div style={{ fontSize: '12px', color: '#4b5563', fontWeight: 700, lineHeight: 1.3 }}>Active Listings</div>
             </div>
           </div>
 
           {/* Sessions Completed */}
           <div className="glossy-card" onClick={() => navigate('/app/sessions')} style={{ background: '#ffffff', padding: '20px 12px', minHeight: '130px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: '10px', cursor: 'pointer' }}>
             <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#ecfdf5', color: '#065f46', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 8px rgba(16, 185, 129, 0.12)' }}>
-              <IconCheck size={20} strokeWidth={1.5} />
+              <IconCheck size={22} strokeWidth={1.5} />
             </div>
             <div>
               <div style={{ fontSize: '28px', fontWeight: 800, color: '#111827', lineHeight: 1.1, marginBottom: '4px' }}>{stats.sessionsDone}</div>
@@ -213,17 +227,17 @@ const Dashboard = () => {
           {/* Community Rating */}
           <div className="glossy-card" onClick={() => navigate('/app/profile', { state: { scrollToReviews: true } })} style={{ background: '#ffffff', padding: '20px 12px', minHeight: '130px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: '10px', cursor: 'pointer' }}>
             <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#fef3c7', color: '#92400e', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 8px rgba(234, 179, 8, 0.12)' }}>
-              <IconStar size={20} strokeWidth={1.5} />
+              <IconStar size={22} strokeWidth={1.5} />
             </div>
             <div>
               <div style={{ fontSize: '28px', fontWeight: 800, color: '#111827', lineHeight: 1.1, marginBottom: '4px' }}>{stats.trustScore}</div>
-              <div style={{ fontSize: '12px', color: '#4b5563', fontWeight: 700, lineHeight: 1.3, marginBottom: '2px' }}>Community Rating</div>
+              <div style={{ fontSize: '12px', color: '#4b5563', fontWeight: 700, lineHeight: 1.3 }}>Community Rating</div>
               <div style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 500, lineHeight: 1.3 }}>Based on {user?.stats?.ratingCount || 0} reviews</div>
             </div>
           </div>
 
           {/* Verified Skills */}
-          <div className="glossy-card" onClick={() => navigate('/app/profile')} style={{ background: '#ffffff', padding: '20px 12px', minHeight: '130px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: '10px', cursor: 'pointer' }}>
+          <div className="glossy-card" onClick={() => navigate('/app/profile', { state: { scrollToVerified: true } })} style={{ background: '#ffffff', padding: '20px 12px', minHeight: '130px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: '10px', cursor: 'pointer' }}>
             <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 8px rgba(37, 99, 235, 0.12)' }}>
               <IconTrophy size={22} strokeWidth={1.5} />
             </div>

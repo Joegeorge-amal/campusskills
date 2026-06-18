@@ -42,6 +42,14 @@ const Profile = () => {
         }
       }, 300);
     }
+    if (location.state?.scrollToVerified) {
+      setTimeout(() => {
+        const el = document.getElementById('verified-skills-section');
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 300);
+    }
   }, [location.state]);
 
   const [newSkill, setNewSkill] = useState('');
@@ -574,7 +582,7 @@ const Profile = () => {
         )}
 
         {/* Verified Skills Section */}
-        <div style={{ marginBottom: '32px' }}>
+        <div id="verified-skills-section" style={{ marginBottom: '32px', scrollMarginTop: '100px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
             <div style={{ width: '24px', height: '24px', background: '#ecfdf5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <IconCheck size={14} strokeWidth={3} style={{ color: '#22c55e' }} />
