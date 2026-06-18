@@ -204,7 +204,7 @@ const Dashboard = () => {
           
           {/* Active Listings */}
           <div className="glossy-card" onClick={() => navigate('/app/marketplace')} style={{ background: '#ffffff', padding: '20px 12px', minHeight: '130px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: '10px', cursor: 'pointer' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#f0f6ff', color: '#1e3a8a', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 8px rgba(0, 0, 0, 0.08)' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#f0f6ff', color: '#1e3a8a', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 8px rgba(0, 0, 0, 0.08)', marginTop: '2px' }}>
               <IconSparkles size={22} strokeWidth={1.5} />
             </div>
             <div>
@@ -215,7 +215,7 @@ const Dashboard = () => {
 
           {/* Sessions Completed */}
           <div className="glossy-card" onClick={() => navigate('/app/sessions')} style={{ background: '#ffffff', padding: '20px 12px', minHeight: '130px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: '10px', cursor: 'pointer' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#ecfdf5', color: '#065f46', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 8px rgba(0, 0, 0, 0.08)' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#ecfdf5', color: '#065f46', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 8px rgba(0, 0, 0, 0.08)', marginTop: '2px' }}>
               <IconCheck size={22} strokeWidth={1.5} />
             </div>
             <div>
@@ -238,7 +238,7 @@ const Dashboard = () => {
 
           {/* Verified Skills */}
           <div className="glossy-card" onClick={() => navigate('/app/profile', { state: { scrollToVerified: true } })} style={{ background: '#ffffff', padding: '20px 12px', minHeight: '130px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: '10px', cursor: 'pointer' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 8px rgba(0, 0, 0, 0.08)' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 8px rgba(0, 0, 0, 0.08)', marginTop: '2px' }}>
               <IconTrophy size={22} strokeWidth={1.5} />
             </div>
             <div>
