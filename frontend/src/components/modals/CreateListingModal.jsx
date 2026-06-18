@@ -285,8 +285,8 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
 
           {(listingType !== 'SWAP') && (
             <div className="clm-field">
-              <label>{listingType.startsWith('LEARN') ? 'Willing to pay per hour (₹)' : 'Price per hour (₹)'}</label>
-              <input type="number" className="clm-input" value={price} onChange={(e) => setPrice(e.target.value)} required />
+              <label>{listingType.startsWith('LEARN') ? 'Willing to pay per hour (₹) (Optional)' : 'Price per hour (₹) (Optional)'}</label>
+              <input type="number" className="clm-input" value={price} onChange={(e) => setPrice(e.target.value)} min="0" placeholder="0 for Free" />
             </div>
           )}
 
