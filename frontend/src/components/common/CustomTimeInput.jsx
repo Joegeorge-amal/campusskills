@@ -118,12 +118,12 @@ const CustomTimeInput = ({ value, onChange, style }) => {
             bottom: 'calc(100% + 6px)',
             left: 0,
             width: '200px',
-            background: 'rgba(255, 255, 255, 0.85)',
-            backdropFilter: 'blur(16px)',
-            WebkitBackdropFilter: 'blur(16px)',
-            border: '1px solid rgba(255, 255, 255, 0.5)',
+            background: 'rgba(245, 247, 250, 0.75)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(0, 0, 0, 0.06)',
             borderRadius: '12px',
-            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.12)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.10)',
             zIndex: 100,
             padding: '6px'
           }}
@@ -228,10 +228,8 @@ const CustomTimeInput = ({ value, onChange, style }) => {
         </div>
       )}
 
-      <style>{`
-        .time-scroll-col::-webkit-scrollbar { width: 4px; }
-        .time-scroll-col::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 4px; }
-      `}</style>
+      <style>{`.time-scroll-col { scrollbar-width: none; -ms-overflow-style: none; }
+.time-scroll-col::-webkit-scrollbar { display: none; }`}</style>
     </div>
   );
 };
