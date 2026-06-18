@@ -398,6 +398,7 @@ export const AppDataProvider = ({ children }) => {
         notifType === 'SESSION_ACCEPTED' ||
         notifType === 'SESSION_BOOKED' ||
         notifType === 'SESSION_COMPLETED' ||
+        notifType === 'SESSION_CANCELLED' ||
         notifType === 'COMPLETION_REQUESTED' ||
         notifType === 'RESCHEDULE_PROPOSED' ||
         notifType === 'RESCHEDULE_ACCEPTED' ||
@@ -578,7 +579,8 @@ export const AppDataProvider = ({ children }) => {
       lastMessage.type === 'PAYMENT_SUBMITTED' ||
       lastMessage.type === 'PAYMENT_CONFIRMED' ||
       lastMessage.type === 'SESSION_UPDATE' ||
-      lastMessage.type === 'SESSION_BOOKED'
+      lastMessage.type === 'SESSION_BOOKED' ||
+      lastMessage.type === 'SESSION_CANCELLED'
     ) {
       setSessionEvent({ type: lastMessage.type, session: lastMessage.payload });
       fetchInitialData();

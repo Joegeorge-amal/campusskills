@@ -287,8 +287,11 @@ const Sessions = () => {
     .filter(s => {
       if (s.status === 'SCHEDULED') return true;
       if (s.status === 'COMPLETED') {
-        const isSwap = !!s.rawSession.swapGroupId;
-        return !isSwap && !s.rawSession.teacherConfirmedPayment;
+        const req = requestsData.find(r => r.id === s.rawSession.exchangeId);
+        const isSwap = !!s.rawSession.swapGroupId || (req && req.rawReq?.type === 'SWAP');
+        const requiresPayment = s.rawSession.requiresPayment != null ? s.rawSession.requiresPayment : !isSwap;
+        // Stay in active if paid session and payment not yet fully confirmed
+        return requiresPayment && !s.rawSession.teacherConfirmedPayment;
       }
       return false;
     })
@@ -304,12 +307,16 @@ const Sessions = () => {
     .filter(s => {
       if (s.status === 'CANCELLED') return true;
       if (s.status === 'COMPLETED') {
-        const isSwap = !!s.rawSession.swapGroupId;
-        return isSwap || s.rawSession.teacherConfirmedPayment;
+        const req = requestsData.find(r => r.id === s.rawSession.exchangeId);
+        const isSwap = !!s.rawSession.swapGroupId || (req && req.rawReq?.type === 'SWAP');
+        const requiresPayment = s.rawSession.requiresPayment != null ? s.rawSession.requiresPayment : !isSwap;
+        // Goes to history if free/swap (no payment needed), or if paid and fully confirmed
+        return !requiresPayment || s.rawSession.teacherConfirmedPayment;
       }
       return false;
     })
     .sort((a, b) => (b.rawSession.updatedAt || 0) - (a.rawSession.updatedAt || 0));
+
 
   const formatSessionFullTime = (start, end) => {
     if (!start) return 'TBD';
@@ -326,6 +333,7 @@ const Sessions = () => {
     const isCancelled = s.status === 'CANCELLED';
     const req = requestsData.find(r => r.id === s.rawSession.exchangeId);
     const isSwap = !!s.rawSession.swapGroupId || (req && req.rawReq?.type === 'SWAP');
+    const isPaidSession = s.rawSession.requiresPayment != null ? s.rawSession.requiresPayment : !isSwap;
 
     // Cancellation rule: status is SCHEDULED and neither has confirmed completion
     const canCancel = s.status === 'SCHEDULED' && 
@@ -343,7 +351,7 @@ const Sessions = () => {
         guidanceStyle = { background: '#fffbeb', color: '#d97706', border: '1px solid #fde68a' };
       }
     } else if (s.status === 'COMPLETED') {
-      if (!isSwap) {
+      if (isPaidSession) {
         if (!s.rawSession.studentMarkedPaid) {
           guidanceText = "Payment pending";
           guidanceStyle = { background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca' };
@@ -351,15 +359,17 @@ const Sessions = () => {
           guidanceText = "Waiting for payment confirmation";
           guidanceStyle = { background: '#fffbeb', color: '#d97706', border: '1px solid #fde68a' };
         } else {
-          const reviewExists = s.rawSession.reviews && s.rawSession.reviews.some(r => r.reviewerId === user?.userId);
-          if (!reviewExists) {
+          const hasReviewed = s.rawSession.hasReviewed ||
+            (s.rawSession.reviews && s.rawSession.reviews.some(r => r.reviewerId === user?.userId));
+          if (!hasReviewed) {
             guidanceText = "Please leave a review";
             guidanceStyle = { background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe' };
           }
         }
       } else {
-        const reviewExists = s.rawSession.reviews && s.rawSession.reviews.some(r => r.reviewerId === user?.userId);
-        if (!reviewExists) {
+        const hasReviewed = s.rawSession.hasReviewed ||
+          (s.rawSession.reviews && s.rawSession.reviews.some(r => r.reviewerId === user?.userId));
+        if (!hasReviewed) {
           guidanceText = "Please leave a review";
           guidanceStyle = { background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe' };
         }
@@ -613,8 +623,8 @@ const Sessions = () => {
             {/* Context Actions for Completed */}
             {s.status === 'COMPLETED' && (
               <div style={{ borderTop: '1px solid #f3f4f6', paddingTop: '16px', marginTop: '8px' }}>
-                {/* Non-swap paid session logic */}
-                {!isSwap ? (
+                {/* Paid session logic */}
+                {isPaidSession ? (
                   s.role === 'Learning' ? (
                     // We are the student
                     !s.rawSession.studentMarkedPaid ? (

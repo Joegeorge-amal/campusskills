@@ -75,9 +75,10 @@ const SessionLifecycleManager = () => {
     const pendingPayment = sessionsData.find(s => {
       const req = requestsData.find(r => r.id === s.rawSession.exchangeId);
       const isSwap = !!s.rawSession.swapGroupId || (req && req.rawReq?.type === 'SWAP');
+      const reqPayment = s.rawSession.requiresPayment != null ? s.rawSession.requiresPayment : !isSwap;
       
       if (s.status !== 'COMPLETED' || isSwap) return false;
-      if (s.rawSession.requiresPayment === false) return false;
+      if (reqPayment === false) return false;
       const isTeacher = s.rawSession.teacherId === user.userId;
       const isStudent = s.rawSession.studentId === user.userId;
       
@@ -102,7 +103,43 @@ const SessionLifecycleManager = () => {
       return;
     }
 
-  }, [sessionsData, user]);
+    // Check for PENDING_REVIEW — completed free/swap session where we haven't reviewed yet
+    // This is the fallback for the user who marked first (they may miss the WS event)
+    if (!reviewModalData) {
+      const pendingReview = sessionsData.find(s => {
+        if (s.status !== 'COMPLETED') return false;
+        const req = requestsData.find(r => r.id === s.rawSession.exchangeId);
+        const isSwap = !!s.rawSession.swapGroupId || (req && req.rawReq?.type === 'SWAP');
+        const reqPayment = s.rawSession.requiresPayment != null ? s.rawSession.requiresPayment : !isSwap;
+
+        // Only show review for sessions where payment is fully settled (or not required)
+        const paymentDone = !reqPayment || (s.rawSession.studentMarkedPaid && s.rawSession.teacherConfirmedPayment);
+        if (!paymentDone) return false;
+
+        // Don't show if already reviewed
+        const hasReviewed = s.rawSession.hasReviewed ||
+          (s.rawSession.reviews && s.rawSession.reviews.some(r => r.reviewerId === user.userId));
+        if (hasReviewed) return false;
+
+        return true;
+      });
+
+      if (pendingReview) {
+        const isTeacher = pendingReview.rawSession.teacherId === user.userId;
+        setReviewModalData({
+          id: pendingReview.id,
+          rawSession: pendingReview.rawSession,
+          topic: pendingReview.topic,
+          name: isTeacher
+            ? (pendingReview.rawSession.studentName || 'Student')
+            : (pendingReview.rawSession.teacherName || 'Teacher'),
+          role: isTeacher ? 'Teaching' : 'Learning',
+          status: 'COMPLETED'
+        });
+      }
+    }
+
+  }, [sessionsData, requestsData, reviewModalData, user]);
 
   // Monitor for 'Session End Reached' locally since backend doesn't broadcast it currently
   useEffect(() => {
@@ -169,8 +206,11 @@ const SessionLifecycleManager = () => {
         });
       }
     } else if (sessionEvent.type === 'SESSION_BOTH_CONFIRMED') {
-      const isSwap = !!raw.swapGroupId;
-      if (!isSwap) {
+      const req = requestsData.find(r => r.id === raw.exchangeId);
+      const isSwap = !!raw.swapGroupId || (req && req.rawReq?.type === 'SWAP');
+      const requiresPayment = raw.requiresPayment != null ? raw.requiresPayment : !isSwap;
+
+      if (requiresPayment) {
         if (isStudent) {
           setActivePopup({
             type: 'PAYMENT_NEEDED',
@@ -183,7 +223,7 @@ const SessionLifecycleManager = () => {
           });
         }
       } else {
-        // Swap session completed, jump straight to review
+        // Free or Swap session completed, jump straight to review
         setReviewModalData({
           id: sessionId,
           rawSession: raw,
