@@ -78,7 +78,7 @@ const Messages = () => {
     if (activeChatId && activeChatId !== 'requests') {
       // Always fetch history from API (merges with any WS-pre-populated messages)
       const isNewChat = !chatMessages[activeChatId];
-      setIsMessagesLoading(true);
+      if (isNewChat) setIsMessagesLoading(true);
       messageService.getMessages(activeChatId, { page: 1, limit: 50 }).then(res => {
         setIsMessagesLoading(false);
         if (isNewChat) {
@@ -785,15 +785,15 @@ const Messages = () => {
                     />
                   );
                 })}
-                {isMessagesLoading ? (
+                {isMessagesLoading && activeChatMsgs.length === 0 ? (
                   <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0', margin: 'auto' }}>
                     <LoadingSpinner />
                   </div>
-                ) : activeChatMsgs.length === 0 && (
+                ) : !isMessagesLoading && activeChatMsgs.length === 0 ? (
                   <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: '13px', margin: 'auto' }}>
                     No messages yet. Send a message to start the conversation!
                   </div>
-                )}
+                ) : null}
 
                 {/* Typing indicator bubble */}
                 {isOtherUserTyping && (

@@ -29,6 +29,9 @@ export const AppDataProvider = ({ children }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [sessionEvent, setSessionEvent] = useState(null);
 
+  const initialLoadDone = useRef(false);
+  const sessionsLoadDone = useRef(false);
+
   const triggerToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
@@ -41,9 +44,12 @@ export const AppDataProvider = ({ children }) => {
   const fetchInitialData = useCallback(async () => {
     if (!user?.userId) return;
     try {
-      setIsChatsLoading(true);
-      setIsRequestsLoading(true);
-      setIsSessionsLoading(true);
+      if (!initialLoadDone.current) {
+        setIsChatsLoading(true);
+        setIsRequestsLoading(true);
+        setIsSessionsLoading(true);
+        initialLoadDone.current = true;
+      }
 
       const [chatsRes, exchangesData, chatReqsRes, sessionsRes] = await Promise.all([
         chatService.getUserChats().catch(e => { console.warn('fetchInitialData: chats failed', e); return { items: [] }; }),
@@ -290,7 +296,10 @@ export const AppDataProvider = ({ children }) => {
   const fetchSessionsOnly = useCallback(async () => {
     if (!user?.userId) return;
     try {
-      setIsSessionsLoading(true);
+      if (!sessionsLoadDone.current) {
+        setIsSessionsLoading(true);
+        sessionsLoadDone.current = true;
+      }
       const sessionsRes = await sessionService.getSessions();
       const rawSessions = sessionsRes?.items || [];
       const sessionOtherUserIds = [...new Set(rawSessions.map(s => {
