@@ -1,10 +1,10 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { IconX, IconCheck, IconCalendarEvent } from '@tabler/icons-react';
 import HandshakeSection from './active-session/HandshakeSection';
 import PaymentSection from './active-session/PaymentSection';
 import RescheduleSection from './active-session/RescheduleSection';
 import { useAppData } from '../../context/AppDataContext';
+import ModalWrapper from '../common/ModalWrapper';
 
 const ActiveSessionModal = ({ isOpen, onClose, session }) => {
   const { user } = useAppData();
@@ -67,12 +67,8 @@ const ActiveSessionModal = ({ isOpen, onClose, session }) => {
     );
   };
 
-  return ReactDOM.createPortal(
-    <div style={{
-      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-      background: 'rgba(0,0,0,0.5)', zIndex: 1000,
-      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px'
-    }} onClick={onClose}>
+  return (
+    <ModalWrapper isOpen={true} onClose={onClose} maxWidth="400px" zIndex={1000}>
       <style>{`
         .asm-wrapper {
           background: #ffffff;
@@ -80,8 +76,6 @@ const ActiveSessionModal = ({ isOpen, onClose, session }) => {
           width: 100%;
           max-width: 400px;
           overflow: hidden;
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-          animation: modalDropIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .asm-header {
           background: linear-gradient(105deg, #1e3a8a 0%, #3b82f6 55%, #1e3a8a 100%);
@@ -140,8 +134,7 @@ const ActiveSessionModal = ({ isOpen, onClose, session }) => {
           {renderContent()}
         </div>
       </div>
-    </div>,
-    document.body
+    </ModalWrapper>
   );
 };
 

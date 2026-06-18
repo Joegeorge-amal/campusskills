@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import ReactDOM from 'react-dom';
 import { IconX } from '@tabler/icons-react';
 import { useAuth } from '../../context/AuthContext';
 import { useAppData } from '../../context/AppDataContext';
 import api from '../../services/api';
 import BackloggdStarSelector from '../common/BackloggdStarSelector';
+import ModalWrapper from '../common/ModalWrapper';
 
 const ReviewModal = ({ isOpen, onClose, session, onSubmit }) => {
   const { user } = useAuth();
@@ -41,28 +41,13 @@ const ReviewModal = ({ isOpen, onClose, session, onSubmit }) => {
     }
   };
 
-  return ReactDOM.createPortal(
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(15, 23, 42, 0.6)',
-      backdropFilter: 'blur(4px)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 1000,
-      padding: '16px'
-    }}>
+  return (
+    <ModalWrapper isOpen={true} onClose={onClose} maxWidth="420px" zIndex={1000}>
       <div style={{
         backgroundColor: '#ffffff',
         borderRadius: '16px',
         padding: '24px',
-        maxWidth: '420px',
         width: '100%',
-        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
         boxSizing: 'border-box'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -115,8 +100,7 @@ const ReviewModal = ({ isOpen, onClose, session, onSubmit }) => {
           </button>
         </div>
       </div>
-    </div>,
-    document.body
+    </ModalWrapper>
   );
 };
 

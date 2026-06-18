@@ -7,6 +7,7 @@ import { sessionService } from '../../services/sessionService';
 import { IconX } from '@tabler/icons-react';
 import CustomTimeInput from '../common/CustomTimeInput';
 import CustomSelect from '../common/CustomSelect';
+import ModalWrapper from '../common/ModalWrapper';
 
 const SessionReminderManager = () => {
   const { sessionsData, triggerToast, fetchSessionsOnly } = useAppData();
@@ -85,28 +86,13 @@ const SessionReminderManager = () => {
       />
 
       {/* Reschedule Modal */}
-      {rescheduleSession && ReactDOM.createPortal(
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(15, 23, 42, 0.6)',
-          backdropFilter: 'blur(4px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000,
-          padding: '16px'
-        }}>
+      {rescheduleSession && (
+        <ModalWrapper isOpen={true} onClose={() => setRescheduleSession(null)} maxWidth="400px" zIndex={1000}>
           <div style={{
             backgroundColor: '#ffffff',
             borderRadius: '16px',
             padding: '24px',
-            maxWidth: '400px',
             width: '100%',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
             boxSizing: 'border-box'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -159,8 +145,7 @@ const SessionReminderManager = () => {
               </button>
             </div>
           </div>
-        </div>,
-        document.body
+        </ModalWrapper>
       )}
     </>
   );

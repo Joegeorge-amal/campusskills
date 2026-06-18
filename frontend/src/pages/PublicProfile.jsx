@@ -4,6 +4,7 @@ import { useAppData } from '../context/AppDataContext';
 import { useAuth } from '../context/AuthContext';
 import { useWebSocket } from '../context/WebSocketContext';
 import { IconMapPin, IconCalendarMonth, IconMessageCircle, IconDotsVertical } from '@tabler/icons-react';
+import ModalWrapper from '../components/common/ModalWrapper';
 
 import ProfileHeader from '../components/profile/ProfileHeader';
 import StatsCards from '../components/profile/StatsCards';
@@ -339,33 +340,31 @@ const PublicProfile = () => {
           }}
         />
       )}
-      {showBlockConfirm && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000, padding: '24px' }}>
-          <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', width: '100%', maxWidth: '320px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}>
-            <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 600, color: '#0f172a' }}>Block {profileData?.name}?</h3>
-            <p style={{ margin: '0 0 24px 0', fontSize: '14px', color: '#64748b', lineHeight: '1.4' }}>Are you sure you want to block this user? They will not be able to message you or view your listings.</p>
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button onClick={() => setShowBlockConfirm(false)} style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#fff', color: '#64748b', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
-              <button 
-                onClick={async () => {
-                  setShowBlockConfirm(false);
-                  try {
-                    await userService.blockUser(profileData.userId);
-                    triggerToast('User blocked successfully.');
-                    navigate('/app/dashboard');
-                  } catch (err) {
-                    console.error('Block user error:', err);
-                    triggerToast('Failed to block user');
-                  }
-                }} 
-                style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: '#ef4444', color: '#fff', fontWeight: 600, cursor: 'pointer' }}
-              >
-                Block
-              </button>
-            </div>
+      <ModalWrapper isOpen={showBlockConfirm} onClose={() => setShowBlockConfirm(false)} maxWidth="320px" zIndex={10000}>
+        <div style={{ padding: '24px' }}>
+          <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 600, color: '#0f172a' }}>Block {profileData?.name}?</h3>
+          <p style={{ margin: '0 0 24px 0', fontSize: '14px', color: '#64748b', lineHeight: '1.4' }}>Are you sure you want to block this user? They will not be able to message you or view your listings.</p>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button onClick={() => setShowBlockConfirm(false)} style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#fff', color: '#64748b', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
+            <button
+              onClick={async () => {
+                setShowBlockConfirm(false);
+                try {
+                  await userService.blockUser(profileData.userId);
+                  triggerToast('User blocked successfully.');
+                  navigate('/app/dashboard');
+                } catch (err) {
+                  console.error('Block user error:', err);
+                  triggerToast('Failed to block user');
+                }
+              }}
+              style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: '#ef4444', color: '#fff', fontWeight: 600, cursor: 'pointer' }}
+            >
+              Block
+            </button>
           </div>
         </div>
-      )}
+      </ModalWrapper>
     </div>
   );
 };

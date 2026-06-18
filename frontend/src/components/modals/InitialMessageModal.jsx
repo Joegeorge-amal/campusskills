@@ -22,12 +22,12 @@ const InitialMessageModal = ({ selectedTutor, onClose, onSend }) => {
     <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <motion.div 
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        style={{ position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(4px)' }}
+        style={{ position: 'absolute', inset: 0, background: 'rgba(15, 23, 42, 0.20)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)' }}
         onClick={onClose}
       />
       
       <motion.div 
-        initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1, transition: { duration: 0.2, ease: 'easeOut' } }} exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.12, ease: 'easeOut' } }}
         style={{ width: '90%', maxWidth: '440px', background: '#fff', borderRadius: '24px', overflow: 'hidden', position: 'relative', zIndex: 1, boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}
       >
         <div style={{ padding: '24px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

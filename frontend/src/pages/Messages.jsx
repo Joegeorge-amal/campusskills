@@ -14,6 +14,7 @@ import { messageService } from '../services/messageService';
 import { userService } from '../services/userService';
 import { AnimatePresence } from 'framer-motion';
 import DeleteChatModal from '../components/modals/DeleteChatModal';
+import ModalWrapper from '../components/common/ModalWrapper';
 
 const getInitials = (name) => {
   if (!name) return 'U';
@@ -874,20 +875,16 @@ const Messages = () => {
               />
 
               {/* Delete Message Modal */}
-              <AnimatePresence>
-                {deletingMessage && (
-                  <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '24px' }}>
-                    <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', width: '100%', maxWidth: '320px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}>
-                      <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 600, color: 'var(--cs-text-main)' }}>Delete message?</h3>
-                      <p style={{ margin: '0 0 24px 0', fontSize: '14px', color: 'var(--cs-text-inactive)' }}>Are you sure you want to delete this message? This action cannot be undone.</p>
-                      <div style={{ display: 'flex', gap: '12px' }}>
-                        <button onClick={() => setDeletingMessage(null)} style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#fff', color: '#64748b', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
-                        <button onClick={confirmDeleteMessage} style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: '#ef4444', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>Delete</button>
-                      </div>
-                    </div>
+              <ModalWrapper isOpen={!!deletingMessage} onClose={() => setDeletingMessage(null)} maxWidth="320px" zIndex={1000}>
+                <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', width: '100%' }}>
+                  <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 600, color: 'var(--cs-text-main)' }}>Delete message?</h3>
+                  <p style={{ margin: '0 0 24px 0', fontSize: '14px', color: 'var(--cs-text-inactive)' }}>Are you sure you want to delete this message? This action cannot be undone.</p>
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    <button onClick={() => setDeletingMessage(null)} style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#fff', color: '#64748b', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
+                    <button onClick={confirmDeleteMessage} style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: '#ef4444', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>Delete</button>
                   </div>
-                )}
-              </AnimatePresence>
+                </div>
+              </ModalWrapper>
             </>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--cs-text-inactive)' }}>
@@ -919,42 +916,38 @@ const Messages = () => {
         )}
       </AnimatePresence>
 
-      <AnimatePresence>
-        {blockingUser && (
-          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '24px' }}>
-            <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', width: '100%', maxWidth: '320px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}>
-              <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 600, color: 'var(--cs-text-main)' }}>Block {blockingUser.name}?</h3>
-              <p style={{ margin: '0 0 24px 0', fontSize: '14px', color: 'var(--cs-text-inactive)', lineHeight: '1.4' }}>Are you sure you want to block this user? They will not be able to message you or view your listings.</p>
-              <div style={{ display: 'flex', gap: '12px' }}>
-                <button onClick={() => setBlockingUser(null)} style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#fff', color: '#64748b', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
-                <button 
-                  onClick={async () => {
-                    const targetId = blockingUser.id;
-                    const callback = blockingUser.callback;
-                    setBlockingUser(null);
-                    try {
-                      await userService.blockUser(targetId);
-                      triggerToast('User blocked successfully');
-                      if (callback) {
-                        callback();
-                      } else {
-                        navigate('/app/messages');
-                        window.location.reload();
-                      }
-                    } catch (e) {
-                      console.error('[Messages] Failed to block user:', e);
-                      triggerToast('Failed to block user');
-                    }
-                  }} 
-                  style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: '#ef4444', color: '#fff', fontWeight: 600, cursor: 'pointer' }}
-                >
-                  Block
-                </button>
-              </div>
-            </div>
+      <ModalWrapper isOpen={!!blockingUser} onClose={() => setBlockingUser(null)} maxWidth="320px" zIndex={1000}>
+        <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', width: '100%' }}>
+          <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 600, color: 'var(--cs-text-main)' }}>Block {blockingUser?.name}?</h3>
+          <p style={{ margin: '0 0 24px 0', fontSize: '14px', color: 'var(--cs-text-inactive)', lineHeight: '1.4' }}>Are you sure you want to block this user? They will not be able to message you or view your listings.</p>
+          <div style={{ display: 'flex', gap: '12px' }}>
+            <button onClick={() => setBlockingUser(null)} style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#fff', color: '#64748b', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
+            <button 
+              onClick={async () => {
+                const targetId = blockingUser.id;
+                const callback = blockingUser.callback;
+                setBlockingUser(null);
+                try {
+                  await userService.blockUser(targetId);
+                  triggerToast('User blocked successfully');
+                  if (callback) {
+                    callback();
+                  } else {
+                    navigate('/app/messages');
+                    window.location.reload();
+                  }
+                } catch (e) {
+                  console.error('[Messages] Failed to block user:', e);
+                  triggerToast('Failed to block user');
+                }
+              }} 
+              style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: '#ef4444', color: '#fff', fontWeight: 600, cursor: 'pointer' }}
+            >
+              Block
+            </button>
           </div>
-        )}
-      </AnimatePresence>
+        </div>
+      </ModalWrapper>
     </div>
   );
 };

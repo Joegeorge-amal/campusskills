@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { IconX, IconCheck, IconTrash } from '@tabler/icons-react';
 import CustomTimeInput from '../common/CustomTimeInput';
 import CustomSelect from '../common/CustomSelect';
+import ModalWrapper from '../common/ModalWrapper';
 
 const BookSessionModal = ({
   slots = [
@@ -52,26 +53,14 @@ const BookSessionModal = ({
   };
 
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0, left: 0, right: 0, bottom: 0,
-      background: 'rgba(0,0,0,0.4)', zIndex: 1000,
-      display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '16px', paddingTop: '80px'
-    }} onClick={onClose}>
+    <ModalWrapper isOpen={true} onClose={onClose} maxWidth="380px" zIndex={1000}>
       <div style={{
         background: '#ffffff',
-        width: '380px',
+        width: '100%',
         borderRadius: '16px',
-        overflow: 'hidden',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
-        animation: 'modalDropIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-      }} onClick={e => e.stopPropagation()}>
-        <style>{`
-          @keyframes modalDropIn {
-            from { opacity: 0; transform: translateY(-40px); }
-            to { opacity: 1; transform: translateY(0); }
-          }
-          .bsm-slot-card {
+        overflow: 'hidden'
+      }}>
+        <style>{`.bsm-slot-card {
             border: 1px solid #e5e7eb;
             border-radius: 12px;
             padding: 12px;
@@ -349,7 +338,7 @@ const BookSessionModal = ({
           </div>
         </div>
       </div>
-    </div>
+    </ModalWrapper>
   );
 };
 

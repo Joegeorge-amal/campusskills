@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
 import { IconCheck } from '@tabler/icons-react';
 import { reportService } from '../../services/reportService';
 import { useAppData } from '../../context/AppDataContext';
+import ModalWrapper from '../common/ModalWrapper';
 
 const ReportSessionModal = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -51,13 +51,8 @@ const ReportSessionModal = () => {
     setIsOpen(false);
   };
 
-  return ReactDOM.createPortal(
-    <div style={{
-      position: 'fixed',
-      top: 0, left: 0, right: 0, bottom: 0,
-      background: 'rgba(0,0,0,0.5)', zIndex: 1000,
-      display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '16px', paddingTop: '80px'
-    }} onClick={handleClose}>
+  return (
+    <ModalWrapper isOpen={isOpen} onClose={handleClose} maxWidth="440px" zIndex={1000}>
       <style>{`
         .rsm-wrapper {
           background: #ffffff;
@@ -65,17 +60,10 @@ const ReportSessionModal = () => {
           width: 100%;
           max-width: 440px;
           padding: 0;
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-          animation: modalDropIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes modalDropIn {
-          from { opacity: 0; transform: translateY(-40px); }
-          to { opacity: 1; transform: translateY(0); }
         }
       `}</style>
       <div 
         className="rsm-wrapper"
-        onClick={(e) => e.stopPropagation()}
       >
         <div style={{ padding: '20px 24px', borderBottom: '1px solid #f3f4f6' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
@@ -172,8 +160,7 @@ const ReportSessionModal = () => {
           )}
         </div>
       </div>
-    </div>,
-    document.body
+    </ModalWrapper>
   );
 };
 

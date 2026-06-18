@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
-import ReactDOM from 'react-dom';
 import { IconArrowsRightLeft, IconX, IconClock, IconCheck, IconCalendar } from '@tabler/icons-react';
 import Avatar from '../common/Avatar';
+import ModalWrapper from '../common/ModalWrapper';
 
 // Helper: given a dayOfWeek string (e.g. "MONDAY") and a startTime (e.g. "17:00"),
 // compute the next occurrence of that day/time from today.
@@ -192,12 +192,8 @@ const SkillSwapModal = ({ isOpen, onClose, request, user, onConfirm }) => {
     onClose();
   };
 
-  return ReactDOM.createPortal(
-    <div className="modal-overlay" onClick={() => { if (!isConfirming) onClose(); }} style={{
-      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-      background: 'rgba(0,0,0,0.5)', zIndex: 1000,
-      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px'
-    }}>
+  return (
+    <ModalWrapper isOpen={true} onClose={() => { if (!isConfirming) onClose(); }} maxWidth="520px" zIndex={1000}>
       <style>{`
         .ssm-wrapper {
           background: #ffffff;
@@ -206,10 +202,8 @@ const SkillSwapModal = ({ isOpen, onClose, request, user, onConfirm }) => {
           max-width: 520px;
           max-height: 90vh;
           overflow: hidden;
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
           display: flex;
           flex-direction: column;
-          animation: modalDropIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .ssm-header {
           background: #1e3a8a;
@@ -523,8 +517,7 @@ const SkillSwapModal = ({ isOpen, onClose, request, user, onConfirm }) => {
           </div>
         )}
       </div>
-    </div>,
-    document.body
+    </ModalWrapper>
   );
 };
 

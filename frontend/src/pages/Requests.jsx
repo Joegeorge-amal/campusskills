@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useAppData } from '../context/AppDataContext';
@@ -9,6 +8,7 @@ import ConfirmModal from '../components/modals/ConfirmModal';
 import { exchangeService } from '../services/exchangeService';
 import { chatRequestService } from '../services/chatRequestService';
 import { IconX, IconArrowsRightLeft } from '@tabler/icons-react';
+import ModalWrapper from '../components/common/ModalWrapper';
 
 // Helper to get initials
 const getInitials = (name) => {
@@ -363,19 +363,11 @@ const Requests = () => {
       )}
 
       {/* Booking Confirmation Modal */}
-      {bookingModalReq && ReactDOM.createPortal(
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: 'rgba(15, 23, 42, 0.6)',
-          backdropFilter: 'blur(4px)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          zIndex: 1000, padding: '16px'
-        }}>
+      {bookingModalReq && (
+        <ModalWrapper isOpen={true} onClose={() => setBookingModalReq(null)} maxWidth="400px" zIndex={1000}>
           <div style={{
             backgroundColor: '#ffffff', borderRadius: '16px', padding: '24px',
-            maxWidth: '400px', width: '100%',
-            boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)',
-            boxSizing: 'border-box'
+            width: '100%', boxSizing: 'border-box'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#111827' }}>
@@ -446,8 +438,7 @@ const Requests = () => {
               </button>
             </div>
           </div>
-        </div>,
-        document.body
+        </ModalWrapper>
       )}
 
       <ConfirmModal

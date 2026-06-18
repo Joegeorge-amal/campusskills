@@ -6,6 +6,7 @@ import { IconCheck } from '@tabler/icons-react';
 import { HexColorPicker } from "react-colorful";
 import BlockedUsersModal from '../components/modals/BlockedUsersModal';
 import CustomSelect from '../components/common/CustomSelect';
+import ModalWrapper from '../components/common/ModalWrapper';
 
 const EditProfile = () => {
   const { user, updateProfile } = useAuth();
@@ -242,19 +243,18 @@ const EditProfile = () => {
 
   return (
     <div id="editprofile" className="pg on" style={{ padding: '24px', background: 'var(--cs-bg-light)', minHeight: '100vh', width: '100%' }}>
-      {showSavePrompt && (
-        <div style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)' }}>
-          <div style={{ background: '#fff', padding: '24px', borderRadius: '16px', width: '320px', boxShadow: '0 20px 40px rgba(0,0,0,0.2)' }}>
-            <div style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px', color: '#111827' }}>Unsaved Changes</div>
-            <div style={{ fontSize: '14px', color: '#4b5563', marginBottom: '24px' }}>Do you want to save your changes?</div>
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', alignItems: 'center' }}>
-              <button disabled={isSaving} onClick={() => navigate('/app/profile')} style={{ background: 'none', border: 'none', color: isSaving ? '#fca5a5' : '#ef4444', fontSize: '14px', fontWeight: 600, cursor: isSaving ? 'default' : 'pointer', marginRight: 'auto' }}>Discard</button>
-              <button disabled={isSaving} onClick={() => setShowSavePrompt(false)} style={{ padding: '8px 16px', background: '#f3f4f6', border: 'none', borderRadius: '8px', color: isSaving ? '#9ca3af' : '#374151', fontSize: '14px', fontWeight: 600, cursor: isSaving ? 'default' : 'pointer' }}>Cancel</button>
-              <button disabled={isSaving} onClick={handleSave} style={{ padding: '8px 16px', background: isSaving ? '#93c5fd' : 'var(--cs-primary)', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '14px', fontWeight: 600, cursor: isSaving ? 'default' : 'pointer', minWidth: '70px' }}>{isSaving ? 'Saving...' : 'Yes'}</button>
-            </div>
+      <ModalWrapper isOpen={showSavePrompt} onClose={() => setShowSavePrompt(false)} maxWidth="360px" zIndex={9999}>
+        <div style={{ padding: '24px' }}>
+          <div style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px', color: '#111827' }}>Unsaved Changes</div>
+          <div style={{ fontSize: '14px', color: '#4b5563', marginBottom: '24px' }}>Do you want to save your changes?</div>
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', alignItems: 'center' }}>
+            <button disabled={isSaving} onClick={() => navigate('/app/profile')} style={{ background: 'none', border: 'none', color: isSaving ? '#fca5a5' : '#ef4444', fontSize: '14px', fontWeight: 600, cursor: isSaving ? 'default' : 'pointer', marginRight: 'auto' }}>Discard</button>
+            <button disabled={isSaving} onClick={() => setShowSavePrompt(false)} style={{ padding: '8px 16px', background: '#f3f4f6', border: 'none', borderRadius: '8px', color: isSaving ? '#9ca3af' : '#374151', fontSize: '14px', fontWeight: 600, cursor: isSaving ? 'default' : 'pointer' }}>Cancel</button>
+            <button disabled={isSaving} onClick={handleSave} style={{ padding: '8px 16px', background: isSaving ? '#93c5fd' : 'var(--cs-primary)', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '14px', fontWeight: 600, cursor: isSaving ? 'default' : 'pointer', minWidth: '70px' }}>{isSaving ? 'Saving...' : 'Yes'}</button>
           </div>
         </div>
-      )}
+      </ModalWrapper>
+      
 
       <button 
         onClick={handleBack} 
