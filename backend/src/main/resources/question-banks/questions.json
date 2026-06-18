@@ -3,1101 +3,2161 @@
     "skill": "Python",
     "question": "Which of the following is the correct way to define a function in Python?",
     "options": ["def my_function():", "function my_function():", "func my_function():", "define my_function():"],
-    "correctAnswer": 0
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "In Python, functions are defined using the 'def' keyword followed by the function name and parentheses."
   },
   {
     "skill": "Python",
     "question": "Which data structure in Python is immutable?",
     "options": ["List", "Dictionary", "Tuple", "Set"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "Tuples are immutable sequences, meaning their elements cannot be changed after creation."
   },
   {
     "skill": "Python",
     "question": "What is the correct way to insert an element at a specific index in a list?",
     "options": ["list.add(index, element)", "list.insert(index, element)", "list.append(index, element)", "list.put(index, element)"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "The insert() method inserts an element at a given index and shifts subsequent elements to the right."
   },
   {
     "skill": "Python",
     "question": "What will be the output of the expression `3 ** 2`?",
     "options": ["6", "8", "9", "12"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "The ** operator performs exponentiation. 3 raised to the power of 2 equals 9."
   },
   {
     "skill": "Python",
     "question": "Which keyword is used to handle exceptions in Python?",
     "options": ["catch", "except", "error", "handle"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "Python uses 'try' and 'except' blocks, where 'except' catches exceptions. Java uses 'catch', but Python does not."
   },
   {
     "skill": "Python",
     "question": "How do you start a single-line comment in Python?",
     "options": ["//", "/*", "#", "<!--"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "The # character begins a single-line comment in Python. Everything after # on that line is ignored."
   },
   {
     "skill": "Python",
     "question": "What is the output of `print(type({}))`?",
     "options": ["<class 'list'>", "<class 'set'>", "<class 'dict'>", "<class 'tuple'>"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "Empty curly braces {} create an empty dictionary, not a set. To create an empty set, use set()."
   },
   {
     "skill": "Python",
     "question": "How do you remove the last element from a list and return it?",
     "options": ["list.remove()", "list.pop()", "list.delete()", "list.shift()"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "pop() removes and returns the last element by default. remove() deletes the first matching value but does not return it."
   },
   {
     "skill": "Python",
     "question": "Which method is used to convert a string to lowercase?",
     "options": ["lower()", "toLowerCase()", "downcase()", "lowercase()"],
-    "correctAnswer": 0
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "Python uses lower() to convert a string to lowercase. toLowerCase() is the JavaScript equivalent."
   },
   {
     "skill": "Python",
     "question": "What does the `len()` function return when applied to a string?",
     "options": ["The memory size of the string", "The number of words in the string", "The number of characters in the string", "The maximum character in the string"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "len() returns the number of characters in a string, including spaces and special characters."
+  },
+  {
+    "skill": "Python",
+    "question": "What is the difference between a list and a tuple in Python?",
+    "options": ["Lists are immutable, tuples are mutable", "Tuples are immutable, lists are mutable", "Lists can only hold strings, tuples can hold any type", "Tuples are ordered, lists are unordered"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "Lists are mutable (can be modified after creation), while tuples are immutable. Both are ordered sequences that can hold mixed data types."
+  },
+  {
+    "skill": "Python",
+    "question": "What will `print(list(range(5)))` output?",
+    "options": ["[1, 2, 3, 4, 5]", "[0, 1, 2, 3, 4]", "[0, 1, 2, 3, 4, 5]", "[1, 2, 3, 4]"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "range(5) generates numbers from 0 to 4 (stop value is exclusive). list() converts the range object to a list."
+  },
+  {
+    "skill": "Python",
+    "question": "Which keyword is used to define a class in Python?",
+    "options": ["struct", "class", "def", "object"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "The 'class' keyword defines a class. 'def' defines a function. Python classes support inheritance, methods, and dunder methods."
+  },
+  {
+    "skill": "Python",
+    "question": "What does the `strip()` method do when called on a string?",
+    "options": ["Removes all whitespace within the string", "Removes leading and trailing whitespace", "Converts the string to lowercase", "Splits the string into a list of words"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "strip() removes leading and trailing whitespace (spaces, tabs, newlines). lstrip() removes only leading, rstrip() removes only trailing."
+  },
+  {
+    "skill": "Python",
+    "question": "What is the output of `print(2 ** 3 ** 2)`?",
+    "options": ["64", "512", "12", "262144"],
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "Exponentiation is right-associative. 3 ** 2 = 9, then 2 ** 9 = 512. Parentheses can override: (2 ** 3) ** 2 = 64."
+  },
+  {
+    "skill": "Python",
+    "question": "Which of the following correctly opens a file for reading?",
+    "options": ["open('file.txt', 'r')", "open('file.txt', read)", "open('file.txt', 'w')", "file('file.txt', 'r')"],
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "The built-in open() function returns a file object. 'r' is read mode, 'w' is write mode, 'a' is append mode. Using 'with' is recommended for automatic closing."
+  },
+  {
+    "skill": "Python",
+    "question": "What is a dictionary comprehension in Python?",
+    "options": ["A method of sorting dictionary keys alphabetically", "A concise syntax to create dictionaries using {key: value for ...}", "A method that merges two dictionaries in place", "A loop that iterates over dictionary keys only"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Dictionary comprehensions use {k: v for ...} syntax to create dictionaries concisely, similar to list comprehensions but with key-value pairs."
+  },
+  {
+    "skill": "Python",
+    "question": "What does the `self` keyword represent in a Python class method?",
+    "options": ["The class itself", "The instance of the class", "A reference to the parent class", "A global variable accessible from any method"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "self refers to the current instance of the class. It is the first parameter of instance methods and provides access to instance attributes and methods."
+  },
+  {
+    "skill": "Python",
+    "question": "Which module is used for generating random numbers in Python?",
+    "options": ["math", "random", "statistics", "os"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "The random module provides functions like randint(), choice(), shuffle(), and uniform(). The math module provides mathematical constants and functions."
+  },
+  {
+    "skill": "Python",
+    "question": "What is the purpose of the `__init__` method in a Python class?",
+    "options": ["It deletes an object when it goes out of scope", "It initializes a new instance of the class", "It returns a string representation of the object", "It compares two instances for equality"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "__init__ is the constructor method, called automatically when a new instance is created. It initializes instance attributes and performs setup."
   },
   {
     "skill": "HTML/CSS",
     "question": "Which HTML5 element is used to specify a footer for a document or section?",
-    "options": [
-      "<bottom>",
-      "<footer>",
-      "<section>",
-      "<div>"
-    ],
-    "correctAnswer": 1
+    "options": ["<bottom>", "<footer>", "<section>", "<div>"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "The <footer> element defines a footer for a document or section, typically containing authorship information or navigation links."
   },
   {
     "skill": "HTML/CSS",
     "question": "In CSS, which property is used to change the background color of an element?",
-    "options": [
-      "color",
-      "bgcolor",
-      "background-color",
-      "background-image"
-    ],
-    "correctAnswer": 2
+    "options": ["color", "bgcolor", "background-color", "background-image"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "The background-color CSS property sets the background color of an element. In older HTML, bgcolor was used as an attribute, not a CSS property."
   },
   {
     "skill": "HTML/CSS",
     "question": "What is the correct HTML for creating a hyperlink?",
-    "options": [
-      "<a url=\"http://www.example.com\">Example</a>",
-      "<a href=\"http://www.example.com\">Example</a>",
-      "<a>http://www.example.com</a>",
-      "<link href=\"http://www.example.com\">Example</link>"
-    ],
-    "correctAnswer": 1
+    "options": ["<a url=\"http://www.example.com\">Example</a>", "<a href=\"http://www.example.com\">Example</a>", "<a>http://www.example.com</a>", "<link href=\"http://www.example.com\">Example</link>"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "The <a> tag with the href attribute creates a hyperlink. The URL is placed in the href attribute, and the visible text goes between the tags."
   },
   {
     "skill": "HTML/CSS",
     "question": "Which CSS property controls the text size?",
-    "options": [
-      "font-size",
-      "text-style",
-      "font-style",
-      "text-size"
-    ],
-    "correctAnswer": 0
+    "options": ["font-size", "text-style", "font-style", "text-size"],
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "font-size controls the size of text. Values can be in px, em, rem, percentages, or keywords like small, medium, large."
   },
   {
     "skill": "HTML/CSS",
     "question": "How do you select an element with the id \"main-header\" in CSS?",
-    "options": [
-      ".main-header",
-      "*main-header",
-      "main-header",
-      "#main-header"
-    ],
-    "correctAnswer": 3
+    "options": [".main-header", "*main-header", "main-header", "#main-header"],
+    "correctAnswer": 3,
+    "difficulty": "easy",
+    "explanation": "In CSS, # selects by id, while . selects by class. So #main-header targets the element with id=\"main-header\"."
   },
   {
     "skill": "HTML/CSS",
     "question": "Which HTML attribute is used to define inline styles?",
-    "options": [
-      "style",
-      "class",
-      "font",
-      "styles"
-    ],
-    "correctAnswer": 0
+    "options": ["style", "class", "font", "styles"],
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "The style attribute applies inline CSS directly to an HTML element, overriding external and internal stylesheets."
   },
   {
     "skill": "HTML/CSS",
     "question": "Which of the following is the correct way to link an external CSS file to an HTML document?",
-    "options": [
-      "<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">",
-      "<style src=\"style.css\"></style>",
-      "<stylesheet>style.css</stylesheet>",
-      "<link src=\"style.css\" type=\"text/css\">"
-    ],
-    "correctAnswer": 0
+    "options": ["<link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">", "<style src=\"style.css\"></style>", "<stylesheet>style.css</stylesheet>", "<link src=\"style.css\" type=\"text/css\">"],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "The <link> element in the <head> with rel=\"stylesheet\" and href points to the CSS file's URL. The src attribute is not used for linking stylesheets."
   },
   {
     "skill": "HTML/CSS",
     "question": "Which CSS property is used to change the text color of an element?",
-    "options": [
-      "fgcolor",
-      "text-color",
-      "color",
-      "font-color"
-    ],
-    "correctAnswer": 2
+    "options": ["fgcolor", "text-color", "color", "font-color"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "The color property sets the foreground color of text. font-color and text-color do not exist in CSS."
   },
   {
     "skill": "HTML/CSS",
     "question": "How do you specify a border width of 10px top, 5px right, 2px bottom, and 1px left in CSS?",
-    "options": [
-      "border-width: 10px 1px 2px 5px;",
-      "border-width: 10px 5px 2px 1px;",
-      "border-width: 10px 2px 5px 1px;",
-      "border-width: 1px 2px 5px 10px;"
-    ],
-    "correctAnswer": 1
+    "options": ["border-width: 10px 1px 2px 5px;", "border-width: 10px 5px 2px 1px;", "border-width: 10px 2px 5px 1px;", "border-width: 1px 2px 5px 10px;"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "The shorthand order for margin/padding/border-width is top, right, bottom, left (clockwise). So 10px 5px 2px 1px means top=10, right=5, bottom=2, left=1."
   },
   {
     "skill": "HTML/CSS",
     "question": "Which HTML element is used to define the title of a document, displayed in the browser's title bar or tab?",
-    "options": [
-      "<head>",
-      "<header>",
-      "<meta>",
-      "<title>"
-    ],
-    "correctAnswer": 3
+    "options": ["<head>", "<header>", "<meta>", "<title>"],
+    "correctAnswer": 3,
+    "difficulty": "easy",
+    "explanation": "The <title> element goes inside the <head> and defines the page title shown in the browser tab, bookmark menus, and search results."
+  },
+  {
+    "skill": "HTML/CSS",
+    "question": "Which HTML element is used to create a dropdown list?",
+    "options": ["<list>", "<select>", "<dropdown>", "<input>"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "The <select> element creates a dropdown list. Each option is defined by <option> elements inside the <select>. The <datalist> element provides autocomplete suggestions."
+  },
+  {
+    "skill": "HTML/CSS",
+    "question": "What does the 'display: flex' property do in CSS?",
+    "options": ["Makes an element invisible", "Creates a flexible container that enables a flex context for its children", "Centers the element horizontally on the page", "Sets a fixed width and height for the element"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "display: flex turns an element into a flex container, enabling flexible layout with properties like justify-content, align-items, and flex-wrap."
+  },
+  {
+    "skill": "HTML/CSS",
+    "question": "Which HTML attribute specifies an alternate text for an image if it cannot be displayed?",
+    "options": ["title", "alt", "src", "longdesc"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "The alt attribute provides alternative text for images. It improves accessibility for screen readers and displays when the image fails to load."
+  },
+  {
+    "skill": "HTML/CSS",
+    "question": "What is the CSS 'box model'?",
+    "options": ["A box that constrains the dimensions of an element", "A model that describes the rectangular boxes generated for elements: content, padding, border, and margin", "A layout mode that arranges elements in a grid pattern", "A JavaScript library for creating animated boxes"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "The box model consists of content (innermost), padding (space around content), border (around padding), and margin (space outside the border)."
+  },
+  {
+    "skill": "HTML/CSS",
+    "question": "Which CSS property is used to make a layout responsive to different screen sizes?",
+    "options": ["@viewport", "@media", "@responsive", "@screen"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "The @media rule applies styles conditionally based on media features like screen width, enabling responsive designs through breakpoints."
+  },
+  {
+    "skill": "HTML/CSS",
+    "question": "What is the purpose of the <meta> viewport tag?",
+    "options": ["It defines the visible area of the webpage on different devices", "It links an external CSS file to the HTML document", "It sets the character encoding of the document", "It defines a favicon for the browser tab"],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"> ensures proper scaling and rendering on mobile devices by controlling the viewport dimensions."
+  },
+  {
+    "skill": "HTML/CSS",
+    "question": "How do you apply a CSS class to an HTML element?",
+    "options": ["<div class=\"my-class\">", "<div id=\"my-class\">", "<div style=\"my-class\">", "<div css=\"my-class\">"],
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "The class attribute applies a CSS class (or multiple classes) to an element. Classes are reusable across elements, unlike IDs which must be unique."
+  },
+  {
+    "skill": "HTML/CSS",
+    "question": "Which CSS property creates space between the element's border and its content?",
+    "options": ["margin", "padding", "spacing", "gap"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "padding creates space inside the border, around the content. margin creates space outside the border, between elements."
+  },
+  {
+    "skill": "HTML/CSS",
+    "question": "What is the difference between 'visibility: hidden' and 'display: none'?",
+    "options": ["They behave identically in all browsers", "visibility: hidden hides the element but preserves its space; display: none removes the element entirely from the layout", "visibility: hidden removes the element; display: none only hides it", "display: none works only on block elements"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "visibility: hidden makes the element invisible but it still occupies space in the layout. display: none removes the element from the document flow entirely."
+  },
+  {
+    "skill": "HTML/CSS",
+    "question": "Which HTML element is used to embed a JavaScript file?",
+    "options": ["<javascript>", "<script>", "<js>", "<code>"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "The <script> element embeds or references JavaScript code. The 'src' attribute links an external file, while inline code goes between the opening and closing tags."
   },
   {
     "skill": "Java",
     "question": "Which of the following is NOT a fundamental concept of Object-Oriented Programming in Java?",
-    "options": [
-      "Inheritance",
-      "Polymorphism",
-      "Compilation",
-      "Encapsulation"
-    ],
-    "correctAnswer": 2
+    "options": ["Inheritance", "Polymorphism", "Compilation", "Encapsulation"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "Compilation is a language processing step, not an OOP concept. The four pillars of OOP are Encapsulation, Inheritance, Polymorphism, and Abstraction."
   },
   {
     "skill": "Java",
     "question": "What happens if you attempt to compile a Java file containing a 'public' class named 'MyClass', but the file is named 'YourClass.java'?",
-    "options": [
-      "It compiles successfully",
-      "It throws a runtime error",
-      "It throws a compilation error",
-      "It generates a warning but compiles"
-    ],
-    "correctAnswer": 2
+    "options": ["It compiles successfully", "It throws a runtime error", "It throws a compilation error", "It generates a warning but compiles"],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "In Java, a public class must be defined in a file with the same name. A mismatch causes a compilation error."
   },
   {
     "skill": "Java",
     "question": "Which keyword is used to prevent a class from being subclassed in Java?",
-    "options": [
-      "static",
-      "final",
-      "abstract",
-      "private"
-    ],
-    "correctAnswer": 1
+    "options": ["static", "final", "abstract", "private"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "The 'final' keyword on a class prevents it from being extended (subclassed). A final class cannot have subclasses."
   },
   {
     "skill": "Java",
     "question": "What is the default value of a local variable declared inside a method in Java?",
-    "options": [
-      "null",
-      "0",
-      "Garbage value",
-      "Local variables do not have default values"
-    ],
-    "correctAnswer": 3
+    "options": ["null", "0", "Garbage value", "Local variables do not have default values"],
+    "correctAnswer": 3,
+    "difficulty": "medium",
+    "explanation": "Unlike instance and class variables, local variables in Java do not get default values and must be explicitly initialized before use."
   },
   {
     "skill": "Java",
     "question": "Which collection interface in Java is designed to not allow duplicate elements?",
-    "options": [
-      "List",
-      "Set",
-      "Map",
-      "Queue"
-    ],
-    "correctAnswer": 1
+    "options": ["List", "Set", "Map", "Queue"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "The Set interface prohibits duplicate elements. Lists allow duplicates, Maps store key-value pairs, and Queues hold elements for processing."
   },
   {
     "skill": "Java",
     "question": "How do you properly compare the contents of two String objects 'str1' and 'str2' for equality in Java?",
-    "options": [
-      "str1 == str2",
-      "str1.equals(str2)",
-      "str1.compare(str2)",
-      "str1 = str2"
-    ],
-    "correctAnswer": 1
+    "options": ["str1 == str2", "str1.equals(str2)", "str1.compare(str2)", "str1 = str2"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "equals() compares the actual contents of String objects. == compares object references (memory addresses), not content."
   },
   {
     "skill": "Java",
     "question": "What is the main purpose of the 'transient' keyword in Java?",
-    "options": [
-      "To make a variable accessible by multiple threads",
-      "To prevent a variable from being serialized",
-      "To define a variable that can be changed by the garbage collector",
-      "To indicate a method that cannot be overridden"
-    ],
-    "correctAnswer": 1
+    "options": ["To make a variable accessible by multiple threads", "To prevent a variable from being serialized", "To define a variable that can be changed by the garbage collector", "To indicate a method that cannot be overridden"],
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "The transient keyword marks a field as not part of the persistent state, so it is excluded during serialization."
   },
   {
     "skill": "Java",
     "question": "Which of the following statements about Java exceptions is true?",
-    "options": [
-      "Runtime exceptions must be caught or declared in the method signature",
-      "Checked exceptions do not require a try-catch block",
-      "The finally block executes regardless of whether an exception is thrown",
-      "Error and Exception are both subclasses of RuntimeException"
-    ],
-    "correctAnswer": 2
+    "options": ["Runtime exceptions must be caught or declared in the method signature", "Checked exceptions do not require a try-catch block", "The finally block executes regardless of whether an exception is thrown", "Error and Exception are both subclasses of RuntimeException"],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "The finally block always executes when the try block exits, whether an exception is thrown or not, making it ideal for cleanup code."
   },
   {
     "skill": "Java",
     "question": "What is the correct way to start a thread execution in Java?",
-    "options": [
-      "thread.run()",
-      "thread.start()",
-      "thread.init()",
-      "thread.execute()"
-    ],
-    "correctAnswer": 1
+    "options": ["thread.run()", "thread.start()", "thread.init()", "thread.execute()"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "start() creates a new thread and invokes run() in that new thread. Calling run() directly executes it in the current thread."
   },
   {
     "skill": "Java",
     "question": "In Java 8 and later, which feature provides a concise way to pass a block of code or behavior as a method argument?",
-    "options": [
-      "Anonymous inner classes only",
-      "Generics",
-      "Lambda expressions",
-      "Reflection"
-    ],
-    "correctAnswer": 2
+    "options": ["Anonymous inner classes only", "Generics", "Lambda expressions", "Reflection"],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "Lambda expressions provide a concise functional syntax for implementing single-method interfaces, reducing boilerplate compared to anonymous inner classes."
+  },
+  {
+    "skill": "Java",
+    "question": "What is the difference between '==' and '.equals()' for comparing String objects?",
+    "options": ["'==' compares memory references, .equals() compares content", "'==' compares content, .equals() compares memory references", "There is no difference for String objects", ".equals() only works for primitive types"],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "== checks if two references point to the same object in memory. .equals() (overridden in String) compares the actual character sequence."
+  },
+  {
+    "skill": "Java",
+    "question": "What is the purpose of the 'finally' block in exception handling?",
+    "options": ["It executes only if no exception occurs", "It always executes, regardless of whether an exception is thrown or caught", "It executes only if an exception occurs", "It is used to rethrow exceptions to the caller"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "The finally block always executes after try/catch, even if an exception occurs or a return statement is encountered. It is typically used for cleanup operations."
+  },
+  {
+    "skill": "Java",
+    "question": "Which access modifier makes a member visible only within its own package?",
+    "options": ["public", "private", "protected", "No modifier (default/package-private)"],
+    "correctAnswer": 3,
+    "difficulty": "medium",
+    "explanation": "In Java, the default (no modifier) access level is package-private: visibility is limited to classes within the same package."
+  },
+  {
+    "skill": "Java",
+    "question": "What is the output of 'System.out.println(10 / 3)' in Java?",
+    "options": ["3.333...", "3", "3.0", "Compilation error"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "Integer division in Java truncates the decimal part. 10 / 3 = 3 (since both operands are ints). Using 10.0 / 3 would give 3.333... (double result)."
+  },
+  {
+    "skill": "Java",
+    "question": "What is the purpose of the 'static' keyword for a method?",
+    "options": ["It makes the method accessible only from within the same class", "It allows the method to be called without creating an instance of the class", "It prevents the method from being overridden", "It makes the method execute asynchronously"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Static methods belong to the class itself, not instances. They can be called as ClassName.methodName() and cannot access instance variables directly."
+  },
+  {
+    "skill": "Java",
+    "question": "Which of the following is NOT a primitive type in Java?",
+    "options": ["int", "boolean", "String", "char"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "Java has 8 primitive types: byte, short, int, long, float, double, boolean, and char. String is a reference type (class)."
+  },
+  {
+    "skill": "Java",
+    "question": "What is an ArrayIndexOutOfBoundsException?",
+    "options": ["An exception thrown when trying to access an array with a negative or out-of-range index", "An exception thrown when an array cannot be allocated due to insufficient memory", "An error that occurs when comparing arrays of different types", "A compile-time error, not a runtime exception"],
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "ArrayIndexOutOfBoundsException occurs at runtime when accessing an array with an invalid index (negative or >= array.length)."
+  },
+  {
+    "skill": "Java",
+    "question": "What does the 'super' keyword refer to in a subclass?",
+    "options": ["The current object's reference", "The immediate parent class object", "The root Object class", "The superclass of the parent class"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "super refers to the immediate parent class. It is used to access parent class members (constructors, methods, fields) that are hidden or overridden in the subclass."
+  },
+  {
+    "skill": "Java",
+    "question": "What is the difference between an abstract class and an interface?",
+    "options": ["Abstract classes can have implemented methods; interfaces cannot (prior to Java 8)", "Interfaces can have instance variables; abstract classes cannot", "Abstract classes support multiple inheritance; interfaces do not", "There is no difference in modern Java"],
+    "correctAnswer": 0,
+    "difficulty": "hard",
+    "explanation": "Abstract classes can have concrete methods and instance variables. Interfaces (pre-Java 8) had only abstract methods. Since Java 8, interfaces can have default and static methods."
+  },
+  {
+    "skill": "Java",
+    "question": "Which wrapper class is used to convert a String to an int?",
+    "options": ["Int", "Integer", "int", "StringToInt"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "Integer.parseInt(String) converts a String to a primitive int. Integer.valueOf(String) returns an Integer object."
   },
   {
     "skill": "React",
     "question": "What is JSX in React?",
-    "options": [
-      "A syntax extension for JavaScript that allows writing HTML-like code inside JavaScript",
-      "A completely new programming language built specifically for React",
-      "A state management library used to handle complex component state",
-      "A built-in React method to fetch data asynchronously from an API"
-    ],
-    "correctAnswer": 0
+    "options": ["A syntax extension for JavaScript that allows writing HTML-like code inside JavaScript", "A completely new programming language built specifically for React", "A state management library used to handle complex component state", "A built-in React method to fetch data asynchronously from an API"],
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "JSX is a syntax extension that lets you write HTML-like markup inside JavaScript. It is transformed into regular JavaScript function calls by tools like Babel."
   },
   {
     "skill": "React",
     "question": "Which of the following hooks is primarily used for handling side effects in a functional component?",
-    "options": [
-      "useState",
-      "useEffect",
-      "useRef",
-      "useReducer"
-    ],
-    "correctAnswer": 1
+    "options": ["useState", "useEffect", "useRef", "useReducer"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "useEffect runs side effects like data fetching, subscriptions, or DOM manipulation after render. useState manages state, useRef holds mutable refs, useReducer manages complex state logic."
   },
   {
     "skill": "React",
     "question": "How are 'props' used in React components?",
-    "options": [
-      "To manage the internal local state of a single component",
-      "To pass data from a parent component down to a child component",
-      "To interact directly with the browser's local storage",
-      "To update the virtual DOM directly without triggering a re-render"
-    ],
-    "correctAnswer": 1
+    "options": ["To manage the internal local state of a single component", "To pass data from a parent component down to a child component", "To interact directly with the browser's local storage", "To update the virtual DOM directly without triggering a re-render"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "Props (properties) are read-only data passed from parent to child components. They enable component reusability and communication."
   },
   {
     "skill": "React",
     "question": "What is the primary function of the Virtual DOM in React?",
-    "options": [
-      "It replaces the browser's DOM entirely to improve cross-site security",
-      "It acts as a lightweight, in-memory representation of the real DOM to optimize rendering performance",
-      "It is a special database instance used to securely store React component state",
-      "It provides a mechanism to automatically style components using CSS-in-JS"
-    ],
-    "correctAnswer": 1
+    "options": ["It replaces the browser's DOM entirely to improve cross-site security", "It acts as a lightweight, in-memory representation of the real DOM to optimize rendering performance", "It is a special database instance used to securely store React component state", "It provides a mechanism to automatically style components using CSS-in-JS"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "The Virtual DOM is a JavaScript object representation of the real DOM. React uses it to compute minimal updates via diffing, improving rendering performance."
   },
   {
     "skill": "React",
-    "question": "Why is it important to provide a unique `key` prop when rendering a list of elements in React?",
-    "options": [
-      "It ensures that the elements receive unique CSS classes across the application",
-      "It helps React efficiently identify which items have changed, been added, or been removed",
-      "It automatically sorts the rendered list in alphabetical or numerical order",
-      "It prevents browser memory leaks by unmounting hidden list elements"
-    ],
-    "correctAnswer": 1
+    "question": "Why is it important to provide a unique 'key' prop when rendering a list of elements in React?",
+    "options": ["It ensures that the elements receive unique CSS classes across the application", "It helps React efficiently identify which items have changed, been added, or been removed", "It automatically sorts the rendered list in alphabetical or numerical order", "It prevents browser memory leaks by unmounting hidden list elements"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "Keys help the reconciliation algorithm identify which items have changed position, been added, or removed, enabling efficient re-rendering."
   },
   {
     "skill": "React",
     "question": "What common problem does the React Context API solve in a large application?",
-    "options": [
-      "It handles complex form validation logic without needing external libraries",
-      "It manages client-side URL routing and browser navigation history",
-      "It avoids 'prop drilling' by allowing data to be shared across the component tree directly",
-      "It completely replaces the need for making asynchronous API calls"
-    ],
-    "correctAnswer": 2
+    "options": ["It handles complex form validation logic without needing external libraries", "It manages client-side URL routing and browser navigation history", "It avoids 'prop drilling' by allowing data to be shared across the component tree directly", "It completely replaces the need for making asynchronous API calls"],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "Context provides a way to pass data through the component tree without manually passing props at every level, solving the prop drilling problem."
   },
   {
     "skill": "React",
-    "question": "What is the primary difference between the `useState` and `useRef` hooks?",
-    "options": [
-      "Updating `useState` causes a component to re-render, while updating `useRef` does not trigger a re-render",
-      "`useRef` is strictly used for global state management, while `useState` is used for local component state",
-      "`useState` can only store primitive data types, while `useRef` can store complex objects",
-      "There is no functional difference; they are completely interchangeable in React"
-    ],
-    "correctAnswer": 0
+    "question": "What is the primary difference between the 'useState' and 'useRef' hooks?",
+    "options": ["Updating 'useState' causes a component to re-render, while updating 'useRef' does not trigger a re-render", "'useRef' is strictly used for global state management, while 'useState' is used for local component state", "'useState' can only store primitive data types, while 'useRef' can store complex objects", "There is no functional difference; they are completely interchangeable in React"],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "useState triggers re-renders when updated, making it suitable for UI state. useRef stores mutable values that persist across renders without causing re-renders."
   },
   {
     "skill": "React",
     "question": "How can you optimize performance in React by preventing a functional component from re-rendering unless its props have changed?",
-    "options": [
-      "By wrapping the component in `React.memo`",
-      "By wrapping the component's state in the `useReducer` hook",
-      "By defining the component as an ES6 Class component instead",
-      "By conditionally removing the `useEffect` hook during renders"
-    ],
-    "correctAnswer": 0
+    "options": ["By wrapping the component in 'React.memo'", "By wrapping the component's state in the 'useReducer' hook", "By defining the component as an ES6 Class component instead", "By conditionally removing the 'useEffect' hook during renders"],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "React.memo is a higher-order component that memoizes the rendered output, skipping re-rendering if props have not changed (shallow comparison)."
   },
   {
     "skill": "React",
-    "question": "What will happen if you directly mutate the state object in React (e.g., `state.count = 1`) instead of using the provided state updater function?",
-    "options": [
-      "The component will immediately re-render to display the newly mutated value",
-      "React will throw a strict-mode syntax error and crash the application",
-      "The state value will change in memory, but the component will not re-render to reflect the update visually",
-      "The browser will freeze due to an infinite rendering loop"
-    ],
-    "correctAnswer": 2
+    "question": "What will happen if you directly mutate the state object in React instead of using the provided state updater function?",
+    "options": ["The component will immediately re-render to display the newly mutated value", "React will throw a strict-mode syntax error and crash the application", "The state value will change in memory, but the component will not re-render to reflect the update visually", "The browser will freeze due to an infinite rendering loop"],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "State mutation does not trigger re-renders because React identifies changes by comparing previous and new references. Use the state updater function to create a new reference."
   },
   {
     "skill": "React",
-    "question": "Which of the following best describes the purpose of the `useMemo` hook?",
-    "options": [
-      "It memorizes a callback function reference to safely pass to child components",
-      "It caches the result of an expensive calculation so it doesn't need to be recomputed on every render",
-      "It automatically stores the previous state of a component to implement undo/redo functionality",
-      "It fetches data from an external API and permanently caches the JSON response locally"
-    ],
-    "correctAnswer": 1
+    "question": "Which of the following best describes the purpose of the 'useMemo' hook?",
+    "options": ["It memorizes a callback function reference to safely pass to child components", "It caches the result of an expensive calculation so it doesn't need to be recomputed on every render", "It automatically stores the previous state of a component to implement undo/redo functionality", "It fetches data from an external API and permanently caches the JSON response locally"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "useMemo caches the result of an expensive computation between renders. It only recomputes when its dependencies change, avoiding unnecessary work."
+  },
+  {
+    "skill": "React",
+    "question": "What is the purpose of useEffect's dependency array?",
+    "options": ["It lists the state variables that the effect can modify", "It specifies values that, when changed, should re-run the effect", "It defines the initial values for the component's state", "It controls the order in which effects execute"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "The dependency array tells React when to re-run the effect. An empty array [] runs only once (on mount). Omitting it runs on every render."
+  },
+  {
+    "skill": "React",
+    "question": "What is 'props drilling' and how does React Context solve it?",
+    "options": ["Props drilling is passing data through many nested components; Context provides a way to share values without explicit prop passing", "Props drilling is a security vulnerability; Context patches it automatically", "Props drilling occurs when components re-render too frequently; Context throttles updates", "Props drilling is a testing technique; Context is only for production builds"],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "Props drilling passes data through intermediate components just to reach a deeply nested child. Context provides a way to broadcast data to all consumers without manual prop threading."
+  },
+  {
+    "skill": "React",
+    "question": "What does the useCallback hook do?",
+    "options": ["It caches a function definition so it is not recreated on every render", "It calls a function after a specified delay", "It binds a function to the component instance", "It creates a callback that runs only once after the component mounts"],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "useCallback returns a memoized function reference that only changes when its dependencies change. This prevents unnecessary re-renders of child components that depend on referential equality."
+  },
+  {
+    "skill": "React",
+    "question": "What is the correct way to conditionally render a component in React?",
+    "options": ["Using if/else statements directly in JSX", "Using ternary operators or && with short-circuit evaluation", "Using switch statements in the render function", "Using a special <If> component provided by React"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "Ternary (condition ? <A /> : <B />) and logical && (condition && <Component />) are idiomatic for conditional rendering. if/else cannot be used directly inside JSX."
+  },
+  {
+    "skill": "React",
+    "question": "What happens when a component's state or props change?",
+    "options": ["The component unmounts and remounts", "The component re-renders, potentially causing its children to re-render", "The component is permanently cached", "React throws a warning requiring explicit re-render authorization"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "State and props changes trigger re-renders. React compares the new virtual DOM with the previous one and updates the real DOM efficiently."
+  },
+  {
+    "skill": "React",
+    "question": "What is the main purpose of React StrictMode?",
+    "options": ["It enforces strict typing rules for props", "It highlights potential problems in an application by running additional checks in development", "It prevents components from using state", "It optimizes production builds by removing warnings"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "StrictMode is a development-only wrapper that double-invokes effects and constructors to detect side-effect problems and deprecated API usage."
+  },
+  {
+    "skill": "React",
+    "question": "How do you pass data from a child component to a parent component?",
+    "options": ["By using refs to access the parent's state directly", "By calling a callback function passed from the parent as a prop", "By emitting custom DOM events", "By modifying the parent's state through React Context"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "The parent passes a callback function as a prop to the child. The child calls the callback with the data, and the parent updates its state in the handler."
+  },
+  {
+    "skill": "React",
+    "question": "What is the significance of keys in React lists?",
+    "options": ["Keys are optional styling properties for list items", "Keys help React identify which items changed, were added, or removed for efficient DOM updates", "Keys determine the order of items in the rendered list", "Keys are used for security to prevent XSS attacks in lists"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "Keys give each element a stable identity so React can match items across renders, enabling efficient reconciliation and avoiding unnecessary re-renders."
+  },
+  {
+    "skill": "React",
+    "question": "What is the difference between controlled and uncontrolled components?",
+    "options": ["Controlled components use state to manage form values; uncontrolled components use refs to access values directly from the DOM", "Controlled components are faster than uncontrolled ones", "Uncontrolled components cannot be used with form validation", "There is no practical difference"],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "Controlled components have form data managed by React state (the React source of truth). Uncontrolled components store their own state internally (the DOM is the source of truth)."
+  },
+  {
+    "skill": "React",
+    "question": "Which hook would you use to perform cleanup when a component unmounts?",
+    "options": ["useEffect with a return function", "useCleanup", "useUnmount", "useLayoutEffect"],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "The cleanup function returned from useEffect runs when the component unmounts or before re-running the effect. It is used for subscriptions, timers, and event listeners."
   },
   {
     "skill": "JavaScript",
     "question": "What is the primary difference between let and var when declaring variables in JavaScript?",
-    "options": [
-      "let has block scope, while var has function scope.",
-      "let can only be used for numbers, while var is for all data types.",
-      "var variables cannot be reassigned, while let variables can.",
-      "let is hoisted to the top of the scope, while var is not."
-    ],
-    "correctAnswer": 0
+    "options": ["let has block scope, while var has function scope.", "let can only be used for numbers, while var is for all data types.", "var variables cannot be reassigned, while let variables can.", "let is hoisted to the top of the scope, while var is not."],
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "let is block-scoped (limited to {} blocks), while var is function-scoped. Both are hoisted, but let is in a temporal dead zone until declaration."
   },
   {
     "skill": "JavaScript",
     "question": "What does the strict equality operator (===) do in JavaScript?",
-    "options": [
-      "Compares only the value of two operands, ignoring type.",
-      "Compares both the value and the type of two operands.",
-      "Assigns a variable to a strictly typed value.",
-      "Converts a string to a number before comparing."
-    ],
-    "correctAnswer": 1
+    "options": ["Compares only the value of two operands, ignoring type.", "Compares both the value and the type of two operands.", "Assigns a variable to a strictly typed value.", "Converts a string to a number before comparing."],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "=== compares both value and type without type coercion. For example, 5 === '5' is false because one is number and the other is string."
   },
   {
     "skill": "JavaScript",
     "question": "Which array method is used to create a new array with the results of calling a provided function on every element in the calling array?",
-    "options": [
-      "filter()",
-      "reduce()",
-      "map()",
-      "forEach()"
-    ],
-    "correctAnswer": 2
+    "options": ["filter()", "reduce()", "map()", "forEach()"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "map() creates a new array by transforming each element. filter() selects elements, reduce() aggregates to a single value, forEach() executes side effects."
   },
   {
     "skill": "JavaScript",
     "question": "What is the main purpose of a Promise in JavaScript?",
-    "options": [
-      "To represent the eventual completion or failure of an asynchronous operation.",
-      "To guarantee that a variable's value will never change throughout the program.",
-      "To synchronously block the main thread until a network request finishes.",
-      "To enforce strict type-checking in modern JavaScript applications."
-    ],
-    "correctAnswer": 0
+    "options": ["To represent the eventual completion or failure of an asynchronous operation.", "To guarantee that a variable's value will never change throughout the program.", "To synchronously block the main thread until a network request finishes.", "To enforce strict type-checking in modern JavaScript applications."],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "A Promise is an object representing the eventual result of an asynchronous operation. It can be in pending, fulfilled, or rejected state."
   },
   {
     "skill": "JavaScript",
     "question": "What will be the output of console.log(typeof null) in JavaScript?",
-    "options": [
-      "null",
-      "undefined",
-      "object",
-      "string"
-    ],
-    "correctAnswer": 2
+    "options": ["null", "undefined", "object", "string"],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "typeof null returns 'object'. This is a well-known bug from the early days of JavaScript that has been kept for backward compatibility."
   },
   {
     "skill": "JavaScript",
     "question": "How does an arrow function handle the 'this' keyword differently than a traditional function expression?",
-    "options": [
-      "It always binds 'this' to the global window object.",
-      "It creates its own new 'this' context when invoked.",
-      "It inherits 'this' from the enclosing lexical context.",
-      "It requires 'this' to be explicitly passed as an argument."
-    ],
-    "correctAnswer": 2
+    "options": ["It always binds 'this' to the global window object.", "It creates its own new 'this' context when invoked.", "It inherits 'this' from the enclosing lexical context.", "It requires 'this' to be explicitly passed as an argument."],
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "Arrow functions do not have their own 'this'. They capture 'this' from the surrounding lexical scope, making them ideal for callbacks."
   },
   {
     "skill": "JavaScript",
     "question": "Which method is generally the most efficient way to select a single HTML element by its unique ID attribute?",
-    "options": [
-      "document.querySelector('.id')",
-      "document.getElementById('id')",
-      "document.getElementsByClassName('id')",
-      "document.getElementsByTagName('id')"
-    ],
-    "correctAnswer": 1
+    "options": ["document.querySelector('.id')", "document.getElementById('id')", "document.getElementsByClassName('id')", "document.getElementsByTagName('id')"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "getElementById is the fastest DOM selection method because it accesses the element directly via a hash map of IDs."
   },
   {
     "skill": "JavaScript",
     "question": "Which of the following methods converts a JavaScript object into a JSON string?",
-    "options": [
-      "JSON.parse()",
-      "JSON.stringify()",
-      "Object.toString()",
-      "String(object)"
-    ],
-    "correctAnswer": 1
+    "options": ["JSON.parse()", "JSON.stringify()", "Object.toString()", "String(object)"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "JSON.stringify converts a JavaScript value to a JSON string. JSON.parse does the opposite, converting a JSON string to a JavaScript object."
   },
   {
     "skill": "JavaScript",
     "question": "What is a closure in JavaScript?",
-    "options": [
-      "A function that has access to the outer enclosing function's variables, even after the outer function has finished executing.",
-      "A method used to safely close a database connection to prevent memory leaks.",
-      "The process of ending a loop using the break keyword.",
-      "A built-in security feature that prevents cross-site scripting (XSS) attacks."
-    ],
-    "correctAnswer": 0
+    "options": ["A function that has access to the outer enclosing function's variables, even after the outer function has finished executing.", "A method used to safely close a database connection to prevent memory leaks.", "The process of ending a loop using the break keyword.", "A built-in security feature that prevents cross-site scripting (XSS) attacks."],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "A closure is created when a function retains access to variables from its outer scope even after that outer function has returned. This enables data privacy and factory functions."
   },
   {
     "skill": "JavaScript",
-    "question": "Given the array `const colors = ['red', 'green', 'blue'];`, how would you use array destructuring to extract 'red' and 'green' into variables?",
-    "options": [
-      "const [red, green] = colors;",
-      "const {red, green} = colors;",
-      "const color1='red', color2='green' = colors;",
-      "const [c1: 'red', c2: 'green'] = colors;"
-    ],
-    "correctAnswer": 0
+    "question": "Given the array 'const colors = [\"red\", \"green\", \"blue\"];', how would you use array destructuring to extract 'red' and 'green' into variables?",
+    "options": ["const [red, green] = colors;", "const {red, green} = colors;", "const color1='red', color2='green' = colors;", "const [c1: 'red', c2: 'green'] = colors;"],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "Array destructuring uses square brackets to unpack values by position. Object destructuring uses curly braces to unpack by property name."
+  },
+  {
+    "skill": "JavaScript",
+    "question": "What is the event loop in JavaScript?",
+    "options": ["A loop that continuously checks for syntax errors in the code", "A mechanism that processes queued tasks from the callback queue when the call stack is empty", "A debugging tool for tracing function calls", "A loop that binds event handlers to DOM elements"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "The event loop monitors the call stack and callback queue. When the stack is empty, it moves the first callback from the queue to the stack for execution."
+  },
+  {
+    "skill": "JavaScript",
+    "question": "What does the 'map()' method return?",
+    "options": ["A new array with the same length, each element transformed by the callback", "The original array modified in place", "A boolean indicating whether all elements passed the test", "A single reduced value"],
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "map() creates a new array by calling a provided function on every element. It does not mutate the original array. The new array always has the same length."
+  },
+  {
+    "skill": "JavaScript",
+    "question": "What is the difference between null and undefined?",
+    "options": ["They are identical in JavaScript", "undefined means a variable has been declared but not assigned; null is an intentional assignment representing 'no value'", "null is the default value of uninitialized variables; undefined is a type error", "undefined can be assigned; null cannot"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "undefined is automatically assigned to declared variables that have not been initialized. null is explicitly assigned to indicate the absence of a value."
+  },
+  {
+    "skill": "JavaScript",
+    "question": "How do you create a Promise that resolves after 1 second?",
+    "options": ["new Promise((resolve) => setTimeout(resolve, 1000))", "Promise.delay(1000)", "setTimeout(Promise.resolve, 1000)", "Promise.sleep(1000)"],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "The Promise constructor takes an executor function with resolve and reject parameters. setTimeout(resolve, 1000) calls resolve after 1000ms."
+  },
+  {
+    "skill": "JavaScript",
+    "question": "What is the spread operator (...) used for?",
+    "options": ["It creates a deep copy of nested objects", "It expands an iterable (array, object, string) into individual elements", "It merges multiple functions into one", "It spreads the execution of a function across multiple threads"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "The spread operator (...) expands iterables into individual elements. It is commonly used for array/object copying, concatenation, and passing array elements as function arguments."
+  },
+  {
+    "skill": "JavaScript",
+    "question": "What does 'localStorage' allow you to do in the browser?",
+    "options": ["Store key-value pairs persistently across browser sessions", "Store temporary data that is deleted when the tab closes", "Access the user's local file system", "Cache API responses on the server side"],
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "localStorage stores data with no expiration. Data persists even after the browser is closed and reopened. sessionStorage is cleared when the tab closes."
+  },
+  {
+    "skill": "JavaScript",
+    "question": "What is the result of 'console.log(typeof [])'?",
+    "options": ["'array'", "'object'", "'list'", "undefined"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "In JavaScript, arrays are objects. typeof [] returns 'object'. Array.isArray([]) is the reliable way to check if a value is an array."
+  },
+  {
+    "skill": "JavaScript",
+    "question": "What does the 'fetch()' function return?",
+    "options": ["The response body as a string", "A Promise that resolves to a Response object", "An XMLHttpRequest object", "The parsed JSON data directly"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "fetch() returns a Promise that resolves to a Response object. The Response provides methods like .json(), .text(), and .blob() to extract the body."
+  },
+  {
+    "skill": "JavaScript",
+    "question": "What is the difference between 'forEach' and 'map'?",
+    "options": ["forEach returns a new array; map executes a callback for side effects", "forEach executes a callback for each element but returns undefined; map returns a new array of transformed elements", "There is no difference; they are aliases", "map only works on numbers; forEach works on any type"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "forEach iterates for side effects and returns undefined. map transforms each element and returns a new array. Choose forEach when you need to perform an action, map when you need transformed data."
+  },
+  {
+    "skill": "JavaScript",
+    "question": "What is template literal syntax in JavaScript?",
+    "options": ["Strings enclosed in single quotes that support escape characters", "Strings enclosed in backticks that support interpolation (${}) and multiline text", "Strings that are automatically converted to regular expressions", "A special syntax for defining function templates"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "Template literals use backticks (`) and support embedded expressions via ${}. They also preserve line breaks without needing \\n."
   },
   {
     "skill": "C++",
     "question": "Which of the following is the correct syntax to print a message to the console in C++?",
     "options": ["System.out.println(\"Hello\");", "cout << \"Hello\";", "print(\"Hello\");", "Console.WriteLine(\"Hello\");"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "cout is the standard output stream in C++, combined with the insertion operator << to print text. This is part of the <iostream> header."
   },
   {
     "skill": "C++",
     "question": "What is the size of an 'int' data type in C++ on a typical 32-bit or 64-bit system?",
     "options": ["1 byte", "2 bytes", "4 bytes", "8 bytes"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "On most modern 32-bit and 64-bit systems, an int is 4 bytes (32 bits). A long is typically 8 bytes on 64-bit systems."
   },
   {
     "skill": "C++",
     "question": "Which operator is used to dynamically allocate memory for a single variable in C++?",
     "options": ["malloc", "alloc", "new", "create"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "The 'new' operator allocates memory on the heap and calls the constructor. 'malloc' is a C function that allocates raw memory without constructing objects."
   },
   {
     "skill": "C++",
     "question": "What does the 'virtual' keyword do when applied to a class method in C++?",
     "options": ["It prevents the method from being overridden.", "It allows the method to be overridden in derived classes, enabling polymorphism.", "It makes the method inaccessible outside the class.", "It indicates that the method has no implementation in the base class."],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Virtual functions enable dynamic dispatch: the correct function is called based on the object's actual type at runtime rather than the pointer type."
   },
   {
     "skill": "C++",
     "question": "In C++, what is a reference variable?",
     "options": ["A pointer that holds the memory address of another variable.", "An alias for an already existing variable.", "A variable that cannot be modified once initialized.", "A copy of another variable's value."],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "A reference is an alias to an existing variable. Unlike pointers, references cannot be null and cannot be reassigned to refer to a different variable."
   },
   {
     "skill": "C++",
     "question": "Which of the following is NOT a valid access specifier in C++?",
     "options": ["public", "private", "protected", "internal"],
-    "correctAnswer": 3
+    "correctAnswer": 3,
+    "difficulty": "easy",
+    "explanation": "C++ has three access specifiers: public, private, and protected. 'internal' is a C# access modifier, not valid in C++."
   },
   {
     "skill": "C++",
     "question": "How do you define a constant variable in C++?",
     "options": ["constant int x = 10;", "final int x = 10;", "const int x = 10;", "let x = 10;"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "The 'const' keyword makes a variable read-only after initialization. 'final' is used in Java, 'let' in JavaScript, and 'constant' is not a C++ keyword."
   },
   {
     "skill": "C++",
     "question": "What is the purpose of a destructor in a C++ class?",
     "options": ["To initialize object properties.", "To allocate memory for the object.", "To clean up resources and deallocate memory before the object is destroyed.", "To copy the contents of one object to another."],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "Destructors (~ClassName) are called automatically when an object goes out of scope or is deleted. They release acquired resources like heap memory or file handles."
   },
   {
     "skill": "C++",
     "question": "What is a pure virtual function in C++?",
     "options": ["A function that has no parameters.", "A function declared with '= 0' that must be overridden by derived classes.", "A function that can only be called from within the same class.", "A function that returns no value."],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "A pure virtual function (= 0) makes a class abstract, meaning it cannot be instantiated. Derived classes must provide implementations to become concrete."
   },
   {
     "skill": "C++",
     "question": "Which standard library header is required to use the std::vector container?",
     "options": ["<array>", "<list>", "<vector>", "<collections>"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "The <vector> header provides std::vector, a dynamic array container. It grows automatically when elements are added."
+  },
+  {
+    "skill": "C++",
+    "question": "What is the difference between '++i' and 'i++'?",
+    "options": ["++i increments and returns the new value; i++ returns the original value and then increments", "i++ increments and returns the new value; ++i returns the original value", "There is no difference; they are identical", "++i is only valid in loops; i++ is valid everywhere"],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "++i (pre-increment) increments i and returns the incremented value. i++ (post-increment) returns the original value, then increments i."
+  },
+  {
+    "skill": "C++",
+    "question": "What is a smart pointer in C++?",
+    "options": ["A pointer that automatically manages memory and deletes the object when no longer needed", "A pointer that can point to multiple data types simultaneously", "A pointer that speeds up memory access by caching", "A pointer that logs every access for debugging"],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "Smart pointers (unique_ptr, shared_ptr, weak_ptr) from <memory> automate memory management. They automatically delete the managed object when it goes out of scope."
+  },
+  {
+    "skill": "C++",
+    "question": "Which of the following is true about inline functions?",
+    "options": ["They are always expanded at the call site, regardless of compiler optimization", "They suggest the compiler to insert the function body at the call site to avoid function call overhead", "They cannot have parameters", "They must be defined inside a class definition"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "The inline keyword is a hint to the compiler. The compiler may ignore the hint for large functions. Inline functions can reduce function call overhead for small, frequently used functions."
+  },
+  {
+    "skill": "C++",
+    "question": "What is the Rule of Three in C++?",
+    "options": ["A class can have at most three virtual functions", "If a class defines a destructor, copy constructor, or copy assignment operator, it likely needs all three", "A program must have exactly three header files", "A constructor can take a maximum of three parameters"],
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "The Rule of Three states that if a class manages a resource (like dynamic memory), defining one of destructor, copy constructor, or copy assignment implies the others are also needed."
+  },
+  {
+    "skill": "C++",
+    "question": "What does 'std::move' do?",
+    "options": ["It moves the object to a new memory location", "It casts an lvalue to an rvalue reference, enabling move semantics", "It physically copies the contents from one variable to another", "It transfers the ownership of a pointer to another thread"],
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "std::move performs an unconditional cast to an rvalue reference, allowing the compiler to use move constructors and move assignment operators instead of copies."
+  },
+  {
+    "skill": "C++",
+    "question": "What is a lambda expression in C++?",
+    "options": ["A named function defined inside a class", "An anonymous function object that can capture variables from its enclosing scope", "A special syntax for defining mathematical lambda calculus", "A preprocessor macro that generates functions"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Lambda expressions (since C++11) define anonymous function objects. They can capture variables by value [=] or by reference [&], and are commonly used with STL algorithms."
+  },
+  {
+    "skill": "C++",
+    "question": "What does the 'explicit' keyword prevent?",
+    "options": ["The function from being called with too many arguments", "Implicit conversions via single-argument constructors or conversion operators", "The class from being inherited", "The variable from being modified"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "The explicit keyword prevents the compiler from using a constructor or conversion operator for implicit type conversions, requiring explicit casts instead."
+  },
+  {
+    "skill": "C++",
+    "question": "What is an STL container that stores elements in key-value pairs with unique keys?",
+    "options": ["std::vector", "std::map", "std::list", "std::queue"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "std::map is an associative container storing key-value pairs sorted by keys, with each key unique. std::unordered_map uses a hash table for O(1) average lookup."
+  },
+  {
+    "skill": "C++",
+    "question": "What is the difference between 'struct' and 'class' in C++?",
+    "options": ["struct members default to public; class members default to private", "struct cannot have methods; class can", "struct can only hold data; class supports inheritance", "There is no difference in C++"],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "In C++, struct and class are identical except for default access: struct members are public by default, class members are private. Both can have methods, inheritance, and templates."
+  },
+  {
+    "skill": "C++",
+    "question": "Which header provides std::array, a fixed-size array container?",
+    "options": ["<array>", "<vector>", "<list>", "<algorithm>"],
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "std::array<T, N> from <array> is a fixed-size array container that combines C-style array performance with STL container benefits like iterators and bounds-checked access."
   },
   {
     "skill": "C",
     "question": "Which of the following is the correct way to declare a pointer to an integer in C?",
     "options": ["int ptr*;", "int *ptr;", "ptr *int;", "pointer int ptr;"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "In C, a pointer is declared with an asterisk (*) between the type and the variable name: int *ptr declares a pointer to an int."
   },
   {
     "skill": "C",
     "question": "What is the return type of the malloc() function in C?",
     "options": ["int*", "void*", "char*", "null*"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "malloc returns void*, a generic pointer type that can be cast to any other pointer type. It returns NULL on failure."
   },
   {
     "skill": "C",
     "question": "Which format specifier is used to print a string using printf() in C?",
     "options": ["%c", "%d", "%s", "%f"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "%s prints a string. %c prints a single character, %d prints an integer, and %f prints a floating-point number."
   },
   {
     "skill": "C",
     "question": "What does the 'sizeof' operator do in C?",
     "options": ["Returns the value of a variable.", "Returns the memory address of a variable.", "Returns the size of a variable or data type in bytes.", "Returns the length of a string in characters."],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "sizeof is a compile-time operator that returns the size (in bytes) of a type or variable. sizeof(char) is always 1."
   },
   {
     "skill": "C",
     "question": "How do you access the value stored at a memory address held by a pointer?",
     "options": ["Using the '&' operator (e.g., &ptr)", "Using the '*' operator (e.g., *ptr)", "Using the '->' operator (e.g., ptr->value)", "Using the '.' operator (e.g., ptr.value)"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "The dereference operator (*) accesses the value at the address a pointer holds. & is the address-of operator, while -> accesses members through a pointer."
   },
   {
     "skill": "C",
     "question": "Which header file is required to use functions like printf() and scanf() in C?",
     "options": ["<stdlib.h>", "<conio.h>", "<stdio.h>", "<math.h>"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "The <stdio.h> header (standard input/output) provides printf, scanf, fopen, and other I/O functions."
   },
   {
     "skill": "C",
     "question": "In C, what is the index of the first element in an array?",
     "options": ["1", "0", "-1", "Depends on the array declaration"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "C arrays are zero-indexed: the first element is at index 0. The last element of an array of size n is at index n-1."
   },
   {
     "skill": "C",
     "question": "What happens if you attempt to access an array element outside of its declared bounds in C?",
     "options": ["The compiler throws a syntax error.", "The program throws an IndexOutOfBoundsException.", "The array is automatically resized.", "It results in undefined behavior and may cause a segmentation fault."],
-    "correctAnswer": 3
+    "correctAnswer": 3,
+    "difficulty": "medium",
+    "explanation": "C does not perform bounds checking on arrays. Accessing out-of-bounds leads to undefined behavior, often causing segmentation faults or data corruption."
   },
   {
     "skill": "C",
     "question": "Which of the following is used to define a custom data type that groups multiple variables of different types under a single name?",
     "options": ["array", "union", "struct", "class"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "A struct groups multiple variables (possibly of different types) under one name. Unlike a class (C++/Java), a C struct has no methods or access control."
   },
   {
     "skill": "C",
     "question": "What is the purpose of the 'break' statement in a loop?",
     "options": ["To pause the loop execution temporarily.", "To skip the current iteration and proceed to the next.", "To exit the loop immediately.", "To restart the loop from the beginning."],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "break terminates the innermost loop or switch statement immediately. 'continue' skips to the next iteration."
+  },
+  {
+    "skill": "C",
+    "question": "What does the '&' operator return when applied to a variable?",
+    "options": ["The value stored at the variable's address", "The memory address of the variable", "The size of the variable in bytes", "A boolean indicating whether the variable is valid"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "The address-of operator (&) returns the memory address of a variable. It is used to create pointers: int *ptr = &var."
+  },
+  {
+    "skill": "C",
+    "question": "What is the purpose of the 'NULL' macro in C?",
+    "options": ["It represents an empty string", "It represents a pointer that points to nothing (address 0)", "It sets a variable to zero", "It indicates the end of an array"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "NULL is a macro that expands to ((void*)0) or 0. It is used to indicate that a pointer does not point to a valid memory location."
+  },
+  {
+    "skill": "C",
+    "question": "How do you declare a function that takes a pointer to an int as a parameter?",
+    "options": ["void func(int ptr)", "void func(int *ptr)", "void func(int& ptr)", "void func(*int ptr)"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "int *ptr as a parameter declares a pointer to int. The function can modify the original variable by dereferencing the pointer with *ptr."
+  },
+  {
+    "skill": "C",
+    "question": "What is a string in C?",
+    "options": ["A built-in string data type", "An array of characters terminated by a null character ('\\0')", "A pointer to a character allocated on the heap only", "A linked list of characters"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "C strings are character arrays terminated by a null character ('\\0'). String functions in <string.h> rely on this terminator to determine the end of the string."
+  },
+  {
+    "skill": "C",
+    "question": "Which function is used to dynamically allocate memory for an array of elements and initialize them to zero?",
+    "options": ["malloc()", "calloc()", "realloc()", "alloc()"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "calloc() allocates memory for an array of elements and initializes all bytes to zero. malloc() allocates uninitialized memory. realloc() resizes previously allocated memory."
+  },
+  {
+    "skill": "C",
+    "question": "What is a 'segmentation fault'?",
+    "options": ["A compile-time error indicating a syntax mistake", "A runtime error caused by accessing memory that the program does not have permission to access", "A warning that the program uses too many variables", "An error caused by dividing by zero"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "A segfault occurs when a program tries to access restricted memory (e.g., dereferencing a NULL pointer, buffer overflow, accessing freed memory)."
+  },
+  {
+    "skill": "C",
+    "question": "What is the function of 'fgets()' in C?",
+    "options": ["It reads a single character from stdin", "It reads a line of text from a file or stdin safely, preventing buffer overflow", "It writes formatted output to a file", "It gets the file size in bytes"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "fgets(str, n, stream) reads up to n-1 characters or until a newline, safely bounding the input. It is preferred over gets() which has no bounds checking."
+  },
+  {
+    "skill": "C",
+    "question": "How do you define a constant integer in C?",
+    "options": ["const int MAX = 100;", "#define MAX 100", "Both const int and #define work for defining constants", "int MAX = 100 const;"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "Both methods define constants. #define is a preprocessor directive (text substitution). const int is a typed constant that respects scope and can be used with pointers."
+  },
+  {
+    "skill": "C",
+    "question": "What is a 'union' in C?",
+    "options": ["A structure that groups multiple variables of the same type", "A data type that stores different data types in the same memory location, only one member at a time", "A function that combines two arrays", "A keyword for creating a shared library"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "A union shares memory among its members. The size of a union is the size of its largest member. Changing one member affects the value of all other members in the union."
+  },
+  {
+    "skill": "C",
+    "question": "What does the 'static' keyword do when applied to a local variable inside a function?",
+    "options": ["It makes the variable visible to other functions in the file", "It preserves the variable's value between function calls", "It allocates the variable on the heap instead of the stack", "It prevents the variable from being modified"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "A static local variable retains its value across function calls. It is initialized only once and persists for the lifetime of the program."
   },
   {
     "skill": "C#",
     "question": "Which keyword is used to inherit from a base class in C#?",
     "options": ["extends", "inherits", ":", "->"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "C# uses a colon (:) for inheritance. 'extends' is used in Java and PHP, 'inherits' is used in Visual Basic, and -> is a member access operator."
   },
   {
     "skill": "C#",
     "question": "What is the entry point of a standard C# console application?",
     "options": ["public void Start()", "static void Main()", "public static int main()", "private void Init()"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "The Main() method (capital M) is the entry point. In C# 9+, top-level statements can also serve as the entry point without an explicit Main method."
   },
   {
     "skill": "C#",
     "question": "In C#, what is the difference between 'String' and 'string'?",
     "options": ["'String' is a class, 'string' is a struct.", "There is no difference; 'string' is an alias for 'System.String'.", "'String' is used for mutable text, 'string' is immutable.", "'string' can only hold ASCII characters."],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "string (lowercase) is a C# alias for System.String. They are fully interchangeable in both declaration and usage."
   },
   {
     "skill": "C#",
     "question": "Which interface must be implemented to support simple iteration over a collection using a 'foreach' loop in C#?",
     "options": ["ICollection", "IList", "IEnumerable", "IEnumerator"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "IEnumerable (or IEnumerable<T>) provides GetEnumerator(), which returns an IEnumerator. The foreach loop works with any IEnumerable type."
   },
   {
     "skill": "C#",
     "question": "What is the default access modifier for members of a class in C#?",
     "options": ["public", "private", "protected", "internal"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "In C#, class members default to private. In Java, default access is package-private. In C++, class members default to private as well."
   },
   {
     "skill": "C#",
     "question": "Which of the following modifiers makes a class unable to be inherited?",
     "options": ["abstract", "sealed", "static", "readonly"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "The sealed modifier prevents a class from being used as a base class. 'abstract' requires inheritance, 'static' prevents instantiation, 'readonly' applies to fields."
   },
   {
     "skill": "C#",
     "question": "What does the 'async' keyword do when modifying a method in C#?",
     "options": ["It runs the method on a separate background thread automatically.", "It enables the use of the 'await' keyword within the method.", "It prevents the method from modifying any class variables.", "It makes the method execute synchronously."],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "async enables the await keyword inside the method, allowing non-blocking waits. The method runs synchronously until it hits an await expression."
   },
   {
     "skill": "C#",
     "question": "How do you handle exceptions in C#?",
     "options": ["try-catch blocks", "on error goto", "try-except blocks", "error-catch blocks"],
-    "correctAnswer": 0
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "C# uses try-catch-finally blocks for structured exception handling. 'on error goto' is VB6/VBA syntax, 'try-except' is Python syntax."
   },
   {
     "skill": "C#",
     "question": "What is a 'delegate' in C#?",
     "options": ["A variable that holds an object reference.", "A type that represents references to methods with a particular parameter list and return type.", "A class that manages background tasks.", "A keyword used to pass properties between classes."],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "A delegate is a type-safe function pointer. It defines a method signature, and instances can reference any matching method, enabling callbacks and events."
   },
   {
     "skill": "C#",
     "question": "Which LINQ method is used to filter a collection based on a condition?",
     "options": ["Select", "Filter", "Where", "Find"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "Where() filters elements based on a predicate. Select() projects each element, and Find() is available on List<T> to locate a single element."
   },
   {
     "skill": "TypeScript",
     "question": "What is TypeScript primarily known for compared to JavaScript?",
     "options": ["It runs faster in the browser.", "It adds optional static typing to JavaScript.", "It provides a built-in virtual DOM.", "It does not require compilation."],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "TypeScript is a typed superset of JavaScript that compiles to plain JavaScript. Its key feature is optional static typing, enabling better tooling and error detection at compile time."
   },
   {
     "skill": "TypeScript",
     "question": "How do you define an interface in TypeScript?",
     "options": ["type User = { name: string; }", "interface User { name: string; }", "class User { name: string; }", "struct User { name: string; }"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "The 'interface' keyword defines a contract for object shapes. 'type' aliases can also define object types, but 'interface' is the more traditional approach with better extendability."
   },
   {
     "skill": "TypeScript",
     "question": "Which keyword is used to specify that a variable can be of multiple specific types?",
     "options": ["any", "mixed", "union (|)", "combine"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "Union types use the pipe operator (|), e.g., string | number. 'any' opts out of type checking entirely."
   },
   {
     "skill": "TypeScript",
     "question": "What does the 'any' type represent in TypeScript?",
     "options": ["A type that accepts only boolean values.", "A type that opts out of type checking, allowing any value.", "A strict type that requires exhaustive checking.", "An empty type with no values."],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "'any' disables type checking for a variable, giving full flexibility. It is useful during migration from JavaScript but should be used sparingly in production code."
   },
   {
     "skill": "TypeScript",
     "question": "How do you indicate that a parameter is optional in a TypeScript interface or function?",
     "options": ["By appending a '?' after the parameter name.", "By wrapping the parameter in brackets '[]'.", "By using the 'optional' keyword.", "By setting its default value to 'null'."],
-    "correctAnswer": 0
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "The question mark (?) suffix makes a property or parameter optional, meaning it can be undefined or omitted entirely."
   },
   {
     "skill": "TypeScript",
     "question": "What is a generic type in TypeScript?",
     "options": ["A type that applies to all variables globally.", "A way to create reusable components that can work over a variety of types rather than a single one.", "A default type assigned when no type is provided.", "A built-in class for generic algorithms."],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Generics allow creating reusable components that work with multiple types while preserving type safety, e.g., Array<T> or function identity<T>(arg: T): T."
   },
   {
     "skill": "TypeScript",
     "question": "Which command is commonly used to compile a TypeScript file into JavaScript?",
     "options": ["tsc", "ts-compile", "node", "ts-node"],
-    "correctAnswer": 0
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "The TypeScript compiler 'tsc' (installed via npm) compiles .ts files into .js. 'ts-node' runs TypeScript directly without a separate compilation step."
   },
   {
     "skill": "TypeScript",
     "question": "What is the 'readonly' modifier used for in TypeScript?",
     "options": ["To make a class immutable.", "To prevent a property from being modified after it is initialized.", "To define a constant variable.", "To stop methods from being overridden."],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "'readonly' marks a property as immutable after initialization, similar to 'const' but for class/interface properties. It does not prevent object mutation entirely (only reference assignment)."
   },
   {
     "skill": "TypeScript",
     "question": "What does 'typeof' do when used in a TypeScript type annotation?",
     "options": ["Returns the JavaScript type of a variable at runtime.", "Extracts the type of a variable or property to use as a type definition.", "Converts a string into a primitive type.", "Checks if a variable is defined."],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "'typeof' in a type context captures the type of an existing variable, e.g., type T = typeof someVar. This is useful for reusing types from existing objects or functions."
   },
   {
     "skill": "TypeScript",
     "question": "What is a tuple in TypeScript?",
     "options": ["An array with an unknown number of elements.", "A fixed-length array where the types of each element are known and do not have to be the same.", "An object with purely optional properties.", "A function that returns multiple values."],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "A tuple is a fixed-length array with a specific type at each index, e.g., [string, number]. It enforces both length and element types at each position."
+  },
+  {
+    "skill": "TypeScript",
+    "question": "What is the 'never' type in TypeScript?",
+    "options": ["A type that represents values that never occur, like functions that always throw exceptions", "A type that represents undefined values", "A type that can be assigned any value without error", "The return type of all void functions"],
+    "correctAnswer": 0,
+    "difficulty": "hard",
+    "explanation": "The never type represents values that never occur. It is the return type for functions that always throw an exception or never return (infinite loops)."
+  },
+  {
+    "skill": "TypeScript",
+    "question": "How do you define an intersection type in TypeScript?",
+    "options": ["A & B", "A | B", "A extends B", "A && B"],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "Intersection types (&) combine multiple types into one, requiring all properties from each type. Union types (|) allow values to be one type or another."
+  },
+  {
+    "skill": "TypeScript",
+    "question": "What does 'as const' do when applied to an object or array?",
+    "options": ["It makes the variable read-only at compile time", "It infers literal types for all properties, making them readonly and narrowing types to their exact values", "It casts the value to a constant number", "It prevents the variable from being reassigned at runtime"],
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "'as const' marks all properties as readonly and infers the narrowest literal types (e.g., 'hello' instead of string). Useful for creating constant tuples and objects."
+  },
+  {
+    "skill": "TypeScript",
+    "question": "What is the purpose of 'keyof' in TypeScript?",
+    "options": ["It returns the keys of an object at runtime", "It creates a union type of all property keys of a given type", "It validates that a key exists on an object", "It maps over object keys to create a new type"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "keyof T produces a union of string literal types representing all property names of type T. For example, keyof { a: number; b: string } is 'a' | 'b'."
+  },
+  {
+    "skill": "TypeScript",
+    "question": "What is a 'type guard' in TypeScript?",
+    "options": ["A decorator that prevents a class from being instantiated", "An expression that performs a runtime check to narrow down the type within a conditional block", "A keyword that locks a variable to its initial type", "A configuration option in tsconfig.json that restricts type usage"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Type guards are expressions like typeof, instanceof, or custom functions that return a type predicate. They narrow the type within a conditional scope."
+  },
+  {
+    "skill": "TypeScript",
+    "question": "How do you declare an array of strings in TypeScript?",
+    "options": ["string[]", "Array<string>", "Both string[] and Array<string> are valid", "[string]"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "Both string[] (shorthand syntax) and Array<string> (generic syntax) are equivalent ways to declare an array of strings."
+  },
+  {
+    "skill": "TypeScript",
+    "question": "What is the 'Partial<T>' utility type?",
+    "options": ["It makes all properties of T required", "It makes all properties of T optional", "It picks a subset of properties from T", "It removes null and undefined from T"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Partial<T> transforms each property in T to be optional (?). Required<T> does the opposite, Omit<T, K> removes keys, and NonNullable<T> removes null/undefined."
+  },
+  {
+    "skill": "TypeScript",
+    "question": "What does 'declare' keyword do in TypeScript?",
+    "options": ["It declares a variable globally that can be accessed from any file", "It tells TypeScript that a variable or module exists externally without providing an implementation", "It declares a new type that can be used across multiple modules", "It marks a function as deprecated"],
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "declare is used for ambient declarations in .d.ts files. It tells the compiler that something exists (e.g., a global variable or module) without defining its implementation."
+  },
+  {
+    "skill": "TypeScript",
+    "question": "What is the purpose of tsconfig.json?",
+    "options": ["It contains the source code for TypeScript files", "It configures the TypeScript compiler options and project settings", "It defines the runtime dependencies for a TypeScript project", "It stores TypeScript type definitions for installed npm packages"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "tsconfig.json specifies compiler options (target, module, strict mode), file inclusion/exclusion rules, and other project-level settings for the TypeScript compiler."
+  },
+  {
+    "skill": "TypeScript",
+    "question": "What is an enum in TypeScript?",
+    "options": ["A way to define a set of named constants, either numeric or string-based", "A built-in function for enumerating object keys", "A type that represents all possible string values", "A class that manages iterable collections"],
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "Enums allow definition of a set of named constants. Numeric enums auto-increment values. String enums have each member initialized with a string literal."
   },
   {
     "skill": "Node.js",
     "question": "What engine powers Node.js under the hood?",
     "options": ["SpiderMonkey", "Chakra", "V8", "JavaScriptCore"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "Node.js is built on Google's V8 JavaScript engine (same as Chrome). SpiderMonkey powers Firefox, JavaScriptCore powers Safari, and Chakra (legacy) powered Edge."
   },
   {
     "skill": "Node.js",
     "question": "Node.js is primarily designed for building what type of applications?",
     "options": ["Desktop graphical interfaces", "Scalable network applications using an event-driven, non-blocking I/O model", "CPU-intensive mathematical processing scripts", "Client-side browser applications"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "Node.js excels at I/O-bound applications like web servers, APIs, and real-time services due to its event-driven, non-blocking architecture. It is not ideal for CPU-heavy workloads."
   },
   {
     "skill": "Node.js",
     "question": "Which global object in Node.js provides information about the current executing process?",
     "options": ["system", "global", "process", "env"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "The 'process' global object provides info about the current Node.js process, including environment variables (process.env), command-line arguments (process.argv), and CPU/memory usage."
   },
   {
     "skill": "Node.js",
     "question": "What is 'npm'?",
     "options": ["Node Process Manager", "Node Package Manager", "New Project Module", "Network Protocol Manager"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "npm is the default package manager for Node.js. It installs, manages, and publishes packages from the npm registry."
   },
   {
     "skill": "Node.js",
     "question": "Which core module in Node.js is used to interact with the file system?",
     "options": ["os", "path", "http", "fs"],
-    "correctAnswer": 3
+    "correctAnswer": 3,
+    "difficulty": "easy",
+    "explanation": "The 'fs' (file system) module provides file I/O operations like reading, writing, and deleting files. 'path' handles path manipulation, 'os' provides OS-level utilities."
   },
   {
     "skill": "Node.js",
     "question": "What is the purpose of the 'module.exports' object in Node.js?",
     "options": ["To import modules from external libraries.", "To define variables that are exposed to other files that require this module.", "To compile the JavaScript code into binary.", "To start a local server."],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "module.exports (or exports) determines what a module exposes when imported with require(). Only the properties assigned to module.exports are accessible to consumers."
   },
   {
     "skill": "Node.js",
     "question": "How do you import an installed package in a CommonJS Node.js script?",
     "options": ["include('package_name')", "import package_name from 'package_name'", "require('package_name')", "load('package_name')"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "CommonJS modules use require() to import modules. The 'import' syntax is used in ES modules (ESM), which requires 'type': 'module' in package.json or .mjs extension."
   },
   {
     "skill": "Node.js",
     "question": "What is the 'Event Loop' in Node.js?",
     "options": ["A continuous loop that parses incoming HTTP headers.", "A mechanism that handles asynchronous callbacks, moving them to the call stack when complete.", "A security feature that prevents infinite loops in JavaScript.", "A library used exclusively for scheduling cron jobs."],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "The event loop allows Node.js to perform non-blocking I/O by offloading operations to the system kernel and processing callbacks when results are available."
   },
   {
     "skill": "Node.js",
     "question": "Which core module is commonly used to create a basic web server in Node.js?",
     "options": ["server", "express", "http", "url"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "The 'http' core module provides createServer() for building web servers. Express.js is a popular third-party framework built on top of http that simplifies routing and middleware."
   },
   {
     "skill": "Node.js",
     "question": "What does the '__dirname' variable represent in a Node.js script?",
     "options": ["The absolute path of the directory containing the currently executing file.", "The name of the main execution file.", "The directory where Node.js is installed.", "The current working directory from where the script was launched."],
-    "correctAnswer": 0
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "__dirname returns the absolute path of the directory containing the currently executing file. __filename includes the file name as well."
+  },
+  {
+    "skill": "Node.js",
+    "question": "What is the difference between 'require' and 'import' in Node.js?",
+    "options": ["require is CommonJS (synchronous); import is ES modules (asynchronous, static analysis)", "require is asynchronous; import is synchronous", "They are identical; just different syntax", "import can only be used for local files; require is for npm packages"],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "require() is the CommonJS module system (synchronous, runtime resolution). import/export is ES module syntax (static analysis, asynchronous, tree-shakeable)."
+  },
+  {
+    "skill": "Node.js",
+    "question": "What is the purpose of the 'path' module in Node.js?",
+    "options": ["It manages the PATH environment variable", "It provides utilities for working with file and directory paths", "It tracks the execution path through callback functions", "It configures the Node.js runtime search path for modules"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "The path module provides path manipulation utilities like join(), resolve(), dirname(), basename(), and extname() for cross-platform path handling."
+  },
+  {
+    "skill": "Node.js",
+    "question": "What does 'process.nextTick()' do?",
+    "options": ["It schedules a callback to run on the next iteration of the event loop, before any I/O", "It delays execution by exactly 1 millisecond", "It queues a callback for the next timer phase of the event loop", "It runs a function asynchronously in a separate thread"],
+    "correctAnswer": 0,
+    "difficulty": "hard",
+    "explanation": "process.nextTick() registers a callback to execute in the current phase after the current operation completes but before the event loop continues. It has higher priority than I/O callbacks."
+  },
+  {
+    "skill": "Node.js",
+    "question": "What is the 'os' core module used for?",
+    "options": ["To interact with the operating system: CPU info, memory, network interfaces, and platform details", "To manage operating system user accounts", "To create and manage child processes", "To handle operating system signals like SIGINT"],
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "The os module provides OS-related utility methods: os.cpus(), os.totalmem(), os.freemem(), os.networkInterfaces(), os.platform(), os.homedir(), etc."
+  },
+  {
+    "skill": "Node.js",
+    "question": "What is 'npm scripts' used for?",
+    "options": ["A way to publish JavaScript libraries to the npm registry", "A built-in task runner that runs commands defined in package.json scripts field", "A scripting language for automating npm package installation", "A security scanner for npm packages"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "npm scripts in package.json define custom commands like 'start', 'test', 'build' that can be run with 'npm run <name>'. They are commonly used for build automation."
+  },
+  {
+    "skill": "Node.js",
+    "question": "What is the 'Buffer' class used for in Node.js?",
+    "options": ["A temporary holding area for data before processing", "A class that handles binary data directly, without converting to strings", "A queue management system for async operations", "A caching mechanism for HTTP responses"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Buffer represents fixed-length sequences of bytes. It is used to handle binary data from streams, files, and network operations when raw bytes are needed."
+  },
+  {
+    "skill": "Node.js",
+    "question": "What is a 'stream' in Node.js?",
+    "options": ["A sequence of HTTP requests that share the same connection", "An abstract interface for working with flowing data, enabling processing of large data piece by piece", "A data structure that stores elements in first-in-first-out order", "A built-in module for live video streaming"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Streams are objects that let you read/write data continuously. They can be readable, writable, duplex (both), or transform (modifying). Streams prevent loading entire datasets into memory."
+  },
+  {
+    "skill": "Node.js",
+    "question": "How do you handle asynchronous errors in Node.js try-catch?",
+    "options": ["try-catch catches all errors, including those in callbacks and Promises", "try-catch only catches synchronous errors; Promise rejections need .catch() or await", "Asynchronous errors are silently ignored", "Use try-catch inside setTimeout to catch async errors"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "try-catch cannot catch errors from asynchronous callbacks. For Promises, use .catch() or wrap await in try-catch. For callbacks, handle errors in the callback itself."
+  },
+  {
+    "skill": "Node.js",
+    "question": "What is the purpose of the 'crypto' module?",
+    "options": ["To create and manage cryptocurrency wallets", "To provide cryptographic functionality: hashing, HMAC, encryption, and random number generation", "To secure HTTP connections via TLS/SSL", "To validate JSON Web Tokens"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "The crypto module provides cryptographic functions: createHash() for hashing, createHmac() for HMAC, randomBytes() for secure random data, and cipher/decipher for encryption."
+  },
+  {
+    "skill": "Node.js",
+    "question": "What does 'globalThis' refer to in Node.js?",
+    "options": ["A special variable that is only available in ES modules", "The global object across all JavaScript environments (window in browsers, global in Node.js)", "A reference to the currently executing module's exports", "A polyfill for older Node.js versions"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "globalThis provides a standard way to access the global object across environments. In Node.js it is equivalent to 'global', in browsers it is 'window'."
   },
   {
     "skill": "Express.js",
     "question": "What is Express.js?",
     "options": ["A relational database management system.", "A front-end JavaScript framework.", "A minimal and flexible Node.js web application framework.", "A tool for compiling TypeScript into JavaScript."],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "Express.js is a lightweight web application framework for Node.js that provides features like routing, middleware, and template engine integration."
   },
   {
     "skill": "Express.js",
     "question": "How do you instantiate an Express application?",
     "options": ["const app = express();", "const app = new Express();", "const app = createExpressApp();", "const app = require('express').init();"],
-    "correctAnswer": 0
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "Calling express() (the top-level function exported by the Express module) creates a new Express application instance."
   },
   {
     "skill": "Express.js",
     "question": "What is middleware in Express.js?",
     "options": ["Software that connects the Express app to a database.", "Functions that have access to the request object, response object, and the next middleware function.", "A built-in module for rendering HTML templates.", "A specific route that handles errors."],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Middleware functions are the building blocks of Express applications. They execute in sequence, can modify req/res, end the request, or call next() to pass control."
   },
   {
     "skill": "Express.js",
     "question": "How do you define a route that handles GET requests to the '/users' endpoint in Express?",
     "options": ["app.get('/users', (req, res) => { ... });", "app.route('/users', 'GET', (req, res) => { ... });", "app.handle('GET', '/users', (req, res) => { ... });", "app.receive('/users', (req, res) => { ... });"],
-    "correctAnswer": 0
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "app.get() defines a route handler for HTTP GET requests. Express provides app.post(), app.put(), app.delete(), and app.patch() for other HTTP methods."
   },
   {
     "skill": "Express.js",
     "question": "Which method is used to send a JSON response to the client?",
     "options": ["res.sendJson()", "res.json()", "res.endJson()", "res.reply()"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "res.json() sends a JSON response by serializing the provided JavaScript object. It also sets the Content-Type header to application/json."
   },
   {
     "skill": "Express.js",
     "question": "How can you access URL parameters in an Express route (e.g., '/users/:id')?",
     "options": ["req.params.id", "req.query.id", "req.body.id", "req.url.id"],
-    "correctAnswer": 0
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "req.params contains route parameters (defined with :name in the path). req.query holds query string parameters, req.body holds parsed request body."
   },
   {
     "skill": "Express.js",
     "question": "Which middleware is commonly used to parse incoming JSON payloads in Express?",
     "options": ["body-parser", "json-parser", "express.json()", "express.parse()"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "medium",
+    "explanation": "Since Express 4.16+, express.json() is a built-in middleware that parses JSON request bodies. Previously body-parser was a separate package."
   },
   {
     "skill": "Express.js",
     "question": "How do you start a server to listen on port 3000 in Express?",
     "options": ["app.start(3000)", "app.listen(3000)", "app.serve(3000)", "app.run(3000)"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "app.listen(port) binds the Express application to the specified port and begins accepting connections. It returns an http.Server instance."
   },
   {
     "skill": "Express.js",
     "question": "What does the 'next()' function do in an Express middleware?",
     "options": ["It ends the HTTP request.", "It passes control to the next middleware function in the stack.", "It restarts the server.", "It throws an error."],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "Calling next() passes control to the next matching middleware or route handler. If next() is not called, the request hangs. next(err) passes errors to error-handling middleware."
   },
   {
     "skill": "Express.js",
     "question": "How do you handle 404 errors for undefined routes in Express?",
     "options": ["By defining a middleware function with app.use() at the very end of all route definitions.", "By setting app.set('404', handler).", "Express handles it automatically without any code.", "By throwing a new Error('404') inside the main app file."],
-    "correctAnswer": 0
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "A catch-all middleware placed after all routes handles unmatched requests. Express passes each unmatched request through the middleware stack, where the final handler sends a 404 response."
+  },
+  {
+    "skill": "Express.js",
+    "question": "How do you serve static files in Express?",
+    "options": ["app.serve('public')", "app.static('public')", "app.use(express.static('public'))", "app.public('public')"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "express.static() is a built-in middleware for serving static files (CSS, images, JS). app.use('/path', express.static('dir')) mounts it at a specific path."
+  },
+  {
+    "skill": "Express.js",
+    "question": "What is the purpose of 'app.set()' in Express?",
+    "options": ["It sets HTTP response headers", "It assigns application-level settings like view engine, port, and cache options", "It configures the database connection", "It sets up SSL certificates"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "app.set() stores application settings (e.g., app.set('view engine', 'ejs')). app.get('key') retrieves them. Common settings include 'view engine', 'views' directory, and 'port'."
+  },
+  {
+    "skill": "Express.js",
+    "question": "How do you handle file uploads in Express?",
+    "options": ["Express has built-in file upload support via req.file", "Using middleware like multer that processes multipart/form-data", "File uploads are handled automatically without any middleware", "Using the 'fs' module directly in route handlers"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Express does not handle multipart bodies (file uploads) natively. Multer is a popular middleware that parses multipart/form-data and makes files available via req.file or req.files."
+  },
+  {
+    "skill": "Express.js",
+    "question": "What does 'app.route()' provide?",
+    "options": ["It redirects all requests to a specific URL", "It creates a single route path that can handle multiple HTTP methods with chaining", "It generates a route map of all defined routes in the application", "It routes traffic between different server instances"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "app.route('/path').get(...).post(...).put(...).delete(...) allows chaining multiple HTTP method handlers for the same route path, keeping the code organized."
+  },
+  {
+    "skill": "Express.js",
+    "question": "How do you redirect a user to another URL in Express?",
+    "options": ["res.redirect('/new-path')", "res.sendRedirect('/new-path')", "res.forward('/new-path')", "res.navigate('/new-path')"],
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "res.redirect() sends a 302 response with a Location header, instructing the browser to navigate to the specified URL. Status codes can be customized (e.g., 301 for permanent redirect)."
+  },
+  {
+    "skill": "Express.js",
+    "question": "What is error-handling middleware in Express?",
+    "options": ["A regular middleware function that catches all errors thrown by the app", "A middleware with four parameters (err, req, res, next) that handles errors throughout the application", "A built-in Express module that automatically logs errors", "A separate process that monitors errors and restarts the server"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Error-handling middleware has exactly four parameters. It is defined last in the middleware stack and catches errors passed via next(err) from other middleware or routes."
+  },
+  {
+    "skill": "Express.js",
+    "question": "What is the difference between 'req.query' and 'req.params'?",
+    "options": ["req.query contains URL query string parameters; req.params contains route parameters", "req.query contains POST body data; req.params contains URL parameters", "There is no difference", "req.query is for GET requests; req.params is for POST requests"],
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "req.query holds parsed query string parameters (?key=value). req.params holds route parameters (:id in /users/:id). req.body (with body-parser middleware) holds parsed request body."
+  },
+  {
+    "skill": "Express.js",
+    "question": "How do you set HTTP response headers in Express?",
+    "options": ["res.header('name', 'value')", "res.setHeader('name', 'value')", "Both res.set() and res.header() can set headers", "app.header('name', 'value')"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "Both res.set() and res.header() (which are aliases) set HTTP response headers. res.get() retrieves request headers. Multiple headers can be set with an object argument."
+  },
+  {
+    "skill": "Express.js",
+    "question": "What does 'res.status()' return?",
+    "options": ["The current status code of the response", "The res object itself, enabling method chaining", "A boolean indicating whether the status was set successfully", "The response body after status is set"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "res.status() returns the res object for chaining: res.status(404).json({ error: 'Not found' }). The status code must be set before sending the response."
+  },
+  {
+    "skill": "Express.js",
+    "question": "How do you use template engines like EJS or Pug with Express?",
+    "options": ["Template engines are built into Express and work automatically", "Set the view engine with app.set('view engine', 'ejs') and use res.render()", "Import the template engine and call it directly in route handlers", "Template engines require a separate server process"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "app.set('view engine', 'ejs') configures the template engine. res.render('view', data) renders the template with data. The 'views' setting specifies the template directory."
   },
   {
     "skill": "SQL",
     "question": "What does SQL stand for?",
     "options": ["Standard Query Language", "Structured Query Language", "System Query Language", "Simple Query Language"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "SQL stands for Structured Query Language, the standard language for relational database management and manipulation."
   },
   {
     "skill": "SQL",
     "question": "Which SQL statement is used to extract data from a database?",
     "options": ["EXTRACT", "SELECT", "GET", "PULL"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "SELECT retrieves data from one or more tables. It can include WHERE, ORDER BY, GROUP BY, JOIN, and other clauses for complex queries."
   },
   {
     "skill": "SQL",
     "question": "Which SQL clause is used to filter records based on a specified condition?",
     "options": ["FILTER", "ORDER BY", "WHERE", "HAVING"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "WHERE filters rows before aggregation. HAVING filters groups after GROUP BY. ORDER BY sorts the result set."
   },
   {
     "skill": "SQL",
     "question": "Which command is used to add new rows to a database table?",
     "options": ["ADD ROW", "INSERT INTO", "UPDATE", "APPEND"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "INSERT INTO adds new rows. UPDATE modifies existing rows. There is no 'ADD ROW' or 'APPEND' command in SQL."
   },
   {
     "skill": "SQL",
     "question": "How do you select all columns from a table named 'Users'?",
     "options": ["SELECT [all] FROM Users;", "SELECT Users;", "SELECT * FROM Users;", "SELECT ALL FROM Users;"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "SELECT * returns all columns. For production queries, it is better practice to specify individual column names for clarity and performance."
   },
   {
     "skill": "SQL",
     "question": "What is the primary purpose of a PRIMARY KEY in a SQL table?",
     "options": ["To encrypt the table data.", "To automatically increment a number for each row.", "To uniquely identify each record in the table.", "To link the table to another table."],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "A PRIMARY KEY uniquely identifies each row. It enforces uniqueness and typically uses a clustered index. Foreign keys link tables."
   },
   {
     "skill": "SQL",
     "question": "Which SQL keyword is used to sort the result-set?",
     "options": ["SORT BY", "ORDER BY", "GROUP BY", "ALIGN BY"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "ORDER BY sorts results in ascending (ASC, default) or descending (DESC) order. GROUP BY groups rows for aggregation."
   },
   {
     "skill": "SQL",
     "question": "What does the JOIN clause do in SQL?",
     "options": ["It combines rows from two or more tables, based on a related column between them.", "It merges two databases together.", "It adds a new column to a table.", "It concatenates two strings."],
-    "correctAnswer": 0
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "JOINs combine rows from multiple tables using related columns. Common types: INNER JOIN, LEFT JOIN, RIGHT JOIN, and FULL OUTER JOIN."
   },
   {
     "skill": "SQL",
     "question": "Which function is used to return the number of records that match a specified criterion?",
     "options": ["SUM()", "COUNT()", "TOTAL()", "MAX()"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "COUNT() returns the number of rows. SUM() adds numeric values, MAX() returns the maximum value, MIN() returns the minimum, and AVG() returns the average."
   },
   {
     "skill": "SQL",
     "question": "What is the difference between TRUNCATE and DELETE?",
     "options": ["DELETE removes the table entirely, TRUNCATE just empties it.", "TRUNCATE removes all rows quickly without logging individual row deletions, DELETE removes rows one by one.", "There is no difference; they are synonyms.", "TRUNCATE requires a WHERE clause, DELETE does not."],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "TRUNCATE is DDL, removes all rows quickly, cannot use WHERE, and resets identity counters. DELETE is DML, removes rows one by one (slower), and can use WHERE to filter."
+  },
+  {
+    "skill": "SQL",
+    "question": "What is a FOREIGN KEY in SQL?",
+    "options": ["A key that encrypts the data in a column", "A field that links to the PRIMARY KEY of another table to enforce referential integrity", "An index that speeds up foreign language searches", "A key that is used for full-text search indexing"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "A FOREIGN KEY ensures referential integrity by linking a column to the PRIMARY KEY of another table. It prevents actions that would break the link between tables."
+  },
+  {
+    "skill": "SQL",
+    "question": "What is the difference between WHERE and HAVING?",
+    "options": ["WHERE filters before aggregation; HAVING filters after GROUP BY", "WHERE filters after GROUP BY; HAVING filters before aggregation", "They are interchangeable", "HAVING can only be used with COUNT()"],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "WHERE filters individual rows before grouping. HAVING filters groups after GROUP BY. HAVING can use aggregate functions (SUM, COUNT, etc.); WHERE cannot."
+  },
+  {
+    "skill": "SQL",
+    "question": "What does the 'LIKE' operator do in SQL?",
+    "options": ["It checks if two values are identical", "It performs pattern matching using wildcards like % and _", "It returns similar rows based on fuzzy logic", "It compares case-insensitive string equality"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "LIKE is used for pattern matching: % matches any sequence of characters, _ matches a single character. WHERE name LIKE 'J%' finds names starting with 'J'."
+  },
+  {
+    "skill": "SQL",
+    "question": "What is the purpose of the 'GROUP BY' clause?",
+    "options": ["It sorts the result set in ascending order", "It groups rows that have the same values in specified columns for aggregation", "It combines two tables together", "It splits a table into multiple smaller tables"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "GROUP BY groups rows with the same values into summary rows, typically used with aggregate functions like COUNT(), SUM(), AVG(), MAX(), MIN()."
+  },
+  {
+    "skill": "SQL",
+    "question": "What is an INNER JOIN?",
+    "options": ["A join that returns all rows from the left table and matching rows from the right table", "A join that returns only rows with matching values in both tables", "A join that returns all rows from both tables", "A join that returns rows from the right table only"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "INNER JOIN returns rows where there is a match in both tables. LEFT JOIN returns all rows from the left table. FULL OUTER JOIN returns all rows from both."
+  },
+  {
+    "skill": "SQL",
+    "question": "What is a SQL index?",
+    "options": ["A data structure that improves the speed of data retrieval operations on a table", "A list of all tables in the database", "A unique identifier for each row in the table", "A stored procedure for indexing data"],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "Indexes are database structures (typically B-tree) that speed up SELECT queries and WHERE clauses at the cost of slower INSERT/UPDATE/DELETE operations."
+  },
+  {
+    "skill": "SQL",
+    "question": "What does the 'UNIQUE' constraint ensure?",
+    "options": ["That all values in a column are different from each other", "That a column cannot contain NULL values", "That the table can only have one of this column type", "That the column values are unique within the entire database"],
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "UNIQUE ensures no duplicate values in a column or set of columns. Unlike PRIMARY KEY, a table can have multiple UNIQUE constraints and they can contain NULL values."
+  },
+  {
+    "skill": "SQL",
+    "question": "What is a subquery in SQL?",
+    "options": ["A query that is executed after the main query", "A SELECT query nested inside another SQL query (inside WHERE, FROM, or SELECT)", "A query that returns an error", "A query that modifies the database schema"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "A subquery (nested query or inner query) is a SELECT statement inside another SQL statement. It can be used in WHERE (with IN, EXISTS), FROM, or SELECT clauses."
+  },
+  {
+    "skill": "SQL",
+    "question": "Which statement is used to modify existing records in a table?",
+    "options": ["MODIFY", "CHANGE", "UPDATE", "ALTER"],
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "UPDATE modifies existing records. ALTER modifies the table structure (columns, constraints). INSERT adds new rows. DELETE removes rows."
+  },
+  {
+    "skill": "SQL",
+    "question": "What does 'DISTINCT' do in a SELECT query?",
+    "options": ["It removes duplicate rows from the result set", "It sorts the result in distinct order", "It returns only the first unique row from each group", "It selects rows that are different from the previous row"],
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "SELECT DISTINCT removes duplicate rows, returning only unique combinations of the selected columns. SELECT ALL (default) returns all rows including duplicates."
   },
   {
     "skill": "MongoDB",
     "question": "What type of database is MongoDB?",
     "options": ["Relational Database (RDBMS)", "Graph Database", "NoSQL Document-Oriented Database", "Key-Value Store"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "MongoDB is a NoSQL document-oriented database that stores data in BSON (Binary JSON) documents, offering flexible schemas compared to relational databases."
   },
   {
     "skill": "MongoDB",
     "question": "In MongoDB, what is the equivalent of a relational database 'Table'?",
     "options": ["Collection", "Document", "Index", "Cluster"],
-    "correctAnswer": 0
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "A collection groups related documents (like a table in SQL). A document is the equivalent of a row, stored as a BSON object."
   },
   {
     "skill": "MongoDB",
     "question": "What format does MongoDB use to store data?",
     "options": ["XML", "BSON (Binary JSON)", "CSV", "YAML"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "MongoDB stores data in BSON format, a binary representation of JSON-like documents. BSON supports additional data types like Date and Binary."
   },
   {
     "skill": "MongoDB",
     "question": "Which MongoDB shell command is used to insert a single document into a collection?",
     "options": ["db.collection.add()", "db.collection.insert()", "db.collection.insertOne()", "db.collection.create()"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "insertOne() inserts a single document. insertMany() inserts multiple documents at once. The older insert() method is deprecated in favor of these explicit methods."
   },
   {
     "skill": "MongoDB",
     "question": "What is the primary key field automatically generated for every MongoDB document if not provided?",
     "options": ["id", "_id", "primaryKey", "uid"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "_id is a 12-byte ObjectId by default (timestamp + machine ID + process ID + counter). It is automatically generated if not specified."
   },
   {
     "skill": "MongoDB",
     "question": "Which operator is used in MongoDB to find documents where a field is greater than a specific value?",
     "options": ["$greater", "$gt", "$g", ">"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "$gt is the greater-than comparison operator. Related operators: $gte (>=), $lt (<), $lte (<=), $ne (not equal)."
   },
   {
     "skill": "MongoDB",
     "question": "What does the MongoDB aggregation pipeline do?",
     "options": ["It processes data records and returns computed results, similar to SQL GROUP BY.", "It connects multiple MongoDB instances together.", "It automatically creates backups of the database.", "It converts BSON documents into JSON."],
-    "correctAnswer": 0
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "The aggregation pipeline processes documents through stages like $match, $group, $sort, and $project, enabling data transformations similar to SQL GROUP BY and complex operations."
   },
   {
     "skill": "MongoDB",
     "question": "How do you update a document in MongoDB?",
     "options": ["db.collection.modify()", "db.collection.updateOne()", "db.collection.change()", "db.collection.set()"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "updateOne() modifies a single matching document. updateMany() modifies all matching documents. replaceOne() replaces the entire document."
   },
   {
     "skill": "MongoDB",
     "question": "What is the purpose of creating an index in MongoDB?",
     "options": ["To encrypt the data in a collection.", "To automatically delete old documents.", "To improve the speed of search queries.", "To link two collections together."],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "Indexes improve query performance by reducing the number of documents scanned. They are B-tree structures that allow efficient field-based lookups."
   },
   {
     "skill": "MongoDB",
     "question": "Which method is used to remove all documents from a collection without deleting the collection itself?",
     "options": ["db.collection.removeAll()", "db.collection.deleteMany({})", "db.collection.drop()", "db.collection.truncate()"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "deleteMany({}) removes all documents but keeps the collection. drop() removes both documents and the collection (including indexes)."
+  },
+  {
+    "skill": "MongoDB",
+    "question": "What is a MongoDB replica set?",
+    "options": ["A group of mongod processes that maintain the same data set for redundancy and high availability", "A backup of the entire database stored in a different location", "A set of indexes that replicate data across collections", "A tool for duplicating documents within the same collection"],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "A replica set is a group of MongoDB servers with one primary (handling writes) and multiple secondaries (replicating data). It provides automatic failover and data redundancy."
+  },
+  {
+    "skill": "MongoDB",
+    "question": "What is sharding in MongoDB?",
+    "options": ["Dividing a single backup into multiple encrypted chunks", "A method of distributing data across multiple machines to support large datasets and high-throughput operations", "A process of splitting a collection into smaller temporary tables", "A compression algorithm for reducing storage size"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Sharding horizontally partitions data across multiple servers using a shard key. It enables scaling out by distributing the database workload across a cluster."
+  },
+  {
+    "skill": "MongoDB",
+    "question": "How do you find documents that match a specific field value?",
+    "options": ["db.collection.find({ field: 'value' })", "db.collection.search({ field: 'value' })", "db.collection.lookup({ field: 'value' })", "db.collection.get({ field: 'value' })"],
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "find({ field: value }) retrieves documents matching the query filter. find() without arguments returns all documents. Query operators like $gt, $in, $regex provide advanced filtering."
+  },
+  {
+    "skill": "MongoDB",
+    "question": "What is the difference between 'findOneAndUpdate' and 'updateOne'?",
+    "options": ["findOneAndUpdate returns the document before/after update; updateOne only returns acknowledgement", "updateOne returns the document; findOneAndUpdate does not", "There is no difference", "findOneAndUpdate updates all matching documents; updateOne updates only one"],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "updateOne() updates the first matching document and returns a WriteResult. findOneAndUpdate() returns the document itself (with options for before/after state)."
+  },
+  {
+    "skill": "MongoDB",
+    "question": "What does the '$set' operator do?",
+    "options": ["It deletes a field from a document", "It sets the value of a field in a document during an update operation", "It creates a new collection", "It updates all documents in a collection to have the same value"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "$set replaces the value of a field or adds a new field if it does not exist. Other field update operators: $unset (remove), $rename, $inc (increment)."
+  },
+  {
+    "skill": "MongoDB",
+    "question": "What is a TTL index in MongoDB?",
+    "options": ["An index that tracks how long queries take to execute", "A special index that automatically removes documents after a specified time period", "An index that expires after a set duration", "A time-based index that improves query performance for date fields"],
+    "correctAnswer": 1,
+    "difficulty": "hard",
+    "explanation": "TTL (Time-To-Live) indexes on Date fields cause MongoDB to automatically delete documents after a specified number of seconds, useful for session data or event logs."
+  },
+  {
+    "skill": "MongoDB",
+    "question": "What is the 'explain()' method used for?",
+    "options": ["It returns a human-readable description of what a query does", "It provides execution plan details for query optimization", "It explains the database schema in detail", "It generates documentation for MongoDB collections"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "explain() returns query execution statistics: which indexes were used, how many documents were examined (totalDocsExamined), and execution time. Essential for query performance tuning."
+  },
+  {
+    "skill": "MongoDB",
+    "question": "How do you create a compound index in MongoDB?",
+    "options": ["db.collection.createIndex({ field1: 1, field2: -1 })", "db.collection.index({ field1: 1, field2: -1 })", "db.collection.addIndex({ field1: 1, field2: -1 })", "db.collection.createCompoundIndex({ field1: 1, field2: -1 })"],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "A compound index on multiple fields uses ascending (1) or descending (-1) order per field. The order of fields matters: it supports queries on prefixes of the indexed fields."
+  },
+  {
+    "skill": "MongoDB",
+    "question": "What is the '$in' operator used for?",
+    "options": ["It checks if a field value is within a specified array of values", "It joins two collections together", "It inserts multiple documents at once", "It increments a numeric field by a specified amount"],
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "$in selects documents where a field value equals any value in the specified array. db.collection.find({ field: { $in: [value1, value2] } }). $nin is the negation."
+  },
+  {
+    "skill": "MongoDB",
+    "question": "What is a MongoDB aggregation 'stage'?",
+    "options": ["A temporary storage location in the aggregation pipeline", "An individual operation in the aggregation pipeline that transforms data (like $match, $group, $sort)", "The final output of the aggregation query", "A configuration setting for aggregation performance"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "The aggregation pipeline consists of stages like $match (filter), $group (group by), $sort (order), $project (reshape), $limit, $skip, and $unwind. Each stage processes documents sequentially."
   },
   {
     "skill": "Git & GitHub",
     "question": "What is the primary difference between Git and GitHub?",
     "options": ["Git is a programming language, GitHub is a compiler.", "Git is a version control system, GitHub is a cloud-based hosting service for Git repositories.", "They are exactly the same thing.", "Git is for Windows, GitHub is for Mac."],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "Git is a distributed version control system that runs locally. GitHub is a cloud platform that hosts Git repositories and adds collaboration features like pull requests and issues."
   },
   {
     "skill": "Git & GitHub",
     "question": "Which command initializes a new Git repository in the current directory?",
     "options": ["git start", "git create", "git init", "git new"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "git init creates a new .git directory and initializes the repository. git clone copies an existing remote repository."
   },
   {
     "skill": "Git & GitHub",
     "question": "How do you stage all modified files for a commit in Git?",
     "options": ["git stage all", "git add .", "git commit all", "git add -all"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "git add . stages all changes in the current directory. Specific files can be staged individually: git add filename. The staging area is between working directory and commit."
   },
   {
     "skill": "Git & GitHub",
     "question": "Which command is used to save staged changes to the local repository?",
     "options": ["git push", "git save", "git store", "git commit"],
-    "correctAnswer": 3
+    "correctAnswer": 3,
+    "difficulty": "easy",
+    "explanation": "git commit creates a snapshot of staged changes. git push uploads local commits to a remote repository."
   },
   {
     "skill": "Git & GitHub",
     "question": "What does the 'git clone' command do?",
     "options": ["It creates a copy of an existing remote repository on your local machine.", "It duplicates a file within the repository.", "It creates a new branch.", "It merges two branches together."],
-    "correctAnswer": 0
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "git clone copies a remote repository to your local machine, including all branches and commit history. It is the typical way to start working on an existing project."
   },
   {
     "skill": "Git & GitHub",
     "question": "How do you create a new branch named 'feature' and switch to it immediately?",
     "options": ["git branch feature", "git checkout -b feature", "git switch -new feature", "git new branch feature"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "git checkout -b feature creates and switches to a new branch. Alternatively, 'git branch feature' followed by 'git checkout feature' (or 'git switch feature' in newer Git)."
   },
   {
     "skill": "Git & GitHub",
     "question": "What is a 'Merge Conflict'?",
     "options": ["When GitHub's servers go offline.", "When two branches have competing changes on the same lines of a file and Git cannot automatically resolve them.", "When you forget to add a commit message.", "When you try to push code without internet access."],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Merge conflicts occur when two branches modify the same lines differently. Git marks the conflict in the file, and the user must manually resolve it before completing the merge."
   },
   {
     "skill": "Git & GitHub",
     "question": "Which command fetches and merges changes from the remote repository to your local branch?",
     "options": ["git fetch", "git pull", "git sync", "git download"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "git pull = git fetch + git merge. It downloads remote changes and integrates them into the current branch. git fetch only downloads without merging."
   },
   {
     "skill": "Git & GitHub",
     "question": "What is a Pull Request (PR) on GitHub?",
     "options": ["A request to download code to your local machine.", "A command to force the server to accept your code.", "A proposal to merge your pushed branch into another branch (usually main), allowing for code review.", "A feature to request help from GitHub support."],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "A pull request notifies team members of changes you have pushed, enabling code review, discussion, and testing before merging into the target branch."
   },
   {
     "skill": "Git & GitHub",
     "question": "How do you check the current state of the repository, including untracked and modified files?",
     "options": ["git info", "git log", "git state", "git status"],
-    "correctAnswer": 3
+    "correctAnswer": 3,
+    "difficulty": "easy",
+    "explanation": "git status shows the working tree status: staged changes, unstaged changes, and untracked files. git log shows commit history."
   },
   {
     "skill": "Docker",
     "question": "What is Docker primarily used for?",
     "options": ["Writing front-end UI code.", "Containerizing applications so they run consistently across different environments.", "Managing relational databases.", "Editing images and videos."],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "Docker packages applications into containers that include all dependencies, ensuring consistent behavior across development, staging, and production environments."
   },
   {
     "skill": "Docker",
     "question": "What is a Dockerfile?",
     "options": ["A compressed backup of a container.", "A text document containing all the commands a user could call on the command line to assemble an image.", "The executable that runs the Docker engine.", "A file used to configure network routing in Docker."],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "A Dockerfile is a script of instructions (FROM, RUN, COPY, CMD, etc.) that Docker reads to build a container image layer by layer."
   },
   {
     "skill": "Docker",
     "question": "Which command builds a Docker image from a Dockerfile in the current directory?",
     "options": ["docker create .", "docker make .", "docker build -t my-image .", "docker compile ."],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "docker build reads the Dockerfile and builds an image. The -t flag tags the image with a name. The dot (.) specifies the build context directory."
   },
   {
     "skill": "Docker",
     "question": "What is the difference between a Docker Image and a Docker Container?",
     "options": ["An image is a running instance of a container.", "An image is a read-only template, and a container is a runnable instance of that image.", "There is no difference.", "An image is for Linux, a container is for Windows."],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "An image is an immutable template (like a class in OOP). A container is a running instance of an image (like an object). Containers can be started, stopped, and deleted."
   },
   {
     "skill": "Docker",
     "question": "Which command lists all running Docker containers?",
     "options": ["docker list", "docker ps", "docker running", "docker containers"],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "docker ps lists running containers. docker ps -a includes stopped containers. docker ps -q returns only container IDs."
   },
   {
     "skill": "Docker",
     "question": "How do you stop a running Docker container?",
     "options": ["docker kill <id>", "docker halt <id>", "docker stop <id>", "docker terminate <id>"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "docker stop sends SIGTERM (graceful shutdown), then SIGKILL after a timeout. docker kill sends an immediate SIGKILL signal."
   },
   {
     "skill": "Docker",
     "question": "What does 'docker-compose' do?",
     "options": ["It formats Dockerfiles for better readability.", "It allows you to define and run multi-container Docker applications using a YAML file.", "It combines multiple Docker images into one massive image.", "It acts as a graphical user interface for Docker."],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Docker Compose defines multi-container applications in a docker-compose.yml file, managing networking, volumes, and dependencies between services."
   },
   {
     "skill": "Docker",
     "question": "What is Docker Hub?",
     "options": ["The central processing unit of Docker.", "A cloud-based registry service where you can find and share container images.", "The internal network created by Docker.", "A tool for orchestrating containers."],
-    "correctAnswer": 1
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "Docker Hub is a public registry for Docker images. You can pull existing images (like ubuntu, nginx) and push your own custom images."
   },
   {
     "skill": "Docker",
     "question": "Which instruction in a Dockerfile specifies the base image?",
     "options": ["BASE", "START", "FROM", "INIT"],
-    "correctAnswer": 2
+    "correctAnswer": 2,
+    "difficulty": "easy",
+    "explanation": "FROM specifies the base image (e.g., FROM node:18). Every Dockerfile must start with FROM (or FROM scratch for empty base images)."
   },
   {
     "skill": "Docker",
     "question": "How do you map port 8080 on your host machine to port 80 in a Docker container?",
     "options": ["docker run -p 8080:80 my-image", "docker run -map 8080->80 my-image", "docker run --port 80:8080 my-image", "docker run -bind 8080=80 my-image"],
-    "correctAnswer": 0
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "-p (--publish) maps host:container ports. Host port 8080 receives traffic and forwards to container port 80. The format is -p host_port:container_port."
   },
   {
     "skill": "Kubernetes",
@@ -1555,8 +2615,14 @@
     "skill": "Machine Learning",
     "question": "What is Gradient Descent?",
     "options": [
+      "An algorithm that iteratively adjusts model parameters to minimize the loss function",
+      "A technique for descending a mountain gradient",
+      "A method to calculate the derivative of a function",
+      "A tree-based algorithm for classification"
+    ],
+    "correctAnswer": 0,
     "difficulty": "medium",
-    "explanation": "In a balanced BST, each comparison allows the algorithm to skip about half of the remaining tree, resulting in logarithmic time complexity."
+    "explanation": "Gradient descent is an optimization algorithm that iteratively moves model parameters in the direction of the steepest descent of the loss function to find the minimum."
   },
   {
     "skill": "Data Structures & Algorithms",
@@ -1649,6 +2715,94 @@
     "correctAnswer": 2,
     "difficulty": "hard",
     "explanation": "Dijkstra's algorithm is the standard choice for finding the shortest path from a single source to all other nodes in a weighted graph without negative edges."
+  },
+  {
+    "skill": "Data Structures & Algorithms",
+    "question": "What is the time complexity of searching for a value in a balanced Binary Search Tree (BST)?",
+    "options": ["O(1)", "O(log n)", "O(n)", "O(n^2)"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "In a balanced BST, each comparison allows the algorithm to skip about half of the remaining tree, resulting in logarithmic time complexity."
+  },
+  {
+    "skill": "Data Structures & Algorithms",
+    "question": "What is the time complexity of accessing an element in an array by index?",
+    "options": ["O(1)", "O(log n)", "O(n)", "O(n log n)"],
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "Array access by index is O(1) because the memory address is computed directly: base_address + index * element_size."
+  },
+  {
+    "skill": "Data Structures & Algorithms",
+    "question": "What is a 'stack overflow'?",
+    "options": ["When the heap memory runs out of space", "When the call stack exceeds its memory limit, often due to infinite recursion", "When a stack data structure contains too many elements", "An error in the stack push operation due to data type mismatch"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "A stack overflow occurs when the call stack exceeds its allocated memory, typically caused by unbounded recursion or excessive function calls."
+  },
+  {
+    "skill": "Data Structures & Algorithms",
+    "question": "What is the space complexity of an algorithm?",
+    "options": ["The time required to execute the algorithm", "The amount of memory required by the algorithm to run to completion", "The number of lines of code in the algorithm", "The number of variables used in the algorithm"],
+    "correctAnswer": 1,
+    "difficulty": "easy",
+    "explanation": "Space complexity measures the total memory usage (input + auxiliary space) as a function of input size. It is expressed using Big O notation like time complexity."
+  },
+  {
+    "skill": "Data Structures & Algorithms",
+    "question": "Which data structure is best for implementing a breadth-first search (BFS)?",
+    "options": ["Stack", "Queue", "Array", "Hash Table"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "BFS uses a queue to explore nodes level by level. It processes nodes in first-in-first-out order, visiting all neighbors at the current depth before moving deeper."
+  },
+  {
+    "skill": "Data Structures & Algorithms",
+    "question": "What is the worst-case time complexity of quicksort?",
+    "options": ["O(n log n)", "O(n^2)", "O(n)", "O(log n)"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "Quicksort has O(n log n) average case but O(n^2) worst case (when the pivot is consistently the smallest or largest element). Randomized pivot selection mitigates this."
+  },
+  {
+    "skill": "Data Structures & Algorithms",
+    "question": "What is a 'priority queue'?",
+    "options": ["A queue where elements are processed in the order they were added", "An abstract data type where each element has a priority and higher-priority elements are dequeued first", "A queue that can only store numbers", "A type of queue that automatically sorts elements in ascending order"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "A priority queue dequeues elements based on priority rather than insertion order. It is typically implemented using a binary heap (min-heap or max-heap)."
+  },
+  {
+    "skill": "Data Structures & Algorithms",
+    "question": "What is 'memoization'?",
+    "options": ["A technique that stores function call results and reuses them for identical inputs to avoid recomputation", "A method for organizing memory in the operating system", "A dynamic memory allocation strategy used in C", "A debugging tool for tracking memory usage"],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "Memoization caches the results of expensive function calls based on their arguments. It is a top-down approach commonly used in dynamic programming."
+  },
+  {
+    "skill": "Data Structures & Algorithms",
+    "question": "What is the time complexity of inserting at the beginning of a linked list?",
+    "options": ["O(1)", "O(n)", "O(log n)", "O(n^2)"],
+    "correctAnswer": 0,
+    "difficulty": "medium",
+    "explanation": "Inserting at the beginning of a singly linked list is O(1): create the new node and update the head pointer. No traversal is needed."
+  },
+  {
+    "skill": "Data Structures & Algorithms",
+    "question": "What is an 'adjacency matrix' in graph theory?",
+    "options": ["A list of all paths from the starting node", "A 2D array where matrix[i][j] indicates whether there is an edge from vertex i to vertex j", "A matrix that stores the shortest path distances between every pair of vertices", "A sparse representation of graph edges using linked lists"],
+    "correctAnswer": 1,
+    "difficulty": "medium",
+    "explanation": "An adjacency matrix is a V x V boolean matrix (or weighted) representation of a graph. It provides O(1) edge lookup but uses O(V^2) space."
+  },
+  {
+    "skill": "Data Structures & Algorithms",
+    "question": "What is 'divide and conquer' in algorithm design?",
+    "options": ["A strategy that splits a problem into smaller subproblems, solves them recursively, and combines the results", "A technique for dividing data evenly across multiple processors", "A method for partitioning memory into segments for different processes", "A conflict resolution strategy in concurrent programming"],
+    "correctAnswer": 0,
+    "difficulty": "easy",
+    "explanation": "Divide and conquer breaks a problem into similar subproblems (divide), solves them recursively (conquer), and combines the results. Examples: merge sort, quicksort, binary search."
   },
   {
     "skill": "Cybersecurity",
