@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { IconSearch, IconStarFilled, IconLoader2 } from '@tabler/icons-react';
 import adminService from '../../services/adminService';
 import CustomSelect from '../../components/common/CustomSelect';
+import ConfirmModal from '../../components/modals/ConfirmModal';
 
 const AdminSkills = () => {
   const [skills, setSkills] = useState([]);
@@ -10,6 +11,8 @@ const AdminSkills = () => {
   
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
+
+  const [confirmRemove, setConfirmRemove] = useState({ isOpen: false, id: null });
 
   const fetchSkills = async () => {
     try {
@@ -35,19 +38,34 @@ const AdminSkills = () => {
     return () => clearTimeout(timer);
   }, [searchQuery, activeFilter]);
 
-  const handleRemoveSkill = async (id) => {
-    if (!window.confirm("Are you sure you want to remove this skill?")) return;
+  const executeRemoveSkill = async () => {
+    if (!confirmRemove.id) return;
     try {
-      await adminService.updateListingStatus(id, 'ADMIN_DISABLED');
+      await adminService.updateListingStatus(confirmRemove.id, 'ADMIN_DISABLED');
       fetchSkills();
     } catch (err) {
       console.error('Failed to remove skill:', err);
       alert('Failed to remove skill.');
+    } finally {
+      setConfirmRemove({ isOpen: false, id: null });
     }
+  };
+
+  const handleRemoveSkill = (id) => {
+    setConfirmRemove({ isOpen: true, id });
   };
 
   return (
     <div className="fade-in">
+      <ConfirmModal 
+        isOpen={confirmRemove.isOpen}
+        onClose={() => setConfirmRemove({ isOpen: false, id: null })}
+        onConfirm={executeRemoveSkill}
+        title="Remove Skill"
+        message="Are you sure you want to remove this skill?"
+        isDanger={true}
+        confirmText="Remove Skill"
+      />
       <div className="admin-page-header">
         <div>
           <h1 className="admin-page-title">Skills Marketplace</h1>

@@ -80,7 +80,7 @@ const AppHeader = ({
         </div>
       </div>
       
-      {showSearch && (
+      {showSearch && !isNotificationOpen && (
         <GlobalSearch />
       )}
 
@@ -108,7 +108,7 @@ const AppHeader = ({
           </div>
         ))}
 
-        <NotificationDropdown />
+        <NotificationDropdown onToggle={(isOpen) => setIsNotificationOpen(isOpen)} />
 
         {avatarData && (
           <div className="profile-trigger" ref={dropdownRef}>

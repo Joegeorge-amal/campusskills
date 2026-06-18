@@ -6,7 +6,7 @@ import { useWebSocket } from '../../context/WebSocketContext';
 import NotificationPanel from '../common/AppHeader/NotificationPanel';
 import '../../styles/admin.css';
 
-const NotificationDropdown = () => {
+const NotificationDropdown = ({ onToggle }) => {
   const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
@@ -120,6 +120,12 @@ const NotificationDropdown = () => {
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen]);
+
+  useEffect(() => {
+    if (onToggle) {
+      onToggle(isOpen);
+    }
+  }, [isOpen, onToggle]);
 
   const markAllRead = async () => {
     try {

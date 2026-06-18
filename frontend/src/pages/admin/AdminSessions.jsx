@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { IconSearch, IconLoader2 } from '@tabler/icons-react';
 import adminService from '../../services/adminService';
+import ConfirmModal from '../../components/modals/ConfirmModal';
 
 const AdminSessions = () => {
   const [sessions, setSessions] = useState([]);
@@ -9,6 +10,8 @@ const AdminSessions = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
+
+  const [confirmCancel, setConfirmCancel] = useState({ isOpen: false, id: null });
 
   const fetchSessions = async () => {
     try {
@@ -34,15 +37,21 @@ const AdminSessions = () => {
     return () => clearTimeout(timer);
   }, [searchQuery, activeFilter]);
 
-  const handleCancel = async (id) => {
-    if (!window.confirm("Are you sure you want to cancel this session?")) return;
+  const executeCancel = async () => {
+    if (!confirmCancel.id) return;
     try {
-      await adminService.cancelSession(id, "Cancelled by Admin");
+      await adminService.cancelSession(confirmCancel.id, "Cancelled by Admin");
       fetchSessions();
     } catch (err) {
       console.error('Failed to cancel session:', err);
       alert('Failed to cancel session.');
+    } finally {
+      setConfirmCancel({ isOpen: false, id: null });
     }
+  };
+
+  const handleCancel = (id) => {
+    setConfirmCancel({ isOpen: true, id });
   };
 
   // Compute stats locally from fetched data
@@ -54,6 +63,15 @@ const AdminSessions = () => {
 
   return (
     <div className="admin-sessions-page fade-in">
+      <ConfirmModal 
+        isOpen={confirmCancel.isOpen}
+        onClose={() => setConfirmCancel({ isOpen: false, id: null })}
+        onConfirm={executeCancel}
+        title="Cancel Session"
+        message="Are you sure you want to cancel this session?"
+        isDanger={true}
+        confirmText="Cancel Session"
+      />
       
       {/* Top Toolbar */}
       <div className="admin-sessions-toolbar">
