@@ -18,6 +18,8 @@ import com.campusskills.modules.users.models.UserProfile;
 import com.campusskills.modules.sessions.models.Session;
 import java.util.stream.Collectors;
 
+import com.campusskills.core.database.MongoManager;
+
 public class ReviewService {
     private static final Logger log = LoggerFactory.getLogger(ReviewService.class);
 
@@ -101,6 +103,7 @@ public class ReviewService {
                 return reviewRepository.createReview(review).compose(id -> {
                     // Trigger async recalculation and update Profile & Stats
                     syncRatings(finalRevieweeId);
+                    syncListingRatings(req.getSessionId());
                     
                     // Send notification to reviewee
                     sendNotification(finalRevieweeId, com.campusskills.shared.constants.NotificationType.REVIEW_RECEIVED, "New Review Received", "You have received a new review with a rating of " + req.getRating() + " stars.", "REVIEW", id);
@@ -174,7 +177,10 @@ public class ReviewService {
             }
 
             return reviewRepository.updateReview(reviewId, rating, comment).compose(success -> {
-                if (success) syncRatings(review.getRevieweeId());
+                if (success) {
+                    syncRatings(review.getRevieweeId());
+                    syncListingRatings(review.getSessionId());
+                }
                 return Future.succeededFuture(success);
             });
         });
@@ -189,7 +195,10 @@ public class ReviewService {
             }
 
             return reviewRepository.deleteReview(reviewId).compose(success -> {
-                if (success) syncRatings(review.getRevieweeId());
+                if (success) {
+                    syncRatings(review.getRevieweeId());
+                    syncListingRatings(review.getSessionId());
+                }
                 return Future.succeededFuture(success);
             });
         });
@@ -211,6 +220,57 @@ public class ReviewService {
             }).onFailure(err -> {
                 log.error("Failed to sync ratings for user {}", revieweeId, err);
             });
+        });
+    }
+
+    private void syncListingRatings(String sessionId) {
+        if (sessionId == null) return;
+        sessionRepository.getSessionById(sessionId).onSuccess(session -> {
+            if (session == null || session.getListingId() == null) return;
+            String listingId = session.getListingId();
+            
+            JsonArray pipeline = new JsonArray()
+                .add(new JsonObject().put("$lookup", new JsonObject()
+                    .put("from", "sessions")
+                    .put("localField", "sessionId")
+                    .put("foreignField", "_id")
+                    .put("as", "session")
+                ))
+                .add(new JsonObject().put("$unwind", "$session"))
+                .add(new JsonObject().put("$match", new JsonObject().put("session.listingId", listingId)))
+                .add(new JsonObject().put("$group", new JsonObject()
+                    .put("_id", null)
+                    .put("averageRating", new JsonObject().put("$avg", "$rating"))
+                    .put("reviewCount", new JsonObject().put("$sum", 1))
+                ));
+            
+            io.vertx.core.Promise<JsonObject> promise = io.vertx.core.Promise.promise();
+            MongoManager.getClient().aggregateWithOptions("reviews", pipeline, new io.vertx.ext.mongo.AggregateOptions())
+                .handler(doc -> promise.tryComplete(doc))
+                .exceptionHandler(err -> promise.tryFail(err))
+                .endHandler(v -> promise.tryComplete(new JsonObject().put("averageRating", 0.0).put("reviewCount", 0)));
+                
+            promise.future().onSuccess(agg -> {
+                Double avg = agg.getDouble("averageRating");
+                Integer count = agg.getInteger("reviewCount");
+                
+                double finalAvg = avg != null ? avg : 0.0;
+                int finalCount = count != null ? count : 0;
+                
+                JsonObject query = new JsonObject().put("_id", listingId);
+                JsonObject update = new JsonObject().put("$set", new JsonObject()
+                    .put("averageRating", finalAvg)
+                    .put("reviewCount", finalCount)
+                    .put("updatedAt", System.currentTimeMillis()));
+                    
+                MongoManager.getClient().updateCollection("skill_listings", query, update).onFailure(err -> {
+                    log.error("Failed to update ratings for listing {}", listingId, err);
+                });
+            }).onFailure(err -> {
+                log.error("Failed to aggregate listing ratings for listing {}", listingId, err);
+            });
+        }).onFailure(err -> {
+            log.error("Failed to get session {} for listing ratings sync", sessionId, err);
         });
     }
 }

@@ -40,12 +40,14 @@ const Messages = () => {
     chats, setChats, 
     chatRequests: requests, setChatRequests: setRequests, 
     chatMessages, setChatMessages,
-    isChatsLoading: loading
+    isChatsLoading: loading,
+    fetchInitialData
   } = useAppData();
 
 
   const [typingUsers, setTypingUsers] = useState({});
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [blockingUser, setBlockingUser] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [replyingTo, setReplyingTo] = useState(null);
   const [editingMessage, setEditingMessage] = useState(null);
@@ -485,7 +487,7 @@ const Messages = () => {
       } else if (activeChatId === 'requests') {
         navigate('/app/messages');
       }
-      fetchChatsAndRequests();
+      fetchInitialData();
     } catch (err) {
       triggerToast('Failed to accept request');
     }
@@ -494,7 +496,7 @@ const Messages = () => {
   const handleDeclineRequest = async (id) => {
     try {
       await chatRequestService.rejectRequest(id);
-      fetchChatsAndRequests();
+      fetchInitialData();
     } catch (err) {
       triggerToast('Failed to decline request');
     }
@@ -650,16 +652,12 @@ const Messages = () => {
                     </div>
                     <div style={{ display: 'flex', gap: '8px' }}>
                       <button 
-                        onClick={async () => {
-                          if (window.confirm('Are you sure you want to block this user?')) {
-                            try {
-                              await userService.blockUser(req.rawReq.senderId);
-                              triggerToast('User blocked successfully');
-                              fetchChatsAndRequests();
-                            } catch (e) {
-                              triggerToast('Failed to block user');
-                            }
-                          }
+                        onClick={() => {
+                          setBlockingUser({
+                            id: req.rawReq.senderId,
+                            name: req.name,
+                            callback: fetchChatsAndRequests
+                          });
                         }}
                         style={{ width: '36px', height: '36px', borderRadius: '100px', border: '1px solid #e2e8f0', background: '#fff', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', title: 'Block User' }}
                       >
@@ -709,17 +707,11 @@ const Messages = () => {
                 </div>
 
                 <button 
-                  onClick={async () => {
-                    if (window.confirm('Are you sure you want to block this user?')) {
-                      try {
-                        await userService.blockUser(activeChat.otherId);
-                        triggerToast('User blocked successfully');
-                        navigate('/app/messages');
-                        window.location.reload();
-                      } catch (e) {
-                        triggerToast('Failed to block user');
-                      }
-                    }
+                  onClick={() => {
+                    setBlockingUser({
+                      id: activeChat.otherId,
+                      name: activeChat.name
+                    });
                   }}
                   style={{ width: '36px', height: '36px', borderRadius: '100px', border: 'none', background: '#fee2e2', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', title: 'Block User' }}
                 >
@@ -924,6 +916,42 @@ const Messages = () => {
             onConfirm={handleDeleteChat}
             isDeleting={isDeleting}
           />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {blockingUser && (
+          <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(15, 23, 42, 0.4)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '24px' }}>
+            <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', width: '100%', maxWidth: '320px', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}>
+              <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 600, color: 'var(--cs-text-main)' }}>Block {blockingUser.name}?</h3>
+              <p style={{ margin: '0 0 24px 0', fontSize: '14px', color: 'var(--cs-text-inactive)', lineHeight: '1.4' }}>Are you sure you want to block this user? They will not be able to message you or view your listings.</p>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button onClick={() => setBlockingUser(null)} style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#fff', color: '#64748b', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
+                <button 
+                  onClick={async () => {
+                    const targetId = blockingUser.id;
+                    const callback = blockingUser.callback;
+                    setBlockingUser(null);
+                    try {
+                      await userService.blockUser(targetId);
+                      triggerToast('User blocked successfully');
+                      if (callback) {
+                        callback();
+                      } else {
+                        navigate('/app/messages');
+                        window.location.reload();
+                      }
+                    } catch (e) {
+                      triggerToast('Failed to block user');
+                    }
+                  }} 
+                  style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: '#ef4444', color: '#fff', fontWeight: 600, cursor: 'pointer' }}
+                >
+                  Block
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </AnimatePresence>
     </div>

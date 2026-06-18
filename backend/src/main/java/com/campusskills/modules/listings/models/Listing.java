@@ -55,9 +55,14 @@ public class Listing {
 
     private Integer requestCount; // NEW: tracks total requests received
 
+    private Double averageRating;
+    private Integer reviewCount;
+
     public Listing() {
         this.status = "ACTIVE";
         this.requestCount = 0;
+        this.averageRating = 0.0;
+        this.reviewCount = 0;
     }
 
     // --- Synchronization methods for dual-write ---
@@ -172,4 +177,10 @@ public class Listing {
 
     public Integer getRequestCount() { return requestCount; }
     public void setRequestCount(Integer requestCount) { this.requestCount = requestCount; }
+
+    public Double getAverageRating() { return averageRating; }
+    public void setAverageRating(Double averageRating) { this.averageRating = averageRating; }
+
+    public Integer getReviewCount() { return reviewCount; }
+    public void setReviewCount(Integer reviewCount) { this.reviewCount = reviewCount; }
 }

@@ -21,6 +21,29 @@ const SessionLifecycleManager = () => {
   const [activePopup, setActivePopup] = useState(null);
   const [reviewModalData, setReviewModalData] = useState(null);
   const [dismissedRequests, setDismissedRequests] = useState([]);
+  const [snoozedSessions, setSnoozedSessions] = useState(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem('snoozedSessions') || '{}');
+      const now = Date.now();
+      const cleaned = {};
+      Object.keys(stored).forEach(key => {
+        if (stored[key] > now) {
+          cleaned[key] = stored[key];
+        }
+      });
+      return cleaned;
+    } catch {
+      return {};
+    }
+  });
+
+  const handleSnooze = (sessionId) => {
+    const snoozeUntil = Date.now() + 10 * 60 * 1000; // 10 minutes
+    const updated = { ...snoozedSessions, [sessionId]: snoozeUntil };
+    setSnoozedSessions(updated);
+    localStorage.setItem('snoozedSessions', JSON.stringify(updated));
+    setActivePopup(null);
+  };
 
   // Monitor for pending states on load or data refresh (handles reloads where WS events are lost)
   useEffect(() => {
@@ -94,6 +117,11 @@ const SessionLifecycleManager = () => {
         if (weConfirmed) return false;
 
         const end = s.rawSession.scheduledEnd;
+
+        // Skip if this session is currently snoozed
+        const snoozeUntil = snoozedSessions[s.id];
+        if (snoozeUntil && now < snoozeUntil) return false;
+
         // Prompt if it ended in the last hour, and is past the end time
         return end && now >= end && (now - end) < 3600000;
       });
@@ -107,7 +135,7 @@ const SessionLifecycleManager = () => {
     }, 60000); // Check every minute
 
     return () => clearInterval(interval);
-  }, [sessionsData, user, activePopup]);
+  }, [sessionsData, user, activePopup, snoozedSessions]);
 
   // React to WebSockets via sessionEvent
   useEffect(() => {
@@ -337,9 +365,9 @@ const SessionLifecycleManager = () => {
           title={`Has ${activePopup.session.topic || 'the session'} been completed?`}
           message="The scheduled time has ended. Did you complete the session successfully?"
           confirmText="Yes, Completed"
-          cancelText="Dismiss"
+          cancelText="Snooze"
           onConfirm={() => handleMarkCompletion(activePopup.session.id)}
-          onClose={() => setActivePopup(null)}
+          onClose={() => handleSnooze(activePopup.session.id)}
         />
       )}
 

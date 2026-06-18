@@ -79,7 +79,7 @@ public class UserProfileRepository {
         JsonObject updateDoc = new JsonObject()
             .put("$addToSet", new JsonObject().put("blockedUsers", targetUserId))
             .put("$set", new JsonObject().put("updatedAt", System.currentTimeMillis()));
-        return client.updateCollection(COLLECTION, query, updateDoc).map(res -> res.getDocModified() > 0);
+        return client.updateCollection(COLLECTION, query, updateDoc).map(res -> res.getDocMatched() > 0);
     }
 
     public Future<Boolean> unblockUser(String userId, String targetUserId) {
@@ -87,7 +87,7 @@ public class UserProfileRepository {
         JsonObject updateDoc = new JsonObject()
             .put("$pull", new JsonObject().put("blockedUsers", targetUserId))
             .put("$set", new JsonObject().put("updatedAt", System.currentTimeMillis()));
-        return client.updateCollection(COLLECTION, query, updateDoc).map(res -> res.getDocModified() > 0);
+        return client.updateCollection(COLLECTION, query, updateDoc).map(res -> res.getDocMatched() > 0);
     }
 
     public Future<java.util.List<String>> getBlockedByUsers(String targetUserId) {

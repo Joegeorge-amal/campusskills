@@ -350,12 +350,6 @@ const SkillQuizModal = ({ isOpen, skillName, onClose, onComplete }) => {
           <p style={{ fontSize: '16px', color: '#6b7280', marginBottom: '8px' }}>
             You scored <strong style={{ color: '#ef4444' }}>{finalScore}%</strong>. A minimum of 60% is required to pass.
           </p>
-          {debugMsg && (
-            <div style={{ background: '#f3f4f6', padding: '12px', borderRadius: '8px', marginBottom: '24px', fontSize: '12px', textAlign: 'left', overflowWrap: 'break-word', maxHeight: '200px', overflowY: 'auto', fontFamily: 'monospace' }}>
-              <strong>DEBUG TRACE (Please send to AI):</strong><br/>
-              {debugMsg}
-            </div>
-          )}
           <button onClick={handleReturnToProfile} style={{ marginTop: '24px', padding: '14px 24px', background: '#e5e7eb', color: '#374151', border: 'none', borderRadius: '12px', fontWeight: 700, fontSize: '16px', cursor: 'pointer' }}>
             Return to Profile
           </button>
