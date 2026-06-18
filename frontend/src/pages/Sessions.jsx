@@ -404,8 +404,21 @@ const Sessions = () => {
 
           {/* Details Preview */}
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: '14px', fontWeight: 700, color: '#111827', marginBottom: '2px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ fontSize: '14px', fontWeight: 700, color: '#111827', marginBottom: '2px', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
               {s.topic}
+              {isSwap ? (
+                <span style={{ fontSize: '10px', fontWeight: 600, background: '#f3e8ff', color: '#7e22ce', padding: '2px 8px', borderRadius: '12px' }}>
+                  🔄 Skill Exchange
+                </span>
+              ) : s.rawSession.requiresPayment ? (
+                <span style={{ fontSize: '10px', fontWeight: 600, background: '#dcfce7', color: '#166534', padding: '2px 8px', borderRadius: '12px' }}>
+                  💰 Paid Session
+                </span>
+              ) : (
+                <span style={{ fontSize: '10px', fontWeight: 600, background: '#e0f2fe', color: '#0369a1', padding: '2px 8px', borderRadius: '12px' }}>
+                  🤝 Free Session
+                </span>
+              )}
             </div>
             <div style={{ fontSize: '12px', color: '#6b7280' }}>
               {s.role === 'Teaching' ? `Teaching ${s.name}` : `Learning from ${s.name}`} · {s.time}

@@ -208,6 +208,7 @@ public class ExchangeService {
                             sessionA.setScheduledEnd(firstSessionStart + durationMs);
                             sessionA.setListingId(exchange.getListingId());
                             sessionA.setMode(sessionMode);
+                            sessionA.setRequiresPayment(false);
                             
                             // Session B
                             Session sessionB = new Session();
@@ -219,6 +220,7 @@ public class ExchangeService {
                             sessionB.setScheduledEnd(secondSessionStart + durationMs);
                             sessionB.setListingId(exchange.getListingId());
                             sessionB.setMode(sessionMode);
+                            sessionB.setRequiresPayment(false);
                             
                             sessionFutures.add(sessionRepository.createSession(sessionA).onSuccess(sessId -> {
                                 sendNotification(sessionA.getTeacherId(), "SESSION_ACCEPTED", "Session Accepted", "A new session has been scheduled.", "SESSION", sessId);
@@ -262,6 +264,9 @@ public class ExchangeService {
                             session.setScheduledEnd(sessionStart + durationMs);
                             session.setListingId(exchange.getListingId());
                             session.setMode(sessionMode);
+                            
+                            boolean isPaid = listing != null && listing.getPrice() != null && listing.getPrice() > 0;
+                            session.setRequiresPayment(isPaid);
                             
                             final String fTeacherId = teacherId;
                             final String fStudentId = studentId;
