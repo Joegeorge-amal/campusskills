@@ -29,7 +29,10 @@ const ReviewModal = ({ isOpen, onClose, session, onSubmit }) => {
       if (onSubmit) onSubmit();
       onClose();
     } catch (err) {
-      if (err.message && (err.message.includes('CONFLICT') || err.message.includes('already reviewed'))) {
+      const errorMsg = err.response?.data?.error || err.message || '';
+      const status = err.response?.status;
+      console.log('[ReviewModal] Error:', { status, errorMsg, sessionId: session?.id });
+      if (errorMsg.includes('CONFLICT') || errorMsg.includes('already reviewed')) {
         triggerToast('You already reviewed this session');
         if (onSubmit) onSubmit();
         onClose();

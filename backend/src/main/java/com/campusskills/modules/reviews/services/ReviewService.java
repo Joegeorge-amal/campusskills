@@ -50,44 +50,60 @@ public class ReviewService {
     }
 
     public Future<String> createReview(CreateReviewRequest req, String reviewerId) {
+        log.info("[Review DEBUG] createReview entry — sessionId='{}', rating={}, reviewerId='{}'", req.getSessionId(), req.getRating(), reviewerId);
         if (req.getSessionId() == null || req.getSessionId().trim().isEmpty()) {
+            log.warn("[Review DEBUG] FAILED — sessionId is null/empty");
             return Future.failedFuture("sessionId is required");
         }
         if (req.getRating() == null) {
+            log.warn("[Review DEBUG] FAILED — rating is null");
             return Future.failedFuture("rating is required");
         }
         if (req.getRating() < 1.0 || req.getRating() > 5.0) {
+            log.warn("[Review DEBUG] FAILED — rating out of range: {}", req.getRating());
             return Future.failedFuture("rating must be between 1.0 and 5.0");
         }
         if ((req.getRating() * 10) % 5 != 0) {
+            log.warn("[Review DEBUG] FAILED — rating not in 0.5 increments: {}", req.getRating());
             return Future.failedFuture("rating must be in 0.5 increments (e.g. 1.0, 1.5, 2.0)");
         }
 
         return sessionRepository.getSessionById(req.getSessionId()).compose(session -> {
             if (session == null) {
+                log.warn("[Review DEBUG] FAILED — getSessionById returned null for sessionId='{}'", req.getSessionId());
                 return Future.failedFuture("SESSION_NOT_FOUND");
             }
+            log.info("[Review DEBUG] getSessionById OK — sessionId='{}', teacherId='{}', studentId='{}', status={}",
+                session.getId(), session.getTeacherId(), session.getStudentId(), session.getStatus());
             if (!session.getTeacherId().equals(reviewerId) && !session.getStudentId().equals(reviewerId)) {
+                log.warn("[Review DEBUG] FAILED — reviewerId='{}' not in session participants (teacher='{}', student='{}')",
+                    reviewerId, session.getTeacherId(), session.getStudentId());
                 return Future.failedFuture("UNAUTHORIZED: You are not a participant in this session");
             }
             if (session.getStatus() != SessionStatus.COMPLETED) {
+                log.warn("[Review DEBUG] FAILED — session status is {} not COMPLETED", session.getStatus());
                 return Future.failedFuture("FORBIDDEN: Reviews can only be submitted for COMPLETED sessions");
             }
 
             // Determine revieweeId (the other participant)
             String revieweeId = session.getTeacherId().equals(reviewerId) ? session.getStudentId() : session.getTeacherId();
+            log.info("[Review DEBUG] Determined revieweeId='{}' for reviewerId='{}'", revieweeId, reviewerId);
 
             if (revieweeId == null) {
+                log.warn("[Review DEBUG] FAILED — revieweeId is null");
                 return Future.failedFuture("UNAUTHORIZED: Could not determine reviewee");
             }
             if (revieweeId.equals(reviewerId)) {
+                log.warn("[Review DEBUG] FAILED — revieweeId equals reviewerId ('{}')", reviewerId);
                 return Future.failedFuture("CONFLICT: You cannot review yourself");
             }
             
             final String finalRevieweeId = revieweeId;
 
             return reviewRepository.hasReviewed(req.getSessionId(), reviewerId, finalRevieweeId).compose(hasReviewed -> {
+                log.info("[Review DEBUG] hasReviewed({}, {}, {}) = {}", req.getSessionId(), reviewerId, finalRevieweeId, hasReviewed);
                 if (hasReviewed) {
+                    log.warn("[Review DEBUG] FAILED — duplicate review detected");
                     return Future.failedFuture("CONFLICT: You have already reviewed this user for this session");
                 }
 
@@ -100,7 +116,10 @@ public class ReviewService {
                     review.setComment(req.getComment().trim());
                 }
 
+                log.info("[Review DEBUG] Creating review document — sessionId='{}', reviewerId='{}', revieweeId='{}'",
+                    req.getSessionId(), reviewerId, finalRevieweeId);
                 return reviewRepository.createReview(review).compose(id -> {
+                    log.info("[Review DEBUG] Review created with id='{}'", id);
                     // Trigger async recalculation and update Profile & Stats
                     syncRatings(finalRevieweeId);
                     syncListingRatings(req.getSessionId());

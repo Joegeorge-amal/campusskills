@@ -5,8 +5,11 @@ import com.campusskills.modules.reviews.services.ReviewService;
 import com.campusskills.web.response.ApiResponse;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ReviewHandler {
+    private static final Logger log = LoggerFactory.getLogger(ReviewHandler.class);
 
     private final ReviewService reviewService;
 
@@ -20,15 +23,21 @@ public class ReviewHandler {
             CreateReviewRequest req = body.mapTo(CreateReviewRequest.class);
 
             String authId = ctx.get("authenticatedUserId");
+            log.info("[Review DEBUG] createReview called — sessionId={}, rating={}, authId={}", req.getSessionId(), req.getRating(), authId);
+
             if (authId == null) {
                 ApiResponse.forbidden(ctx, "Unauthorized");
                 return;
             }
 
             reviewService.createReview(req, authId)
-                .onSuccess(id -> ApiResponse.created(ctx, new JsonObject().put("id", id).put("message", "Review submitted successfully")))
+                .onSuccess(id -> {
+                    log.info("[Review DEBUG] createReview SUCCESS — reviewId={}, sessionId={}, reviewerId={}", id, req.getSessionId(), authId);
+                    ApiResponse.created(ctx, new JsonObject().put("id", id).put("message", "Review submitted successfully"));
+                })
                 .onFailure(err -> {
                     String msg = err.getMessage();
+                    log.error("[Review DEBUG] createReview FAILED — sessionId={}, reviewerId={}, error={}", req.getSessionId(), authId, msg);
                     if (msg.startsWith("FORBIDDEN") || msg.startsWith("UNAUTHORIZED")) {
                         ApiResponse.forbidden(ctx, msg);
                     } else if (msg.startsWith("CONFLICT")) {
@@ -40,6 +49,7 @@ public class ReviewHandler {
                     }
                 });
         } catch (Exception e) {
+            log.error("[Review DEBUG] createReview parse error", e);
             ApiResponse.badRequest(ctx, "Invalid JSON format");
         }
     }
