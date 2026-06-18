@@ -204,7 +204,9 @@ button, input, select, textarea {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0,0,0,0.45);
+  background: rgba(15, 23, 42, 0.20);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   z-index: 9999;
 }
 
@@ -212,12 +214,11 @@ button, input, select, textarea {
   width: min(500px, 92vw);
   border-radius: 24px;
   background: white;
-  animation: modalDropIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 @keyframes modalDropIn {
-  from { opacity: 0; transform: translateY(-40px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 /* ─── GLOSSY CARD EFFECT ─── */

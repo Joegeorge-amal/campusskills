@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useAppData } from '../context/AppDataContext';
 import Avatar from '../components/common/Avatar';
+import ModalWrapper from '../components/common/ModalWrapper';
 import ReviewSection from '../components/profile/ReviewSection';
 import { 
   IconCheck, 
@@ -320,16 +321,15 @@ const Profile = () => {
         }} 
       />
 
-      {listingToDelete && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', zIndex: 1000, display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '16px', paddingTop: '80px', backdropFilter: 'blur(4px)' }}>
-          <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', width: '100%', maxWidth: '400px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <ModalWrapper isOpen={!!listingToDelete} onClose={() => setListingToDelete(null)} maxWidth="400px" zIndex={1000}>
+          <div style={{ padding: '24px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
               <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#111827' }}>Delete Listing</h3>
               <button onClick={() => setListingToDelete(null)} style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', padding: '4px', display: 'flex' }}><IconX size={20} /></button>
             </div>
-            <p style={{ margin: 0, fontSize: '14px', color: '#4b5563', lineHeight: '1.5' }}>Are you sure you want to delete <strong style={{color: '#111827'}}>{listingToDelete.title}</strong>? This action cannot be undone.</p>
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', marginTop: '8px' }}>
-              <button onClick={() => setListingToDelete(null)} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #e5e7eb', background: '#fff', color: '#374151', fontWeight: 600, fontSize: '13px', cursor: 'pointer', transition: 'all 0.2s' }}>Cancel</button>
+            <p style={{ margin: '0 0 16px 0', fontSize: '14px', color: '#4b5563', lineHeight: '1.5' }}>Are you sure you want to delete <strong style={{color: '#111827'}}>{listingToDelete?.title}</strong>? This action cannot be undone.</p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button onClick={() => setListingToDelete(null)} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #e5e7eb', background: '#fff', color: '#374151', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}>Cancel</button>
               <button onClick={async () => {
                 try {
                   await listingService.deactivateListing(listingToDelete._id || listingToDelete.id);
@@ -343,8 +343,8 @@ const Profile = () => {
               }} style={{ padding: '8px 16px', borderRadius: '6px', border: 'none', background: '#dc2626', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>Delete</button>
             </div>
           </div>
-        </div>
-      )}
+        </ModalWrapper>
+        
 
       {/* Blue Banner */}
       <div 

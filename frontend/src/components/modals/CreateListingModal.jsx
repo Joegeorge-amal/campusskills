@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
 import { useAppData } from '../../context/AppDataContext';
 import { useAuth } from '../../context/AuthContext';
 import { IconX, IconPlus, IconTrash } from '@tabler/icons-react';
@@ -8,6 +7,7 @@ import MarketplaceCard from '../common/MarketplaceCard/MarketplaceCard';
 import AutocompleteInput from '../AutocompleteInput';
 import CustomSelect from '../common/CustomSelect';
 import CustomTimeInput from '../common/CustomTimeInput';
+import ModalWrapper from '../common/ModalWrapper';
 
 const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
   const { triggerToast } = useAppData();
@@ -172,12 +172,8 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
     }
   };
 
-  return ReactDOM.createPortal(
-    <div className="modal-overlay" onClick={onClose} style={{
-      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-      background: 'rgba(0,0,0,0.5)', zIndex: 1000,
-      display: 'flex', alignItems: 'flex-start', justifyContent: 'center', padding: '16px', paddingTop: '40px'
-    }}>
+  return (
+    <ModalWrapper isOpen={isOpen} onClose={onClose} maxWidth="640px" zIndex={1000}>
       <style>{`
         .clm-wrapper {
           background: #ffffff;
@@ -186,14 +182,8 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
           max-width: 640px;
           max-height: 90vh;
           overflow: hidden;
-          box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
           display: flex;
           flex-direction: column;
-          animation: modalDropIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        @keyframes modalDropIn {
-          from { opacity: 0; transform: translateY(-40px); }
-          to { opacity: 1; transform: translateY(0); }
         }
         .clm-header {
           background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
@@ -563,8 +553,7 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
           </div>
         )}
       </div>
-    </div>,
-    document.body
+    </ModalWrapper>
   );
 };
 

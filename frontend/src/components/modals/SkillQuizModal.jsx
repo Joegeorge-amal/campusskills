@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import ReactDOM from 'react-dom';
 import { verificationService } from '../../services/verificationService';
 import { IconCircleCheckFilled, IconAlertTriangleFilled, IconClock, IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
+import ModalWrapper from '../common/ModalWrapper';
 
 const SkillQuizModal = ({ isOpen, skillName, onClose, onComplete }) => {
   const [step, setStep] = useState('loading'); // 'loading', 'not_available', 'quiz', 'confirm', 'pass', 'fail', 'fail_cheat'
@@ -358,13 +358,12 @@ const SkillQuizModal = ({ isOpen, skillName, onClose, onComplete }) => {
     }
   };
 
-  return ReactDOM.createPortal(
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 99999 }}>
-      <div style={{ background: '#fff', width: '100%', maxWidth: '600px', height: '600px', borderRadius: '24px', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}>
+  return (
+    <ModalWrapper isOpen={true} onClose={onClose} maxWidth="600px" zIndex={99999}>
+      <div style={{ background: '#fff', width: '100%', height: '600px', borderRadius: '16px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         {renderContent()}
       </div>
-    </div>,
-    document.body
+    </ModalWrapper>
   );
 };
 
