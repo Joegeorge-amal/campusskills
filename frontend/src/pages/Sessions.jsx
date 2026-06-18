@@ -108,17 +108,20 @@ const Sessions = () => {
     } else if (sessionEvent.type === 'PAYMENT_CONFIRMED') {
       setIsHistoryOpen(true);
       triggerToast('Payment confirmed! Please leave a review.');
-      // Build a stub session object for the review modal
-      const stubSession = localSession || {
-        id: sessionId,
-        rawSession: raw,
-        topic: raw.topic || 'Skill Session',
-        name: isTeacher ? (raw.studentName || 'Student') : (raw.teacherName || 'Teacher'),
-        role: myRole,
-        status: 'COMPLETED'
-      };
-      setSelectedSessionForReview(stubSession);
-      setReviewModalOpen(true);
+      // Only auto-open review modal if not already reviewed
+      const alreadyReviewed = localSession?.rawSession?.hasReviewed || raw.hasReviewed;
+      if (!alreadyReviewed) {
+        const stubSession = localSession || {
+          id: sessionId,
+          rawSession: raw,
+          topic: raw.topic || 'Skill Session',
+          name: isTeacher ? (raw.studentName || 'Student') : (raw.teacherName || 'Teacher'),
+          role: myRole,
+          status: 'COMPLETED'
+        };
+        setSelectedSessionForReview(stubSession);
+        setReviewModalOpen(true);
+      }
     } else if (sessionEvent.type === 'COMPLETION_REQUESTED') {
       setIsHistoryOpen(true);
       const requesterIsTeacher = raw.teacherConfirmedCompletion;
@@ -962,14 +965,13 @@ const Sessions = () => {
         onClose={() => {
           setReviewModalOpen(false);
           setSelectedSessionForReview(null);
+          fetchInitialData();
         }}
         session={selectedSessionForReview}
         onSubmit={() => {
-          if (selectedSessionForReview) {
-            selectedSessionForReview.rawSession.hasReviewed = true;
-          }
           setReviewModalOpen(false);
           setSelectedSessionForReview(null);
+          fetchInitialData();
         }}
       />
     </div>
