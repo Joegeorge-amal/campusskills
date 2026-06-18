@@ -69,10 +69,11 @@
     font-size: 9px;
   }
 
-  /* ─── DASHBOARD STAT CARDS: MOBILE (2×2 → 2 columns) ─── */
+  /* ─── DASHBOARD STAT CARDS: MOBILE (4 → 2 columns) ─── */
   #home .stats-grid {
     max-width: 100% !important;
     gap: 12px !important;
+    grid-template-columns: repeat(2, 1fr) !important;
   }
 
   #home .stats-grid .glossy-card {

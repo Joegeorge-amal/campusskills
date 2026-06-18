@@ -10,6 +10,7 @@ import {
   IconCheck, 
   IconStarFilled, 
   IconStar,
+  IconTrophy,
   IconCalendarMonth,
   IconArrowsRightLeft,
   IconActivity
@@ -188,22 +189,12 @@ const Dashboard = () => {
           </button>
         </div>
 
-        {/* Compute verified skill text */}
+        {/* Stats Grid — 4 columns */}
         {(() => {
-          const vSkills = user?.verifiedSkills || [];
-          const verifiedCount = vSkills.length;
-          let verifiedText = 'No verified skills';
-          if (verifiedCount === 1) {
-            const s = vSkills[0];
-            const name = typeof s === 'string' ? s : (s?.name || 'Skill');
-            verifiedText = `${name}`;
-          } else if (verifiedCount > 1) {
-            verifiedText = `${verifiedCount} verified skills`;
-          }
+          const verifiedCount = user?.verifiedSkills?.length || 0;
         
-        {/* Stats Grid — 2×2 */}
         return (
-        <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px', marginBottom: '28px', maxWidth: '520px', marginLeft: 'auto', marginRight: 'auto', width: '100%' }}>
+        <div className="stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '28px', maxWidth: '700px', marginLeft: 'auto', marginRight: 'auto', width: '100%' }}>
           
           {/* Skills Offered */}
           <div className="glossy-card" style={{ background: '#ffffff', padding: '32px 16px', minHeight: '190px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: '16px' }}>
@@ -243,13 +234,13 @@ const Dashboard = () => {
 
           {/* Verified Skills */}
           <div className="glossy-card" style={{ background: '#ffffff', padding: '32px 16px', minHeight: '190px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: '16px' }}>
-            <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <IconStarFilled size={22} strokeWidth={1.5} />
+            <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#fefce8', color: '#a16207', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <IconTrophy size={22} strokeWidth={1.5} />
             </div>
             <div>
               <div style={{ fontSize: '32px', fontWeight: 800, color: '#111827', lineHeight: 1.1, marginBottom: '6px' }}>{verifiedCount}</div>
               <div style={{ fontSize: '13px', color: '#4b5563', fontWeight: 700, lineHeight: 1.3, marginBottom: '4px' }}>Verified Skills</div>
-              <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500, lineHeight: 1.3 }}>{verifiedText}</div>
+              <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500, lineHeight: 1.3 }}>Verified</div>
             </div>
           </div>
 
