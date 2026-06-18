@@ -7,7 +7,7 @@ import { useAppData } from '../../context/AppDataContext';
 import Avatar from '../common/Avatar';
 
 const BlockedUsersModal = ({ onClose }) => {
-  const { user, fetchUser } = useAuth();
+  const { user, fetchProfile } = useAuth();
   const { triggerToast } = useAppData();
   const [blockedProfiles, setBlockedProfiles] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -50,9 +50,11 @@ const BlockedUsersModal = ({ onClose }) => {
   const handleUnblock = async (targetId) => {
     try {
       await userService.unblockUser(targetId);
-      triggerToast('User unblocked');
+      triggerToast('User unblocked', 'success');
+      // Update local state instantly so user doesn't see "Failed to unblock" or stale list
+      setBlockedProfiles(prev => prev.filter(p => p.userId !== targetId));
       // Refresh context user to get updated blockedUsers list
-      await fetchUser();
+      await fetchProfile();
     } catch (err) {
       triggerToast('Failed to unblock user');
     }
