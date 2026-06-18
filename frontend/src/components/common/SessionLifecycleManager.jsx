@@ -11,32 +11,23 @@ import PaymentModal from '../modals/PaymentModal';
 
 const SessionLifecycleManager = () => {
   const { user } = useAuth();
-  const {
-    sessionEvent,
-    sessionsData,
-    requestsData,
-    fetchInitialData
-  } = useAppData();
+  const { sessionEvent, sessionsData, requestsData, fetchInitialData } = useAppData();
 
   const [activePopup, setActivePopup] = useState(null);
   const [reviewModalData, setReviewModalData] = useState(null);
   const [dismissedRequests, setDismissedRequests] = useState([]);
 
-  // Ref tracks session IDs whose review popup was already opened this page session.
-  // Every code path that opens the review modal MUST add the ID here first.
-  // This is the single guard against duplicate review popups.
-  const shownReviewIds = useRef(new Set());
-  // Ref tracks session IDs for which PAYMENT_WAITING was already shown to avoid repeated info banners.
-  const shownPaymentWaitingIds = useRef(new Set());
+  // These refs are the ONLY guards against duplicate modals.
+  // They are always current (not subject to stale closures).
+  const shownReviewIds = useRef(new Set());          // session IDs where review was already triggered
+  const shownPaymentWaitingIds = useRef(new Set()); // teacher "waiting for payment" shown IDs
 
   const [snoozedSessions, setSnoozedSessions] = useState(() => {
     try {
       const stored = JSON.parse(localStorage.getItem('snoozedSessions') || '{}');
       const now = Date.now();
       const cleaned = {};
-      Object.keys(stored).forEach(key => {
-        if (stored[key] > now) cleaned[key] = stored[key];
-      });
+      Object.keys(stored).forEach(k => { if (stored[k] > now) cleaned[k] = stored[k]; });
       return cleaned;
     } catch { return {}; }
   });
@@ -49,150 +40,158 @@ const SessionLifecycleManager = () => {
     setActivePopup(null);
   };
 
-  // ─── Helper: open review modal (always marks shownReviewIds first) ────────────
+  // Open the review modal — single gateway, always checks shownReviewIds first
   const openReviewModal = (id, rawSession, topic, name, role) => {
-    if (shownReviewIds.current.has(id)) return; // already shown, skip
+    if (shownReviewIds.current.has(id)) return;
     shownReviewIds.current.add(id);
-    setReviewModalData({ id, rawSession, topic, name, role, status: 'COMPLETED' });
+    // Use functional setter: if a review modal is already open, don't overwrite
+    setReviewModalData(prev => prev ?? { id, rawSession, topic, name, role, status: 'COMPLETED' });
   };
 
-  // ─── Helper: detect if a session is a swap ────────────────────────────────────
-  const detectIsSwap = (rawSession) => {
-    if (rawSession.swapGroupId) return true;
-    const req = requestsData.find(r => r.id === rawSession.exchangeId);
-    return req && req.rawReq?.type === 'SWAP';
-  };
-
-  // ─── Helper: detect if session requires payment ───────────────────────────────
-  const detectRequiresPayment = (rawSession) => {
+  // Detect if a session requires payment based on its current stored fields
+  const requiresPaymentFor = (rawSession) => {
     if (rawSession.requiresPayment != null) return rawSession.requiresPayment;
-    // Fallback for old sessions without the field:
-    // if payment was auto-settled (free), both flags will be true
+    // Fallback for old sessions: if backend auto-settled payment, it's free
     if (rawSession.studentMarkedPaid && rawSession.teacherConfirmedPayment) return false;
-    // if it's a swap, no payment
-    if (detectIsSwap(rawSession)) return false;
-    // Otherwise assume paid (conservative)
-    return true;
+    // Check if it's a swap via requestsData
+    const req = requestsData.find(r => r.id === rawSession.exchangeId);
+    if (rawSession.swapGroupId || (req && req.rawReq?.type === 'SWAP')) return false;
+    return true; // conservative default
   };
 
-  // ─── POLLING FALLBACK ────────────────────────────────────────────────────────
+  // ─── POLLING (data-driven, single source of truth) ───────────────────────────
   // Runs on every sessionsData/requestsData refresh.
-  // This is the reliable fallback for missed WS events and page reloads.
+  // Uses functional setters throughout — if current state already matches, React
+  // returns the same reference and skips the re-render, preventing modal flicker.
   useEffect(() => {
     if (!sessionsData || !user?.userId) return;
 
-    // 1. COMPLETION_REQUESTED — the other person confirmed, WE haven't yet
+    // ── 1. COMPLETION_REQUESTED ───────────────────────────────────────────────
+    // The other person confirmed but WE haven't yet
     const pendingCompletion = sessionsData.find(s => {
       if (s.status !== 'SCHEDULED') return false;
-      const isTeacher = s.rawSession.teacherId === user.userId;
-      const isStudent = s.rawSession.studentId === user.userId;
-      const tConf = s.rawSession.teacherConfirmedCompletion;
-      const sConf = s.rawSession.studentConfirmedCompletion;
-      if (isTeacher && sConf && !tConf) return true;
-      if (isStudent && tConf && !sConf) return true;
-      return false;
+      const iT = s.rawSession.teacherId === user.userId;
+      const iS = s.rawSession.studentId === user.userId;
+      const tC = s.rawSession.teacherConfirmedCompletion;
+      const sC = s.rawSession.studentConfirmedCompletion;
+      return (iT && sC && !tC) || (iS && tC && !sC);
     });
 
     if (pendingCompletion) {
-      if (!activePopup || activePopup.type !== 'COMPLETION_REQUESTED' || activePopup.session?.id !== pendingCompletion.id) {
-        setActivePopup({ type: 'COMPLETION_REQUESTED', session: { id: pendingCompletion.id, topic: pendingCompletion.topic } });
+      setActivePopup(prev => {
+        // Functional setter: only update if the popup is genuinely different
+        if (prev?.type === 'COMPLETION_REQUESTED' && prev?.session?.id === pendingCompletion.id) return prev;
+        return { type: 'COMPLETION_REQUESTED', session: { id: pendingCompletion.id, topic: pendingCompletion.topic } };
+      });
+      return; // don't check lower-priority states
+    }
+
+    // ── 2. PAYMENT states (paid sessions only) ────────────────────────────────
+    let paymentPopup = null;
+    for (const s of sessionsData) {
+      if (s.status !== 'COMPLETED') continue;
+      if (!requiresPaymentFor(s.rawSession)) continue;
+
+      const iT = s.rawSession.teacherId === user.userId;
+      const iS = s.rawSession.studentId === user.userId;
+      const sPaid = s.rawSession.studentMarkedPaid;
+      const tConf = s.rawSession.teacherConfirmedPayment;
+
+      if (iS && !sPaid) {
+        // Student needs to pay
+        paymentPopup = { type: 'PAYMENT_NEEDED', session: { id: s.id, topic: s.topic } };
+        break;
       }
+      if (iT && sPaid && !tConf) {
+        // Teacher needs to confirm receipt
+        paymentPopup = { type: 'PAYMENT_SUBMITTED_TEACHER', session: { id: s.id, topic: s.topic, studentName: s.rawSession.studentName } };
+        break;
+      }
+      if (iT && !sPaid && !shownPaymentWaitingIds.current.has(s.id)) {
+        // Teacher waiting for student to pay — show once only
+        shownPaymentWaitingIds.current.add(s.id);
+        paymentPopup = { type: 'PAYMENT_WAITING', session: { id: s.id, topic: s.topic } };
+        break;
+      }
+    }
+
+    if (paymentPopup) {
+      setActivePopup(prev => {
+        if (prev?.type === paymentPopup.type && prev?.session?.id === paymentPopup.session.id) return prev;
+        return paymentPopup;
+      });
       return;
     }
 
-    // 2. PAYMENT states — only for sessions that require payment
-    const pendingPayment = sessionsData.find(s => {
-      if (s.status !== 'COMPLETED') return false;
-      const requiresPayment = detectRequiresPayment(s.rawSession);
-      if (!requiresPayment) return false;
-      const isTeacher = s.rawSession.teacherId === user.userId;
-      const isStudent = s.rawSession.studentId === user.userId;
-      if (isStudent && !s.rawSession.studentMarkedPaid) return true;
-      if (isTeacher && s.rawSession.studentMarkedPaid && !s.rawSession.teacherConfirmedPayment) return true;
-      return false;
+    // ── 3. Clear stale lifecycle popup if session state no longer needs it ────
+    setActivePopup(prev => {
+      if (!prev) return prev;
+      const lifecycleTypes = ['COMPLETION_REQUESTED', 'PAYMENT_NEEDED', 'PAYMENT_WAITING', 'PAYMENT_SUBMITTED_TEACHER'];
+      if (lifecycleTypes.includes(prev.type)) return null; // clear stale popup
+      return prev; // keep END_REACHED, etc.
     });
 
-    if (pendingPayment) {
-      const isTeacher = pendingPayment.rawSession.teacherId === user.userId;
-      if (isTeacher) {
-        // Teacher waiting for student payment — only show once
-        if (!shownPaymentWaitingIds.current.has(pendingPayment.id) &&
-            (!activePopup || activePopup.type !== 'PAYMENT_SUBMITTED_TEACHER' && activePopup.type !== 'PAYMENT_WAITING')) {
-          if (pendingPayment.rawSession.studentMarkedPaid) {
-            // Student already paid, teacher needs to confirm
-            setActivePopup({ type: 'PAYMENT_SUBMITTED_TEACHER', session: { id: pendingPayment.id, topic: pendingPayment.topic, studentName: pendingPayment.rawSession.studentName } });
-          } else {
-            // Waiting for student to pay
-            shownPaymentWaitingIds.current.add(pendingPayment.id);
-            setActivePopup({ type: 'PAYMENT_WAITING', session: { id: pendingPayment.id, topic: pendingPayment.topic } });
-          }
-        }
-      } else {
-        if (!activePopup || activePopup.type !== 'PAYMENT_NEEDED' || activePopup.session?.id !== pendingPayment.id) {
-          setActivePopup({ type: 'PAYMENT_NEEDED', session: { id: pendingPayment.id, topic: pendingPayment.topic } });
-        }
-      }
-      return;
+    // ── 4. REVIEW ─────────────────────────────────────────────────────────────
+    const pendingReview = sessionsData.find(s => {
+      if (s.status !== 'COMPLETED') return false;
+      if (shownReviewIds.current.has(s.id)) return false;
+      const reqPayment = requiresPaymentFor(s.rawSession);
+      const paymentDone = !reqPayment || (s.rawSession.studentMarkedPaid && s.rawSession.teacherConfirmedPayment);
+      if (!paymentDone) return false;
+      const reviewed = s.rawSession.hasReviewed ||
+        (s.rawSession.reviews && s.rawSession.reviews.some(r => r.reviewerId === user.userId));
+      return !reviewed;
+    });
+
+    if (pendingReview) {
+      const iT = pendingReview.rawSession.teacherId === user.userId;
+      openReviewModal(
+        pendingReview.id,
+        pendingReview.rawSession,
+        pendingReview.topic,
+        iT ? (pendingReview.rawSession.studentName || 'Student') : (pendingReview.rawSession.teacherName || 'Teacher'),
+        iT ? 'Teaching' : 'Learning'
+      );
     }
 
-    // 3. REVIEW — session complete, payment done (or not needed), not yet reviewed
-    if (!reviewModalData) {
-      const pendingReview = sessionsData.find(s => {
-        if (s.status !== 'COMPLETED') return false;
-        if (shownReviewIds.current.has(s.id)) return false;
-        const requiresPayment = detectRequiresPayment(s.rawSession);
-        const paymentDone = !requiresPayment || (s.rawSession.studentMarkedPaid && s.rawSession.teacherConfirmedPayment);
-        if (!paymentDone) return false;
-        const hasReviewed = s.rawSession.hasReviewed ||
-          (s.rawSession.reviews && s.rawSession.reviews.some(r => r.reviewerId === user.userId));
-        return !hasReviewed;
-      });
-
-      if (pendingReview) {
-        const isTeacher = pendingReview.rawSession.teacherId === user.userId;
-        openReviewModal(
-          pendingReview.id,
-          pendingReview.rawSession,
-          pendingReview.topic,
-          isTeacher ? (pendingReview.rawSession.studentName || 'Student') : (pendingReview.rawSession.teacherName || 'Teacher'),
-          isTeacher ? 'Teaching' : 'Learning'
-        );
-      }
-    }
-
-  }, [sessionsData, requestsData, user]); // intentionally excludes activePopup/reviewModalData — use refs for guards
+  }, [sessionsData, requestsData, user]);
+  // NOTE: activePopup intentionally NOT in deps — functional setters make this safe
 
   // ─── TIME-BASED END REACHED ──────────────────────────────────────────────────
   useEffect(() => {
     if (!sessionsData || !user?.userId) return;
     const interval = setInterval(() => {
       const now = Date.now();
-      const recentlyEnded = sessionsData.find(s => {
+      const ended = sessionsData.find(s => {
         if (s.status !== 'SCHEDULED') return false;
-        const isTeacher = s.rawSession.teacherId === user.userId;
-        const weConfirmed = isTeacher ? s.rawSession.teacherConfirmedCompletion : s.rawSession.studentConfirmedCompletion;
+        const iT = s.rawSession.teacherId === user.userId;
+        const weConfirmed = iT ? s.rawSession.teacherConfirmedCompletion : s.rawSession.studentConfirmedCompletion;
         if (weConfirmed) return false;
         const end = s.rawSession.scheduledEnd;
         const snoozeUntil = snoozedSessions[s.id];
         if (snoozeUntil && now < snoozeUntil) return false;
         return end && now >= end && (now - end) < 3600000;
       });
-      if (recentlyEnded && !activePopup) {
-        setActivePopup({ type: 'END_REACHED', session: recentlyEnded });
+      if (ended) {
+        setActivePopup(prev => {
+          if (prev?.type === 'END_REACHED' && prev?.session?.id === ended.id) return prev;
+          if (prev) return prev; // don't overwrite an existing popup
+          return { type: 'END_REACHED', session: ended };
+        });
       }
     }, 60000);
     return () => clearInterval(interval);
-  }, [sessionsData, user, activePopup, snoozedSessions]);
+  }, [sessionsData, user, snoozedSessions]);
 
   // ─── WEBSOCKET EVENTS ────────────────────────────────────────────────────────
-  // WS events are used for immediate, real-time reactions.
-  // AppDataContext also calls fetchInitialData() on these events, so the polling
-  // fallback will run with fresh data shortly after. We avoid duplicates via refs.
+  // The WS handler ONLY handles COMPLETION_REQUESTED for immediate real-time feel.
+  // All other events: AppDataContext already calls fetchInitialData() which updates
+  // sessionsData, and the polling above handles showing the correct popup.
+  // This eliminates race conditions between WS handler and polling.
   useEffect(() => {
     if (!sessionEvent || !user?.userId) return;
     const raw = sessionEvent.session;
     if (!raw) return;
-
     const sessionId = raw._id || raw.id;
     if (!sessionId) return;
 
@@ -200,69 +199,20 @@ const SessionLifecycleManager = () => {
     const isStudent = raw.studentId === user.userId;
     if (!isTeacher && !isStudent) return;
 
-    const topic = raw.topic || 'Skill Session';
-    const myRole = isTeacher ? 'Teaching' : 'Learning';
-
     if (sessionEvent.type === 'COMPLETION_REQUESTED') {
-      // Immediately show popup to the person who hasn't confirmed yet
       const weConfirmed = isTeacher ? raw.teacherConfirmedCompletion : raw.studentConfirmedCompletion;
       const requesterIsTeacher = raw.teacherConfirmedCompletion;
       const shouldShow = !weConfirmed && ((isStudent && requesterIsTeacher) || (isTeacher && !requesterIsTeacher));
       if (shouldShow) {
-        setActivePopup({ type: 'COMPLETION_REQUESTED', session: { id: sessionId, topic } });
-      }
-
-    } else if (sessionEvent.type === 'SESSION_BOTH_CONFIRMED') {
-      // Backend now broadcasts finalSession (with correct studentMarkedPaid/teacherConfirmedPayment/requiresPayment)
-      setActivePopup(null);
-
-      // Determine payment requirement directly from the final session state
-      const requiresPayment = raw.requiresPayment != null
-        ? raw.requiresPayment
-        : !(raw.studentMarkedPaid && raw.teacherConfirmedPayment); // auto-settled = free
-
-      if (requiresPayment) {
-        // Paid session
-        if (isStudent) {
-          setActivePopup({ type: 'PAYMENT_NEEDED', session: { id: sessionId, topic } });
-        } else if (isTeacher) {
-          shownPaymentWaitingIds.current.add(sessionId);
-          setActivePopup({ type: 'PAYMENT_WAITING', session: { id: sessionId, topic } });
-        }
-      } else {
-        // Free or Swap — show review for BOTH parties
-        openReviewModal(
-          sessionId, raw, topic,
-          isTeacher ? (raw.studentName || 'Student') : (raw.teacherName || 'Teacher'),
-          myRole
-        );
-      }
-
-    } else if (sessionEvent.type === 'PAYMENT_SUBMITTED') {
-      if (isTeacher) {
-        setActivePopup({ type: 'PAYMENT_SUBMITTED_TEACHER', session: { id: sessionId, topic, studentName: raw.studentName } });
-      } else {
-        setActivePopup(null); // student already handled by handleMarkPaid → review modal
-      }
-
-    } else if (sessionEvent.type === 'PAYMENT_CONFIRMED') {
-      setActivePopup(null);
-      // Student needs review after teacher confirms payment
-      if (isStudent) {
-        const localSession = sessionsData?.find(s => s.id === sessionId);
-        const alreadyReviewed = localSession?.rawSession?.hasReviewed ||
-          (localSession?.rawSession?.reviews && localSession.rawSession.reviews.some(r => r.reviewerId === user.userId));
-        if (!alreadyReviewed) {
-          openReviewModal(
-            sessionId,
-            localSession?.rawSession || raw,
-            localSession?.topic || topic,
-            localSession?.rawSession?.teacherName || raw.teacherName || 'Teacher',
-            'Learning'
-          );
-        }
+        const topic = raw.topic || 'Skill Session';
+        setActivePopup(prev => {
+          if (prev?.type === 'COMPLETION_REQUESTED' && prev?.session?.id === sessionId) return prev;
+          return { type: 'COMPLETION_REQUESTED', session: { id: sessionId, topic } };
+        });
       }
     }
+    // All other types (SESSION_BOTH_CONFIRMED, PAYMENT_SUBMITTED, PAYMENT_CONFIRMED, etc.)
+    // are handled by the polling useEffect after fetchInitialData() refreshes sessionsData.
 
   }, [sessionEvent, user]);
 
@@ -272,99 +222,57 @@ const SessionLifecycleManager = () => {
     setActivePopup(null);
     try {
       await sessionService.markCompletion(sessionId);
-      window.dispatchEvent(new CustomEvent('markNotificationAsRead', {
-        detail: { sourceType: 'SESSION', sourceId: sessionId }
-      }));
+      window.dispatchEvent(new CustomEvent('markNotificationAsRead', { detail: { sourceType: 'SESSION', sourceId: sessionId } }));
       fetchInitialData();
-    } catch (err) {
-      console.error('Failed to mark completion', err);
-    }
+    } catch (err) { console.error('Failed to mark completion', err); }
   };
 
   const handleMarkPaid = async (sessionId) => {
-    const sessionToReview = sessionsData?.find(s => s.id === sessionId);
+    const s = sessionsData?.find(x => x.id === sessionId);
     setActivePopup(null);
     try {
       await sessionService.markPaid(sessionId);
-      window.dispatchEvent(new CustomEvent('markNotificationAsRead', {
-        detail: { sourceType: 'SESSION', sourceId: sessionId }
-      }));
+      window.dispatchEvent(new CustomEvent('markNotificationAsRead', { detail: { sourceType: 'SESSION', sourceId: sessionId } }));
       fetchInitialData();
-      // Student goes straight to review after paying
-      if (sessionToReview) {
-        openReviewModal(
-          sessionId,
-          sessionToReview.rawSession,
-          sessionToReview.topic,
-          sessionToReview.rawSession.teacherName || 'Teacher',
-          'Learning'
-        );
-      }
-    } catch (err) {
-      console.error('Failed to mark paid', err);
-    }
+      if (s) openReviewModal(sessionId, s.rawSession, s.topic, s.rawSession.teacherName || 'Teacher', 'Learning');
+    } catch (err) { console.error('Failed to mark paid', err); }
   };
 
   const handleConfirmPayment = async (sessionId) => {
-    const sessionToReview = sessionsData?.find(s => s.id === sessionId);
+    const s = sessionsData?.find(x => x.id === sessionId);
     setActivePopup(null);
     try {
       await sessionService.confirmPayment(sessionId);
-      window.dispatchEvent(new CustomEvent('markNotificationAsRead', {
-        detail: { sourceType: 'SESSION', sourceId: sessionId }
-      }));
+      window.dispatchEvent(new CustomEvent('markNotificationAsRead', { detail: { sourceType: 'SESSION', sourceId: sessionId } }));
       fetchInitialData();
-      // Teacher goes straight to review after confirming
-      if (sessionToReview) {
-        openReviewModal(
-          sessionId,
-          sessionToReview.rawSession,
-          sessionToReview.topic,
-          sessionToReview.rawSession.studentName || 'Student',
-          'Teaching'
-        );
-      }
-    } catch (err) {
-      console.error('Failed to confirm payment', err);
-    }
+      if (s) openReviewModal(sessionId, s.rawSession, s.topic, s.rawSession.studentName || 'Student', 'Teaching');
+    } catch (err) { console.error('Failed to confirm payment', err); }
   };
 
   const handleAcceptRequest = async (req) => {
     try {
-      if (req.type?.toLowerCase().includes('chat')) {
-        await chatRequestService.acceptRequest(req.id);
-      } else if (req.type?.toLowerCase().includes('swap')) {
-        await exchangeService.acceptSwap(req.id);
-      } else {
-        await exchangeService.acceptRequest(req.id);
-      }
+      if (req.type?.toLowerCase().includes('chat')) await chatRequestService.acceptRequest(req.id);
+      else if (req.type?.toLowerCase().includes('swap')) await exchangeService.acceptSwap(req.id);
+      else await exchangeService.acceptRequest(req.id);
       setDismissedRequests(prev => [...prev, req.id]);
       window.dispatchEvent(new CustomEvent('markNotificationAsRead', {
         detail: { sourceType: req.type?.toLowerCase().includes('chat') ? 'CHAT_REQUEST' : 'EXCHANGE', sourceId: req.id }
       }));
       fetchInitialData();
-    } catch (error) {
-      console.error('Failed to accept request:', error);
-    }
+    } catch (e) { console.error('Failed to accept request:', e); }
   };
 
   const handleDeclineRequest = async (req) => {
     try {
-      if (req.type?.toLowerCase().includes('chat')) {
-        await chatRequestService.rejectRequest(req.id);
-      } else if (req.type?.toLowerCase().includes('swap')) {
-        await exchangeService.rejectExchange(req.id);
-      } else {
-        await exchangeService.rejectRequest(req.id);
-      }
+      if (req.type?.toLowerCase().includes('chat')) await chatRequestService.rejectRequest(req.id);
+      else if (req.type?.toLowerCase().includes('swap')) await exchangeService.rejectExchange(req.id);
+      else await exchangeService.rejectRequest(req.id);
       setDismissedRequests(prev => [...prev, req.id]);
       window.dispatchEvent(new CustomEvent('markNotificationAsRead', {
         detail: { sourceType: req.type?.toLowerCase().includes('chat') ? 'CHAT_REQUEST' : 'EXCHANGE', sourceId: req.id }
       }));
       fetchInitialData();
-    } catch (error) {
-      console.error('Failed to decline request:', error);
-    }
+    } catch (e) { console.error('Failed to decline request:', e); }
   };
 
   const pendingRequests = requestsData?.filter(r =>
@@ -376,7 +284,7 @@ const SessionLifecycleManager = () => {
 
   return (
     <>
-      {/* Incoming request popup — only shown when no lifecycle popup is active */}
+      {/* Incoming request — only when no lifecycle popup is active */}
       {!activePopup && !reviewModalData && activeRequest && (() => {
         let reqType = 'Session Request';
         let isChat = false;
@@ -384,16 +292,13 @@ const SessionLifecycleManager = () => {
         else if (activeRequest.type?.toLowerCase().includes('chat')) { reqType = 'Chat Request'; isChat = true; }
         else if (activeRequest.otherUserExtras?.listingType?.includes('TEACH')) reqType = 'Teach Request';
         else if (activeRequest.otherUserExtras?.listingType?.includes('LEARN')) reqType = 'Learn Request';
-
-        const listingTitle = activeRequest.otherUserExtras?.listingTitle || 'Skill Session';
-        const subtitleText = isChat ? 'Wants to chat with you' : `Wants to book ${listingTitle}`;
-        const remainingCount = pendingRequests.length - 1;
-
+        const subtitleText = isChat ? 'Wants to chat with you' : `Wants to book ${activeRequest.otherUserExtras?.listingTitle || 'Skill Session'}`;
+        const remaining = pendingRequests.length - 1;
         return (
           <GlobalNotificationPopup
             title={activeRequest.name || 'Unknown User'}
             subtitle={subtitleText}
-            badge={`NEW ${reqType.toUpperCase()}${remainingCount > 0 ? ` (+${remainingCount} more)` : ''}`}
+            badge={`NEW ${reqType.toUpperCase()}${remaining > 0 ? ` (+${remaining} more)` : ''}`}
             badgeColor="#1d4ed8"
             avatarInitials={activeRequest.init}
             avatarBg={activeRequest.bg}
@@ -407,11 +312,10 @@ const SessionLifecycleManager = () => {
         );
       })()}
 
-      {/* Session scheduled end time reached — prompt to mark complete */}
       {activePopup?.type === 'END_REACHED' && (
         <ConfirmModal
           isOpen={true}
-          title={`Has ${activePopup.session.topic || 'the session'} been completed?`}
+          title={`Has ${activePopup.session?.topic || 'the session'} been completed?`}
           message="The scheduled time has ended. Did you complete the session successfully?"
           confirmText="Yes, Completed"
           cancelText="Snooze (10 min)"
@@ -420,7 +324,6 @@ const SessionLifecycleManager = () => {
         />
       )}
 
-      {/* Other party already confirmed — asking us to confirm */}
       {activePopup?.type === 'COMPLETION_REQUESTED' && (
         <ConfirmModal
           isOpen={true}
@@ -433,7 +336,6 @@ const SessionLifecycleManager = () => {
         />
       )}
 
-      {/* Student: make payment */}
       {activePopup?.type === 'PAYMENT_NEEDED' && (
         <PaymentModal
           isOpen={true}
@@ -443,7 +345,6 @@ const SessionLifecycleManager = () => {
         />
       )}
 
-      {/* Teacher: waiting for student to pay */}
       {activePopup?.type === 'PAYMENT_WAITING' && (
         <GlobalNotificationPopup
           title="Waiting for payment"
@@ -457,7 +358,6 @@ const SessionLifecycleManager = () => {
         />
       )}
 
-      {/* Teacher: student claims payment sent */}
       {activePopup?.type === 'PAYMENT_SUBMITTED_TEACHER' && (
         <ConfirmModal
           isOpen={true}
@@ -470,16 +370,12 @@ const SessionLifecycleManager = () => {
         />
       )}
 
-      {/* Review modal — shown exactly once per session per page session */}
       {reviewModalData && (
         <ReviewModal
           isOpen={true}
           onClose={() => setReviewModalData(null)}
           session={reviewModalData}
-          onSubmit={() => {
-            setReviewModalData(null);
-            fetchInitialData();
-          }}
+          onSubmit={() => { setReviewModalData(null); fetchInitialData(); }}
         />
       )}
     </>
