@@ -28,9 +28,12 @@ export const AppDataProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [sessionEvent, setSessionEvent] = useState(null);
+  const [pendingReviewRequest, setPendingReviewRequest] = useState(null);
 
   const initialLoadDone = useRef(false);
   const sessionsLoadDone = useRef(false);
+  const fetchInFlight = useRef(false);
+  const pendingRefresh = useRef(false);
 
   const triggerToast = (msg) => {
     setToastMessage(msg);
@@ -43,6 +46,11 @@ export const AppDataProvider = ({ children }) => {
 
   const fetchInitialData = useCallback(async () => {
     if (!user?.userId) return;
+    if (fetchInFlight.current) {
+      pendingRefresh.current = true;
+      return;
+    }
+    fetchInFlight.current = true;
     try {
       if (!initialLoadDone.current) {
         setIsChatsLoading(true);
@@ -287,9 +295,14 @@ export const AppDataProvider = ({ children }) => {
     } catch (err) {
       console.error('Failed to load global data', err);
     } finally {
+      fetchInFlight.current = false;
       setIsChatsLoading(false);
       setIsRequestsLoading(false);
       setIsSessionsLoading(false);
+      if (pendingRefresh.current) {
+        pendingRefresh.current = false;
+        fetchInitialData();
+      }
     }
   }, [user]);
 
@@ -615,7 +628,8 @@ export const AppDataProvider = ({ children }) => {
         searchQuery,
         setSearchQuery,
         sessionEvent,
-        setSessionEvent
+        pendingReviewRequest,
+        setPendingReviewRequest
       }}
     >
       {children}

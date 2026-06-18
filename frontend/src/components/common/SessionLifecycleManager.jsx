@@ -11,11 +11,14 @@ import PaymentModal from '../modals/PaymentModal';
 
 const SessionLifecycleManager = () => {
   const { user } = useAuth();
-  const { sessionEvent, sessionsData, requestsData, fetchInitialData } = useAppData();
+  const { sessionEvent, sessionsData, requestsData, fetchInitialData, triggerToast, pendingReviewRequest, setPendingReviewRequest } = useAppData();
 
   const [activePopup, setActivePopup] = useState(null);
   const [reviewModalData, setReviewModalData] = useState(null);
   const [dismissedRequests, setDismissedRequests] = useState([]);
+  const [processingLifecycleAction, setProcessingLifecycleAction] = useState(null);
+
+  const dismissedPopupIds = useRef(new Map());
 
   // Use sessionStorage to persist shown modals across page navigation/reloads
   const getStoredSet = (key) => {
@@ -82,6 +85,12 @@ const SessionLifecycleManager = () => {
   useEffect(() => {
     if (!sessionsData || !user?.userId) return;
 
+    // Clean stale dismissed entries (> 5 seconds old)
+    const now = Date.now();
+    dismissedPopupIds.current.forEach((ts, key) => {
+      if (now - ts > 5000) dismissedPopupIds.current.delete(key);
+    });
+
     // ── 1. COMPLETION_REQUESTED ───────────────────────────────────────────────
     // The other person confirmed but WE haven't yet
     const pendingCompletion = sessionsData.find(s => {
@@ -94,12 +103,13 @@ const SessionLifecycleManager = () => {
     });
 
     if (pendingCompletion) {
-      setActivePopup(prev => {
-        // Functional setter: only update if the popup is genuinely different
-        if (prev?.type === 'COMPLETION_REQUESTED' && prev?.session?.id === pendingCompletion.id) return prev;
-        return { type: 'COMPLETION_REQUESTED', session: { id: pendingCompletion.id, topic: pendingCompletion.topic } };
-      });
-      return; // don't check lower-priority states
+      if (!dismissedPopupIds.current.has(`${pendingCompletion.id}:COMPLETION_REQUESTED`)) {
+        setActivePopup(prev => {
+          if (prev?.type === 'COMPLETION_REQUESTED' && prev?.session?.id === pendingCompletion.id) return prev;
+          return { type: 'COMPLETION_REQUESTED', session: { id: pendingCompletion.id, topic: pendingCompletion.topic } };
+        });
+      }
+      return;
     }
 
     // ── 2. PAYMENT states (paid sessions only) ────────────────────────────────
@@ -132,10 +142,12 @@ const SessionLifecycleManager = () => {
     }
 
     if (paymentPopup) {
-      setActivePopup(prev => {
-        if (prev?.type === paymentPopup.type && prev?.session?.id === paymentPopup.session.id) return prev;
-        return paymentPopup;
-      });
+      if (!dismissedPopupIds.current.has(`${paymentPopup.session.id}:${paymentPopup.type}`)) {
+        setActivePopup(prev => {
+          if (prev?.type === paymentPopup.type && prev?.session?.id === paymentPopup.session.id) return prev;
+          return paymentPopup;
+        });
+      }
       return;
     }
 
@@ -232,37 +244,54 @@ const SessionLifecycleManager = () => {
 
   }, [sessionEvent, user]);
 
+  // ─── MANUAL REVIEW REQUEST (from Sessions.jsx card button) ────────────────────
+  useEffect(() => {
+    if (!pendingReviewRequest) return;
+    const { id, rawSession, topic, name, role } = pendingReviewRequest;
+    openReviewModal(id, rawSession, topic, name, role === 'Teaching' ? 'Teaching' : 'Learning');
+    setPendingReviewRequest(null);
+  }, [pendingReviewRequest, setPendingReviewRequest]);
+
   // ─── ACTION HANDLERS ─────────────────────────────────────────────────────────
 
   const handleMarkCompletion = async (sessionId) => {
+    dismissedPopupIds.current.set(`${sessionId}:COMPLETION_REQUESTED`, Date.now());
     setActivePopup(null);
+    setProcessingLifecycleAction('completing');
     try {
       await sessionService.markCompletion(sessionId);
       window.dispatchEvent(new CustomEvent('markNotificationAsRead', { detail: { sourceType: 'SESSION', sourceId: sessionId } }));
       fetchInitialData();
     } catch (err) { console.error('Failed to mark completion', err); }
+    finally { setProcessingLifecycleAction(null); }
   };
 
   const handleMarkPaid = async (sessionId) => {
     const s = sessionsData?.find(x => x.id === sessionId);
+    dismissedPopupIds.current.set(`${sessionId}:PAYMENT_NEEDED`, Date.now());
     setActivePopup(null);
+    setProcessingLifecycleAction('paying');
     try {
       await sessionService.markPaid(sessionId);
       window.dispatchEvent(new CustomEvent('markNotificationAsRead', { detail: { sourceType: 'SESSION', sourceId: sessionId } }));
       fetchInitialData();
       if (s) openReviewModal(sessionId, s.rawSession, s.topic, s.name || 'Teacher', 'Learning');
     } catch (err) { console.error('Failed to mark paid', err); }
+    finally { setProcessingLifecycleAction(null); }
   };
 
   const handleConfirmPayment = async (sessionId) => {
     const s = sessionsData?.find(x => x.id === sessionId);
+    dismissedPopupIds.current.set(`${sessionId}:PAYMENT_SUBMITTED_TEACHER`, Date.now());
     setActivePopup(null);
+    setProcessingLifecycleAction('confirmingPayment');
     try {
       await sessionService.confirmPayment(sessionId);
       window.dispatchEvent(new CustomEvent('markNotificationAsRead', { detail: { sourceType: 'SESSION', sourceId: sessionId } }));
       fetchInitialData();
       if (s) openReviewModal(sessionId, s.rawSession, s.topic, s.name || 'Student', 'Teaching');
     } catch (err) { console.error('Failed to confirm payment', err); }
+    finally { setProcessingLifecycleAction(null); }
   };
 
   const handleAcceptRequest = async (req) => {
@@ -337,6 +366,8 @@ const SessionLifecycleManager = () => {
           cancelText="Snooze (10 min)"
           onConfirm={() => handleMarkCompletion(activePopup.session.id)}
           onClose={() => handleSnooze(activePopup.session.id)}
+          confirmDisabled={processingLifecycleAction === 'completing'}
+          confirmLoadingText="Confirming..."
         />
       )}
 
@@ -349,6 +380,8 @@ const SessionLifecycleManager = () => {
           cancelText="Dispute"
           onConfirm={() => handleMarkCompletion(activePopup.session.id)}
           onClose={() => setActivePopup(null)}
+          confirmDisabled={processingLifecycleAction === 'completing'}
+          confirmLoadingText="Confirming..."
         />
       )}
 
@@ -383,15 +416,17 @@ const SessionLifecycleManager = () => {
           cancelText="Not Yet"
           onConfirm={() => handleConfirmPayment(activePopup.session.id)}
           onClose={() => setActivePopup(null)}
+          confirmDisabled={processingLifecycleAction === 'confirmingPayment'}
+          confirmLoadingText="Confirming..."
         />
       )}
 
       {reviewModalData && (
         <ReviewModal
           isOpen={true}
-          onClose={() => setReviewModalData(null)}
+          onClose={() => { setReviewModalData(null); setPendingReviewRequest(null); }}
           session={reviewModalData}
-          onSubmit={() => { setReviewModalData(null); fetchInitialData(); }}
+          onSubmit={() => { setReviewModalData(null); setPendingReviewRequest(null); fetchInitialData(); }}
         />
       )}
     </>

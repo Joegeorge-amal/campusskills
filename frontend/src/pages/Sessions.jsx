@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAppData } from '../context/AppDataContext';
 import { useAuth } from '../context/AuthContext';
@@ -22,13 +22,12 @@ import {
   IconFlag
 } from '@tabler/icons-react';
 
-import ReviewModal from '../components/modals/ReviewModal';
 import CustomTimeInput from '../components/common/CustomTimeInput';
 import CustomSelect from '../components/common/CustomSelect';
 
 const Sessions = () => {
   const { user } = useAuth();
-  const { sessionsData, requestsData, isSessionsLoading, triggerToast, fetchInitialData, searchQuery, sessionEvent, setSessionEvent } = useAppData();
+  const { sessionsData, requestsData, isSessionsLoading, triggerToast, fetchInitialData, searchQuery, setPendingReviewRequest } = useAppData();
   const [expandedSessionId, setExpandedSessionId] = useState(null);
   const [paymentInfos, setPaymentInfos] = useState({});
   const [loadingPaymentId, setLoadingPaymentId] = useState(null);
@@ -76,82 +75,6 @@ const Sessions = () => {
     }
   }, [highlightedSessionId, sessionsData]);
 
-  // Auto-guide effect: react to session WS events with proactive modals
-  useEffect(() => {
-    if (!sessionEvent) return;
-    const raw = sessionEvent.session;
-    if (!raw) return;
-
-    const sessionId = raw._id || raw.id;
-    if (!sessionId) return;
-
-    // Auto-expand — find in local data first, fall back to raw id
-    const localSession = sessionsData.find(s => s.id === sessionId);
-    const myId = user?.userId;
-    if (!myId) return;
-
-    const isTeacher = raw.teacherId === myId;
-    const myRole = isTeacher ? 'Teaching' : 'Learning';
-
-    setExpandedSessionId(sessionId);
-
-    if (sessionEvent.type === 'SESSION_BOTH_CONFIRMED') {
-      setIsHistoryOpen(true);
-      const isSwap = !!raw.swapGroupId || (localSession && localSession.rawSession && localSession.rawSession.swapGroupId);
-      if (isSwap || !raw.requiresPayment) {
-        triggerToast('Session completed! Please leave a review.');
-        const alreadyReviewed = localSession?.rawSession?.hasReviewed || raw.hasReviewed;
-        if (!alreadyReviewed) {
-          const stubSession = localSession || {
-            id: sessionId,
-            rawSession: raw,
-            topic: raw.topic || 'Skill Session',
-            name: isTeacher ? (raw.studentName || 'Student') : (raw.teacherName || 'Teacher'),
-            role: myRole,
-            status: 'COMPLETED'
-          };
-          setSelectedSessionForReview(stubSession);
-          setReviewModalOpen(true);
-        }
-      } else {
-        triggerToast('Session completed! ' + (myRole === 'Learning' ? 'Please complete payment.' : 'Waiting for payment from student.'));
-      }
-    } else if (sessionEvent.type === 'PAYMENT_SUBMITTED') {
-      setIsHistoryOpen(true);
-      if (isTeacher) {
-        triggerToast('Payment claimed by ' + (raw.studentName || 'student') + '. Please confirm receipt.');
-      } else {
-        triggerToast('Payment submitted. Waiting for teacher to confirm.');
-      }
-    } else if (sessionEvent.type === 'PAYMENT_CONFIRMED') {
-      setIsHistoryOpen(true);
-      triggerToast('Payment confirmed! Please leave a review.');
-      // Only auto-open review modal if not already reviewed
-      const alreadyReviewed = localSession?.rawSession?.hasReviewed || raw.hasReviewed;
-      if (!alreadyReviewed) {
-        const stubSession = localSession || {
-          id: sessionId,
-          rawSession: raw,
-          topic: raw.topic || 'Skill Session',
-          name: isTeacher ? (raw.studentName || 'Student') : (raw.teacherName || 'Teacher'),
-          role: myRole,
-          status: 'COMPLETED'
-        };
-        setSelectedSessionForReview(stubSession);
-        setReviewModalOpen(true);
-      }
-    } else if (sessionEvent.type === 'COMPLETION_REQUESTED') {
-      setIsHistoryOpen(true);
-      const requesterIsTeacher = raw.teacherConfirmedCompletion;
-      if ((myRole === 'Learning' && requesterIsTeacher) || (myRole === 'Teaching' && !requesterIsTeacher)) {
-        triggerToast('Session marked as completed. Please confirm.');
-      }
-    }
-
-    const timer = setTimeout(() => setSessionEvent(null), 500);
-    return () => clearTimeout(timer);
-  }, [sessionEvent, sessionsData, user, triggerToast, setSessionEvent]);
-
   // Reschedule Modal state
   const [rescheduleSession, setRescheduleSession] = useState(null);
   const [rescheduleDate, setRescheduleDate] = useState('');
@@ -165,10 +88,6 @@ const Sessions = () => {
   // Processing state for buttons
   const [processingSessionId, setProcessingSessionId] = useState(null);
   const [processingAction, setProcessingAction] = useState(null);
-
-  // Review states
-  const [reviewModalOpen, setReviewModalOpen] = useState(false);
-  const [selectedSessionForReview, setSelectedSessionForReview] = useState(null);
 
   const handleToggleExpand = async (session) => {
     const sessionId = session.id;
@@ -761,8 +680,14 @@ const Sessions = () => {
                         <span style={{ fontSize: '12px', fontWeight: 600, color: '#4b5563' }}>Reviews are unlocked for this session.</span>
                         <button 
                           onClick={() => {
-                            setSelectedSessionForReview(s);
-                            setReviewModalOpen(true);
+                            setPendingReviewRequest({
+                              id: s.id,
+                              rawSession: s.rawSession,
+                              topic: s.topic,
+                              name: s.name,
+                              role: s.role,
+                              status: 'COMPLETED'
+                            });
                           }}
                           style={{ 
                             padding: '6px 14px', 
@@ -988,20 +913,6 @@ const Sessions = () => {
         </ModalWrapper>
       )}
 
-      <ReviewModal 
-        isOpen={reviewModalOpen} 
-        onClose={() => {
-          setReviewModalOpen(false);
-          setSelectedSessionForReview(null);
-          fetchInitialData();
-        }}
-        session={selectedSessionForReview}
-        onSubmit={() => {
-          setReviewModalOpen(false);
-          setSelectedSessionForReview(null);
-          fetchInitialData();
-        }}
-      />
     </div>
   );
 };

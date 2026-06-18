@@ -9,7 +9,9 @@ const ConfirmModal = ({
   message, 
   confirmText = "Confirm", 
   cancelText = "Cancel", 
-  isDanger = false 
+  isDanger = false,
+  confirmDisabled = false,
+  confirmLoadingText = "Processing..."
 }) => {
   if (!isOpen) return null;
 
@@ -55,19 +57,21 @@ const ConfirmModal = ({
             {cancelText}
           </button>
           <button 
+            disabled={confirmDisabled}
             style={{ 
               padding: '10px 18px', 
               background: isDanger ? '#ef4444' : '#4f46e5', 
               color: '#fff', 
               border: 'none', 
               borderRadius: '8px', 
-              cursor: 'pointer', 
+              cursor: confirmDisabled ? 'not-allowed' : 'pointer', 
               fontWeight: 600,
-              fontSize: '14px'
+              fontSize: '14px',
+              opacity: confirmDisabled ? 0.6 : 1
             }} 
             onClick={onConfirm}
           >
-            {confirmText}
+            {confirmDisabled ? confirmLoadingText : confirmText}
           </button>
         </div>
       </div>
