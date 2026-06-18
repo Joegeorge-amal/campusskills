@@ -287,8 +287,11 @@ const Sessions = () => {
     .filter(s => {
       if (s.status === 'SCHEDULED') return true;
       if (s.status === 'COMPLETED') {
-        const isSwap = !!s.rawSession.swapGroupId;
-        return !isSwap && !s.rawSession.teacherConfirmedPayment;
+        const req = requestsData.find(r => r.id === s.rawSession.exchangeId);
+        const isSwap = !!s.rawSession.swapGroupId || (req && req.rawReq?.type === 'SWAP');
+        const requiresPayment = s.rawSession.requiresPayment != null ? s.rawSession.requiresPayment : !isSwap;
+        // Stay in active if paid session and payment not yet fully confirmed
+        return requiresPayment && !s.rawSession.teacherConfirmedPayment;
       }
       return false;
     })
@@ -304,12 +307,16 @@ const Sessions = () => {
     .filter(s => {
       if (s.status === 'CANCELLED') return true;
       if (s.status === 'COMPLETED') {
-        const isSwap = !!s.rawSession.swapGroupId;
-        return isSwap || s.rawSession.teacherConfirmedPayment;
+        const req = requestsData.find(r => r.id === s.rawSession.exchangeId);
+        const isSwap = !!s.rawSession.swapGroupId || (req && req.rawReq?.type === 'SWAP');
+        const requiresPayment = s.rawSession.requiresPayment != null ? s.rawSession.requiresPayment : !isSwap;
+        // Goes to history if free/swap (no payment needed), or if paid and fully confirmed
+        return !requiresPayment || s.rawSession.teacherConfirmedPayment;
       }
       return false;
     })
     .sort((a, b) => (b.rawSession.updatedAt || 0) - (a.rawSession.updatedAt || 0));
+
 
   const formatSessionFullTime = (start, end) => {
     if (!start) return 'TBD';
@@ -352,15 +359,17 @@ const Sessions = () => {
           guidanceText = "Waiting for payment confirmation";
           guidanceStyle = { background: '#fffbeb', color: '#d97706', border: '1px solid #fde68a' };
         } else {
-          const reviewExists = s.rawSession.reviews && s.rawSession.reviews.some(r => r.reviewerId === user?.userId);
-          if (!reviewExists) {
+          const hasReviewed = s.rawSession.hasReviewed ||
+            (s.rawSession.reviews && s.rawSession.reviews.some(r => r.reviewerId === user?.userId));
+          if (!hasReviewed) {
             guidanceText = "Please leave a review";
             guidanceStyle = { background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe' };
           }
         }
       } else {
-        const reviewExists = s.rawSession.reviews && s.rawSession.reviews.some(r => r.reviewerId === user?.userId);
-        if (!reviewExists) {
+        const hasReviewed = s.rawSession.hasReviewed ||
+          (s.rawSession.reviews && s.rawSession.reviews.some(r => r.reviewerId === user?.userId));
+        if (!hasReviewed) {
           guidanceText = "Please leave a review";
           guidanceStyle = { background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe' };
         }
