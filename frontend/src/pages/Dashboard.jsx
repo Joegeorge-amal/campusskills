@@ -105,15 +105,7 @@ const Dashboard = () => {
             <div style={{ fontSize: '24px', fontWeight: 800, marginBottom: '4px', letterSpacing: '-0.3px' }}>{user?.name || 'User'}</div>
             <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.85)', fontWeight: 500 }}>{user?.year ? `${user.year} · ${user.programme || ''}` : ''}</div>
             
-            {/* Desktop Hero Compact Chips */}
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '16px' }}>
-              <span style={{ fontSize: '11px', background: 'rgba(255, 255, 255, 0.15)', padding: '5px 12px', borderRadius: '100px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{stats.skillsOffered} Active Listings</span>
-              <span style={{ fontSize: '11px', background: 'rgba(255, 255, 255, 0.15)', padding: '5px 12px', borderRadius: '100px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{stats.sessionsDone} Completed</span>
-              <span style={{ fontSize: '11px', background: 'rgba(255, 255, 255, 0.15)', padding: '5px 12px', borderRadius: '100px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{user?.stats?.ratingCount || 0} Reviews</span>
-              {user?.verifiedSkills?.length > 0 && (
-                <span style={{ fontSize: '11px', background: 'rgba(255, 255, 255, 0.25)', border: '1px solid rgba(255, 255, 255, 0.3)', padding: '5px 12px', borderRadius: '100px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>✓ {user.verifiedSkills.length} Verified</span>
-              )}
-            </div>
+
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px' }}>
             <div style={{ 
