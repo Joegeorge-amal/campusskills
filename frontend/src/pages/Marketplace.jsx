@@ -181,7 +181,7 @@ const Marketplace = () => {
       <div style={{ display: 'flex', flex: 1, minHeight: 0, position: 'relative' }}>
         
         {/* Left: skill list */}
-        <div id="marketplace-scroll-container" style={{ width: '100%', flexShrink: 0, padding: selectedSkill ? '16px' : '24px 32px', overflowY: 'auto', backgroundColor: 'var(--cs-bg-light)', backgroundImage: 'radial-gradient(rgba(15, 23, 42, 0.06) 1px, transparent 1px)', backgroundSize: '24px 24px', height: '100%' }}>
+        <div id="marketplace-scroll-container" style={{ width: '100%', flexShrink: 0, padding: selectedSkill ? '16px' : '24px 32px', overflowY: 'auto', background: 'linear-gradient(180deg, #fafafa 0%, #f8f9ff 100%)', height: '100%' }}>
           
           <div style={{ width: selectedSkill ? '320px' : '100%', maxWidth: '1200px', margin: selectedSkill ? '0' : '0 auto' }}>
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>

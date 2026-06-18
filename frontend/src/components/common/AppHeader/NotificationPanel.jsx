@@ -171,8 +171,8 @@ const NotificationPanel = ({ notifications, onClose, onMarkAllRead, onNotificati
               <div className="notif-empty-icon">
                 <IconCheck size={32} />
               </div>
-              <h4>You're all caught up</h4>
-              <p>No notifications right now.</p>
+               <h4>You're all caught up 🎉</h4>
+              <p>New messages, requests and session updates will appear here.</p>
             </div>
           ) : (
             <div className="notif-list">

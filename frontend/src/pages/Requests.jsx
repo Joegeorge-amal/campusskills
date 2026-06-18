@@ -184,7 +184,7 @@ const Requests = () => {
 
   return (
     <>
-      <div id="requests" className="pg on" style={{ padding: '32px 40px', backgroundColor: 'var(--cs-bg-light)', backgroundImage: 'radial-gradient(rgba(15, 23, 42, 0.06) 1px, transparent 1px)', backgroundSize: '24px 24px', minHeight: '100vh', boxSizing: 'border-box' }}>
+      <div id="requests" className="pg on" style={{ padding: '32px 40px', background: 'linear-gradient(180deg, #fafafa 0%, #f8f9ff 100%)', minHeight: '100vh', boxSizing: 'border-box' }}>
       
       {loading ? (
         <div style={{ textAlign: 'center', padding: '48px 0', color: '#6b7280' }}>Loading requests...</div>
@@ -241,8 +241,11 @@ const Requests = () => {
                 ))}
                 
                 {incomingRequests.length === 0 && (
-                  <div style={{ fontSize: '14px', color: '#6b7280', padding: '48px 0', textAlign: 'center', background: '#ffffff', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
-                    No incoming requests right now.
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 16px', textAlign: 'center', background: '#ffffff', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 30px -5px rgba(0,0,0,.04)' }}>
+                    <IconArrowsRightLeft size={28} style={{ color: '#94a3b8', marginBottom: '8px' }} />
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#1e293b', marginBottom: '4px' }}>No incoming requests</div>
+                    <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '16px', maxWidth: '280px' }}>No incoming requests right now. Explore the marketplace to send requests to others!</div>
+                    <button onClick={() => navigate('/app/marketplace')} style={{ padding: '8px 16px', borderRadius: '10px', background: '#2563eb', color: '#fff', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Browse Marketplace</button>
                   </div>
                 )}
               </div>
@@ -254,25 +257,15 @@ const Requests = () => {
               style={{ fontSize: '12px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
               onClick={() => setIsSentOpen(!isSentOpen)}
             >
-              <span>{isSentOpen ? '▼' : '▶'}</span> Sent by you ({outgoingRequests.length})
+              <span>{isSentOpen ? '▼' : '▶'}</span> Sent Requests ({outgoingRequests.length})
             </div>
             
             {isSentOpen && (
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {outgoingRequests.map(req => (
-                  <div 
-                    key={req.id}
-                    id={`request-${req.id}`}
-                    style={{
-                      background: req.id === activeHighlightId ? '#f0f7ff' : 'transparent',
-                      borderRadius: '16px',
-                      padding: req.id === activeHighlightId ? '6px' : '0',
-                      border: req.id === activeHighlightId ? '2px solid #3b82f6' : 'none',
-                      transition: 'all 0.5s ease',
-                      marginBottom: '12px'
-                    }}
-                  >
+                  <div key={req.id}>
                     <RequestsCardV2
+                      id={req.id}
                       avatarProps={{ initials: req.init, bg: req.bg, color: req.col, backgroundImage: req.otherUser?.avatarImg || req.otherUser?.profilePicture, size: '32px', fontSize: '12px' }}
                       title={req.title}
                       subtitle={req.sub}
@@ -289,8 +282,11 @@ const Requests = () => {
                 ))}
 
                 {outgoingRequests.length === 0 && (
-                  <div style={{ fontSize: '14px', color: '#6b7280', padding: '48px 0', textAlign: 'center', background: '#ffffff', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
-                    You haven't sent any requests yet.
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 16px', textAlign: 'center', background: '#ffffff', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 30px -5px rgba(0,0,0,.04)' }}>
+                    <IconArrowsRightLeft size={28} style={{ color: '#94a3b8', marginBottom: '8px' }} />
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#1e293b', marginBottom: '4px' }}>No sent requests</div>
+                    <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '16px', maxWidth: '280px' }}>You haven't sent any skill swap or session requests yet.</div>
+                    <button onClick={() => navigate('/app/marketplace')} style={{ padding: '8px 16px', borderRadius: '10px', background: '#2563eb', color: '#fff', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Find Swaps</button>
                   </div>
                 )}
               </div>
@@ -306,20 +302,9 @@ const Requests = () => {
             </div>
             
             {isHistoryOpen && (
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {historyRequests.map(req => (
-                  <div 
-                    key={req.id}
-                    id={`request-${req.id}`}
-                    style={{
-                      background: req.id === activeHighlightId ? '#f0f7ff' : 'transparent',
-                      borderRadius: '16px',
-                      padding: req.id === activeHighlightId ? '6px' : '0',
-                      border: req.id === activeHighlightId ? '2px solid #3b82f6' : 'none',
-                      transition: 'all 0.5s ease',
-                      marginBottom: '12px'
-                    }}
-                  >
+                  <div key={req.id}>
                     <RequestsCardV2
                       avatarProps={{ initials: req.init, bg: req.bg, color: req.col, backgroundImage: req.otherUser?.avatarImg || req.otherUser?.profilePicture, size: '32px', fontSize: '12px' }}
                       title={req.title}
@@ -337,8 +322,10 @@ const Requests = () => {
                 ))}
                 
                 {historyRequests.length === 0 && (
-                  <div style={{ fontSize: '14px', color: '#6b7280', padding: '48px 0', textAlign: 'center', background: '#ffffff', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
-                    No past requests found.
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 16px', textAlign: 'center', background: '#ffffff', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 30px -5px rgba(0,0,0,.04)' }}>
+                    <IconArrowsRightLeft size={28} style={{ color: '#94a3b8', marginBottom: '8px' }} />
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#1e293b', marginBottom: '4px' }}>No past requests</div>
+                    <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '16px', maxWidth: '280px' }}>History of accepted, declined, or cancelled requests will appear here.</div>
                   </div>
                 )}
               </div>

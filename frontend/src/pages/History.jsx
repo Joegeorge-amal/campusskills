@@ -7,7 +7,7 @@ const History = () => {
   const { transactions } = useAppData();
 
   return (
-    <div id="history" className="pg on" style={{ padding: '32px 40px', backgroundColor: 'var(--cs-bg-light)', backgroundImage: 'radial-gradient(rgba(15, 23, 42, 0.06) 1px, transparent 1px)', backgroundSize: '24px 24px', minHeight: '100vh', boxSizing: 'border-box' }}>
+    <div id="history" className="pg on" style={{ padding: '32px 40px', background: 'linear-gradient(180deg, #fafafa 0%, #f8f9ff 100%)', minHeight: '100vh', boxSizing: 'border-box' }}>
       
       <div style={{ fontSize: '18px', fontWeight: 600, color: '#111827', marginBottom: '24px' }}>
         Transaction history

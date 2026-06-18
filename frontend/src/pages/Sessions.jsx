@@ -368,12 +368,12 @@ const Sessions = () => {
         id={`session-${s.id}`}
         style={{
           background: s.id === activeHighlightId ? '#f0f7ff' : '#ffffff',
-          border: s.id === activeHighlightId ? '2px solid #3b82f6' : '1px solid #e5e7eb',
-          borderRadius: '12px',
+          border: s.id === activeHighlightId ? '2px solid #3b82f6' : '1px solid rgba(0, 0, 0, 0.05)',
+          borderRadius: '16px',
           padding: '16px',
           marginBottom: '12px',
-          boxShadow: s.id === activeHighlightId ? '0 4px 14px rgba(59, 130, 246, 0.15)' : '0 1px 3px 0 rgba(0, 0, 0, 0.05)',
-          transition: 'all 0.5s ease',
+          boxShadow: s.id === activeHighlightId ? '0 10px 30px -5px rgba(59, 130, 246, 0.25)' : '0 10px 30px -5px rgba(0,0,0,.04), 0 4px 6px -2px rgba(0,0,0,.02)',
+          transition: 'all 0.2s ease',
           display: 'flex',
           flexDirection: 'column'
         }}
@@ -749,7 +749,7 @@ const Sessions = () => {
   };
 
   return (
-    <div id="sessions" className="pg on" style={{ padding: '32px 40px', backgroundColor: 'var(--cs-bg-light)', backgroundImage: 'radial-gradient(rgba(15, 23, 42, 0.06) 1px, transparent 1px)', backgroundSize: '24px 24px', minHeight: '100vh', boxSizing: 'border-box', overflowY: 'auto' }}>
+    <div id="sessions" className="pg on" style={{ padding: '32px 40px', background: 'linear-gradient(180deg, #fafafa 0%, #f8f9ff 100%)', minHeight: '100vh', boxSizing: 'border-box', overflowY: 'auto' }}>
       <ReportSessionModal />
 
       {/* Coming up soon Section */}
@@ -766,8 +766,11 @@ const Sessions = () => {
             {upcomingSoon.map((s, idx) => renderSessionCard(s, idx))}
             
             {upcomingSoon.length === 0 && (
-              <div style={{ fontSize: '14px', color: '#6b7280', padding: '32px 0', textAlign: 'center', background: '#ffffff', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
-                No sessions scheduled for the next 48 hours.
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 16px', textAlign: 'center', background: '#ffffff', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 30px -5px rgba(0,0,0,.04)' }}>
+                <IconCalendarMonth size={28} style={{ color: '#94a3b8', marginBottom: '8px' }} />
+                <div style={{ fontSize: '14px', fontWeight: 700, color: '#1e293b', marginBottom: '4px' }}>No upcoming sessions</div>
+                <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '16px', maxWidth: '280px' }}>No sessions scheduled for the next 48 hours. Ready to exchange skills?</div>
+                <button onClick={() => navigate('/app/marketplace')} style={{ padding: '8px 16px', borderRadius: '10px', background: '#2563eb', color: '#fff', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Browse Marketplace</button>
               </div>
             )}
           </div>
@@ -788,8 +791,11 @@ const Sessions = () => {
             {activeSessions.map((s, idx) => renderSessionCard(s, idx))}
             
             {activeSessions.length === 0 && (
-              <div style={{ fontSize: '14px', color: '#6b7280', padding: '32px 0', textAlign: 'center', background: '#ffffff', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
-                No other active sessions.
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 16px', textAlign: 'center', background: '#ffffff', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 30px -5px rgba(0,0,0,.04)' }}>
+                <IconCalendarMonth size={28} style={{ color: '#94a3b8', marginBottom: '8px' }} />
+                <div style={{ fontSize: '14px', fontWeight: 700, color: '#1e293b', marginBottom: '4px' }}>No other active sessions</div>
+                <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '16px', maxWidth: '280px' }}>Your active skill exchanges will appear here.</div>
+                <button onClick={() => navigate('/app/marketplace')} style={{ padding: '8px 16px', borderRadius: '10px', background: '#2563eb', color: '#fff', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Find Swaps</button>
               </div>
             )}
           </div>
@@ -810,8 +816,10 @@ const Sessions = () => {
             {pastSessions.map((s, idx) => renderSessionCard(s, idx))}
             
             {pastSessions.length === 0 && (
-              <div style={{ fontSize: '14px', color: '#6b7280', padding: '32px 0', textAlign: 'center', background: '#ffffff', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
-                No past sessions found.
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 16px', textAlign: 'center', background: '#ffffff', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 30px -5px rgba(0,0,0,.04)' }}>
+                <IconCalendarMonth size={28} style={{ color: '#94a3b8', marginBottom: '8px' }} />
+                <div style={{ fontSize: '14px', fontWeight: 700, color: '#1e293b', marginBottom: '4px' }}>No past sessions</div>
+                <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '16px', maxWidth: '280px' }}>History of your completed and cancelled sessions will be displayed here.</div>
               </div>
             )}
           </div>

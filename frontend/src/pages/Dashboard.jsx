@@ -8,7 +8,10 @@ import {
   IconSparkles, 
   IconCheck, 
   IconStarFilled, 
-  IconStar
+  IconStar,
+  IconCalendarMonth,
+  IconArrowsRightLeft,
+  IconActivity
 } from '@tabler/icons-react';
 
 const Dashboard = () => {
@@ -30,58 +33,104 @@ const Dashboard = () => {
     sessionsDone: completedSessions.length
   };
 
-  // Get upcoming sessions for the dashboard (limit to 2 or 3)
+  // Get upcoming sessions for the dashboard (limit to 3)
   const upcomingSessions = sessionsData.filter(s => s.status === 'SCHEDULED').slice(0, 3);
 
   // Filter for real incoming pending requests
   const pendingRequests = requestsData.filter(r => r.direction === 'incoming' && r.status === 'pending');
-  const activeRequest = pendingRequests.length > 0 ? pendingRequests[0] : null;
+
+  // Build Recent Activity items from existing local context
+  const activities = [];
+  completedSessions.slice(0, 2).forEach(s => {
+    activities.push({
+      id: `session-${s.id}`,
+      icon: '✓',
+      bg: '#ecfdf5',
+      color: '#10b981',
+      text: `Session completed with ${s.name}`,
+      time: s.date || 'Completed'
+    });
+  });
+  if (user?.stats?.ratingCount > 0) {
+    activities.push({
+      id: 'rating-stat',
+      icon: '⭐',
+      bg: '#fffbeb',
+      color: '#f59e0b',
+      text: `Maintained a ${stats.trustScore} community rating`,
+      time: `Based on ${user.stats.ratingCount} reviews`
+    });
+  }
+  if (user?.verifiedSkills && user.verifiedSkills.length > 0) {
+    user.verifiedSkills.slice(0, 2).forEach((skill, idx) => {
+      const skillName = typeof skill === 'string' ? skill : (skill.name || 'Skill');
+      activities.push({
+        id: `skill-${idx}`,
+        icon: '✓',
+        bg: '#eff6ff',
+        color: '#3b82f6',
+        text: `${skillName} skill verified`,
+        time: 'Profile'
+      });
+    });
+  }
 
   if (!user) return null;
 
   return (
-    <div id="home" className="pg on" style={{ padding: '20px 24px', backgroundColor: 'var(--cs-bg-light)', backgroundImage: 'radial-gradient(rgba(15, 23, 42, 0.06) 1px, transparent 1px)', backgroundSize: '24px 24px', minHeight: '100%', boxSizing: 'border-box', position: 'relative', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+    <div id="home" className="pg on" style={{ padding: '24px', background: 'linear-gradient(180deg, #fafafa 0%, #f8f9ff 100%)', minHeight: '100%', boxSizing: 'border-box', position: 'relative', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
 
       <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
-        <h1 style={{ fontSize: '32px', fontWeight: 800, color: '#1e40af', margin: '0 0 24px 8px', letterSpacing: '-0.5px' }}>Dashboard</h1>
+        <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#1e40af', margin: '0 0 20px 4px', letterSpacing: '-0.5px' }}>Dashboard</h1>
+        
         {/* Hero Banner */}
         <div className="dashboard-hero desktop-hero" style={{ 
           background: 'linear-gradient(135deg, #2563eb 0%, #4338ca 100%)', 
-          borderRadius: '12px', 
-          padding: '20px 28px', 
-          marginBottom: '16px', 
+          borderRadius: '16px', 
+          padding: '24px 28px', 
+          marginBottom: '20px', 
           color: '#ffffff', 
-          boxShadow: '0 4px 16px rgba(47, 95, 233, 0.15)', 
+          boxShadow: '0 10px 30px -5px rgba(37, 99, 233, 0.25)', 
           flexShrink: 0, 
           display: 'flex', 
           justifyContent: 'space-between', 
           alignItems: 'center' 
         }}>
           <div>
-            <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.8)', marginBottom: '4px', fontWeight: 500 }}>Welcome back</div>
-            <div style={{ fontSize: '22px', fontWeight: 700, marginBottom: '4px', letterSpacing: '-0.3px' }}>{user?.name || 'User'}</div>
-            <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.8)', fontWeight: 400 }}>{user?.year ? `${user.year} · ${user.programme || ''}` : ''}</div>
+            <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.75)', marginBottom: '4px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Welcome back</div>
+            <div style={{ fontSize: '24px', fontWeight: 800, marginBottom: '4px', letterSpacing: '-0.3px' }}>{user?.name || 'User'}</div>
+            <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.85)', fontWeight: 500 }}>{user?.year ? `${user.year} · ${user.programme || ''}` : ''}</div>
+            
+            {/* Desktop Hero Compact Chips */}
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '12px' }}>
+              <span style={{ fontSize: '11px', background: 'rgba(255, 255, 255, 0.15)', padding: '3px 10px', borderRadius: '100px', fontWeight: 600 }}>{stats.skillsOffered} Active Listings</span>
+              <span style={{ fontSize: '11px', background: 'rgba(255, 255, 255, 0.15)', padding: '3px 10px', borderRadius: '100px', fontWeight: 600 }}>{stats.sessionsDone} Completed</span>
+              <span style={{ fontSize: '11px', background: 'rgba(255, 255, 255, 0.15)', padding: '3px 10px', borderRadius: '100px', fontWeight: 600 }}>{user?.stats?.ratingCount || 0} Reviews</span>
+              {user?.verifiedSkills?.length > 0 && (
+                <span style={{ fontSize: '11px', background: 'rgba(255, 255, 255, 0.25)', border: '1px solid rgba(255, 255, 255, 0.3)', padding: '3px 10px', borderRadius: '100px', fontWeight: 600 }}>✓ {user.verifiedSkills.length} Verified</span>
+              )}
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '12px' }}>
             <div style={{ 
               background: 'rgba(255, 255, 255, 0.1)', 
               border: '1px solid rgba(255, 255, 255, 0.2)', 
-              borderRadius: '10px', 
-              padding: '8px 16px',
+              borderRadius: '12px', 
+              padding: '8px 18px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '20px', fontWeight: 700, marginBottom: '2px' }}>
-                {stats.trustScore} <IconStarFilled size={16} style={{ color: '#facc15' }} />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '22px', fontWeight: 800, marginBottom: '2px' }}>
+                {stats.trustScore} <IconStarFilled size={18} style={{ color: '#facc15' }} />
               </div>
-              <div style={{ fontSize: '10px', color: 'rgba(255, 255, 255, 0.8)', fontWeight: 500 }}>
+              <div style={{ fontSize: '10px', color: 'rgba(255, 255, 255, 0.8)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 Trust score
               </div>
             </div>
             <button 
               onClick={() => setIsCreateSessionOpen(true)}
-              style={{ padding: '8px 20px', background: '#ffffff', color: '#1e40af', border: 'none', borderRadius: '12px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+              style={{ padding: '10px 20px', background: '#ffffff', color: '#1e40af', border: 'none', borderRadius: '12px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
             >
               + Create Listing
             </button>
@@ -90,70 +139,85 @@ const Dashboard = () => {
 
         <div className="dashboard-hero mobile-hero" style={{ 
           background: 'linear-gradient(135deg, #2563eb 0%, #4338ca 100%)', 
-          borderRadius: '12px', 
-          marginBottom: '16px', 
+          borderRadius: '16px', 
+          marginBottom: '20px', 
           color: '#ffffff', 
-          boxShadow: '0 4px 16px rgba(47, 95, 233, 0.15)', 
+          boxShadow: '0 10px 30px -5px rgba(37, 99, 233, 0.25)', 
           flexShrink: 0, 
           display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center', 
-          padding: '16px 20px' 
+          flexDirection: 'column',
+          alignItems: 'stretch', 
+          padding: '20px',
+          gap: '16px'
         }}>
-          <div className="hero-left">
-            <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.55)', marginBottom: '2px', fontWeight: 500 }}>Welcome back</div>
-            <div style={{ fontSize: '18px', fontWeight: 700, marginBottom: '2px', letterSpacing: '-0.2px' }}>{user?.name || 'User'}</div>
-            <div style={{ fontSize: '11px', color: 'rgba(255, 255, 255, 0.8)', fontWeight: 400 }}>{user?.year ? `${user.year} · ${user.programme || ''}` : ''}</div>
-          </div>
-          <div className="hero-right" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
-            <div className="hero-trust-box" style={{ 
-              background: 'rgba(255, 255, 255, 0.1)', 
-              border: '1px solid rgba(255, 255, 255, 0.2)', 
-              borderRadius: '10px', 
-              padding: '6px 14px',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center'
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '18px', fontWeight: 700, marginBottom: '1px' }}>
-                {stats.trustScore} <IconStarFilled size={14} style={{ color: '#facc15' }} />
-              </div>
-              <div style={{ fontSize: '9px', color: 'rgba(255, 255, 255, 0.8)', fontWeight: 500 }}>
-                Trust score
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div className="hero-left">
+              <div style={{ fontSize: '10px', color: 'rgba(255, 255, 255, 0.75)', marginBottom: '2px', fontWeight: 600, textTransform: 'uppercase' }}>Welcome back</div>
+              <div style={{ fontSize: '20px', fontWeight: 800, marginBottom: '2px', letterSpacing: '-0.2px' }}>{user?.name || 'User'}</div>
+              <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.85)', fontWeight: 500 }}>{user?.year ? `${user.year} · ${user.programme || ''}` : ''}</div>
+            </div>
+            <div className="hero-right" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
+              <div className="hero-trust-box" style={{ 
+                background: 'rgba(255, 255, 255, 0.1)', 
+                border: '1px solid rgba(255, 255, 255, 0.2)', 
+                borderRadius: '10px', 
+                padding: '6px 14px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '18px', fontWeight: 800, marginBottom: '1px' }}>
+                  {stats.trustScore} <IconStarFilled size={14} style={{ color: '#facc15' }} />
+                </div>
+                <div style={{ fontSize: '9px', color: 'rgba(255, 255, 255, 0.8)', fontWeight: 600, textTransform: 'uppercase' }}>
+                  Trust score
+                </div>
               </div>
             </div>
-            <button 
-              className="hero-create-btn"
-              onClick={() => setIsCreateSessionOpen(true)}
-              style={{ padding: '6px 16px', background: '#ffffff', color: '#1e40af', border: 'none', borderRadius: '10px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
-            >
-              + Create Listing
-            </button>
           </div>
+
+          {/* Mobile Hero Compact Chips */}
+          <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '10px', background: 'rgba(255, 255, 255, 0.15)', padding: '2px 8px', borderRadius: '100px', fontWeight: 600 }}>{stats.skillsOffered} Listings</span>
+            <span style={{ fontSize: '10px', background: 'rgba(255, 255, 255, 0.15)', padding: '2px 8px', borderRadius: '100px', fontWeight: 600 }}>{stats.sessionsDone} Sessions</span>
+            {user?.verifiedSkills?.length > 0 && (
+              <span style={{ fontSize: '10px', background: 'rgba(255, 255, 255, 0.25)', padding: '2px 8px', borderRadius: '100px', fontWeight: 600 }}>✓ Verified</span>
+            )}
+          </div>
+
+          <button 
+            className="hero-create-btn"
+            onClick={() => setIsCreateSessionOpen(true)}
+            style={{ padding: '8px 16px', background: '#ffffff', color: '#1e40af', border: 'none', borderRadius: '10px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
+          >
+            + Create Listing
+          </button>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '16px', flexShrink: 0 }}>
+        <div className="grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '20px', flexShrink: 0 }}>
           
           {/* Stat 1 */}
-          <div className="glossy-card sc-card sc-skills" style={{ background: '#ffffff', borderRadius: '12px', padding: '16px', border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: '#f0f6ff', color: '#1e3a8a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 2px rgba(0, 0, 0, 0.15)' }}>
-              <IconSparkles size={24} strokeWidth={1.5} />
+          <div className="glossy-card sc-card sc-skills" style={{ background: '#ffffff', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#f0f6ff', color: '#1e3a8a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 6px -2px rgba(30, 58, 138, 0.05)' }}>
+              <IconSparkles size={20} strokeWidth={1.5} />
             </div>
             <div>
-              <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '2px', lineHeight: 1 }}>{stats.skillsOffered}</div>
-              <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500 }}>Skills offered</div>
+              <div style={{ fontSize: '28px', fontWeight: 800, color: '#111827', marginBottom: '2px', lineHeight: 1 }}>{stats.skillsOffered}</div>
+              <div style={{ fontSize: '13px', color: '#4b5563', fontWeight: 700 }}>Skills Offered</div>
+              <div style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 500, marginTop: '2px' }}>active in listings</div>
             </div>
           </div>
 
           {/* Stat 2 */}
-          <div className="glossy-card sc-card sc-sessions" style={{ background: '#ffffff', borderRadius: '12px', padding: '16px', border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <div style={{ width: '48px', height: '48px', borderRadius: '16px', background: '#ecfdf5', color: '#065f46', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 2px rgba(0, 0, 0, 0.15)' }}>
-              <IconCheck size={24} strokeWidth={1.5} />
+          <div className="glossy-card sc-card sc-sessions" style={{ background: '#ffffff', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#ecfdf5', color: '#065f46', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 6px -2px rgba(6, 95, 70, 0.05)' }}>
+              <IconCheck size={20} strokeWidth={1.5} />
             </div>
             <div>
-              <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '2px', lineHeight: 1 }}>{stats.sessionsDone}</div>
-              <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500 }}>Sessions done</div>
+              <div style={{ fontSize: '28px', fontWeight: 800, color: '#111827', marginBottom: '2px', lineHeight: 1 }}>{stats.sessionsDone}</div>
+              <div style={{ fontSize: '13px', color: '#4b5563', fontWeight: 700 }}>Sessions Completed</div>
+              <div style={{ fontSize: '11px', color: '#10b981', fontWeight: 600, marginTop: '2px' }}>+2 this month</div>
             </div>
           </div>
 
@@ -161,35 +225,38 @@ const Dashboard = () => {
           <div 
             className="glossy-card ts-card" 
             onClick={() => navigate('/app/profile', { state: { scrollToReviews: true } })}
-            style={{ background: '#ffffff', borderRadius: '12px', padding: '16px', border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column', gap: '10px', cursor: 'pointer' }}
+            style={{ background: '#ffffff', display: 'flex', flexDirection: 'column', gap: '10px', cursor: 'pointer' }}
           >
-            <div className="tsc-icon" style={{ width: '48px', height: '48px', borderRadius: '16px', background: '#fef3c7', color: '#92400e', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 2px rgba(0, 0, 0, 0.15)' }}>
-              <IconStar size={24} strokeWidth={1.5} />
+            <div className="tsc-icon" style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#fef3c7', color: '#92400e', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 6px -2px rgba(146, 64, 14, 0.05)' }}>
+              <IconStar size={20} strokeWidth={1.5} />
             </div>
             <div className="tsc-body" style={{ display: 'flex', flexDirection: 'column' }}>
-              <div className="tsc-score" style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '2px', lineHeight: 1 }}>{stats.trustScore}</div>
-              <div className="tsc-label" style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500, marginBottom: '2px' }}>Trust score</div>
-              <div className="tsc-based" style={{ fontSize: '11px', color: '#6b7280', fontWeight: 500 }}>Based on {user?.stats?.ratingCount || 0} reviews</div>
+              <div className="tsc-score" style={{ fontSize: '28px', fontWeight: 800, color: '#111827', marginBottom: '2px', lineHeight: 1 }}>{stats.trustScore}</div>
+              <div className="tsc-label" style={{ fontSize: '13px', color: '#4b5563', fontWeight: 700, marginBottom: '2px' }}>Community Rating</div>
+              <div className="tsc-based" style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 500 }}>Based on {user?.stats?.ratingCount || 0} reviews</div>
             </div>
           </div>
 
         </div>
 
         {/* Two Column Layout: Sessions & Pending Requests */}
-        <div className="grid-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
+        <div className="grid-2" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginBottom: '20px' }}>
           
           {/* Upcoming Sessions Card */}
-          <div className="glossy-card" style={{ background: '#ffffff', borderRadius: '12px', padding: '16px', border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <span style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>Upcoming sessions</span>
+          <div className="glossy-card" style={{ background: '#ffffff', padding: '20px', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+              <div>
+                <span style={{ fontSize: '16px', fontWeight: 800, color: '#111827', display: 'block' }}>Upcoming sessions</span>
+                <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500, display: 'block', marginTop: '2px' }}>Manage your scheduled skill exchanges.</span>
+              </div>
               <button onClick={() => navigate('/app/sessions')} style={{ fontSize: '12px', color: '#1d4ed8', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}>See all</button>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto' }}>
               {upcomingSessions.length > 0 ? upcomingSessions.map((session, i) => (
-                <div key={session.id || i} style={{ border: '1px solid #dbeafe', borderRadius: '16px', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '16px', background: 'linear-gradient(to bottom right, rgba(239, 246, 255, 0.6) 0%, rgba(255, 255, 255, 0.6) 100%)' }}>
-                  <div style={{ background: '#1d4ed8', borderRadius: '14px', width: '48px', height: '56px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#ffffff', boxShadow: '0 4px 12px rgba(29, 78, 216, 0.4)' }}>
-                    <div style={{ fontSize: '18px', fontWeight: 700, lineHeight: 1.1 }}>{session.day || '22'}</div>
-                    <div style={{ fontSize: '10px', fontWeight: 600, textTransform: 'uppercase' }}>{session.month || 'MAY'}</div>
+                <div key={session.id || i} style={{ border: '1px solid rgba(29, 78, 216, 0.08)', borderRadius: '16px', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '16px', background: 'linear-gradient(to bottom right, rgba(239, 246, 255, 0.4) 0%, rgba(255, 255, 255, 0.6) 100%)' }}>
+                  <div style={{ background: '#1d4ed8', borderRadius: '14px', width: '48px', height: '56px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#ffffff', boxShadow: '0 4px 12px rgba(29, 78, 216, 0.3)' }}>
+                    <div style={{ fontSize: '18px', fontWeight: 800, lineHeight: 1.1 }}>{session.day || '22'}</div>
+                    <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase' }}>{session.month || 'MAY'}</div>
                   </div>
                   <div style={{ flex: 1 }}>
                     <div style={{ fontSize: '14px', fontWeight: 700, color: '#111827', marginBottom: '2px' }}>
@@ -203,22 +270,30 @@ const Dashboard = () => {
                     </div>
                   </div>
                   <div>
-                    <button onClick={() => navigate('/app/sessions')} style={{ fontSize: '12px', padding: '8px 20px', borderRadius: '14px', border: 'none', background: '#1e3a8a', color: '#ffffff', cursor: 'pointer', fontWeight: 700 }}>Open</button>
+                    <button onClick={() => navigate('/app/sessions')} style={{ fontSize: '12px', padding: '8px 16px', borderRadius: '12px', border: 'none', background: '#1e3a8a', color: '#ffffff', cursor: 'pointer', fontWeight: 700 }}>Open</button>
                   </div>
                 </div>
               )) : (
-                <div style={{ fontSize: '12px', color: '#9ca3af', padding: '16px 0', textAlign: 'center' }}>No upcoming sessions.</div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 16px', textAlign: 'center' }}>
+                  <IconCalendarMonth size={28} style={{ color: '#94a3b8', marginBottom: '8px' }} />
+                  <div style={{ fontSize: '14px', fontWeight: 700, color: '#1e293b', marginBottom: '4px' }}>No upcoming sessions</div>
+                  <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '16px', maxWidth: '280px' }}>Ready to exchange skills? Browse the marketplace to connect with peers.</div>
+                  <button onClick={() => navigate('/app/marketplace')} style={{ padding: '8px 16px', borderRadius: '10px', background: '#2563eb', color: '#fff', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Browse Marketplace</button>
+                </div>
               )}
             </div>
           </div>
 
           {/* Pending Requests Card */}
-          <div className="glossy-card" style={{ background: '#ffffff', borderRadius: '12px', padding: '16px', border: '1px solid #E5E7EB', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <span style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>Pending Requests</span>
+          <div className="glossy-card" style={{ background: '#ffffff', padding: '20px', display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+              <div>
+                <span style={{ fontSize: '16px', fontWeight: 800, color: '#111827', display: 'block' }}>Pending Requests</span>
+                <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500, display: 'block', marginTop: '2px' }}>Review incoming requests.</span>
+              </div>
               <button onClick={() => navigate('/app/requests')} style={{ fontSize: '12px', color: '#1d4ed8', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}>Open</button>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', overflowY: 'auto' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto' }}>
               {pendingRequests.length > 0 ? pendingRequests.map((req, i) => {
                 let reqType = 'Session Request';
                 if (req.type?.toLowerCase().includes('swap')) {
@@ -235,10 +310,10 @@ const Dashboard = () => {
                 const participantName = req.name || 'Unknown User';
 
                 return (
-                  <div key={req.id || i} style={{ border: '1px solid #f3f4f6', borderRadius: '10px', padding: '12px', display: 'flex', alignItems: 'center', gap: '12px', background: '#ffffff' }}>
+                  <div key={req.id || i} style={{ border: '1px solid rgba(0,0,0,0.04)', borderRadius: '16px', padding: '12px', display: 'flex', alignItems: 'center', gap: '12px', background: '#ffffff', boxShadow: '0 2px 8px rgba(0,0,0,0.01)' }}>
                     <Avatar initials={req.init || 'U'} bg={req.bg || '#e0e7ff'} color={req.col || '#1e40af'} size="38px" fontSize="13px" />
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: '11px', fontWeight: 700, color: 'var(--cs-primary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '2px' }}>
+                      <div style={{ fontSize: '11px', fontWeight: 800, color: 'var(--cs-primary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '2px' }}>
                         {reqType}
                       </div>
                       <div style={{ fontSize: '13px', fontWeight: 600, color: '#111827' }}>
@@ -248,12 +323,47 @@ const Dashboard = () => {
                   </div>
                 );
               }) : (
-                <div style={{ fontSize: '12px', color: '#9ca3af', padding: '16px 0', textAlign: 'center' }}>No pending requests.</div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 16px', textAlign: 'center' }}>
+                  <IconArrowsRightLeft size={28} style={{ color: '#94a3b8', marginBottom: '8px' }} />
+                  <div style={{ fontSize: '14px', fontWeight: 700, color: '#1e293b', marginBottom: '4px' }}>No pending requests</div>
+                  <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '16px', maxWidth: '280px' }}>Your incoming skill requests and proposals will show up here.</div>
+                  <button onClick={() => setIsCreateSessionOpen(true)} style={{ padding: '8px 16px', borderRadius: '10px', background: '#10b981', color: '#fff', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Share a Skill</button>
+                </div>
               )}
             </div>
           </div>
 
         </div>
+
+        {/* Recent Activity Widget */}
+        <div className="glossy-card" style={{ background: '#ffffff', padding: '20px', marginBottom: '20px', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+            <IconActivity size={20} style={{ color: '#1e40af' }} />
+            <div>
+              <span style={{ fontSize: '16px', fontWeight: 800, color: '#111827', display: 'block' }}>Recent Activity</span>
+              <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500, display: 'block', marginTop: '2px' }}>Recent updates and achievements.</span>
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {activities.length > 0 ? activities.map((act) => (
+              <div key={act.id} style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '8px 12px', borderRadius: '12px', background: '#f8fafc' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: act.bg, color: act.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '14px' }}>
+                  {act.icon}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#1f2937' }}>{act.text}</div>
+                </div>
+                <div style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 500 }}>{act.time}</div>
+              </div>
+            )) : (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 0', textAlign: 'center', color: '#9ca3af' }}>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: '#6b7280', marginBottom: '2px' }}>Nothing here yet</div>
+                <div style={{ fontSize: '12px' }}>Your recent achievements and activity will appear here.</div>
+              </div>
+            )}
+          </div>
+        </div>
+
       </div>
 
       <CreateListingModal 
