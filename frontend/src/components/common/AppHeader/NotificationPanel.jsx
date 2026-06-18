@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { IconCheck, IconX, IconCalendarEvent, IconBell, IconMessage, IconTrash, IconListCheck } from '@tabler/icons-react';
 import './NotificationPanel.css';
+import LoadingSpinner from '../../common/LoadingSpinner';
 
 import ConfirmModal from '../../modals/ConfirmModal';
 
@@ -43,7 +44,7 @@ const formatTimeAgo = (timestamp) => {
   return Math.floor(seconds) + " sec ago";
 };
 
-const NotificationPanel = ({ notifications, onClose, onMarkAllRead, onNotificationClick, onDeleteNotification, onDeleteMultipleNotifications }) => {
+const NotificationPanel = ({ notifications, loading, onClose, onMarkAllRead, onNotificationClick, onDeleteNotification, onDeleteMultipleNotifications }) => {
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [isSelectionModeActive, setIsSelectionModeActive] = useState(false);
   
@@ -182,7 +183,11 @@ const NotificationPanel = ({ notifications, onClose, onMarkAllRead, onNotificati
 
         {/* Body */}
         <div className="notif-body">
-          {notifications.length === 0 ? (
+          {loading ? (
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '48px 0', height: '100%' }}>
+              <LoadingSpinner />
+            </div>
+          ) : notifications.length === 0 ? (
             <div className="notif-empty-state">
               <div className="notif-empty-icon">
                 <IconCheck size={32} />

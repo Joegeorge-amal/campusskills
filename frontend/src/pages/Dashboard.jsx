@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useAppData } from '../context/AppDataContext';
 import CreateListingModal from '../components/modals/CreateListingModal';
 import Avatar from '../components/common/Avatar';
+import LoadingSpinner from '../components/common/LoadingSpinner';
 import { 
   IconSparkles, 
   IconCheck, 
@@ -19,7 +20,9 @@ const Dashboard = () => {
   const { user } = useAuth();
   const { 
     sessionsData = [], 
-    requestsData = []
+    requestsData = [],
+    isSessionsLoading,
+    isRequestsLoading
   } = useAppData();
   const navigate = useNavigate();
 
@@ -252,7 +255,11 @@ const Dashboard = () => {
               <button onClick={() => navigate('/app/sessions')} style={{ fontSize: '12px', color: '#1d4ed8', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}>See all</button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto' }}>
-              {upcomingSessions.length > 0 ? upcomingSessions.map((session, i) => (
+              {isSessionsLoading ? (
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0' }}>
+                  <LoadingSpinner />
+                </div>
+              ) : upcomingSessions.length > 0 ? upcomingSessions.map((session, i) => (
                 <div key={session.id || i} style={{ border: '1px solid rgba(29, 78, 216, 0.08)', borderRadius: '16px', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '16px', background: 'linear-gradient(to bottom right, rgba(239, 246, 255, 0.4) 0%, rgba(255, 255, 255, 0.6) 100%)' }}>
                   <div style={{ background: '#1d4ed8', borderRadius: '14px', width: '48px', height: '56px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#ffffff', boxShadow: '0 4px 12px rgba(29, 78, 216, 0.3)' }}>
                     <div style={{ fontSize: '18px', fontWeight: 800, lineHeight: 1.1 }}>{session.day || '22'}</div>
@@ -294,7 +301,11 @@ const Dashboard = () => {
               <button onClick={() => navigate('/app/requests')} style={{ fontSize: '12px', color: '#1d4ed8', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}>Open</button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto' }}>
-              {pendingRequests.length > 0 ? pendingRequests.map((req, i) => {
+              {isRequestsLoading ? (
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0' }}>
+                  <LoadingSpinner />
+                </div>
+              ) : pendingRequests.length > 0 ? pendingRequests.map((req, i) => {
                 let reqType = 'Session Request';
                 if (req.type?.toLowerCase().includes('swap')) {
                   reqType = 'Swap Request';
@@ -345,7 +356,11 @@ const Dashboard = () => {
             </div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {activities.length > 0 ? activities.map((act) => (
+            {isSessionsLoading ? (
+              <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0' }}>
+                <LoadingSpinner />
+              </div>
+            ) : activities.length > 0 ? activities.map((act) => (
               <div key={act.id} style={{ display: 'flex', alignItems: 'center', gap: '14px', padding: '8px 12px', borderRadius: '12px', background: '#f8fafc' }}>
                 <div style={{ width: '32px', height: '32px', borderRadius: '10px', background: act.bg, color: act.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: '14px' }}>
                   {act.icon}

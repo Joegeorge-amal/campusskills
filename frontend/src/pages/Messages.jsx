@@ -14,6 +14,7 @@ import { messageService } from '../services/messageService';
 import { userService } from '../services/userService';
 import { AnimatePresence } from 'framer-motion';
 import DeleteChatModal from '../components/modals/DeleteChatModal';
+import LoadingSpinner from '../components/common/LoadingSpinner';
 import ModalWrapper from '../components/common/ModalWrapper';
 
 const getInitials = (name) => {
@@ -57,6 +58,7 @@ const Messages = () => {
   const typingThrottleRef = useRef(0);
   const isTypingRef = useRef(false);
 
+  const [isMessagesLoading, setIsMessagesLoading] = useState(false);
   const [loadingOlder, setLoadingOlder] = useState(false);
   const [hasMoreMessages, setHasMoreMessages] = useState({});
   const messagesContainerRef = useRef(null);
@@ -76,7 +78,9 @@ const Messages = () => {
     if (activeChatId && activeChatId !== 'requests') {
       // Always fetch history from API (merges with any WS-pre-populated messages)
       const isNewChat = !chatMessages[activeChatId];
+      setIsMessagesLoading(true);
       messageService.getMessages(activeChatId, { page: 1, limit: 50 }).then(res => {
+        setIsMessagesLoading(false);
         if (isNewChat) {
           setChatMessages(prev => ({ ...prev, [activeChatId]: res.items || [] }));
         } else {
@@ -90,6 +94,7 @@ const Messages = () => {
         }
         setHasMoreMessages(prev => ({ ...prev, [activeChatId]: res.items.length === 50 }));
       }).catch(err => {
+        setIsMessagesLoading(false);
         console.error(err);
       });
 
@@ -780,7 +785,11 @@ const Messages = () => {
                     />
                   );
                 })}
-                {activeChatMsgs.length === 0 && (
+                {isMessagesLoading ? (
+                  <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0', margin: 'auto' }}>
+                    <LoadingSpinner />
+                  </div>
+                ) : activeChatMsgs.length === 0 && (
                   <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: '13px', margin: 'auto' }}>
                     No messages yet. Send a message to start the conversation!
                   </div>

@@ -325,6 +325,7 @@ const NotificationDropdown = () => {
       {isSidePanelOpen && (
         <NotificationPanel
           notifications={notifications}
+          loading={loading}
           onClose={() => setIsSidePanelOpen(false)}
           onMarkAllRead={markAllRead}
           onNotificationClick={(notif) => {

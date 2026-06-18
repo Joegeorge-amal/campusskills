@@ -5,6 +5,7 @@ import MarketplaceCard from '../components/common/MarketplaceCard/MarketplaceCar
 import CategoryFilterTabs from '../components/common/CategoryFilterTabs/CategoryFilterTabs';
 import BookSessionModal from '../components/modals/BookSessionModal';
 import InitialMessageModal from '../components/modals/InitialMessageModal';
+import LoadingSpinner from '../components/common/LoadingSpinner';
 import { IconStar, IconUser, IconMessageCircle, IconRefresh } from '@tabler/icons-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { listingService } from '../services/listingService';
@@ -235,7 +236,11 @@ const Marketplace = () => {
                   <div style={{ fontSize: '18px', fontWeight: 800, color: '#111827', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     Most Requested
                   </div>
-                  {featuredSkills.length > 0 ? (
+                  {isLoading ? (
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: '32px 0' }}>
+                      <LoadingSpinner />
+                    </div>
+                  ) : featuredSkills.length > 0 ? (
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '16px' }}>
                       {featuredSkills.map((skill, i) => renderSkillCard(skill, i))}
                     </div>
