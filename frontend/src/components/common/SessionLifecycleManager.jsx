@@ -75,9 +75,10 @@ const SessionLifecycleManager = () => {
     const pendingPayment = sessionsData.find(s => {
       const req = requestsData.find(r => r.id === s.rawSession.exchangeId);
       const isSwap = !!s.rawSession.swapGroupId || (req && req.rawReq?.type === 'SWAP');
+      const reqPayment = s.rawSession.requiresPayment != null ? s.rawSession.requiresPayment : !isSwap;
       
       if (s.status !== 'COMPLETED' || isSwap) return false;
-      if (s.rawSession.requiresPayment === false) return false;
+      if (reqPayment === false) return false;
       const isTeacher = s.rawSession.teacherId === user.userId;
       const isStudent = s.rawSession.studentId === user.userId;
       
@@ -169,8 +170,11 @@ const SessionLifecycleManager = () => {
         });
       }
     } else if (sessionEvent.type === 'SESSION_BOTH_CONFIRMED') {
-      const isSwap = !!raw.swapGroupId;
-      if (!isSwap) {
+      const req = requestsData.find(r => r.id === raw.exchangeId);
+      const isSwap = !!raw.swapGroupId || (req && req.rawReq?.type === 'SWAP');
+      const requiresPayment = raw.requiresPayment != null ? raw.requiresPayment : !isSwap;
+
+      if (requiresPayment) {
         if (isStudent) {
           setActivePopup({
             type: 'PAYMENT_NEEDED',
@@ -183,7 +187,7 @@ const SessionLifecycleManager = () => {
           });
         }
       } else {
-        // Swap session completed, jump straight to review
+        // Free or Swap session completed, jump straight to review
         setReviewModalData({
           id: sessionId,
           rawSession: raw,
