@@ -86,6 +86,10 @@ const NotificationDropdown = () => {
   }, [lastMessage]);
 
   const toggleDropdown = () => {
+    // Blur any active element (like the search bar input) to resolve overlay/focus conflicts
+    if (document.activeElement && typeof document.activeElement.blur === 'function') {
+      document.activeElement.blur();
+    }
     setIsOpen(!isOpen);
   };
 
@@ -294,6 +298,9 @@ const NotificationDropdown = () => {
             <div style={{ borderTop: '1px solid #f1f5f9', padding: '12px', textAlign: 'center' }}>
               <button 
                 onClick={() => {
+                  if (document.activeElement && typeof document.activeElement.blur === 'function') {
+                    document.activeElement.blur();
+                  }
                   setIsOpen(false);
                   setIsSidePanelOpen(true);
                 }}

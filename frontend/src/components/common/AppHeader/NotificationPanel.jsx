@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { IconCheck, IconX, IconCalendarEvent, IconBell, IconMessage, IconTrash, IconListCheck } from '@tabler/icons-react';
 import './NotificationPanel.css';
 
+import ConfirmModal from '../../modals/ConfirmModal';
+
 const getIconForType = (type) => {
   switch (type) {
     case 'NEW_MESSAGE':
@@ -47,6 +49,8 @@ const NotificationPanel = ({ notifications, onClose, onMarkAllRead, onNotificati
   
   const unreadCount = notifications.filter(n => n.isRead === false || n.read === false || n.unread === true).length;
 
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
   const toggleSelectionMode = () => {
     setIsSelectionModeActive(!isSelectionModeActive);
     if (isSelectionModeActive) {
@@ -75,19 +79,31 @@ const NotificationPanel = ({ notifications, onClose, onMarkAllRead, onNotificati
 
   const handleBulkDelete = () => {
     if (selectedIds.size === 0) return;
-    if (window.confirm(`Are you sure you want to delete ${selectedIds.size} notifications?`)) {
-      if (onDeleteMultipleNotifications) {
-        onDeleteMultipleNotifications(Array.from(selectedIds));
-      } else if (onDeleteNotification) {
-        Array.from(selectedIds).forEach(id => onDeleteNotification(id));
-      }
-      setSelectedIds(new Set());
-      setIsSelectionModeActive(false);
+    setIsConfirmOpen(true);
+  };
+
+  const executeBulkDelete = () => {
+    if (onDeleteMultipleNotifications) {
+      onDeleteMultipleNotifications(Array.from(selectedIds));
+    } else if (onDeleteNotification) {
+      Array.from(selectedIds).forEach(id => onDeleteNotification(id));
     }
+    setSelectedIds(new Set());
+    setIsSelectionModeActive(false);
+    setIsConfirmOpen(false);
   };
 
   return (
     <div className="notif-panel-overlay" onClick={onClose}>
+      <ConfirmModal
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={executeBulkDelete}
+        title="Delete Notifications"
+        message={`Are you sure you want to delete ${selectedIds.size} notifications?`}
+        confirmText="Delete"
+        isDanger={true}
+      />
       <div className="notif-panel" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="notif-header" style={{ transition: 'background 0.3s' }}>
