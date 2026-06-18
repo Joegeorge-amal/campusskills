@@ -204,7 +204,7 @@ const Dashboard = () => {
           
           {/* Active Listings */}
           <div className="glossy-card" onClick={() => navigate('/app/marketplace')} style={{ background: '#ffffff', padding: '20px 12px', minHeight: '130px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: '10px', cursor: 'pointer' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#f0f6ff', color: '#1e3a8a', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 8px rgba(37, 99, 235, 0.12)' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#f0f6ff', color: '#1e3a8a', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 8px rgba(0, 0, 0, 0.08)' }}>
               <IconSparkles size={22} strokeWidth={1.5} />
             </div>
             <div>
@@ -215,7 +215,7 @@ const Dashboard = () => {
 
           {/* Sessions Completed */}
           <div className="glossy-card" onClick={() => navigate('/app/sessions')} style={{ background: '#ffffff', padding: '20px 12px', minHeight: '130px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: '10px', cursor: 'pointer' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#ecfdf5', color: '#065f46', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 8px rgba(16, 185, 129, 0.12)' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#ecfdf5', color: '#065f46', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 8px rgba(0, 0, 0, 0.08)' }}>
               <IconCheck size={22} strokeWidth={1.5} />
             </div>
             <div>
@@ -226,8 +226,8 @@ const Dashboard = () => {
 
           {/* Community Rating */}
           <div className="glossy-card" onClick={() => navigate('/app/profile', { state: { scrollToReviews: true } })} style={{ background: '#ffffff', padding: '20px 12px', minHeight: '130px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: '10px', cursor: 'pointer' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#fef3c7', color: '#92400e', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 8px rgba(234, 179, 8, 0.12)' }}>
-              <IconStar size={22} strokeWidth={1.5} />
+            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#fef3c7', color: '#92400e', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 8px rgba(0, 0, 0, 0.08)' }}>
+              <IconStar size={22} strokeWidth={1.5} style={{ marginTop: '1px' }} />
             </div>
             <div>
               <div style={{ fontSize: '28px', fontWeight: 800, color: '#111827', lineHeight: 1.1, marginBottom: '4px' }}>{stats.trustScore}</div>
@@ -238,7 +238,7 @@ const Dashboard = () => {
 
           {/* Verified Skills */}
           <div className="glossy-card" onClick={() => navigate('/app/profile', { state: { scrollToVerified: true } })} style={{ background: '#ffffff', padding: '20px 12px', minHeight: '130px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: '10px', cursor: 'pointer' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 8px rgba(37, 99, 235, 0.12)' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 4px 8px rgba(0, 0, 0, 0.08)' }}>
               <IconTrophy size={22} strokeWidth={1.5} />
             </div>
             <div>
