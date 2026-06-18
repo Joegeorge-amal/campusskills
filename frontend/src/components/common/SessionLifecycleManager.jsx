@@ -21,6 +21,9 @@ const SessionLifecycleManager = () => {
   const [activePopup, setActivePopup] = useState(null);
   const [reviewModalData, setReviewModalData] = useState(null);
   const [dismissedRequests, setDismissedRequests] = useState([]);
+  // Track session IDs for which the review popup has already been shown this page session
+  // so we don't re-open it every time sessionsData refreshes
+  const shownReviewIds = React.useRef(new Set());
   const [snoozedSessions, setSnoozedSessions] = useState(() => {
     try {
       const stored = JSON.parse(localStorage.getItem('snoozedSessions') || '{}');
@@ -105,41 +108,43 @@ const SessionLifecycleManager = () => {
 
     // Check for PENDING_REVIEW — completed free/swap session where we haven't reviewed yet
     // This is the fallback for the user who marked first (they may miss the WS event)
-    if (!reviewModalData) {
-      const pendingReview = sessionsData.find(s => {
-        if (s.status !== 'COMPLETED') return false;
-        const req = requestsData.find(r => r.id === s.rawSession.exchangeId);
-        const isSwap = !!s.rawSession.swapGroupId || (req && req.rawReq?.type === 'SWAP');
-        const reqPayment = s.rawSession.requiresPayment != null ? s.rawSession.requiresPayment : !isSwap;
+    // We use shownReviewIds ref so we only show once per session per page load (prevents infinite loop)
+    const pendingReview = sessionsData.find(s => {
+      if (s.status !== 'COMPLETED') return false;
+      if (shownReviewIds.current.has(s.id)) return false; // already shown this session
+      const req = requestsData.find(r => r.id === s.rawSession.exchangeId);
+      const isSwap = !!s.rawSession.swapGroupId || (req && req.rawReq?.type === 'SWAP');
+      const reqPayment = s.rawSession.requiresPayment != null ? s.rawSession.requiresPayment : !isSwap;
 
-        // Only show review for sessions where payment is fully settled (or not required)
-        const paymentDone = !reqPayment || (s.rawSession.studentMarkedPaid && s.rawSession.teacherConfirmedPayment);
-        if (!paymentDone) return false;
+      // Only show review for sessions where payment is fully settled (or not required)
+      const paymentDone = !reqPayment || (s.rawSession.studentMarkedPaid && s.rawSession.teacherConfirmedPayment);
+      if (!paymentDone) return false;
 
-        // Don't show if already reviewed
-        const hasReviewed = s.rawSession.hasReviewed ||
-          (s.rawSession.reviews && s.rawSession.reviews.some(r => r.reviewerId === user.userId));
-        if (hasReviewed) return false;
+      // Don't show if already reviewed
+      const hasReviewed = s.rawSession.hasReviewed ||
+        (s.rawSession.reviews && s.rawSession.reviews.some(r => r.reviewerId === user.userId));
+      if (hasReviewed) return false;
 
-        return true;
+      return true;
+    });
+
+    if (pendingReview && !reviewModalData) {
+      shownReviewIds.current.add(pendingReview.id); // mark as shown so it won't re-trigger
+      const isTeacher = pendingReview.rawSession.teacherId === user.userId;
+      setReviewModalData({
+        id: pendingReview.id,
+        rawSession: pendingReview.rawSession,
+        topic: pendingReview.topic,
+        name: isTeacher
+          ? (pendingReview.rawSession.studentName || 'Student')
+          : (pendingReview.rawSession.teacherName || 'Teacher'),
+        role: isTeacher ? 'Teaching' : 'Learning',
+        status: 'COMPLETED'
       });
-
-      if (pendingReview) {
-        const isTeacher = pendingReview.rawSession.teacherId === user.userId;
-        setReviewModalData({
-          id: pendingReview.id,
-          rawSession: pendingReview.rawSession,
-          topic: pendingReview.topic,
-          name: isTeacher
-            ? (pendingReview.rawSession.studentName || 'Student')
-            : (pendingReview.rawSession.teacherName || 'Teacher'),
-          role: isTeacher ? 'Teaching' : 'Learning',
-          status: 'COMPLETED'
-        });
-      }
     }
 
-  }, [sessionsData, requestsData, reviewModalData, user]);
+  }, [sessionsData, requestsData, user]);
+
 
   // Monitor for 'Session End Reached' locally since backend doesn't broadcast it currently
   useEffect(() => {
