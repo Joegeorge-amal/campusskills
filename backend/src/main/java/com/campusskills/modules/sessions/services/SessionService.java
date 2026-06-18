@@ -114,7 +114,9 @@ public class SessionService {
                         finalUpdate.put("teacherConfirmedPayment", true);
                     }
 
-                    return repository.updateSessionFields(sessionId, finalUpdate).compose(v2 -> {
+                    return repository.updateSessionFields(sessionId, finalUpdate)
+                        .compose(v2 -> repository.getSessionById(sessionId))  // fetch AFTER finalUpdate
+                        .compose(finalSession -> {
                         if (session.getChatId() != null) {
                             String sysMsg = isPaidSession 
                                 ? "Session completed successfully.\nPayment and reviews are now available."
@@ -154,7 +156,8 @@ public class SessionService {
                                     statsRepository.incrementSessionsTotalMinutes(session.getStudentId(), sessionMinutes);
                                 }
                                 
-                                com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent(com.campusskills.shared.constants.WebSocketEventType.SESSION_BOTH_CONFIRMED, updatedSession);
+                                // Broadcast with finalSession (has correct studentMarkedPaid, teacherConfirmedPayment, requiresPayment)
+                                com.campusskills.web.websockets.MessageBroadcaster.broadcastSessionEvent(com.campusskills.shared.constants.WebSocketEventType.SESSION_BOTH_CONFIRMED, finalSession);
                                 
                                 // Broadcast PROFILE_UPDATED for real-time UI update
                                 statsRepository.findByUserId(session.getTeacherId()).onSuccess(teacherStats -> {
