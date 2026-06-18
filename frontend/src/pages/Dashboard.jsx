@@ -195,8 +195,7 @@ const Dashboard = () => {
             </div>
             <div>
               <div style={{ fontSize: '28px', fontWeight: 800, color: '#111827', lineHeight: 1.1, marginBottom: '4px' }}>{stats.skillsOffered}</div>
-              <div style={{ fontSize: '12px', color: '#4b5563', fontWeight: 700, lineHeight: 1.3, marginBottom: '2px' }}>Skills Offered</div>
-              <div style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 500, lineHeight: 1.3 }}>Active listings</div>
+              <div style={{ fontSize: '12px', color: '#4b5563', fontWeight: 700, lineHeight: 1.3 }}>Skills Offered</div>
             </div>
           </div>
 
@@ -207,8 +206,7 @@ const Dashboard = () => {
             </div>
             <div>
               <div style={{ fontSize: '28px', fontWeight: 800, color: '#111827', lineHeight: 1.1, marginBottom: '4px' }}>{stats.sessionsDone}</div>
-              <div style={{ fontSize: '12px', color: '#4b5563', fontWeight: 700, lineHeight: 1.3, marginBottom: '2px' }}>Sessions Completed</div>
-              <div style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 500, lineHeight: 1.3 }}>Completed sessions</div>
+              <div style={{ fontSize: '12px', color: '#4b5563', fontWeight: 700, lineHeight: 1.3 }}>Sessions Completed</div>
             </div>
           </div>
 
@@ -231,8 +229,7 @@ const Dashboard = () => {
             </div>
             <div>
               <div style={{ fontSize: '28px', fontWeight: 800, color: '#111827', lineHeight: 1.1, marginBottom: '4px' }}>{verifiedCount}</div>
-              <div style={{ fontSize: '12px', color: '#4b5563', fontWeight: 700, lineHeight: 1.3, marginBottom: '2px' }}>Verified Skills</div>
-              <div style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 500, lineHeight: 1.3 }}>Verified</div>
+              <div style={{ fontSize: '12px', color: '#4b5563', fontWeight: 700, lineHeight: 1.3 }}>Verified Skills</div>
             </div>
           </div>
 
