@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useAppData } from '../../context/AppDataContext';
 import { useAuth } from '../../context/AuthContext';
 import { sessionService } from '../../services/sessionService';
@@ -21,18 +21,19 @@ const SessionLifecycleManager = () => {
   const [activePopup, setActivePopup] = useState(null);
   const [reviewModalData, setReviewModalData] = useState(null);
   const [dismissedRequests, setDismissedRequests] = useState([]);
-  // Track session IDs for which the review popup has already been shown this page session
-  // so we don't re-open it every time sessionsData refreshes
-  const shownReviewIds = React.useRef(new Set());
+
+  // Tracks session IDs for which the review popup has been shown this page session.
+  // ANY code path that opens the review modal must add the ID here first.
+  // This prevents the polling fallback from re-opening an already-shown review.
+  const shownReviewIds = useRef(new Set());
+
   const [snoozedSessions, setSnoozedSessions] = useState(() => {
     try {
       const stored = JSON.parse(localStorage.getItem('snoozedSessions') || '{}');
       const now = Date.now();
       const cleaned = {};
       Object.keys(stored).forEach(key => {
-        if (stored[key] > now) {
-          cleaned[key] = stored[key];
-        }
+        if (stored[key] > now) cleaned[key] = stored[key];
       });
       return cleaned;
     } catch {
@@ -40,150 +41,149 @@ const SessionLifecycleManager = () => {
     }
   });
 
+  // Helper: open the review modal for a session, always marking it as shown first
+  const openReviewModal = (sessionObj, myRole) => {
+    const id = sessionObj.id || sessionObj._id;
+    shownReviewIds.current.add(id);
+    const isTeacher = sessionObj.rawSession
+      ? sessionObj.rawSession.teacherId === user?.userId
+      : sessionObj.teacherId === user?.userId;
+    setReviewModalData({
+      id,
+      rawSession: sessionObj.rawSession || sessionObj,
+      topic: sessionObj.topic || sessionObj.topic || 'Skill Session',
+      name: myRole === 'Teaching'
+        ? (sessionObj.rawSession?.studentName || sessionObj.studentName || 'Student')
+        : (sessionObj.rawSession?.teacherName || sessionObj.teacherName || 'Teacher'),
+      role: myRole,
+      status: 'COMPLETED'
+    });
+  };
+
   const handleSnooze = (sessionId) => {
-    const snoozeUntil = Date.now() + 10 * 60 * 1000; // 10 minutes
+    const snoozeUntil = Date.now() + 10 * 60 * 1000;
     const updated = { ...snoozedSessions, [sessionId]: snoozeUntil };
     setSnoozedSessions(updated);
     localStorage.setItem('snoozedSessions', JSON.stringify(updated));
     setActivePopup(null);
   };
 
-  // Monitor for pending states on load or data refresh (handles reloads where WS events are lost)
+  // ─── POLLING FALLBACK ────────────────────────────────────────────────────────
+  // Runs on every sessionsData refresh. Catches states where WS events were missed
+  // (e.g. page reload, tab was in background).
   useEffect(() => {
     if (!sessionsData || !user?.userId) return;
 
-    // Check for COMPLETION_REQUESTED
+    // 1. Completion pending: the OTHER person confirmed but WE haven't yet
     const pendingCompletion = sessionsData.find(s => {
       if (s.status !== 'SCHEDULED') return false;
       const isTeacher = s.rawSession.teacherId === user.userId;
       const isStudent = s.rawSession.studentId === user.userId;
       const tConf = s.rawSession.teacherConfirmedCompletion;
       const sConf = s.rawSession.studentConfirmedCompletion;
-      
-      // If the OTHER person confirmed but WE haven't
       if (isTeacher && sConf && !tConf) return true;
       if (isStudent && tConf && !sConf) return true;
       return false;
     });
 
     if (pendingCompletion) {
-      setActivePopup({
-        type: 'COMPLETION_REQUESTED',
-        session: { id: pendingCompletion.id, topic: pendingCompletion.topic }
-      });
+      // Don't overwrite an existing popup to avoid flicker
+      if (!activePopup || activePopup.type !== 'COMPLETION_REQUESTED') {
+        setActivePopup({
+          type: 'COMPLETION_REQUESTED',
+          session: { id: pendingCompletion.id, topic: pendingCompletion.topic }
+        });
+      }
       return;
     }
 
-    // Check for PAYMENT_NEEDED (Student) or PAYMENT_SUBMITTED_TEACHER (Teacher)
+    // 2. Payment pending for paid sessions
     const pendingPayment = sessionsData.find(s => {
       const req = requestsData.find(r => r.id === s.rawSession.exchangeId);
       const isSwap = !!s.rawSession.swapGroupId || (req && req.rawReq?.type === 'SWAP');
       const reqPayment = s.rawSession.requiresPayment != null ? s.rawSession.requiresPayment : !isSwap;
-      
-      if (s.status !== 'COMPLETED' || isSwap) return false;
-      if (reqPayment === false) return false;
+
+      if (s.status !== 'COMPLETED') return false;
+      if (!reqPayment) return false; // free/swap — no payment needed
+
       const isTeacher = s.rawSession.teacherId === user.userId;
       const isStudent = s.rawSession.studentId === user.userId;
-      
-      if (isStudent && !s.rawSession.studentMarkedPaid) return true; // Student needs to pay
-      if (isTeacher && s.rawSession.studentMarkedPaid && !s.rawSession.teacherConfirmedPayment) return true; // Teacher needs to verify
+      if (isStudent && !s.rawSession.studentMarkedPaid) return true;
+      if (isTeacher && s.rawSession.studentMarkedPaid && !s.rawSession.teacherConfirmedPayment) return true;
       return false;
     });
 
     if (pendingPayment) {
       const isTeacher = pendingPayment.rawSession.teacherId === user.userId;
-      if (isTeacher) {
-        setActivePopup({
-          type: 'PAYMENT_SUBMITTED_TEACHER',
-          session: { id: pendingPayment.id, topic: pendingPayment.topic, studentName: pendingPayment.rawSession.studentName }
-        });
-      } else {
-        setActivePopup({
-          type: 'PAYMENT_NEEDED',
-          session: { id: pendingPayment.id, topic: pendingPayment.topic }
-        });
+      const newType = isTeacher ? 'PAYMENT_SUBMITTED_TEACHER' : 'PAYMENT_NEEDED';
+      if (!activePopup || activePopup.type !== newType) {
+        if (isTeacher) {
+          setActivePopup({
+            type: 'PAYMENT_SUBMITTED_TEACHER',
+            session: { id: pendingPayment.id, topic: pendingPayment.topic, studentName: pendingPayment.rawSession.studentName }
+          });
+        } else {
+          setActivePopup({
+            type: 'PAYMENT_NEEDED',
+            session: { id: pendingPayment.id, topic: pendingPayment.topic }
+          });
+        }
       }
       return;
     }
 
-    // Check for PENDING_REVIEW — completed free/swap session where we haven't reviewed yet
-    // This is the fallback for the user who marked first (they may miss the WS event)
-    // We use shownReviewIds ref so we only show once per session per page load (prevents infinite loop)
-    const pendingReview = sessionsData.find(s => {
-      if (s.status !== 'COMPLETED') return false;
-      if (shownReviewIds.current.has(s.id)) return false; // already shown this session
-      const req = requestsData.find(r => r.id === s.rawSession.exchangeId);
-      const isSwap = !!s.rawSession.swapGroupId || (req && req.rawReq?.type === 'SWAP');
-      const reqPayment = s.rawSession.requiresPayment != null ? s.rawSession.requiresPayment : !isSwap;
+    // 3. Review pending — show once per session per page load
+    if (!reviewModalData) {
+      const pendingReview = sessionsData.find(s => {
+        if (s.status !== 'COMPLETED') return false;
+        if (shownReviewIds.current.has(s.id)) return false;
 
-      // Only show review for sessions where payment is fully settled (or not required)
-      const paymentDone = !reqPayment || (s.rawSession.studentMarkedPaid && s.rawSession.teacherConfirmedPayment);
-      if (!paymentDone) return false;
+        const req = requestsData.find(r => r.id === s.rawSession.exchangeId);
+        const isSwap = !!s.rawSession.swapGroupId || (req && req.rawReq?.type === 'SWAP');
+        const reqPayment = s.rawSession.requiresPayment != null ? s.rawSession.requiresPayment : !isSwap;
 
-      // Don't show if already reviewed
-      const hasReviewed = s.rawSession.hasReviewed ||
-        (s.rawSession.reviews && s.rawSession.reviews.some(r => r.reviewerId === user.userId));
-      if (hasReviewed) return false;
+        const paymentDone = !reqPayment || (s.rawSession.studentMarkedPaid && s.rawSession.teacherConfirmedPayment);
+        if (!paymentDone) return false;
 
-      return true;
-    });
-
-    if (pendingReview && !reviewModalData) {
-      shownReviewIds.current.add(pendingReview.id); // mark as shown so it won't re-trigger
-      const isTeacher = pendingReview.rawSession.teacherId === user.userId;
-      setReviewModalData({
-        id: pendingReview.id,
-        rawSession: pendingReview.rawSession,
-        topic: pendingReview.topic,
-        name: isTeacher
-          ? (pendingReview.rawSession.studentName || 'Student')
-          : (pendingReview.rawSession.teacherName || 'Teacher'),
-        role: isTeacher ? 'Teaching' : 'Learning',
-        status: 'COMPLETED'
+        const hasReviewed = s.rawSession.hasReviewed ||
+          (s.rawSession.reviews && s.rawSession.reviews.some(r => r.reviewerId === user.userId));
+        return !hasReviewed;
       });
+
+      if (pendingReview) {
+        const isTeacher = pendingReview.rawSession.teacherId === user.userId;
+        openReviewModal(pendingReview, isTeacher ? 'Teaching' : 'Learning');
+      }
     }
 
-  }, [sessionsData, requestsData, user]);
+  }, [sessionsData, requestsData, user]); // NOTE: no activePopup or reviewModalData here — handled by shownReviewIds ref
 
-
-  // Monitor for 'Session End Reached' locally since backend doesn't broadcast it currently
+  // ─── TIME-BASED END REACHED ──────────────────────────────────────────────────
   useEffect(() => {
     if (!sessionsData || !user?.userId) return;
 
     const interval = setInterval(() => {
       const now = Date.now();
-      
-      // Find a session that just ended but hasn't been marked completed by us
       const recentlyEnded = sessionsData.find(s => {
         if (s.status !== 'SCHEDULED') return false;
-        
         const isTeacher = s.rawSession.teacherId === user.userId;
         const weConfirmed = isTeacher ? s.rawSession.teacherConfirmedCompletion : s.rawSession.studentConfirmedCompletion;
-        
         if (weConfirmed) return false;
-
         const end = s.rawSession.scheduledEnd;
-
-        // Skip if this session is currently snoozed
         const snoozeUntil = snoozedSessions[s.id];
         if (snoozeUntil && now < snoozeUntil) return false;
-
-        // Prompt if it ended in the last hour, and is past the end time
         return end && now >= end && (now - end) < 3600000;
       });
 
       if (recentlyEnded && !activePopup) {
-        setActivePopup({
-          type: 'END_REACHED',
-          session: recentlyEnded
-        });
+        setActivePopup({ type: 'END_REACHED', session: recentlyEnded });
       }
-    }, 60000); // Check every minute
+    }, 60000);
 
     return () => clearInterval(interval);
   }, [sessionsData, user, activePopup, snoozedSessions]);
 
-  // React to WebSockets via sessionEvent
+  // ─── WEBSOCKET EVENTS ────────────────────────────────────────────────────────
   useEffect(() => {
     if (!sessionEvent || !user?.userId) return;
     const raw = sessionEvent.session;
@@ -192,43 +192,41 @@ const SessionLifecycleManager = () => {
     const sessionId = raw._id || raw.id;
     if (!sessionId) return;
 
-    // We use the raw session to construct the popup state
     const isTeacher = raw.teacherId === user.userId;
     const isStudent = raw.studentId === user.userId;
-    if (!isTeacher && !isStudent) return; // Not our session
+    if (!isTeacher && !isStudent) return;
 
     const topic = raw.topic || 'Skill Session';
     const myRole = isTeacher ? 'Teaching' : 'Learning';
 
     if (sessionEvent.type === 'COMPLETION_REQUESTED') {
-      const requesterIsTeacher = raw.teacherConfirmedCompletion;
+      // Show popup only to the person who hasn't confirmed yet
       const weConfirmed = isTeacher ? raw.teacherConfirmedCompletion : raw.studentConfirmedCompletion;
-      
-      if (!weConfirmed && ((isStudent && requesterIsTeacher) || (isTeacher && !requesterIsTeacher))) {
-        setActivePopup({
-          type: 'COMPLETION_REQUESTED',
-          session: { id: sessionId, topic }
-        });
+      const requesterIsTeacher = raw.teacherConfirmedCompletion;
+      const shouldShow = !weConfirmed && (
+        (isStudent && requesterIsTeacher) || (isTeacher && !requesterIsTeacher)
+      );
+      if (shouldShow) {
+        setActivePopup({ type: 'COMPLETION_REQUESTED', session: { id: sessionId, topic } });
       }
+
     } else if (sessionEvent.type === 'SESSION_BOTH_CONFIRMED') {
       const req = requestsData.find(r => r.id === raw.exchangeId);
       const isSwap = !!raw.swapGroupId || (req && req.rawReq?.type === 'SWAP');
       const requiresPayment = raw.requiresPayment != null ? raw.requiresPayment : !isSwap;
 
+      setActivePopup(null); // clear any existing popup first
+
       if (requiresPayment) {
         if (isStudent) {
-          setActivePopup({
-            type: 'PAYMENT_NEEDED',
-            session: { id: sessionId, topic }
-          });
+          setActivePopup({ type: 'PAYMENT_NEEDED', session: { id: sessionId, topic } });
         } else if (isTeacher) {
-          setActivePopup({
-            type: 'PAYMENT_WAITING',
-            session: { id: sessionId, topic }
-          });
+          setActivePopup({ type: 'PAYMENT_WAITING', session: { id: sessionId, topic } });
         }
       } else {
-        // Free or Swap session completed, jump straight to review
+        // Free or Swap — go straight to review
+        // Mark as shown so polling fallback won't re-open it
+        shownReviewIds.current.add(sessionId);
         setReviewModalData({
           id: sessionId,
           rawSession: raw,
@@ -238,6 +236,7 @@ const SessionLifecycleManager = () => {
           status: 'COMPLETED'
         });
       }
+
     } else if (sessionEvent.type === 'PAYMENT_SUBMITTED') {
       if (isTeacher) {
         setActivePopup({
@@ -245,23 +244,46 @@ const SessionLifecycleManager = () => {
           session: { id: sessionId, topic, studentName: raw.studentName }
         });
       } else {
-        // As a student, after we submit payment, we should go straight to review
-        // But since handleMarkPaid already does this, we don't strictly need to do anything here.
-        // We'll clear the active popup just in case.
-        setActivePopup(null);
+        setActivePopup(null); // student already sees review via handleMarkPaid
       }
+
     } else if (sessionEvent.type === 'PAYMENT_CONFIRMED') {
+      // Teacher confirmed payment → both can now review
+      // Mark as shown here so polling doesn't duplicate
+      shownReviewIds.current.add(sessionId);
       setActivePopup(null);
+      // Review is opened by handleConfirmPayment for teacher, and
+      // fetchInitialData will populate polling for student with the right hasReviewed=false state.
+      // But to be safe: open for student here too since they get this event
+      if (isStudent) {
+        const localSession = sessionsData?.find(s => s.id === sessionId);
+        if (localSession) {
+          const alreadyReviewed = localSession.rawSession?.hasReviewed ||
+            (localSession.rawSession?.reviews && localSession.rawSession.reviews.some(r => r.reviewerId === user.userId));
+          if (!alreadyReviewed) {
+            setReviewModalData({
+              id: sessionId,
+              rawSession: localSession.rawSession,
+              topic: localSession.topic,
+              name: localSession.rawSession.teacherName || 'Teacher',
+              role: 'Learning',
+              status: 'COMPLETED'
+            });
+          }
+        }
+      }
     }
 
   }, [sessionEvent, user]);
+
+  // ─── ACTION HANDLERS ─────────────────────────────────────────────────────────
 
   const handleMarkCompletion = async (sessionId) => {
     setActivePopup(null);
     try {
       await sessionService.markCompletion(sessionId);
-      window.dispatchEvent(new CustomEvent('markNotificationAsRead', { 
-        detail: { sourceType: 'SESSION', sourceId: sessionId } 
+      window.dispatchEvent(new CustomEvent('markNotificationAsRead', {
+        detail: { sourceType: 'SESSION', sourceId: sessionId }
       }));
       fetchInitialData();
     } catch (err) {
@@ -270,18 +292,18 @@ const SessionLifecycleManager = () => {
   };
 
   const handleMarkPaid = async (sessionId) => {
-    // Find the session locally to populate the review modal
     const sessionToReview = sessionsData?.find(s => s.id === sessionId);
     setActivePopup(null);
     try {
       await sessionService.markPaid(sessionId);
-      window.dispatchEvent(new CustomEvent('markNotificationAsRead', { 
-        detail: { sourceType: 'SESSION', sourceId: sessionId } 
+      window.dispatchEvent(new CustomEvent('markNotificationAsRead', {
+        detail: { sourceType: 'SESSION', sourceId: sessionId }
       }));
       fetchInitialData();
-      
-      // Immediately jump to review modal
+
+      // Student goes straight to review after paying
       if (sessionToReview) {
+        shownReviewIds.current.add(sessionId); // prevent polling from re-opening
         setReviewModalData({
           id: sessionId,
           rawSession: sessionToReview.rawSession,
@@ -297,18 +319,18 @@ const SessionLifecycleManager = () => {
   };
 
   const handleConfirmPayment = async (sessionId) => {
-    // Find the session locally to populate the review modal
     const sessionToReview = sessionsData?.find(s => s.id === sessionId);
     setActivePopup(null);
     try {
       await sessionService.confirmPayment(sessionId);
-      window.dispatchEvent(new CustomEvent('markNotificationAsRead', { 
-        detail: { sourceType: 'SESSION', sourceId: sessionId } 
+      window.dispatchEvent(new CustomEvent('markNotificationAsRead', {
+        detail: { sourceType: 'SESSION', sourceId: sessionId }
       }));
       fetchInitialData();
-      
-      // Immediately jump to review modal
+
+      // Teacher goes straight to review after confirming
       if (sessionToReview) {
+        shownReviewIds.current.add(sessionId); // prevent polling from re-opening
         setReviewModalData({
           id: sessionId,
           rawSession: sessionToReview.rawSession,
@@ -333,8 +355,8 @@ const SessionLifecycleManager = () => {
         await exchangeService.acceptRequest(req.id);
       }
       setDismissedRequests(prev => [...prev, req.id]);
-      window.dispatchEvent(new CustomEvent('markNotificationAsRead', { 
-        detail: { sourceType: req.type === 'Chat request' || (req.type && req.type.toLowerCase().includes('chat')) ? 'CHAT_REQUEST' : 'EXCHANGE', sourceId: req.id } 
+      window.dispatchEvent(new CustomEvent('markNotificationAsRead', {
+        detail: { sourceType: req.type?.toLowerCase().includes('chat') ? 'CHAT_REQUEST' : 'EXCHANGE', sourceId: req.id }
       }));
       fetchInitialData();
     } catch (error) {
@@ -352,8 +374,8 @@ const SessionLifecycleManager = () => {
         await exchangeService.rejectRequest(req.id);
       }
       setDismissedRequests(prev => [...prev, req.id]);
-      window.dispatchEvent(new CustomEvent('markNotificationAsRead', { 
-        detail: { sourceType: req.type === 'Chat request' || (req.type && req.type.toLowerCase().includes('chat')) ? 'CHAT_REQUEST' : 'EXCHANGE', sourceId: req.id } 
+      window.dispatchEvent(new CustomEvent('markNotificationAsRead', {
+        detail: { sourceType: req.type?.toLowerCase().includes('chat') ? 'CHAT_REQUEST' : 'EXCHANGE', sourceId: req.id }
       }));
       fetchInitialData();
     } catch (error) {
@@ -365,13 +387,16 @@ const SessionLifecycleManager = () => {
     setDismissedRequests(prev => [...prev, reqId]);
   };
 
-  const pendingRequests = requestsData?.filter(r => r.direction === 'incoming' && r.status === 'pending' && !dismissedRequests.includes(r.id)) || [];
+  const pendingRequests = requestsData?.filter(r =>
+    r.direction === 'incoming' && r.status === 'pending' && !dismissedRequests.includes(r.id)
+  ) || [];
   const activeRequest = pendingRequests.length > 0 ? pendingRequests[0] : null;
 
   if (!activePopup && !reviewModalData && !activeRequest) return null;
 
   return (
     <>
+      {/* Incoming session/swap/chat request popup — lowest priority, only when nothing else showing */}
       {!activePopup && !reviewModalData && activeRequest && (() => {
         let reqType = 'Session Request';
         let isChat = false;
@@ -385,7 +410,6 @@ const SessionLifecycleManager = () => {
         } else if (activeRequest.otherUserExtras?.listingType === 'LEARN' || activeRequest.otherUserExtras?.listingType === 'LEARN_SWAP') {
           reqType = 'Learn Request';
         }
-        
         const listingTitle = activeRequest.otherUserExtras?.listingTitle || 'Skill Session';
         const subtitleText = isChat ? 'Wants to chat with you' : `Wants to book ${listingTitle}`;
         const remainingCount = pendingRequests.length - 1;
@@ -394,7 +418,7 @@ const SessionLifecycleManager = () => {
           <GlobalNotificationPopup
             title={activeRequest.name || 'Unknown User'}
             subtitle={subtitleText}
-            badge={`NEW ${reqType.toUpperCase()} ${remainingCount > 0 ? `(+${remainingCount} more)` : ''}`}
+            badge={`NEW ${reqType.toUpperCase()}${remainingCount > 0 ? ` (+${remainingCount} more)` : ''}`}
             badgeColor="#1d4ed8"
             avatarInitials={activeRequest.init}
             avatarBg={activeRequest.bg}
@@ -408,18 +432,20 @@ const SessionLifecycleManager = () => {
         );
       })()}
 
+      {/* Scheduled end reached — ask user to confirm completion */}
       {activePopup && activePopup.type === 'END_REACHED' && (
         <ConfirmModal
           isOpen={true}
           title={`Has ${activePopup.session.topic || 'the session'} been completed?`}
           message="The scheduled time has ended. Did you complete the session successfully?"
           confirmText="Yes, Completed"
-          cancelText="Snooze"
+          cancelText="Snooze (10 min)"
           onConfirm={() => handleMarkCompletion(activePopup.session.id)}
           onClose={() => handleSnooze(activePopup.session.id)}
         />
       )}
 
+      {/* Other person already marked — asking us to confirm */}
       {activePopup && activePopup.type === 'COMPLETION_REQUESTED' && (
         <ConfirmModal
           isOpen={true}
@@ -432,6 +458,7 @@ const SessionLifecycleManager = () => {
         />
       )}
 
+      {/* Student: pay the teacher */}
       {activePopup && activePopup.type === 'PAYMENT_NEEDED' && (
         <PaymentModal
           isOpen={true}
@@ -441,6 +468,7 @@ const SessionLifecycleManager = () => {
         />
       )}
 
+      {/* Teacher: waiting for student payment */}
       {activePopup && activePopup.type === 'PAYMENT_WAITING' && (
         <GlobalNotificationPopup
           title="Waiting for payment"
@@ -454,6 +482,7 @@ const SessionLifecycleManager = () => {
         />
       )}
 
+      {/* Teacher: student claims payment was made */}
       {activePopup && activePopup.type === 'PAYMENT_SUBMITTED_TEACHER' && (
         <ConfirmModal
           isOpen={true}
@@ -466,8 +495,7 @@ const SessionLifecycleManager = () => {
         />
       )}
 
-      {/* Student submitted payment popup removed as student now reviews instead */}
-
+      {/* Review modal — shown exactly once per session */}
       {reviewModalData && (
         <ReviewModal
           isOpen={true}
