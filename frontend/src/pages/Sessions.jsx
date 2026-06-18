@@ -23,6 +23,7 @@ import {
 
 import ReviewModal from '../components/modals/ReviewModal';
 import CustomTimeInput from '../components/common/CustomTimeInput';
+import CustomSelect from '../components/common/CustomSelect';
 
 const Sessions = () => {
   const { user } = useAuth();
@@ -864,15 +865,15 @@ const Sessions = () => {
 
             <div style={{ marginBottom: '20px' }}>
               <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '4px' }}>Duration</label>
-              <select 
+              <CustomSelect 
                 value={rescheduleDuration} 
-                onChange={(e) => setRescheduleDuration(e.target.value)}
-                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '13px', boxSizing: 'border-box' }}
-              >
-                <option value="30">30 minutes</option>
-                <option value="60">60 minutes</option>
-                <option value="90">90 minutes</option>
-              </select>
+                onChange={val => setRescheduleDuration(val)}
+                options={[
+                  { value: '30', label: '30 minutes' },
+                  { value: '60', label: '60 minutes' },
+                  { value: '90', label: '90 minutes' }
+                ]}
+              />
             </div>
 
             <div style={{ display: 'flex', gap: '8px' }}>

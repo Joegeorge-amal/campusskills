@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useAppData } from '../../hooks/useAppData';
 import { IconFlag } from '@tabler/icons-react';
+import CustomSelect from '../common/CustomSelect';
 
 const ReportModal = ({ isOpen, onClose, tutorName, skillName }) => {
   const { triggerToast } = useAppData();
@@ -57,14 +58,18 @@ const ReportModal = ({ isOpen, onClose, tutorName, skillName }) => {
             <label style={{ fontSize: '12px', color: '#555', display: 'block', marginBottom: '6px', fontWeight: 500 }}>
               Issue type
             </label>
-            <select value={issueType} onChange={(e) => setIssueType(e.target.value)}>
-              <option>No-show (tutor didn't attend)</option>
-              <option>Session ended early without refund</option>
-              <option>Misleading skill description</option>
-              <option>Unprofessional behaviour</option>
-              <option>Payment dispute</option>
-              <option>Other</option>
-            </select>
+            <CustomSelect 
+              value={issueType} 
+              onChange={val => setIssueType(val)}
+              options={[
+                { value: "No-show (tutor didn't attend)", label: "No-show (tutor didn't attend)" },
+                { value: 'Session ended early without refund', label: 'Session ended early without refund' },
+                { value: 'Misleading skill description', label: 'Misleading skill description' },
+                { value: 'Unprofessional behaviour', label: 'Unprofessional behaviour' },
+                { value: 'Payment dispute', label: 'Payment dispute' },
+                { value: 'Other', label: 'Other' }
+              ]}
+            />
           </div>
 
           <div className="sfld">

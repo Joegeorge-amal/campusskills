@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { IconSearch, IconStarFilled, IconLoader2 } from '@tabler/icons-react';
 import adminService from '../../services/adminService';
+import CustomSelect from '../../components/common/CustomSelect';
 
 const AdminSkills = () => {
   const [skills, setSkills] = useState([]);
@@ -68,18 +69,18 @@ const AdminSkills = () => {
           </div>
           
           <div className="admin-header-actions">
-            <select 
-              style={{ padding: '8px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', fontSize: '0.875rem', outline: 'none' }}
-              value={activeFilter}
-              onChange={(e) => setActiveFilter(e.target.value)}
-            >
-              <option value="All">All Categories</option>
-              <option value="Coding">Coding</option>
-              <option value="Design">Design</option>
-              <option value="Language">Language</option>
-              <option value="Math">Math</option>
-              <option value="Music">Music</option>
-            </select>
+            <CustomSelect 
+              value={activeFilter} 
+              onChange={val => setActiveFilter(val)}
+              options={[
+                { value: 'All', label: 'All Categories' },
+                { value: 'Coding', label: 'Coding' },
+                { value: 'Design', label: 'Design' },
+                { value: 'Language', label: 'Language' },
+                { value: 'Math', label: 'Math' },
+                { value: 'Music', label: 'Music' }
+              ]}
+            />
           </div>
         </div>
 

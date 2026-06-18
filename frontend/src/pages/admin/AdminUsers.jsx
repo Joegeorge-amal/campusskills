@@ -1,6 +1,7 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { IconSearch, IconAdjustmentsHorizontal, IconChevronDown, IconLoader2 } from '@tabler/icons-react';
+import React, { useState, useEffect } from 'react';
+import { IconSearch, IconLoader2 } from '@tabler/icons-react';
 import adminService from '../../services/adminService';
+import CustomSelect from '../../components/common/CustomSelect';
 import { useAuth } from '../../context/AuthContext';
 import '../../styles/admin.css';
 
@@ -19,18 +20,6 @@ const AdminUsers = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const filterRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (filterRef.current && !filterRef.current.contains(event.target)) {
-        setIsFilterOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
 
   const fetchUsers = async () => {
     try {
@@ -93,32 +82,16 @@ const AdminUsers = () => {
           />
         </div>
         
-        <div className="admin-u-filter-custom" ref={filterRef}>
-          <button 
-            className="admin-u-filter-btn"
-            onClick={() => setIsFilterOpen(!isFilterOpen)}
-          >
-            <IconAdjustmentsHorizontal size={18} /> 
-            {activeFilter === 'All' ? 'Filters' : `Filter: ${activeFilter}`}
-            <IconChevronDown size={16} />
-          </button>
-
-          {isFilterOpen && (
-            <div className="admin-u-filter-menu">
-              {['All', 'Active', 'Suspended'].map(filter => (
-                <button
-                  key={filter}
-                  className={`admin-u-filter-option ${activeFilter === filter ? 'selected' : ''}`}
-                  onClick={() => {
-                    setActiveFilter(filter);
-                    setIsFilterOpen(false);
-                  }}
-                >
-                  {filter === 'All' ? 'All Users' : `${filter} Users`}
-                </button>
-              ))}
-            </div>
-          )}
+        <div style={{ width: '180px' }}>
+          <CustomSelect 
+            value={activeFilter} 
+            onChange={val => setActiveFilter(val)}
+            options={[
+              { value: 'All', label: 'All Users' },
+              { value: 'Active', label: 'Active Users' },
+              { value: 'Suspended', label: 'Suspended Users' }
+            ]}
+          />
         </div>
       </div>
 

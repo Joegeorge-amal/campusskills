@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { IconSearch, IconLoader2, IconAlertTriangle, IconChevronDown, IconChevronUp, IconShieldCheck } from '@tabler/icons-react';
 import adminService from '../../services/adminService';
+import CustomSelect from '../../components/common/CustomSelect';
 
 const AdminDisputes = () => {
   const [disputes, setDisputes] = useState([]);
@@ -274,13 +275,17 @@ const AdminDisputes = () => {
             <div className="admin-modal-content">
               <div className="form-group">
                 <label>Resolution Type</label>
-                <select value={resolutionType} onChange={(e) => setResolutionType(e.target.value)}>
-                  <option value="FORCE_COMPLETE">FORCE COMPLETE</option>
-                  <option value="REFUND_ISSUED">REFUND ISSUED</option>
-                  <option value="WARNING_ISSUED">WARNING ISSUED</option>
-                  <option value="NO_ACTION">NO ACTION</option>
-                  <option value="REJECTED">REJECTED</option>
-                </select>
+                <CustomSelect 
+                  value={resolutionType} 
+                  onChange={val => setResolutionType(val)}
+                  options={[
+                    { value: 'FORCE_COMPLETE', label: 'FORCE COMPLETE' },
+                    { value: 'REFUND_ISSUED', label: 'REFUND ISSUED' },
+                    { value: 'WARNING_ISSUED', label: 'WARNING ISSUED' },
+                    { value: 'NO_ACTION', label: 'NO ACTION' },
+                    { value: 'REJECTED', label: 'REJECTED' }
+                  ]}
+                />
               </div>
               <div className="form-group">
                 <label>Admin Notes</label>

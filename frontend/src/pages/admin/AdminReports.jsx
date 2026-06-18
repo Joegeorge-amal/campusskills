@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { IconSearch, IconLoader2, IconAlertTriangle, IconChevronDown, IconChevronUp, IconShieldCheck } from '@tabler/icons-react';
 import adminService from '../../services/adminService';
+import CustomSelect from '../../components/common/CustomSelect';
 
 const AdminReports = () => {
   const [reports, setReports] = useState([]);
@@ -205,12 +206,16 @@ const AdminReports = () => {
             <div className="admin-modal-content">
               <div className="form-group">
                 <label>Status</label>
-                <select value={resolutionStatus} onChange={(e) => setResolutionStatus(e.target.value)}>
-                  <option value="OPEN">OPEN</option>
-                  <option value="UNDER_REVIEW">UNDER REVIEW</option>
-                  <option value="RESOLVED">RESOLVED</option>
-                  <option value="DISMISSED">DISMISSED</option>
-                </select>
+                <CustomSelect 
+                  value={resolutionStatus} 
+                  onChange={val => setResolutionStatus(val)}
+                  options={[
+                    { value: 'OPEN', label: 'OPEN' },
+                    { value: 'UNDER_REVIEW', label: 'UNDER REVIEW' },
+                    { value: 'RESOLVED', label: 'RESOLVED' },
+                    { value: 'DISMISSED', label: 'DISMISSED' }
+                  ]}
+                />
               </div>
               <div className="form-group">
                 <label>Admin Notes</label>

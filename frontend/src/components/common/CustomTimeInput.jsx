@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { IconClock } from '@tabler/icons-react';
+import { IconChevronDown } from '@tabler/icons-react';
 
 const to12 = (h24) => {
   const n = parseInt(h24, 10);
@@ -21,14 +21,26 @@ const formatDisplay = (val) => {
   return `${h12}:${m} ${ampm}`;
 };
 
+const generateTimes = () => {
+  const times = [];
+  for (let h = 1; h <= 12; h++) {
+    for (let m = 0; m < 60; m += 5) {
+      times.push({ h12: h, minute: String(m).padStart(2, '0') });
+    }
+  }
+  return times;
+};
+
+const timeOptions = generateTimes();
+
 const CustomTimeInput = ({ value, onChange, style }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  const parsed = to12((value || '09:00').split(':')[0]);
+  const parsed = to12((value || '12:00').split(':')[0]);
   const [hour12, setHour12] = useState(parsed.h12);
   const [ampm, setAmPm] = useState(parsed.ampm);
-  const [minute, setMinute] = useState((value || '09:00').split(':')[1] || '00');
+  const [minute, setMinute] = useState((value || '12:00').split(':')[1] || '00');
 
   useEffect(() => {
     if (value) {
@@ -55,8 +67,13 @@ const CustomTimeInput = ({ value, onChange, style }) => {
     onChange(`${h24}:${m}`);
   };
 
-  const hours = Array.from({ length: 12 }, (_, i) => i + 1);
-  const minutes = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'));
+  const toggleAmPm = () => {
+    const next = ampm === 'AM' ? 'PM' : 'AM';
+    setAmPm(next);
+    handleApply(hour12, minute, next);
+  };
+
+  const isSelected = (h, m) => hour12 === h && minute === m;
 
   return (
     <div 
@@ -85,11 +102,12 @@ const CustomTimeInput = ({ value, onChange, style }) => {
         }}
       >
         <span>{formatDisplay(value)}</span>
-        <IconClock 
+        <IconChevronDown 
           size={16} 
           style={{ 
-            color: isOpen ? '#3b82f6' : '#9ca3af', 
-            transition: 'color 0.2s ease',
+            color: '#9ca3af', 
+            transition: 'transform 0.2s ease',
+            transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
           }} 
         />
       </div>
@@ -99,100 +117,76 @@ const CustomTimeInput = ({ value, onChange, style }) => {
           className="cs-dropdown-menu fade-in"
           style={{
             position: 'absolute',
-            bottom: 'calc(100% + 6px)',
+            top: 'calc(100% + 6px)',
             left: 0,
-            width: '260px',
-            background: 'rgba(255, 255, 255, 0.9)',
+            right: 0,
+            background: 'rgba(255, 255, 255, 0.85)',
             backdropFilter: 'blur(16px)',
             WebkitBackdropFilter: 'blur(16px)',
             border: '1px solid rgba(255, 255, 255, 0.5)',
             borderRadius: '12px',
             boxShadow: '0 10px 40px rgba(0, 0, 0, 0.12)',
             zIndex: 100,
-            display: 'flex',
-            flexDirection: 'column',
-            overflow: 'hidden'
+            padding: '6px'
           }}
         >
-          <div style={{ display: 'flex', height: '200px' }}>
-            {/* Hours Column */}
-            <div style={{ flex: '0 0 70px', overflowY: 'auto', borderRight: '1px solid rgba(0,0,0,0.05)' }} className="time-scroll-col">
-              {hours.map(h => (
+          <div style={{ maxHeight: '220px', overflowY: 'auto' }}>
+            {timeOptions.map((opt, idx) => {
+              const sel = isSelected(opt.h12, opt.minute);
+              return (
                 <div 
-                  key={`h-${h}`}
-                  onClick={() => { setHour12(h); handleApply(h, minute, ampm); }}
+                  key={idx}
+                  onClick={() => { setHour12(opt.h12); setMinute(opt.minute); handleApply(opt.h12, opt.minute, ampm); }}
+                  onMouseEnter={(e) => { if (!sel) e.currentTarget.style.background = 'rgba(0, 0, 0, 0.03)'; }}
+                  onMouseLeave={(e) => { if (!sel) e.currentTarget.style.background = 'transparent'; }}
                   style={{
-                    padding: '8px 0',
-                    textAlign: 'center',
+                    padding: '10px 14px',
+                    borderRadius: '8px',
                     cursor: 'pointer',
                     fontSize: '14px',
-                    fontWeight: hour12 === h ? 600 : 400,
-                    background: hour12 === h ? '#eff6ff' : 'transparent',
-                    color: hour12 === h ? '#1d4ed8' : '#374151',
+                    color: sel ? '#1d4ed8' : '#374151',
+                    background: sel ? '#eff6ff' : 'transparent',
+                    fontWeight: sel ? 600 : 400,
+                    transition: 'all 0.15s ease',
+                    marginBottom: idx === timeOptions.length - 1 ? 0 : '2px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
                   }}
                 >
-                  {h}
+                  <span>{opt.h12}:{opt.minute}</span>
+                  {sel && (
+                    <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#1d4ed8' }}></div>
+                  )}
                 </div>
-              ))}
-            </div>
-            
-            {/* Minutes Column */}
-            <div style={{ flex: '0 0 70px', overflowY: 'auto', borderRight: '1px solid rgba(0,0,0,0.05)' }} className="time-scroll-col">
-              {minutes.map(m => (
-                <div 
-                  key={`m-${m}`}
-                  onClick={() => { setMinute(m); handleApply(hour12, m, ampm); }}
-                  style={{
-                    padding: '8px 0',
-                    textAlign: 'center',
-                    cursor: 'pointer',
-                    fontSize: '14px',
-                    fontWeight: minute === m ? 600 : 400,
-                    background: minute === m ? '#eff6ff' : 'transparent',
-                    color: minute === m ? '#1d4ed8' : '#374151',
-                  }}
-                >
-                  {m}
-                </div>
-              ))}
-            </div>
-
-            {/* AM/PM Column */}
-            <div style={{ flex: '0 0 60px', overflowY: 'auto' }} className="time-scroll-col">
-              {['AM', 'PM'].map(ap => (
-                <div 
-                  key={ap}
-                  onClick={() => { setAmPm(ap); handleApply(hour12, minute, ap); }}
-                  style={{
-                    padding: '8px 0',
-                    textAlign: 'center',
-                    cursor: 'pointer',
-                    fontSize: '13px',
-                    fontWeight: ampm === ap ? 600 : 400,
-                    background: ampm === ap ? '#eff6ff' : 'transparent',
-                    color: ampm === ap ? '#1d4ed8' : '#374151',
-                  }}
-                >
-                  {ap}
-                </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
-          
-          <div style={{ padding: '8px', borderTop: '1px solid rgba(0,0,0,0.05)', display: 'flex', justifyContent: 'center' }}>
-            <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500 }}>HH : MM AM/PM</span>
+          <div style={{ display: 'flex', gap: '6px', padding: '6px 0 2px', borderTop: '1px solid rgba(0,0,0,0.05)' }}>
+            {['AM', 'PM'].map(ap => (
+              <div
+                key={ap}
+                onClick={toggleAmPm}
+                style={{
+                  flex: 1,
+                  padding: '8px 0',
+                  textAlign: 'center',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '13px',
+                  fontWeight: 600,
+                  background: ampm === ap ? '#1d4ed8' : '#f3f4f6',
+                  color: ampm === ap ? '#ffffff' : '#6b7280',
+                  transition: 'all 0.15s ease',
+                  userSelect: 'none'
+                }}
+              >
+                {ap}
+              </div>
+            ))}
           </div>
         </div>
       )}
-      <style>{`
-        .time-scroll-col::-webkit-scrollbar {
-          width: 4px;
-        }
-        .time-scroll-col::-webkit-scrollbar-thumb {
-          background: rgba(0,0,0,0.1);
-          border-radius: 4px;
-        }
-      `}</style>
     </div>
   );
 };

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppData } from '../context/AppDataContext';
+import CustomSelect from '../components/common/CustomSelect';
 
 const SwapRequest = () => {
   const navigate = useNavigate();
@@ -40,11 +41,15 @@ const SwapRequest = () => {
           
           <div className="fld">
             <label>You'll teach in return</label>
-            <select style={{ fontSize: '12px' }} value={offerSkill} onChange={e => setOfferSkill(e.target.value)}>
-              <option>Data structures & algorithms</option>
-              <option>C++ for beginners</option>
-              <option>Figma basics</option>
-            </select>
+            <CustomSelect 
+              value={offerSkill} 
+              onChange={val => setOfferSkill(val)}
+              options={[
+                { value: 'Data structures & algorithms', label: 'Data structures & algorithms' },
+                { value: 'C++ for beginners', label: 'C++ for beginners' },
+                { value: 'Figma basics', label: 'Figma basics' }
+              ]}
+            />
           </div>
           
           <div className="fld">

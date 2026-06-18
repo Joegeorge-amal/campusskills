@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { IconX, IconCheck, IconTrash } from '@tabler/icons-react';
 import CustomTimeInput from '../common/CustomTimeInput';
+import CustomSelect from '../common/CustomSelect';
 
 const BookSessionModal = ({
   slots = [
@@ -282,24 +283,21 @@ const BookSessionModal = ({
           {isSwapRequest && (
             <>
               <div className="bsm-section-title" style={{ marginTop: 0 }}>Which skill are you offering to teach?</div>
-              <select 
-                className="bsm-select"
+              <CustomSelect 
                 value={selectedOfferedSkill}
-                onChange={(e) => setSelectedOfferedSkill(e.target.value)}
-              >
-                {dropdownOptions.length === 0 && <option value="">No skills available</option>}
-                {dropdownOptions.map((skill, idx) => (
-                  <option key={idx} value={skill.name || skill}>
-                    {skill.name || skill}
-                  </option>
-                ))}
-              </select>
+                onChange={val => setSelectedOfferedSkill(val)}
+                options={dropdownOptions.map(s => ({ value: s.name || s, label: s.name || s }))}
+                placeholder={dropdownOptions.length === 0 ? 'No skills available' : 'Select a skill...'}
+              />
 
               <div className="bsm-section-title" style={{ marginTop: '16px' }}>Your Available Teaching Times</div>
               <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-                <select className="bsm-select" style={{ marginBottom: 0 }} value={newSlotDay} onChange={e => setNewSlotDay(e.target.value)}>
-                  {['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map(d => <option key={d}>{d}</option>)}
-                </select>
+                <CustomSelect 
+                  value={newSlotDay} 
+                  onChange={val => setNewSlotDay(val)}
+                  options={['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map(d => ({ value: d, label: d }))}
+                  placeholder="Day"
+                />
                 <CustomTimeInput value={newSlotTime} onChange={setNewSlotTime} style={{ height: '42px' }} />
                 <button type="button" onClick={handleAddSlot} style={{padding: '0 16px', background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: 600, fontSize: '14px'}}>Add</button>
               </div>
@@ -316,16 +314,17 @@ const BookSessionModal = ({
               </div>
 
               <div className="bsm-section-title" style={{ marginTop: '16px' }}>Preferred Duration</div>
-              <select 
-                className="bsm-select"
-                value={preferredDuration}
-                onChange={(e) => setPreferredDuration(e.target.value)}
-              >
-                <option value="30">30 minutes</option>
-                <option value="60">1 hour</option>
-                <option value="90">1.5 hours</option>
-                <option value="120">2 hours</option>
-              </select>
+              <CustomSelect 
+                value={preferredDuration} 
+                onChange={val => setPreferredDuration(val)}
+                options={[
+                  { value: '30', label: '30 minutes' },
+                  { value: '60', label: '1 hour' },
+                  { value: '90', label: '1.5 hours' },
+                  { value: '120', label: '2 hours' }
+                ]}
+                placeholder="Select duration"
+              />
             </>
           )}
 

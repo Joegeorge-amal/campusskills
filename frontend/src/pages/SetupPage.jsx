@@ -1,44 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { IconArrowLeft, IconSchool, IconChevronDown } from '@tabler/icons-react';
-
-const CustomSelect = ({ value, onChange, options, placeholder, style }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const ref = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  return (
-    <div className="custom-select-wrapper" style={style} ref={ref} onClick={() => setIsOpen(!isOpen)}>
-      <div className={`custom-select-trigger ${isOpen ? 'open' : ''} ${!value ? 'placeholder' : ''}`}>
-        <span>{value ? options.find(o => o.value === value)?.label || value : placeholder}</span>
-        <IconChevronDown size={16} className={`custom-select-icon ${isOpen ? 'open' : ''}`} />
-      </div>
-      {isOpen && (
-        <div className="custom-select-dropdown">
-          {options.map(opt => (
-            <div 
-              key={opt.value} 
-              className={`custom-select-option ${value === opt.value ? 'selected' : ''}`}
-              onClick={() => onChange(opt.value)}
-            >
-              {opt.label}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
+import { IconArrowLeft, IconSchool } from '@tabler/icons-react';
+import CustomSelect from '../components/common/CustomSelect';
 import { getTopics } from '../services/topicService';
 import AutocompleteInput from '../components/AutocompleteInput';
 import OtpVerificationModal from '../components/modals/OtpVerificationModal';

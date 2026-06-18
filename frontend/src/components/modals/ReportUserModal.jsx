@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useAppData } from '../../context/AppDataContext';
 import { IconFlag, IconX } from '@tabler/icons-react';
+import CustomSelect from '../common/CustomSelect';
 
 const ReportUserModal = ({ isOpen, onClose, userName }) => {
   const { triggerToast } = useAppData();
@@ -57,25 +58,17 @@ const ReportUserModal = ({ isOpen, onClose, userName }) => {
             <label style={{ fontSize: '13px', color: '#374151', display: 'block', marginBottom: '6px', fontWeight: 600 }}>
               Reason for reporting
             </label>
-            <select 
+            <CustomSelect 
               value={issueType} 
-              onChange={(e) => setIssueType(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '10px 12px',
-                borderRadius: '8px',
-                border: '1px solid #d1d5db',
-                fontSize: '14px',
-                outline: 'none',
-                background: '#fff'
-              }}
-            >
-              <option>Harassment</option>
-              <option>Inappropriate behavior</option>
-              <option>Spam</option>
-              <option>Fake identity</option>
-              <option>Other</option>
-            </select>
+              onChange={val => setIssueType(val)}
+              options={[
+                { value: 'Harassment', label: 'Harassment' },
+                { value: 'Inappropriate behavior', label: 'Inappropriate behavior' },
+                { value: 'Spam', label: 'Spam' },
+                { value: 'Fake identity', label: 'Fake identity' },
+                { value: 'Other', label: 'Other' }
+              ]}
+            />
           </div>
 
           <div style={{ marginBottom: '20px' }}>
