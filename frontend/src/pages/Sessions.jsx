@@ -97,7 +97,25 @@ const Sessions = () => {
 
     if (sessionEvent.type === 'SESSION_BOTH_CONFIRMED') {
       setIsHistoryOpen(true);
-      triggerToast('Session completed! ' + (myRole === 'Learning' ? 'Please complete payment.' : 'Waiting for payment from student.'));
+      const isSwap = !!raw.swapGroupId || (localSession && localSession.rawSession && localSession.rawSession.swapGroupId);
+      if (isSwap || !raw.requiresPayment) {
+        triggerToast('Session completed! Please leave a review.');
+        const alreadyReviewed = localSession?.rawSession?.hasReviewed || raw.hasReviewed;
+        if (!alreadyReviewed) {
+          const stubSession = localSession || {
+            id: sessionId,
+            rawSession: raw,
+            topic: raw.topic || 'Skill Session',
+            name: isTeacher ? (raw.studentName || 'Student') : (raw.teacherName || 'Teacher'),
+            role: myRole,
+            status: 'COMPLETED'
+          };
+          setSelectedSessionForReview(stubSession);
+          setReviewModalOpen(true);
+        }
+      } else {
+        triggerToast('Session completed! ' + (myRole === 'Learning' ? 'Please complete payment.' : 'Waiting for payment from student.'));
+      }
     } else if (sessionEvent.type === 'PAYMENT_SUBMITTED') {
       setIsHistoryOpen(true);
       if (isTeacher) {
@@ -731,7 +749,7 @@ const Sessions = () => {
                 ) : null}
 
                 {/* Rating input (always unlocked for Free/Swap; for Paid unlocked only once paid is true, or if teacher) */}
-                {(isSwap || s.rawSession.studentMarkedPaid || s.role === 'Teaching') ? (
+                {(isSwap || !isPaidSession || s.rawSession.studentMarkedPaid || s.role === 'Teaching') ? (
                   <div style={{ background: '#f9fafb', borderRadius: '8px', padding: '12px', border: '1px solid #f3f4f6' }}>
                     
                     {s.rawSession.hasReviewed ? (

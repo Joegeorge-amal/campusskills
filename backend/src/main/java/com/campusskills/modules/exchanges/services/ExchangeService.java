@@ -201,6 +201,7 @@ public class ExchangeService {
                             // Session A
                             Session sessionA = new Session();
                             sessionA.setExchangeId(exchangeId);
+                            sessionA.setSwapGroupId(exchangeId);
                             sessionA.setTeacherId(firstTeacherId);
                             sessionA.setStudentId(firstStudentId);
                             sessionA.setStatus(SessionStatus.SCHEDULED);
@@ -213,6 +214,7 @@ public class ExchangeService {
                             // Session B
                             Session sessionB = new Session();
                             sessionB.setExchangeId(exchangeId);
+                            sessionB.setSwapGroupId(exchangeId);
                             sessionB.setTeacherId(firstStudentId);
                             sessionB.setStudentId(firstTeacherId);
                             sessionB.setStatus(SessionStatus.SCHEDULED);
