@@ -628,8 +628,9 @@ const Messages = () => {
             })}
 
             {!loading && filteredChats.length === 0 && (
-              <div style={{ fontSize: '13px', color: '#94a3b8', textAlign: 'center', padding: '24px 0' }}>
-                No conversations yet.
+              <div style={{ fontSize: '13px', color: '#94a3b8', textAlign: 'center', padding: '24px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+                <div style={{ fontWeight: 700, color: '#1f2937' }}>No conversations yet</div>
+                <div style={{ fontSize: '11px', color: '#64748b', maxWidth: '200px', margin: '0 auto', lineHeight: '1.4' }}>Start exploring the marketplace to connect with peers.</div>
               </div>
             )}
           </div>
@@ -732,8 +733,6 @@ const Messages = () => {
                 onScroll={handleScroll}
                 style={{ 
                 flex: 1, height: '100%', background: '#f8fafc', 
-                backgroundImage: 'radial-gradient(rgba(15, 23, 42, 0.06) 1px, transparent 1px)', 
-                backgroundSize: '24px 24px',
                 display: 'flex', flexDirection: 'column',
                 overflowY: 'auto', padding: '16px', boxSizing: 'border-box', position: 'relative'
               }}>
