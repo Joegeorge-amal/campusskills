@@ -65,12 +65,12 @@ const CustomSelect = ({ value, onChange, options, placeholder, style, disabled }
             top: 'calc(100% + 6px)',
             left: 0,
             right: 0,
-            background: 'rgba(255, 255, 255, 0.85)',
-            backdropFilter: 'blur(16px)',
-            WebkitBackdropFilter: 'blur(16px)',
-            border: '1px solid rgba(255, 255, 255, 0.5)',
+            background: 'rgba(245, 247, 250, 0.75)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(0, 0, 0, 0.06)',
             borderRadius: '12px',
-            boxShadow: '0 10px 40px rgba(0, 0, 0, 0.12)',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.10)',
             maxHeight: '220px',
             overflowY: 'auto',
             zIndex: 100,
@@ -122,6 +122,8 @@ const CustomSelect = ({ value, onChange, options, placeholder, style, disabled }
           )}
         </div>
       )}
+      <style>{`.cs-dropdown-menu { scrollbar-width: none; -ms-overflow-style: none; }
+.cs-dropdown-menu::-webkit-scrollbar { display: none; }`}</style>
     </div>
   );
 };
