@@ -232,30 +232,7 @@ const NotificationPanel = ({ notifications, onClose, onMarkAllRead, onNotificati
                         <span className="notif-time">{formatTimeAgo(notif.createdAt)}</span>
                       </div>
                     </div>
-                    {onDeleteNotification && !isSelectionModeActive && (
-                      <button 
-                        className="notif-delete-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onDeleteNotification(notif.id);
-                        }}
-                        style={{
-                          background: 'none',
-                          border: 'none',
-                          color: '#ef4444',
-                          cursor: 'pointer',
-                          padding: '4px',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          borderRadius: '4px',
-                          marginLeft: '8px'
-                        }}
-                        title="Delete notification"
-                      >
-                        <IconTrash size={16} />
-                      </button>
-                    )}
+
                   </div>
                 );
               })}
