@@ -22,6 +22,7 @@ import {
 } from '@tabler/icons-react';
 
 import ReviewModal from '../components/modals/ReviewModal';
+import CustomTimeInput from '../components/common/CustomTimeInput';
 
 const Sessions = () => {
   const { user } = useAuth();
@@ -858,12 +859,7 @@ const Sessions = () => {
 
             <div style={{ marginBottom: '12px' }}>
               <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '4px' }}>Start Time</label>
-              <input 
-                type="time" 
-                value={rescheduleTime} 
-                onChange={(e) => setRescheduleTime(e.target.value)}
-                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '13px', boxSizing: 'border-box' }}
-              />
+              <CustomTimeInput value={rescheduleTime} onChange={setRescheduleTime} />
             </div>
 
             <div style={{ marginBottom: '20px' }}>

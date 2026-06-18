@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { IconX, IconCheck, IconTrash } from '@tabler/icons-react';
+import CustomTimeInput from '../common/CustomTimeInput';
 
 const BookSessionModal = ({
   slots = [
@@ -299,7 +300,7 @@ const BookSessionModal = ({
                 <select className="bsm-select" style={{ marginBottom: 0 }} value={newSlotDay} onChange={e => setNewSlotDay(e.target.value)}>
                   {['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].map(d => <option key={d}>{d}</option>)}
                 </select>
-                <input type="time" className="bsm-select" style={{ marginBottom: 0 }} value={newSlotTime} onChange={e => setNewSlotTime(e.target.value)} />
+                <CustomTimeInput value={newSlotTime} onChange={setNewSlotTime} style={{ height: '42px' }} />
                 <button type="button" onClick={handleAddSlot} style={{padding: '0 16px', background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: '10px', cursor: 'pointer', fontWeight: 600, fontSize: '14px'}}>Add</button>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>

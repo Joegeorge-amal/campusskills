@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { IconCalendarEvent, IconClock } from '@tabler/icons-react';
 import { sessionService } from '../../../services/sessionService';
 import { useAppData } from '../../../context/AppDataContext';
+import CustomTimeInput from '../../common/CustomTimeInput';
 
 const RescheduleSection = ({ session }) => {
   const { user, triggerToast, fetchInitialData } = useAppData();
@@ -73,13 +74,7 @@ const RescheduleSection = ({ session }) => {
           </div>
           <div>
             <label style={{ display: 'block', fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '6px' }}>Time</label>
-            <input 
-              type="time" 
-              value={newTime} 
-              onChange={e => setNewTime(e.target.value)}
-              style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
-              required
-            />
+            <CustomTimeInput value={newTime} onChange={setNewTime} />
           </div>
           
           <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
