@@ -408,15 +408,15 @@ const Sessions = () => {
               {s.topic}
               {isSwap ? (
                 <span style={{ fontSize: '10px', fontWeight: 600, background: '#f3e8ff', color: '#7e22ce', padding: '2px 8px', borderRadius: '12px' }}>
-                  🔄 Skill Exchange
+                  Skill Exchange
                 </span>
               ) : s.rawSession.requiresPayment ? (
                 <span style={{ fontSize: '10px', fontWeight: 600, background: '#dcfce7', color: '#166534', padding: '2px 8px', borderRadius: '12px' }}>
-                  💰 Paid Session
+                  Paid Session
                 </span>
               ) : (
                 <span style={{ fontSize: '10px', fontWeight: 600, background: '#e0f2fe', color: '#0369a1', padding: '2px 8px', borderRadius: '12px' }}>
-                  🤝 Free Session
+                  Free Session
                 </span>
               )}
             </div>
