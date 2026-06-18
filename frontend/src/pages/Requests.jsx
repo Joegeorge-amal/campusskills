@@ -8,7 +8,7 @@ import SkillSwapModal from '../components/modals/SkillSwapModal';
 import ConfirmModal from '../components/modals/ConfirmModal';
 import { exchangeService } from '../services/exchangeService';
 import { chatRequestService } from '../services/chatRequestService';
-import { IconX } from '@tabler/icons-react';
+import { IconX, IconArrowsRightLeft } from '@tabler/icons-react';
 
 // Helper to get initials
 const getInitials = (name) => {
