@@ -105,12 +105,12 @@ const Dashboard = () => {
             <div style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.85)', fontWeight: 500 }}>{user?.year ? `${user.year} · ${user.programme || ''}` : ''}</div>
             
             {/* Desktop Hero Compact Chips */}
-            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '12px' }}>
-              <span style={{ fontSize: '11px', background: 'rgba(255, 255, 255, 0.15)', padding: '3px 10px', borderRadius: '100px', fontWeight: 600 }}>{stats.skillsOffered} Active Listings</span>
-              <span style={{ fontSize: '11px', background: 'rgba(255, 255, 255, 0.15)', padding: '3px 10px', borderRadius: '100px', fontWeight: 600 }}>{stats.sessionsDone} Completed</span>
-              <span style={{ fontSize: '11px', background: 'rgba(255, 255, 255, 0.15)', padding: '3px 10px', borderRadius: '100px', fontWeight: 600 }}>{user?.stats?.ratingCount || 0} Reviews</span>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '16px' }}>
+              <span style={{ fontSize: '11px', background: 'rgba(255, 255, 255, 0.15)', padding: '5px 12px', borderRadius: '100px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{stats.skillsOffered} Active Listings</span>
+              <span style={{ fontSize: '11px', background: 'rgba(255, 255, 255, 0.15)', padding: '5px 12px', borderRadius: '100px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{stats.sessionsDone} Completed</span>
+              <span style={{ fontSize: '11px', background: 'rgba(255, 255, 255, 0.15)', padding: '5px 12px', borderRadius: '100px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{user?.stats?.ratingCount || 0} Reviews</span>
               {user?.verifiedSkills?.length > 0 && (
-                <span style={{ fontSize: '11px', background: 'rgba(255, 255, 255, 0.25)', border: '1px solid rgba(255, 255, 255, 0.3)', padding: '3px 10px', borderRadius: '100px', fontWeight: 600 }}>✓ {user.verifiedSkills.length} Verified</span>
+                <span style={{ fontSize: '11px', background: 'rgba(255, 255, 255, 0.25)', border: '1px solid rgba(255, 255, 255, 0.3)', padding: '5px 12px', borderRadius: '100px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>✓ {user.verifiedSkills.length} Verified</span>
               )}
             </div>
           </div>
@@ -180,11 +180,11 @@ const Dashboard = () => {
           </div>
 
           {/* Mobile Hero Compact Chips */}
-          <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '10px', background: 'rgba(255, 255, 255, 0.15)', padding: '2px 8px', borderRadius: '100px', fontWeight: 600 }}>{stats.skillsOffered} Listings</span>
-            <span style={{ fontSize: '10px', background: 'rgba(255, 255, 255, 0.15)', padding: '2px 8px', borderRadius: '100px', fontWeight: 600 }}>{stats.sessionsDone} Sessions</span>
+          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '10px', background: 'rgba(255, 255, 255, 0.15)', padding: '4px 10px', borderRadius: '100px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{stats.skillsOffered} Listings</span>
+            <span style={{ fontSize: '10px', background: 'rgba(255, 255, 255, 0.15)', padding: '4px 10px', borderRadius: '100px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>{stats.sessionsDone} Sessions</span>
             {user?.verifiedSkills?.length > 0 && (
-              <span style={{ fontSize: '10px', background: 'rgba(255, 255, 255, 0.25)', padding: '2px 8px', borderRadius: '100px', fontWeight: 600 }}>✓ Verified</span>
+              <span style={{ fontSize: '10px', background: 'rgba(255, 255, 255, 0.25)', padding: '4px 10px', borderRadius: '100px', fontWeight: 600, display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>✓ Verified</span>
             )}
           </div>
 
