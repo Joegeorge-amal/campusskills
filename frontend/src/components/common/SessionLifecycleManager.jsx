@@ -74,6 +74,7 @@ const SessionLifecycleManager = () => {
     // Check for PAYMENT_NEEDED (Student) or PAYMENT_SUBMITTED_TEACHER (Teacher)
     const pendingPayment = sessionsData.find(s => {
       if (s.status !== 'COMPLETED' || !!s.rawSession.swapGroupId) return false;
+      if (s.rawSession.requiresPayment === false) return false;
       const isTeacher = s.rawSession.teacherId === user.userId;
       const isStudent = s.rawSession.studentId === user.userId;
       

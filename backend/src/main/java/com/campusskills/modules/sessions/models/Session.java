@@ -28,6 +28,7 @@ public class Session {
     private Boolean studentConfirmedCompletion;
     private Boolean studentMarkedPaid;
     private Boolean teacherConfirmedPayment;
+    private Boolean requiresPayment;
     private RescheduleProposal rescheduleProposal;
     private Long createdAt;
     private Long updatedAt;
@@ -89,6 +90,9 @@ public class Session {
 
     public Boolean getTeacherConfirmedPayment() { return teacherConfirmedPayment; }
     public void setTeacherConfirmedPayment(Boolean teacherConfirmedPayment) { this.teacherConfirmedPayment = teacherConfirmedPayment; }
+
+    public Boolean getRequiresPayment() { return requiresPayment; }
+    public void setRequiresPayment(Boolean requiresPayment) { this.requiresPayment = requiresPayment; }
 
     public RescheduleProposal getRescheduleProposal() { return rescheduleProposal; }
     public void setRescheduleProposal(RescheduleProposal rescheduleProposal) { this.rescheduleProposal = rescheduleProposal; }

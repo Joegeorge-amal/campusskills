@@ -106,9 +106,20 @@ public class SessionService {
             return repository.updateSessionFields(sessionId, updates).compose(v -> repository.getSessionById(sessionId)).compose(updatedSession -> {
                 if (Boolean.TRUE.equals(updatedSession.getTeacherConfirmedCompletion()) && Boolean.TRUE.equals(updatedSession.getStudentConfirmedCompletion())) {
                     JsonObject finalUpdate = new JsonObject().put("status", SessionStatus.COMPLETED.name());
+                    Boolean reqPayment = updatedSession.getRequiresPayment();
+                    boolean isPaidSession = reqPayment != null && reqPayment;
+
+                    if (!isPaidSession) {
+                        finalUpdate.put("studentMarkedPaid", true);
+                        finalUpdate.put("teacherConfirmedPayment", true);
+                    }
+
                     return repository.updateSessionFields(sessionId, finalUpdate).compose(v2 -> {
                         if (session.getChatId() != null) {
-                            createAndBroadcastSystemMessage(session.getChatId(), "Session completed successfully.\nPayment and reviews are now available.", sessionId, null, null, null);
+                            String sysMsg = isPaidSession 
+                                ? "Session completed successfully.\nPayment and reviews are now available."
+                                : "Session completed successfully.\nThanks for learning together!\nReviews are now available.";
+                            createAndBroadcastSystemMessage(session.getChatId(), sysMsg, sessionId, null, null, null);
                         }
                         
                         com.campusskills.modules.users.repositories.UserProfileRepository profileRepo = new com.campusskills.modules.users.repositories.UserProfileRepository();
@@ -118,8 +129,12 @@ public class SessionService {
                                 String studentName = studentProfile != null ? studentProfile.getName() : "Student";
                                 String topic = session.getTopic() != null ? session.getTopic() : "Session";
                                 
-                                String msgToTeacher = topic + " Session with " + studentName + " was completed.\nPayment is pending from " + studentName + ".";
-                                String msgToStudent = topic + " Session with " + teacherName + " was completed.\nPlease complete payment.";
+                                String msgToTeacher = isPaidSession 
+                                    ? topic + " Session with " + studentName + " was completed.\nPayment is pending from " + studentName + "."
+                                    : studentName + " completed the session with you.\nReviews are now available.";
+                                String msgToStudent = isPaidSession
+                                    ? topic + " Session with " + teacherName + " was completed.\nPlease complete payment."
+                                    : "Session with " + teacherName + " completed successfully.\nPlease leave a review.";
                                 
                                 sendNotification(session.getTeacherId(), com.campusskills.shared.constants.NotificationType.SESSION_COMPLETED, "Session Completed", msgToTeacher, "SESSION", sessionId);
                                 sendNotification(session.getStudentId(), com.campusskills.shared.constants.NotificationType.SESSION_COMPLETED, "Session Completed", msgToStudent, "SESSION", sessionId);
