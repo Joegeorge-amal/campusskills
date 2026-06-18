@@ -3,6 +3,7 @@ import { IconSearch, IconLoader2 } from '@tabler/icons-react';
 import adminService from '../../services/adminService';
 import CustomSelect from '../../components/common/CustomSelect';
 import { useAuth } from '../../context/AuthContext';
+import ConfirmModal from '../../components/modals/ConfirmModal';
 import '../../styles/admin.css';
 
 const bgColors = ['#f0fdf4', '#eff6ff', '#fdf2f8', '#fffbeb', '#fef2f2'];
@@ -20,6 +21,8 @@ const AdminUsers = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
+
+  const [confirmRoleChange, setConfirmRoleChange] = useState({ isOpen: false, user: null, newRole: null });
 
   const fetchUsers = async () => {
     try {
@@ -56,21 +59,35 @@ const AdminUsers = () => {
     }
   };
 
-  const handleRoleChange = async (user, newRole) => {
-    if (!window.confirm(`Are you sure you want to change ${user.displayName}'s role to ${newRole}?`)) {
-      return;
-    }
+  const executeRoleChange = async () => {
+    const { user, newRole } = confirmRoleChange;
+    if (!user || !newRole) return;
     try {
       await adminService.updateUserRole(user.id, newRole);
       fetchUsers();
     } catch (err) {
       console.error('Failed to change role:', err);
       alert('Failed to update user role.');
+    } finally {
+      setConfirmRoleChange({ isOpen: false, user: null, newRole: null });
     }
+  };
+
+  const handleRoleChange = (user, newRole) => {
+    setConfirmRoleChange({ isOpen: true, user, newRole });
   };
 
   return (
     <div className="admin-users-page fade-in">
+      <ConfirmModal 
+        isOpen={confirmRoleChange.isOpen}
+        onClose={() => setConfirmRoleChange({ isOpen: false, user: null, newRole: null })}
+        onConfirm={executeRoleChange}
+        title="Change User Role"
+        message={`Are you sure you want to change ${confirmRoleChange.user?.displayName}'s role to ${confirmRoleChange.newRole}?`}
+        isDanger={true}
+        confirmText="Change Role"
+      />
       <div className="admin-users-toolbar">
         <div className="admin-u-search">
           <IconSearch size={18} color="#9ca3af" />

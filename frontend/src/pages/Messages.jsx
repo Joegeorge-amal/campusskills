@@ -926,15 +926,17 @@ const Messages = () => {
               <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 600, color: 'var(--cs-text-main)' }}>Block {blockingUser.name}?</h3>
               <p style={{ margin: '0 0 24px 0', fontSize: '14px', color: 'var(--cs-text-inactive)', lineHeight: '1.4' }}>Are you sure you want to block this user? They will not be able to message you or view your listings.</p>
               <div style={{ display: 'flex', gap: '12px' }}>
-                <button onClick={() => setBlockingUser(null)} style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#fff', color: '#64748b', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
+                <button onClick={() => setBlockingUser(null)} style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#fff', color: '#64748b', fontWeight: 600, cursor: 'pointer' }} disabled={blockingUser.loading}>Cancel</button>
                 <button 
+                  disabled={blockingUser.loading}
                   onClick={async () => {
                     const targetId = blockingUser.id;
                     const callback = blockingUser.callback;
-                    setBlockingUser(null);
+                    setBlockingUser({ ...blockingUser, loading: true });
                     try {
                       await userService.blockUser(targetId);
                       triggerToast('User blocked successfully');
+                      setBlockingUser(null);
                       if (callback) {
                         callback();
                       } else {
@@ -944,11 +946,12 @@ const Messages = () => {
                     } catch (e) {
                       console.error('[Messages] Failed to block user:', e);
                       triggerToast('Failed to block user');
+                      setBlockingUser(null);
                     }
                   }} 
-                  style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: '#ef4444', color: '#fff', fontWeight: 600, cursor: 'pointer' }}
+                  style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: '#ef4444', color: '#fff', fontWeight: 600, cursor: blockingUser.loading ? 'not-allowed' : 'pointer', opacity: blockingUser.loading ? 0.7 : 1 }}
                 >
-                  Block
+                  {blockingUser.loading ? 'Blocking...' : 'Block'}
                 </button>
               </div>
             </div>

@@ -24,7 +24,7 @@ const ChatMessageBubble = ({
 
   if (msgType === 'SYSTEM') {
     const { user } = useAuth();
-    const { sessionsData } = useAppData();
+    const { sessionsData, triggerToast } = useAppData();
     const sessionObj = sessionsData?.find(s => s.id === payload.sessionId);
     const isSessionActive = sessionObj ? sessionObj.status === 'SCHEDULED' : true;
 
@@ -118,7 +118,12 @@ const ChatMessageBubble = ({
                   } catch (err) {
                     btn.disabled = false;
                     btn.innerText = "Confirm Completion";
-                    alert(err.message || "Failed to confirm completion");
+                    if (triggerToast) {
+                      triggerToast(err.message || "Failed to confirm completion");
+                    } else {
+                      const event = new CustomEvent('triggerToast', { detail: err.message || "Failed to confirm completion" });
+                      document.dispatchEvent(event);
+                    }
                   }
                 }}
               >
