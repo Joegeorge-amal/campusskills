@@ -73,7 +73,30 @@ public class ExchangeRepository {
                 .add(ExchangeStatus.REQUESTED.name())
                 .add(ExchangeStatus.ACCEPTED.name())
             ));
-        return client.find(COLLECTION, query).map(list -> !list.isEmpty());
+        return client.find(COLLECTION, query).compose(exchanges -> {
+            if (exchanges.isEmpty()) {
+                return Future.succeededFuture(false);
+            }
+            List<Future<Boolean>> checks = exchanges.stream().map(doc -> {
+                String status = doc.getString("status");
+                if (ExchangeStatus.REQUESTED.name().equals(status)) {
+                    return Future.succeededFuture(true);
+                }
+                // ACCEPTED — check if all sessions for this exchange are completed
+                String exchangeId = doc.getString("_id");
+                com.campusskills.modules.sessions.repositories.SessionRepository sessionRepo =
+                    new com.campusskills.modules.sessions.repositories.SessionRepository();
+                return sessionRepo.findByExchangeId(exchangeId).map(sessions -> {
+                    if (sessions == null || sessions.isEmpty()) return true;
+                    boolean allCompleted = sessions.stream().allMatch(s ->
+                        com.campusskills.shared.constants.SessionStatus.COMPLETED == s.getStatus());
+                    return !allCompleted;
+                });
+            }).collect(Collectors.toList());
+            return Future.all(checks).map(join ->
+                join.<Boolean>list().stream().anyMatch(Boolean::booleanValue)
+            );
+        });
     }
 
     public Future<Exchange> findPendingRequestBetween(String senderId, String receiverId) {
