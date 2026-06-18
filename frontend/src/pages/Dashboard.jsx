@@ -198,29 +198,29 @@ const Dashboard = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '20px', flexShrink: 0 }}>
+        <div className="grid-3" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '20px', marginBottom: '24px', maxWidth: '720px', marginLeft: 'auto', marginRight: 'auto', width: '100%' }}>
           
           {/* Stat 1 */}
-          <div className="glossy-card sc-card sc-skills" style={{ background: '#ffffff', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#f0f6ff', color: '#1e3a8a', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 6px -2px rgba(30, 58, 138, 0.05)' }}>
+          <div className="glossy-card sc-card sc-skills" style={{ background: '#ffffff', padding: '28px 16px', minHeight: '180px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: '14px' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#f0f6ff', color: '#1e3a8a', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <IconSparkles size={20} strokeWidth={1.5} />
             </div>
             <div>
-              <div style={{ fontSize: '28px', fontWeight: 800, color: '#111827', marginBottom: '2px', lineHeight: 1 }}>{stats.skillsOffered}</div>
-              <div style={{ fontSize: '13px', color: '#4b5563', fontWeight: 700 }}>Skills Offered</div>
-              <div style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 500, marginTop: '2px' }}>active in listings</div>
+              <div style={{ fontSize: '30px', fontWeight: 800, color: '#111827', lineHeight: 1.1, marginBottom: '6px' }}>{stats.skillsOffered}</div>
+              <div style={{ fontSize: '13px', color: '#4b5563', fontWeight: 700, lineHeight: 1.3, marginBottom: '4px' }}>Skills Offered</div>
+              <div style={{ fontSize: '12px', color: '#9ca3af', fontWeight: 500, lineHeight: 1.3 }}>active in listings</div>
             </div>
           </div>
 
           {/* Stat 2 */}
-          <div className="glossy-card sc-card sc-sessions" style={{ background: '#ffffff', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#ecfdf5', color: '#065f46', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 6px -2px rgba(6, 95, 70, 0.05)' }}>
+          <div className="glossy-card sc-card sc-sessions" style={{ background: '#ffffff', padding: '28px 16px', minHeight: '180px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: '14px' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#ecfdf5', color: '#065f46', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <IconCheck size={20} strokeWidth={1.5} />
             </div>
             <div>
-              <div style={{ fontSize: '28px', fontWeight: 800, color: '#111827', marginBottom: '2px', lineHeight: 1 }}>{stats.sessionsDone}</div>
-              <div style={{ fontSize: '13px', color: '#4b5563', fontWeight: 700 }}>Sessions Completed</div>
-              <div style={{ fontSize: '11px', color: '#10b981', fontWeight: 600, marginTop: '2px' }}>+2 this month</div>
+              <div style={{ fontSize: '30px', fontWeight: 800, color: '#111827', lineHeight: 1.1, marginBottom: '6px' }}>{stats.sessionsDone}</div>
+              <div style={{ fontSize: '13px', color: '#4b5563', fontWeight: 700, lineHeight: 1.3, marginBottom: '4px' }}>Sessions Completed</div>
+              <div style={{ fontSize: '12px', color: '#10b981', fontWeight: 600, lineHeight: 1.3 }}>+2 this month</div>
             </div>
           </div>
 
@@ -228,15 +228,15 @@ const Dashboard = () => {
           <div 
             className="glossy-card ts-card" 
             onClick={() => navigate('/app/profile', { state: { scrollToReviews: true } })}
-            style={{ background: '#ffffff', display: 'flex', flexDirection: 'column', gap: '10px', cursor: 'pointer' }}
+            style={{ background: '#ffffff', padding: '28px 16px', minHeight: '180px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', gap: '14px', cursor: 'pointer' }}
           >
-            <div className="tsc-icon" style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#fef3c7', color: '#92400e', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 6px -2px rgba(146, 64, 14, 0.05)' }}>
+            <div className="tsc-icon" style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#fef3c7', color: '#92400e', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
               <IconStar size={20} strokeWidth={1.5} />
             </div>
             <div className="tsc-body" style={{ display: 'flex', flexDirection: 'column' }}>
-              <div className="tsc-score" style={{ fontSize: '28px', fontWeight: 800, color: '#111827', marginBottom: '2px', lineHeight: 1 }}>{stats.trustScore}</div>
-              <div className="tsc-label" style={{ fontSize: '13px', color: '#4b5563', fontWeight: 700, marginBottom: '2px' }}>Community Rating</div>
-              <div className="tsc-based" style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 500 }}>Based on {user?.stats?.ratingCount || 0} reviews</div>
+              <div className="tsc-score" style={{ fontSize: '30px', fontWeight: 800, color: '#111827', lineHeight: 1.1, marginBottom: '6px' }}>{stats.trustScore}</div>
+              <div className="tsc-label" style={{ fontSize: '13px', color: '#4b5563', fontWeight: 700, lineHeight: 1.3, marginBottom: '4px' }}>Community Rating</div>
+              <div className="tsc-based" style={{ fontSize: '12px', color: '#9ca3af', fontWeight: 500, lineHeight: 1.3 }}>Based on {user?.stats?.ratingCount || 0} reviews</div>
             </div>
           </div>
 

@@ -69,36 +69,33 @@
     font-size: 9px;
   }
 
-  /* ─── DASHBOARD STAT CARDS: HORIZONTAL LAYOUT ON MOBILE ─── */
+  /* ─── DASHBOARD STAT CARDS: MOBILE ─── */
+  #home .grid-3 {
+    max-width: 100% !important;
+    gap: 12px !important;
+  }
+
   #home .grid-3 .glossy-card {
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 14px !important;
-    padding: 16px 20px !important;
-    min-height: 100px !important;
+    padding: 20px 12px !important;
+    min-height: 140px !important;
+    gap: 10px !important;
   }
 
   #home .grid-3 .glossy-card > div:first-child {
-    width: 42px !important;
-    height: 42px !important;
-    min-width: 42px !important;
-    border-radius: 12px !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    border-radius: 10px !important;
   }
 
   #home .grid-3 .glossy-card > div:first-child svg {
-    width: 20px !important;
-    height: 20px !important;
+    width: 18px !important;
+    height: 18px !important;
   }
 
   #home .grid-3 .glossy-card > div:last-child > div:first-child {
-    font-size: 22px !important;
-    margin-bottom: 0 !important;
-  }
-
-  #home .grid-3 .sc-skills > div:last-child,
-  #home .grid-3 .sc-sessions > div:last-child {
-    text-align: center !important;
+    font-size: 24px !important;
+    margin-bottom: 4px !important;
   }
 
   /* ─── MOBILE FULLSCREEN SEARCH OVERLAY ─── */
@@ -459,10 +456,9 @@
   }
 
   #home .grid-3 .glossy-card {
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 12px !important;
-    padding: 12px 16px !important;
+    padding: 20px 14px !important;
+    min-height: 150px !important;
+    gap: 10px !important;
   }
 
   #home .grid-3 .glossy-card > div:first-child {
@@ -478,7 +474,8 @@
   }
 
   #home .grid-3 .glossy-card > div:last-child > div:first-child {
-    font-size: 20px !important;
+    font-size: 22px !important;
+    margin-bottom: 4px !important;
   }
 
   /* Dashboard section cards tighter padding */
@@ -620,49 +617,44 @@
   }
 }
 
-/* ─── TRUST SCORE CARD: MOBILE CENTERED LAYOUT ─── */
+/* ─── TRUST SCORE CARD: MOBILE ─── */
 @media (max-width: 768px) {
   #home .grid-3 div.ts-card {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: center !important;
-    text-align: center !important;
-    gap: 4px !important;
-    padding: 20px 16px !important;
-    min-height: 100px !important;
+    padding: 20px 12px !important;
+    min-height: 140px !important;
+    gap: 10px !important;
   }
 
   #home .grid-3 div.ts-card .tsc-icon {
-    margin-bottom: 0 !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+  }
+
+  #home .grid-3 div.ts-card .tsc-icon svg {
+    width: 18px !important;
+    height: 18px !important;
   }
 
   #home .grid-3 div.ts-card .tsc-body {
     display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: wrap !important;
-    justify-content: center !important;
-    align-items: baseline !important;
-    gap: 2px 8px !important;
+    flex-direction: column !important;
+    align-items: center !important;
   }
 
   #home .grid-3 div.ts-card .tsc-score {
-    font-size: 20px !important;
-    margin: 0 !important;
-    line-height: 1 !important;
+    font-size: 24px !important;
+    margin-bottom: 4px !important;
   }
 
   #home .grid-3 div.ts-card .tsc-label {
-    flex: 0 0 100% !important;
-    text-align: center !important;
-    font-size: 11px !important;
-    margin: 0 !important;
+    font-size: 12px !important;
+    margin-bottom: 2px !important;
   }
 
   #home .grid-3 div.ts-card .tsc-based {
     font-size: 11px !important;
     color: #6b7280 !important;
     font-weight: 500 !important;
-    margin: 0 !important;
   }
 }
