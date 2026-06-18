@@ -10,6 +10,7 @@ import {
   IconChevronDown, 
   IconChevronUp, 
   IconCalendar, 
+  IconCalendarMonth,
   IconMapPin, 
   IconClock, 
   IconCopy, 
