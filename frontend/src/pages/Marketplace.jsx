@@ -162,8 +162,8 @@ const Marketplace = () => {
           return (skill.listingType === 'TEACH_SWAP' || skill.listingType === 'LEARN_SWAP') ? `${priceText} or Swap` : priceText;
         })()}
         user={{ name: skill.owner?.name || 'Unknown', year: skill.owner?.year || '', branch: skill.owner?.branch || '', id: skill.owner?.userId || skill.ownerId }}
-        rating={skill.owner?.averageRating || 0}
-        sessionsCount={skill.owner?.reviewCount || 0}
+        rating={skill.averageRating || 0}
+        sessionsCount={skill.reviewCount || 0}
         mode={skill.availability || 'ONLINE'}
         isVerified={skill.owner?.verifiedSkills?.map(s => (s.name || s).trim().toLowerCase())?.includes(
           (skill.offeredSkills?.[0]?.name || skill.requestedSkills?.[0]?.name || 'Unknown').trim().toLowerCase()
@@ -515,12 +515,12 @@ const Marketplace = () => {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '16px', borderBottom: '1px solid #f1f5f9' }}>
                   <span style={{ color: '#64748b', fontSize: '14px', fontWeight: 500 }}>Sessions completed</span>
-                  <span style={{ color: '#0f172a', fontSize: '14px', fontWeight: 600 }}>{selectedSkill.owner?.reviewCount || 0}</span>
+                  <span style={{ color: '#0f172a', fontSize: '14px', fontWeight: 600 }}>{selectedSkill.reviewCount || 0}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '16px' }}>
                   <span style={{ color: '#64748b', fontSize: '14px', fontWeight: 500 }}>Average rating</span>
                   <span style={{ color: '#0f172a', fontSize: '14px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    {selectedSkill.owner?.averageRating || 0} <IconStar size={16} fill="#d97706" color="#d97706" />
+                    {selectedSkill.averageRating || 0} <IconStar size={16} fill="#d97706" color="#d97706" />
                   </span>
                 </div>
               </div>

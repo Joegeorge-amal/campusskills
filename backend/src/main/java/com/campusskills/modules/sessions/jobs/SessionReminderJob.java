@@ -74,6 +74,19 @@ public class SessionReminderJob {
                                                     .map(Object::toString)
                                                     .collect(java.util.stream.Collectors.toList());
                                                 com.campusskills.web.websockets.MessageBroadcaster.broadcastNewMessage(message, participantList);
+
+                                                for (String participant : participantList) {
+                                                    JsonObject notifPayload = new JsonObject()
+                                                        .put("userId", participant)
+                                                        .put("type", "SESSION_REMINDER")
+                                                        .put("title", "Session Starts in 30 Mins")
+                                                        .put("message", "Your session on " + topic + " starts in 30 minutes.")
+                                                        .put("sourceType", "SESSION")
+                                                        .put("sourceId", sessionId)
+                                                        .put("createdAt", System.currentTimeMillis())
+                                                        .put("isRead", false);
+                                                    vertx.eventBus().send("internal.notification.create", notifPayload);
+                                                }
                                             }
                                         });
                                     });

@@ -26,7 +26,12 @@ const BlockedUsersModal = ({ onClose }) => {
           blockedIds.map(async (id) => {
             try {
               const res = await userService.getPublicProfile(id);
-              return res.data || res;
+              const data = res.data || res;
+              return {
+                userId: data.profile?.userId || data.userId || id,
+                name: data.profile?.name || data.name || 'Unknown User',
+                avatarImg: data.profile?.avatarImg || data.profile?.profilePicture || data.avatarImg
+              };
             } catch (err) {
               return { userId: id, name: 'Unknown User' };
             }
