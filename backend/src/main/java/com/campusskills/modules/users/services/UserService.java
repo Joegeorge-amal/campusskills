@@ -431,31 +431,35 @@ public class UserService {
         
         final String cleanIdentifier = identifier.trim().toLowerCase();
         
-        // Try direct rollNo lookup first (most common path when identifier is a roll number)
-        boolean isObjectIdPattern = cleanIdentifier.length() == 24 && cleanIdentifier.matches("^[0-9a-f]+$");
-        
         Future<User> userFuture;
-        if (!isObjectIdPattern) {
-            // Treat as roll number — try direct profile lookup, fall back to email derivation
-            userFuture = profileRepository.findByRollNo(cleanIdentifier).compose(profile -> {
-                if (profile != null) {
-                    return userRepository.findById(profile.getUserId());
-                }
-                // Fallback: construct email and look up
-                return userRepository.findByEmail(cleanIdentifier + "@kristujayanti.com");
-            });
+        if (cleanIdentifier.contains("@")) {
+            userFuture = userRepository.findByEmail(cleanIdentifier);
         } else {
-            // First try as ObjectId (userId pattern)
-            userFuture = userRepository.findById(cleanIdentifier).compose(user -> {
-                if (user != null) return Future.succeededFuture(user);
-                // Fallback: try rollNo lookup, then email derivation
-                return profileRepository.findByRollNo(cleanIdentifier).compose(profile -> {
+            boolean isObjectIdPattern = cleanIdentifier.length() == 24 && cleanIdentifier.matches("^[0-9a-f]+$");
+            if (isObjectIdPattern) {
+                userFuture = userRepository.findById(cleanIdentifier).compose(user -> {
+                    if (user != null) return Future.succeededFuture(user);
+                    return profileRepository.findByRollNo(cleanIdentifier).compose(profile -> {
+                        if (profile != null) {
+                            return userRepository.findById(profile.getUserId());
+                        }
+                        return userRepository.findByEmailPrefix(cleanIdentifier).compose(u -> {
+                            if (u != null) return Future.succeededFuture(u);
+                            return userRepository.findByEmail(cleanIdentifier + "@kristujayanti.com");
+                        });
+                    });
+                });
+            } else {
+                userFuture = profileRepository.findByRollNo(cleanIdentifier).compose(profile -> {
                     if (profile != null) {
                         return userRepository.findById(profile.getUserId());
                     }
-                    return userRepository.findByEmail(cleanIdentifier + "@kristujayanti.com");
+                    return userRepository.findByEmailPrefix(cleanIdentifier).compose(u -> {
+                        if (u != null) return Future.succeededFuture(u);
+                        return userRepository.findByEmail(cleanIdentifier + "@kristujayanti.com");
+                    });
                 });
-            });
+            }
         }
 
         return userFuture.compose(user -> {

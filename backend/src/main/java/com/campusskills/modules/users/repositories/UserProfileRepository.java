@@ -27,6 +27,10 @@ public class UserProfileRepository {
         JsonObject query = new JsonObject().put("userId", userId);
         return client.findOne(COLLECTION, query, null).map(doc -> {
             if (doc == null) return null;
+            Object idObj = doc.getValue("_id");
+            if (idObj instanceof JsonObject && ((JsonObject) idObj).containsKey("$oid")) {
+                doc.put("_id", ((JsonObject) idObj).getString("$oid"));
+            }
             return doc.mapTo(UserProfile.class);
         });
     }
@@ -35,6 +39,10 @@ public class UserProfileRepository {
         JsonObject query = new JsonObject().put("rollNo", rollNo);
         return client.findOne(COLLECTION, query, null).map(doc -> {
             if (doc == null) return null;
+            Object idObj = doc.getValue("_id");
+            if (idObj instanceof JsonObject && ((JsonObject) idObj).containsKey("$oid")) {
+                doc.put("_id", ((JsonObject) idObj).getString("$oid"));
+            }
             return doc.mapTo(UserProfile.class);
         });
     }
@@ -54,7 +62,13 @@ public class UserProfileRepository {
         }
         io.vertx.ext.mongo.FindOptions options = new io.vertx.ext.mongo.FindOptions().setLimit(limit);
         return client.findWithOptions(COLLECTION, query, options).map(docs -> 
-            docs.stream().map(doc -> doc.mapTo(UserProfile.class)).collect(java.util.stream.Collectors.toList())
+            docs.stream().map(doc -> {
+                Object idObj = doc.getValue("_id");
+                if (idObj instanceof JsonObject && ((JsonObject) idObj).containsKey("$oid")) {
+                    doc.put("_id", ((JsonObject) idObj).getString("$oid"));
+                }
+                return doc.mapTo(UserProfile.class);
+            }).collect(java.util.stream.Collectors.toList())
         );
     }
 

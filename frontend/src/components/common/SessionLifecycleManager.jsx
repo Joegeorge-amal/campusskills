@@ -345,11 +345,20 @@ const SessionLifecycleManager = () => {
       {!activePopup && !reviewModalData && activeRequest && (() => {
         let reqType = 'Session Request';
         let isChat = false;
-        if (activeRequest.type?.toLowerCase().includes('swap')) reqType = 'Swap Request';
-        else if (activeRequest.type?.toLowerCase().includes('chat')) { reqType = 'Chat Request'; isChat = true; }
-        else if (activeRequest.otherUserExtras?.listingType?.includes('TEACH')) reqType = 'Teach Request';
-        else if (activeRequest.otherUserExtras?.listingType?.includes('LEARN')) reqType = 'Learn Request';
-        const subtitleText = isChat ? 'Wants to chat with you' : `Wants to book ${activeRequest.otherUserExtras?.listingTitle || 'Skill Session'}`;
+        let subtitleText = '';
+        if (activeRequest.type?.toLowerCase().includes('swap')) {
+          reqType = 'Swap Request';
+          subtitleText = `Wants to book ${activeRequest.otherUserExtras?.listingTitle || 'Skill Session'}`;
+        } else if (activeRequest.type?.toLowerCase().includes('chat')) {
+          reqType = 'Chat Request';
+          isChat = true;
+          subtitleText = 'Wants to chat with you';
+        } else if (activeRequest.type?.toLowerCase().includes('offer to teach') || activeRequest.otherUserExtras?.listingType?.includes('LEARN')) {
+          reqType = 'Offer to Teach';
+          subtitleText = `Offered to teach you ${activeRequest.otherUserExtras?.listingTitle || 'Skill Session'}`;
+        } else {
+          subtitleText = `Wants to book ${activeRequest.otherUserExtras?.listingTitle || 'Skill Session'}`;
+        }
         const remaining = pendingRequests.length - 1;
         return (
           <GlobalNotificationPopup

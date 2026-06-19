@@ -27,20 +27,65 @@ public class UserRepository {
         JsonObject query = new JsonObject().put("email", email);
         return client.findOne(COLLECTION, query, null).map(doc -> {
             if (doc == null) return null;
+            Object idObj = doc.getValue("_id");
+            if (idObj instanceof JsonObject && ((JsonObject) idObj).containsKey("$oid")) {
+                doc.put("_id", ((JsonObject) idObj).getString("$oid"));
+            }
             return doc.mapTo(User.class);
         });
     }
 
     public Future<User> findById(String id) {
-        JsonObject query = new JsonObject().put("_id", id);
+        if (id == null || id.trim().isEmpty()) {
+            return Future.succeededFuture(null);
+        }
+        JsonObject query;
+        if (id.length() == 24 && id.matches("^[0-9a-fA-F]+$")) {
+            query = new JsonObject().put("$or", new io.vertx.core.json.JsonArray()
+                .add(new JsonObject().put("_id", id))
+                .add(new JsonObject().put("_id", new JsonObject().put("$oid", id)))
+            );
+        } else {
+            query = new JsonObject().put("_id", id);
+        }
         return client.findOne(COLLECTION, query, null).map(doc -> {
             if (doc == null) return null;
+            Object idObj = doc.getValue("_id");
+            if (idObj instanceof JsonObject && ((JsonObject) idObj).containsKey("$oid")) {
+                doc.put("_id", ((JsonObject) idObj).getString("$oid"));
+            }
+            return doc.mapTo(User.class);
+        });
+    }
+
+    public Future<User> findByEmailPrefix(String prefix) {
+        if (prefix == null || prefix.trim().isEmpty()) {
+            return Future.succeededFuture(null);
+        }
+        JsonObject query = new JsonObject().put("email", new JsonObject()
+            .put("$regex", "^" + java.util.regex.Pattern.quote(prefix.trim().toLowerCase()) + "@")
+            .put("$options", "i")
+        );
+        return client.findOne(COLLECTION, query, null).map(doc -> {
+            if (doc == null) return null;
+            Object idObj = doc.getValue("_id");
+            if (idObj instanceof JsonObject && ((JsonObject) idObj).containsKey("$oid")) {
+                doc.put("_id", ((JsonObject) idObj).getString("$oid"));
+            }
             return doc.mapTo(User.class);
         });
     }
 
     public Future<Boolean> updateUserRole(String id, com.campusskills.modules.users.models.UserRole role) {
-        JsonObject query = new JsonObject().put("_id", id);
+        JsonObject query;
+        if (id != null && id.length() == 24 && id.matches("^[0-9a-fA-F]+$")) {
+            query = new JsonObject().put("$or", new io.vertx.core.json.JsonArray()
+                .add(new JsonObject().put("_id", id))
+                .add(new JsonObject().put("_id", new JsonObject().put("$oid", id)))
+            );
+        } else {
+            query = new JsonObject().put("_id", id);
+        }
         JsonObject update = new JsonObject().put("$set", new JsonObject()
             .put("role", role.name())
             .put("updatedAt", System.currentTimeMillis()));
@@ -56,12 +101,27 @@ public class UserRepository {
             .add(new JsonObject().put("lastName", new JsonObject().put("$regex", q.trim()).put("$options", "i")))
         );
         return client.find(COLLECTION, query).map(docs -> 
-            docs.stream().map(doc -> doc.getString("_id")).collect(java.util.stream.Collectors.toList())
+            docs.stream().map(doc -> {
+                Object idObj = doc.getValue("_id");
+                if (idObj instanceof JsonObject && ((JsonObject) idObj).containsKey("$oid")) {
+                    return ((JsonObject) idObj).getString("$oid");
+                }
+                return doc.getString("_id");
+            }).collect(java.util.stream.Collectors.toList())
         );
     }
 
     public Future<Boolean> updateUser(User user) {
-        JsonObject query = new JsonObject().put("_id", user.getId());
+        String id = user.getId();
+        JsonObject query;
+        if (id != null && id.length() == 24 && id.matches("^[0-9a-fA-F]+$")) {
+            query = new JsonObject().put("$or", new io.vertx.core.json.JsonArray()
+                .add(new JsonObject().put("_id", id))
+                .add(new JsonObject().put("_id", new JsonObject().put("$oid", id)))
+            );
+        } else {
+            query = new JsonObject().put("_id", id);
+        }
         user.setUpdatedAt(System.currentTimeMillis());
         JsonObject update = new JsonObject().put("$set", JsonObject.mapFrom(user));
         update.getJsonObject("$set").remove("_id"); // Don't update the ID

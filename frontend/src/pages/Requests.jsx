@@ -372,7 +372,9 @@ const Requests = () => {
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
               <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#111827' }}>
-                Accept Session Request
+                {bookingModalReq.otherUserExtras?.listingType === 'LEARN' || bookingModalReq.otherUserExtras?.listingType === 'LEARN_SWAP'
+                  ? 'Accept Teach Offer'
+                  : 'Accept Session Request'}
               </h3>
               <button onClick={() => setBookingModalReq(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', padding: 0 }}>
                 <IconX size={20} />
@@ -381,7 +383,9 @@ const Requests = () => {
 
             <div style={{ marginBottom: '16px' }}>
               <div style={{ fontSize: '14px', fontWeight: 600, color: '#111827', marginBottom: '8px' }}>
-                {bookingModalReq.name} wants to learn from you
+                {bookingModalReq.otherUserExtras?.listingType === 'LEARN' || bookingModalReq.otherUserExtras?.listingType === 'LEARN_SWAP'
+                  ? `${bookingModalReq.name} offered to teach you`
+                  : `${bookingModalReq.name} wants to learn from you`}
               </div>
 
               {/* Skills */}

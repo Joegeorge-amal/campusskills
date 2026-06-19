@@ -161,14 +161,22 @@ export const AppDataProvider = ({ children }) => {
         let tagText = '';
         let tagType = 'primary';
         
+        const listing = listingsMap[req.listingId];
+        const isLearnListing = listing && (listing.listingType === 'LEARN' || listing.listingType === 'LEARN_SWAP');
+
         if (isExchange) {
           if (req.type === 'SWAP') {
             title = isIncoming ? `${otherUser.name} proposed a skill swap` : `You proposed a skill swap to ${otherUser.name}`;
             tagText = 'Skill swap request';
             tagType = 'success';
           } else {
-            title = isIncoming ? `${otherUser.name} requested a session` : `You requested a session with ${otherUser.name}`;
-            tagText = 'Session request';
+            if (isLearnListing) {
+              title = isIncoming ? `${otherUser.name} offered to teach you` : `You offered to teach ${otherUser.name}`;
+              tagText = 'Offer to teach';
+            } else {
+              title = isIncoming ? `${otherUser.name} requested a session` : `You requested a session with ${otherUser.name}`;
+              tagText = 'Session request';
+            }
           }
           sub = req.message || 'No additional message provided.';
         } else {
@@ -192,8 +200,6 @@ export const AppDataProvider = ({ children }) => {
           sub = 'This request was accepted and a session was created.';
         }
 
-          const listing = req.listingId ? listingsMap[req.listingId] : null;
-          
           let offeredSkillName = null;
           let requestedSkillName = null;
           

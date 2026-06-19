@@ -14,6 +14,7 @@ const BookSessionModal = ({
   selectedSkill,
   isSwapRequest,
   listingRequestedSkills = [],
+  listingType,
   userOfferedSkills = [],
   onContinue,
   onClose
@@ -212,10 +213,10 @@ const BookSessionModal = ({
         }}>
           <div>
             <div style={{ fontSize: '16px', fontWeight: 600, marginBottom: '4px' }}>
-              {isSwapRequest ? 'Request a Skill Swap' : 'Request a Session'}
+              {isSwapRequest ? 'Request a Skill Swap' : (listingType === 'LEARN' ? 'Offer to Teach' : 'Request a Session')}
             </div>
             <div style={{ fontSize: '12px', color: 'rgba(255, 255, 255, 0.7)' }}>
-              {selectedSkill} &middot; {selectedTutor}
+              {selectedSkill} &middot; {listingType === 'LEARN' ? 'Student: ' : ''}{selectedTutor}
             </div>
           </div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.7)', cursor: 'pointer', padding: 0 }}>
@@ -325,7 +326,7 @@ const BookSessionModal = ({
             </>
           )}
 
-          <div className="bsm-section-title" style={{ marginTop: isSwapRequest ? '12px' : '24px' }}>Message to Teacher (Optional)</div>
+          <div className="bsm-section-title" style={{ marginTop: isSwapRequest ? '12px' : '24px' }}>{listingType === 'LEARN' ? 'Message to Student (Optional)' : 'Message to Teacher (Optional)'}</div>
           <textarea
             className="bsm-textarea"
             rows="3"

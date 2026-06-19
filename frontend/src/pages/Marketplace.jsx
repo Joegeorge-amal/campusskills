@@ -460,7 +460,7 @@ const Marketplace = () => {
                 {selectedSkill.listingType === 'LEARN' || selectedSkill.listingType === 'LEARN_SWAP' ? (
                   <button 
                     style={{ flex: 1, padding: '12px 20px', borderRadius: '100px', border: 'none', background: '#1d4ed8', color: '#fff', fontSize: '14px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', boxShadow: '0 4px 12px rgba(29, 78, 216, 0.2)' }}
-                    onClick={() => window.alert('Teach Request flow coming soon')}
+                    onClick={() => { setRequestMode('TUTORING'); setIsBookModalOpen(true); }}
                     onMouseOver={(e) => { e.currentTarget.style.background = '#1e40af'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
                     onMouseOut={(e) => { e.currentTarget.style.background = '#1d4ed8'; e.currentTarget.style.transform = 'translateY(0)'; }}
                   >
@@ -543,6 +543,7 @@ const Marketplace = () => {
           selectedTutor={selectedSkill.owner?.name || 'Unknown User'}
           isSwapRequest={requestMode === 'SWAP'}
           listingRequestedSkills={selectedSkill.requestedSkills}
+          listingType={selectedSkill.listingType}
           userOfferedSkills={user?.skillsOffered || []}
           slots={selectedSkill.availableSlots && selectedSkill.availableSlots.length > 0 ? selectedSkill.availableSlots.map((s, i) => ({
             id: String(i),

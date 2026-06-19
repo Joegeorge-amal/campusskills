@@ -27,6 +27,10 @@ public class UserWalletRepository {
         JsonObject query = new JsonObject().put("userId", userId);
         return client.findOne(COLLECTION, query, null).map(doc -> {
             if (doc == null) return null;
+            Object idObj = doc.getValue("_id");
+            if (idObj instanceof JsonObject && ((JsonObject) idObj).containsKey("$oid")) {
+                doc.put("_id", ((JsonObject) idObj).getString("$oid"));
+            }
             return doc.mapTo(UserWallet.class);
         });
     }

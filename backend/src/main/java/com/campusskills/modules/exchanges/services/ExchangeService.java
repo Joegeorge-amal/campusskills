@@ -252,7 +252,7 @@ public class ExchangeService {
                             String teacherId = exchange.getReceiverId();
                             String studentId = exchange.getInitiatorId();
                             
-                            if (listing != null && listing.getListingType() == com.campusskills.modules.listings.models.ListingType.LEARN) {
+                            if (listing != null && (listing.getListingType() == com.campusskills.modules.listings.models.ListingType.LEARN || listing.getListingType() == com.campusskills.modules.listings.models.ListingType.LEARN_SWAP)) {
                                 teacherId = exchange.getInitiatorId();
                                 studentId = exchange.getReceiverId();
                             }
@@ -267,7 +267,14 @@ public class ExchangeService {
                             session.setListingId(exchange.getListingId());
                             session.setMode(sessionMode);
                             
-                            boolean isPaid = listing != null && listing.getPrice() != null && listing.getPrice() > 0;
+                            boolean isPaid = false;
+                            if (listing != null) {
+                                if (listing.getListingType() == com.campusskills.modules.listings.models.ListingType.LEARN || listing.getListingType() == com.campusskills.modules.listings.models.ListingType.LEARN_SWAP) {
+                                    isPaid = (listing.getBudget() != null && listing.getBudget() > 0) || (listing.getPrice() != null && listing.getPrice() > 0);
+                                } else {
+                                    isPaid = listing.getPrice() != null && listing.getPrice() > 0;
+                                }
+                            }
                             session.setRequiresPayment(isPaid);
                             
                             final String fTeacherId = teacherId;

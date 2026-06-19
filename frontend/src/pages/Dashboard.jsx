@@ -310,10 +310,10 @@ const Dashboard = () => {
                   reqType = 'Swap Request';
                 } else if (req.type?.toLowerCase().includes('chat')) {
                   reqType = 'Chat Request';
+                } else if (req.type?.toLowerCase().includes('offer to teach') || req.otherUserExtras?.listingType === 'LEARN' || req.otherUserExtras?.listingType === 'LEARN_SWAP') {
+                  reqType = 'Offer to Teach';
                 } else if (req.otherUserExtras?.listingType === 'TEACH' || req.otherUserExtras?.listingType === 'TEACH_SWAP') {
-                  reqType = 'Teach Request';
-                } else if (req.otherUserExtras?.listingType === 'LEARN' || req.otherUserExtras?.listingType === 'LEARN_SWAP') {
-                  reqType = 'Learn Request';
+                  reqType = 'Session Request';
                 }
 
                 const listingTitle = req.otherUserExtras?.listingTitle || 'Skill Session';
