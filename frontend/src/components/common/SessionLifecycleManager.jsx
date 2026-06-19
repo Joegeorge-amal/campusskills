@@ -60,9 +60,13 @@ const SessionLifecycleManager = () => {
   };
 
   // Open the review modal — single gateway, always checks shownReviewIds first
-  const openReviewModal = (id, rawSession, topic, name, role) => {
-    if (shownReviewIds.current.has(id)) return;
-    addShownReviewId(id);
+  // bypassGuard: manual user intent (card button) bypasses the early-return
+  // but still populates shownReviewIds to prevent auto-polling from re-opening
+  const openReviewModal = (id, rawSession, topic, name, role, bypassGuard = false) => {
+    if (!bypassGuard && shownReviewIds.current.has(id)) return;
+    if (!shownReviewIds.current.has(id)) {
+      addShownReviewId(id);
+    }
     // Use functional setter: if a review modal is already open, don't overwrite
     setReviewModalData(prev => prev ?? { id, rawSession, topic, name, role, status: 'COMPLETED' });
   };
@@ -252,10 +256,11 @@ const SessionLifecycleManager = () => {
   }, [sessionEvent, user]);
 
   // ─── MANUAL REVIEW REQUEST (from Sessions.jsx card button) ────────────────────
+  // bypassGuard=true: explicit user intent overrides shownReviewIds suppression
   useEffect(() => {
     if (!pendingReviewRequest) return;
     const { id, rawSession, topic, name, role } = pendingReviewRequest;
-    openReviewModal(id, rawSession, topic, name, role === 'Teaching' ? 'Teaching' : 'Learning');
+    openReviewModal(id, rawSession, topic, name, role === 'Teaching' ? 'Teaching' : 'Learning', true);
     setPendingReviewRequest(null);
   }, [pendingReviewRequest, setPendingReviewRequest]);
 
