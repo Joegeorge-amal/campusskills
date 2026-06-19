@@ -135,7 +135,7 @@ const AdminUsers = () => {
                   <div className="au-info">
                     <div className="au-name">{user.displayName} <span style={{fontSize:'0.7rem', color:'#6b7280', marginLeft:'8px'}}>{user.role}</span></div>
                     <div className="au-meta">
-                      {user.email} · {user.course || 'No course'}
+                      {user.rollNo ? user.rollNo.toUpperCase() : user.email} · {user.course || 'No course'}
                     </div>
                   </div>
                 </div>

@@ -31,6 +31,22 @@ public class UserProfileRepository {
         });
     }
 
+    public Future<UserProfile> findByRollNo(String rollNo) {
+        JsonObject query = new JsonObject().put("rollNo", rollNo);
+        return client.findOne(COLLECTION, query, null).map(doc -> {
+            if (doc == null) return null;
+            return doc.mapTo(UserProfile.class);
+        });
+    }
+
+    public Future<Boolean> updateRollNo(String userId, String rollNo) {
+        JsonObject query = new JsonObject().put("userId", userId);
+        JsonObject update = new JsonObject().put("$set", new JsonObject()
+            .put("rollNo", rollNo)
+            .put("updatedAt", System.currentTimeMillis()));
+        return client.updateCollection(COLLECTION, query, update).map(res -> res.getDocModified() > 0);
+    }
+
     public Future<java.util.List<UserProfile>> searchProfilesByName(String q, int limit) {
         JsonObject query = new JsonObject();
         if (q != null && !q.trim().isEmpty()) {

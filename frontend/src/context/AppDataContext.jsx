@@ -628,7 +628,6 @@ export const AppDataProvider = ({ children }) => {
         isSessionsLoading,
         myListingsCount,
         sessionEvent,
-        notifications,
         fetchInitialData,
         fetchSessionsOnly,
         toastMessage,
@@ -640,7 +639,6 @@ export const AppDataProvider = ({ children }) => {
         pendingRequestsCount,
         searchQuery,
         setSearchQuery,
-        sessionEvent,
         pendingReviewRequest,
         setPendingReviewRequest
       }}

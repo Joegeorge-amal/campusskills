@@ -36,6 +36,7 @@ public class UserProfile {
     private Boolean profileCompleted;
     private Boolean heatmapVisibility = true;
     private String institutionId;
+    private String rollNo;
     private Long createdAt;
     private Long updatedAt;
     private Set<String> blockedUsers = new HashSet<>();
@@ -104,6 +105,9 @@ public class UserProfile {
 
     public String getExchangePreference() { return exchangePreference; }
     public void setExchangePreference(String exchangePreference) { this.exchangePreference = exchangePreference; }
+
+    public String getRollNo() { return rollNo; }
+    public void setRollNo(String rollNo) { this.rollNo = rollNo; }
 
     public Set<String> getBlockedUsers() {
         if (blockedUsers == null) {

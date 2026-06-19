@@ -28,7 +28,7 @@ const RequestsCardV2 = ({
   const isPending = s === 'pending' || s === 'requested';
 
   // Derived properties
-  const rollNo = otherUserExtras.email ? otherUserExtras.email.split('@')[0].toUpperCase() : '';
+  const rollNo = otherUserExtras.rollNo || (otherUserExtras.email ? otherUserExtras.email.split('@')[0].toUpperCase() : '');
   const memberSince = otherUserExtras.createdAt 
     ? new Date(otherUserExtras.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) 
     : '';

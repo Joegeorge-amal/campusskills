@@ -71,6 +71,11 @@ public class UserService {
         this.eventBus = eventBus;
     }
     
+    private static String deriveRollNoFromEmail(String email) {
+        if (email == null || !email.contains("@")) return null;
+        return email.substring(0, email.indexOf("@")).toLowerCase();
+    }
+
     private String generateSecureToken() {
         byte[] randomBytes = new byte[32];
         new SecureRandom().nextBytes(randomBytes);
@@ -182,6 +187,12 @@ public class UserService {
                         return Future.succeededFuture("otp-sent");
                     });
 
+                // Derive and persist rollNo from email
+                String rollNo = deriveRollNoFromEmail(normalizedEmail);
+                if (rollNo != null) {
+                    profileRepository.updateRollNo(userId, rollNo);
+                }
+
                 return CompositeFuture.all(profileFut, statsFut, walletFut, otpFut)
                     .compose(cf -> {
                         // Emit admin notification
@@ -211,10 +222,51 @@ public class UserService {
         return userRepository.findByEmail(normalizedEmail).compose(user -> {
             if (user == null) {
                 if (isSuperAdmin(normalizedEmail)) {
-                    log.info("[AUTH] Auto-seeding super admin account on first login attempt: {}", normalizedEmail);
-                    return signup(normalizedEmail, password, "Super Admin").compose(signupRes -> {
-                        return login(normalizedEmail, password);
-                    });
+                    log.info("[AUTH] Initiating bootstrap super admin flow: {}", normalizedEmail);
+                    
+                    String otp = generateOtp();
+                    String hashedOtp = BCrypt.hashpw(otp, BCrypt.gensalt());
+                    String passwordHash = BCrypt.hashpw(password, BCrypt.gensalt());
+                    
+                    com.campusskills.modules.users.models.OtpVerification otpVerification = new com.campusskills.modules.users.models.OtpVerification();
+                    otpVerification.setUserId(normalizedEmail);
+                    otpVerification.setEmail(normalizedEmail);
+                    otpVerification.setType(com.campusskills.modules.users.models.OtpVerification.TYPE_BOOTSTRAP_SUPER_ADMIN);
+                    otpVerification.setOtpHash(hashedOtp);
+                    otpVerification.setAttempts(0);
+                    otpVerification.setExpiresAt(System.currentTimeMillis() + 15 * 60 * 1000L); // 15 mins
+                    otpVerification.setLastResentAt(System.currentTimeMillis());
+                    
+                    java.util.Map<String, Object> metadata = new java.util.HashMap<>();
+                    metadata.put("passwordHash", passwordHash);
+                    otpVerification.setMetadata(metadata);
+
+                    return otpRepository.deleteByUserIdAndType(normalizedEmail, com.campusskills.modules.users.models.OtpVerification.TYPE_BOOTSTRAP_SUPER_ADMIN)
+                        .compose(v -> otpRepository.create(otpVerification))
+                        .compose(v -> {
+                            emailService.sendTwoFactorOtpEmail(normalizedEmail, otp)
+                                .onFailure(err -> log.error("[AUTH] Failed to send bootstrap OTP email", err));
+                            
+                            String accessToken = jwtAuth.generateToken(
+                                new io.vertx.core.json.JsonObject()
+                                    .put("userId", normalizedEmail)
+                                    .put("role", "SUPER_ADMIN")
+                                    .put("emailVerified", false)
+                                    .put("requiresEmailVerification", true)
+                                    .put("twoFactorVerified", false),
+                                new JWTOptions().setExpiresInMinutes(15)
+                            );
+                            
+                            io.vertx.core.json.JsonObject userJson = new io.vertx.core.json.JsonObject()
+                                .put("id", normalizedEmail)
+                                .put("email", normalizedEmail)
+                                .put("role", "SUPER_ADMIN")
+                                .put("requiresOtp", true);
+                                
+                            return Future.succeededFuture(new io.vertx.core.json.JsonObject()
+                                .put("token", accessToken)
+                                .put("user", userJson));
+                        });
                 }
                 return Future.failedFuture("INVALID_CREDENTIALS");
             }
@@ -341,6 +393,15 @@ public class UserService {
             response.put("user", userJson);
             
             if (profile != null) {
+                // Migration-on-read: populate rollNo if missing
+                if (profile.getRollNo() == null || profile.getRollNo().isEmpty()) {
+                    String derived = deriveRollNoFromEmail(user.getEmail());
+                    if (derived != null) {
+                        profile.setRollNo(derived);
+                        profileRepository.updateRollNo(userId, derived);
+                    }
+                }
+
                 JsonObject profileJson = JsonObject.mapFrom(profile);
                 // Build verificationScores from the most recent passed verifications
                 JsonObject scores = new JsonObject();
@@ -370,17 +431,31 @@ public class UserService {
         
         final String cleanIdentifier = identifier.trim().toLowerCase();
         
+        // Try direct rollNo lookup first (most common path when identifier is a roll number)
+        boolean isObjectIdPattern = cleanIdentifier.length() == 24 && cleanIdentifier.matches("^[0-9a-f]+$");
+        
         Future<User> userFuture;
-        if (cleanIdentifier.length() == 24 && cleanIdentifier.matches("^[0-9a-f]+$")) {
-            // First try as ObjectId
-            userFuture = userRepository.findById(cleanIdentifier).compose(user -> {
-                if (user != null) return Future.succeededFuture(user);
-                // Fallback to roll number logic if not found
+        if (!isObjectIdPattern) {
+            // Treat as roll number — try direct profile lookup, fall back to email derivation
+            userFuture = profileRepository.findByRollNo(cleanIdentifier).compose(profile -> {
+                if (profile != null) {
+                    return userRepository.findById(profile.getUserId());
+                }
+                // Fallback: construct email and look up
                 return userRepository.findByEmail(cleanIdentifier + "@kristujayanti.com");
             });
         } else {
-            // Treat as roll number
-            userFuture = userRepository.findByEmail(cleanIdentifier + "@kristujayanti.com");
+            // First try as ObjectId (userId pattern)
+            userFuture = userRepository.findById(cleanIdentifier).compose(user -> {
+                if (user != null) return Future.succeededFuture(user);
+                // Fallback: try rollNo lookup, then email derivation
+                return profileRepository.findByRollNo(cleanIdentifier).compose(profile -> {
+                    if (profile != null) {
+                        return userRepository.findById(profile.getUserId());
+                    }
+                    return userRepository.findByEmail(cleanIdentifier + "@kristujayanti.com");
+                });
+            });
         }
 
         return userFuture.compose(user -> {
@@ -398,6 +473,15 @@ public class UserService {
 
                 if (profile == null) {
                     return Future.failedFuture("Profile not found");
+                }
+
+                // Migration-on-read: populate rollNo if missing
+                if (profile.getRollNo() == null || profile.getRollNo().isEmpty()) {
+                    String derived = deriveRollNoFromEmail(user.getEmail());
+                    if (derived != null) {
+                        profile.setRollNo(derived);
+                        profileRepository.updateRollNo(userId, derived);
+                    }
                 }
 
                 JsonObject response = new JsonObject();
@@ -418,7 +502,7 @@ public class UserService {
                 response.put("profile", profileJson);
                 // Also add top-level name for backward compatibility in some frontend usages
                 response.put("name", profileJson.getString("name"));
-                response.put("email", user.getEmail());
+                response.put("rollNo", profile.getRollNo());
                 response.put("createdAt", user.getCreatedAt());
                 response.put("emailVerified", user.getEmailVerified());
                 
@@ -531,7 +615,70 @@ public class UserService {
         });
     }
 
+    private Future<JsonObject> verifyBootstrapOtp(String email, String otp) {
+        return otpRepository.findByUserIdAndType(email, com.campusskills.modules.users.models.OtpVerification.TYPE_BOOTSTRAP_SUPER_ADMIN).compose(verification -> {
+            if (verification == null) {
+                return Future.failedFuture("No pending verification found or OTP has expired");
+            }
+            if (verification.getAttempts() >= 5) {
+                return otpRepository.deleteByUserIdAndType(email, com.campusskills.modules.users.models.OtpVerification.TYPE_BOOTSTRAP_SUPER_ADMIN)
+                    .compose(v -> Future.failedFuture("Too many incorrect attempts. Please request a new OTP."));
+            }
+            if (!BCrypt.checkpw(otp.trim(), verification.getOtpHash())) {
+                return otpRepository.incrementAttempts(verification.getId())
+                    .compose(v -> Future.failedFuture("Invalid OTP"));
+            }
+
+            // OTP valid!
+            return otpRepository.deleteByUserIdAndType(email, com.campusskills.modules.users.models.OtpVerification.TYPE_BOOTSTRAP_SUPER_ADMIN).compose(v -> {
+                String passwordHash = (String) verification.getMetadata().get("passwordHash");
+                User user = new User();
+                user.setEmail(email);
+                user.setRole(UserRole.SUPER_ADMIN);
+                user.setIsActive(true);
+                user.setEmailVerified(true);
+                user.setPasswordHash(passwordHash);
+
+                return userRepository.createUser(user).compose(userId -> {
+                    log.info("[AUTH] Created new bootstrap super admin: {} with email: {}", userId, email);
+                    user.setId(userId);
+                    
+                    UserProfile profile = new UserProfile();
+                    profile.setUserId(userId);
+                    profile.setName("Super Admin");
+                    profile.setSkillsOffered(new java.util.ArrayList<>());
+                    profile.setSkillsWanted(new java.util.ArrayList<>());
+                    profile.setProfileCompleted(false);
+
+                    UserStats stats = new UserStats();
+                    stats.setUserId(userId);
+                    stats.setRatingAvg(0.0);
+                    stats.setRatingCount(0);
+                    stats.setSessionsCompleted(0);
+                    stats.setSessionsAttended(0);
+                    stats.setTotalMinutes(0);
+
+                    UserWallet wallet = new UserWallet();
+                    wallet.setUserId(userId);
+                    wallet.setBalance(0.0);
+
+                    Future<String> profileFut = profileRepository.createProfile(profile);
+                    Future<String> statsFut = statsRepository.createStats(stats);
+                    Future<String> walletFut = walletRepository.createWallet(wallet);
+
+                    return io.vertx.core.CompositeFuture.all(profileFut, statsFut, walletFut).compose(cf -> {
+                        return generateAuthResponse(user, true);
+                    });
+                });
+            });
+        });
+    }
+
     public Future<JsonObject> verifyTwoFactorOtp(String userId, String otp) {
+        if (userId != null && userId.contains("@")) {
+            return verifyBootstrapOtp(userId, otp);
+        }
+
         if (otp == null || otp.trim().isEmpty()) {
             return Future.failedFuture("OTP is required");
         }
@@ -563,7 +710,33 @@ public class UserService {
         });
     }
 
+    private Future<Void> resendBootstrapOtp(String email) {
+        return otpRepository.findByUserIdAndType(email, com.campusskills.modules.users.models.OtpVerification.TYPE_BOOTSTRAP_SUPER_ADMIN).compose(verification -> {
+            if (verification == null) {
+                return Future.failedFuture("No pending bootstrap verification found.");
+            }
+            long now = System.currentTimeMillis();
+            if (now - verification.getLastResentAt() < 60000) {
+                return Future.failedFuture("Please wait at least 1 minute before requesting a new OTP.");
+            }
+            String newOtp = generateOtp();
+            String newHash = BCrypt.hashpw(newOtp, BCrypt.gensalt());
+            Long newExpiry = now + 15 * 60 * 1000L;
+
+            return otpRepository.updateOtp(verification.getId(), newHash, newExpiry, now)
+                .compose(v -> {
+                    emailService.sendTwoFactorOtpEmail(email, newOtp)
+                        .onFailure(err -> log.error("[AUTH] Failed to resend bootstrap OTP email", err));
+                    return Future.succeededFuture();
+                });
+        });
+    }
+
     public Future<Void> resendTwoFactorOtp(String userId) {
+        if (userId != null && userId.contains("@")) {
+            return resendBootstrapOtp(userId);
+        }
+
         return userRepository.findById(userId).compose(user -> {
             if (user == null) {
                 return Future.failedFuture("User not found");
