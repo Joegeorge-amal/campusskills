@@ -100,5 +100,19 @@ public class DatabaseInitializer {
             .put("status", "text"), options)
             .onSuccess(v -> log.info("Created text index on sessions"))
             .onFailure(err -> log.error("Failed to create text index on sessions", err));
+
+        // user_profiles(rollNo) -> unique index for direct roll number lookup
+        JsonObject rollNoIndex = new JsonObject()
+            .put("createIndexes", "user_profiles")
+            .put("indexes", new io.vertx.core.json.JsonArray().add(
+                new JsonObject()
+                    .put("name", "rollNo_1")
+                    .put("key", new JsonObject().put("rollNo", 1))
+                    .put("unique", true)
+                    .put("sparse", true)
+            ));
+        client.runCommand("createIndexes", rollNoIndex)
+            .onSuccess(v -> log.info("Created unique sparse index: user_profiles(rollNo)"))
+            .onFailure(err -> log.error("Failed to create index on user_profiles(rollNo)", err));
     }
 }

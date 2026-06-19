@@ -71,6 +71,11 @@ public class UserService {
         this.eventBus = eventBus;
     }
     
+    private static String deriveRollNoFromEmail(String email) {
+        if (email == null || !email.contains("@")) return null;
+        return email.substring(0, email.indexOf("@")).toLowerCase();
+    }
+
     private String generateSecureToken() {
         byte[] randomBytes = new byte[32];
         new SecureRandom().nextBytes(randomBytes);
@@ -182,6 +187,12 @@ public class UserService {
                         return Future.succeededFuture("otp-sent");
                     });
 
+                // Derive and persist rollNo from email
+                String rollNo = deriveRollNoFromEmail(normalizedEmail);
+                if (rollNo != null) {
+                    profileRepository.updateRollNo(userId, rollNo);
+                }
+
                 return CompositeFuture.all(profileFut, statsFut, walletFut, otpFut)
                     .compose(cf -> {
                         // Emit admin notification
@@ -226,7 +237,8 @@ public class UserService {
                     otpVerification.setExpiresAt(System.currentTimeMillis() + 15 * 60 * 1000L); // 15 mins
                     otpVerification.setLastResentAt(System.currentTimeMillis());
                     
-                    io.vertx.core.json.JsonObject metadata = new io.vertx.core.json.JsonObject().put("passwordHash", passwordHash);
+                    java.util.Map<String, Object> metadata = new java.util.HashMap<>();
+                    metadata.put("passwordHash", passwordHash);
                     otpVerification.setMetadata(metadata);
 
                     return otpRepository.deleteByUserIdAndType(normalizedEmail, com.campusskills.modules.users.models.OtpVerification.TYPE_BOOTSTRAP_SUPER_ADMIN)
@@ -381,6 +393,15 @@ public class UserService {
             response.put("user", userJson);
             
             if (profile != null) {
+                // Migration-on-read: populate rollNo if missing
+                if (profile.getRollNo() == null || profile.getRollNo().isEmpty()) {
+                    String derived = deriveRollNoFromEmail(user.getEmail());
+                    if (derived != null) {
+                        profile.setRollNo(derived);
+                        profileRepository.updateRollNo(userId, derived);
+                    }
+                }
+
                 JsonObject profileJson = JsonObject.mapFrom(profile);
                 // Build verificationScores from the most recent passed verifications
                 JsonObject scores = new JsonObject();
@@ -410,17 +431,31 @@ public class UserService {
         
         final String cleanIdentifier = identifier.trim().toLowerCase();
         
+        // Try direct rollNo lookup first (most common path when identifier is a roll number)
+        boolean isObjectIdPattern = cleanIdentifier.length() == 24 && cleanIdentifier.matches("^[0-9a-f]+$");
+        
         Future<User> userFuture;
-        if (cleanIdentifier.length() == 24 && cleanIdentifier.matches("^[0-9a-f]+$")) {
-            // First try as ObjectId
-            userFuture = userRepository.findById(cleanIdentifier).compose(user -> {
-                if (user != null) return Future.succeededFuture(user);
-                // Fallback to roll number logic if not found
+        if (!isObjectIdPattern) {
+            // Treat as roll number — try direct profile lookup, fall back to email derivation
+            userFuture = profileRepository.findByRollNo(cleanIdentifier).compose(profile -> {
+                if (profile != null) {
+                    return userRepository.findById(profile.getUserId());
+                }
+                // Fallback: construct email and look up
                 return userRepository.findByEmail(cleanIdentifier + "@kristujayanti.com");
             });
         } else {
-            // Treat as roll number
-            userFuture = userRepository.findByEmail(cleanIdentifier + "@kristujayanti.com");
+            // First try as ObjectId (userId pattern)
+            userFuture = userRepository.findById(cleanIdentifier).compose(user -> {
+                if (user != null) return Future.succeededFuture(user);
+                // Fallback: try rollNo lookup, then email derivation
+                return profileRepository.findByRollNo(cleanIdentifier).compose(profile -> {
+                    if (profile != null) {
+                        return userRepository.findById(profile.getUserId());
+                    }
+                    return userRepository.findByEmail(cleanIdentifier + "@kristujayanti.com");
+                });
+            });
         }
 
         return userFuture.compose(user -> {
@@ -438,6 +473,15 @@ public class UserService {
 
                 if (profile == null) {
                     return Future.failedFuture("Profile not found");
+                }
+
+                // Migration-on-read: populate rollNo if missing
+                if (profile.getRollNo() == null || profile.getRollNo().isEmpty()) {
+                    String derived = deriveRollNoFromEmail(user.getEmail());
+                    if (derived != null) {
+                        profile.setRollNo(derived);
+                        profileRepository.updateRollNo(userId, derived);
+                    }
                 }
 
                 JsonObject response = new JsonObject();
@@ -458,7 +502,7 @@ public class UserService {
                 response.put("profile", profileJson);
                 // Also add top-level name for backward compatibility in some frontend usages
                 response.put("name", profileJson.getString("name"));
-                response.put("email", user.getEmail());
+                response.put("rollNo", profile.getRollNo());
                 response.put("createdAt", user.getCreatedAt());
                 response.put("emailVerified", user.getEmailVerified());
                 
@@ -587,7 +631,7 @@ public class UserService {
 
             // OTP valid!
             return otpRepository.deleteByUserIdAndType(email, com.campusskills.modules.users.models.OtpVerification.TYPE_BOOTSTRAP_SUPER_ADMIN).compose(v -> {
-                String passwordHash = verification.getMetadata().getString("passwordHash");
+                String passwordHash = (String) verification.getMetadata().get("passwordHash");
                 User user = new User();
                 user.setEmail(email);
                 user.setRole(UserRole.SUPER_ADMIN);
