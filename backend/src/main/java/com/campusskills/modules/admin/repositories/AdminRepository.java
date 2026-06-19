@@ -413,9 +413,17 @@ public class AdminRepository {
             .put("as", "studentProfile")
         ));
 
+        // 3.5. Lookup listing to get price
+        pipeline.add(new JsonObject().put("$lookup", new JsonObject()
+            .put("from", "listings")
+            .put("localField", "listingId")
+            .put("foreignField", "_id")
+            .put("as", "listingData")
+        ));
+
         // 4. Facet for pagination
         JsonArray dataFacet = new JsonArray()
-            .add(new JsonObject().put("$sort", new JsonObject().put("scheduledStart", 1))) // Ascending order to show upcoming next
+            .add(new JsonObject().put("$sort", new JsonObject().put("createdAt", -1))) // Most recent first
             .add(new JsonObject().put("$skip", skip))
             .add(new JsonObject().put("$limit", limit));
 
@@ -449,9 +457,19 @@ public class AdminRepository {
                     JsonObject session = data.getJsonObject(i);
                     JsonArray teacherArr = session.getJsonArray("teacherProfile", new JsonArray());
                     JsonArray studentArr = session.getJsonArray("studentProfile", new JsonArray());
+                    JsonArray listingArr = session.getJsonArray("listingData", new JsonArray());
                     
                     String teacherName = teacherArr.isEmpty() ? "Unknown Tutor" : teacherArr.getJsonObject(0).getString("name", "Unknown Tutor");
                     String studentName = studentArr.isEmpty() ? "Unknown Learner" : studentArr.getJsonObject(0).getString("name", "Unknown Learner");
+
+                    Double price = 0.0;
+                    Boolean reqPayment = session.getBoolean("requiresPayment", false);
+                    Boolean isSkillSwap = session.getBoolean("isSkillSwap", false);
+                    
+                    if (Boolean.TRUE.equals(reqPayment) && !listingArr.isEmpty()) {
+                        Number p = (Number) listingArr.getJsonObject(0).getValue("price");
+                        if (p != null) price = p.doubleValue();
+                    }
 
                     formattedData.add(new JsonObject()
                         .put("id", session.getString("_id"))
@@ -460,8 +478,9 @@ public class AdminRepository {
                         .put("tutor", teacherName)
                         .put("learner", studentName)
                         .put("mode", session.getString("meetingPlatform", "Online"))
-                        .put("price", 0.0)
+                        .put("price", price)
                         .put("currency", "INR")
+                        .put("isSkillSwap", isSkillSwap)
                         .put("scheduledAt", session.getLong("scheduledStart"))
                     );
                 }

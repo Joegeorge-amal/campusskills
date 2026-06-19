@@ -5,6 +5,7 @@ import ConfirmModal from '../../components/modals/ConfirmModal';
 
 const AdminSessions = () => {
   const [sessions, setSessions] = useState([]);
+  const [totalSessions, setTotalSessions] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -22,6 +23,7 @@ const AdminSessions = () => {
         status: activeFilter !== 'All' ? activeFilter : undefined
       });
       setSessions(res.data || []);
+      setTotalSessions(res.pagination?.total || (res.data?.length || 0));
     } catch (err) {
       console.error('Failed to fetch sessions:', err);
       setError('Failed to load sessions. Please try again later.');
@@ -56,9 +58,9 @@ const AdminSessions = () => {
 
   // Compute stats locally from fetched data
   const liveCount = sessions.filter(s => s.status === 'LIVE' || s.status === 'IN_PROGRESS').length;
-  const upcomingCount = sessions.filter(s => s.status === 'UPCOMING' || s.status === 'PENDING').length;
+  const upcomingCount = sessions.filter(s => s.status === 'SCHEDULED' || s.status === 'PENDING').length;
   const completedCount = sessions.filter(s => s.status === 'COMPLETED').length;
-  const todayCount = liveCount + upcomingCount + completedCount; // Approximate for demo
+  const todayCount = activeFilter === 'All' ? totalSessions : sessions.length;
 
 
   return (
@@ -135,7 +137,7 @@ const AdminSessions = () => {
           <div className="al-flipper">
             <div className="al-front as-stat-card today" style={{ margin: 0, height: '100%' }}>
               <div className="as-stat-val">{todayCount}</div>
-              <div className="as-stat-lbl">TODAY TOTAL</div>
+              <div className="as-stat-lbl">TOTAL SESSIONS</div>
             </div>
             <div className="al-back as-stat-card completed" style={{ margin: 0, height: '100%' }}>
               <div className="as-stat-val">{completedCount}</div>
@@ -162,7 +164,7 @@ const AdminSessions = () => {
           sessions.map(session => {
             const statusUpper = (session.status || '').toUpperCase();
             const timeStr = session.scheduledAt ? new Date(session.scheduledAt).toLocaleString() : 'Unknown time';
-            const priceStr = session.price ? `${session.currency || 'INR'} ${session.price}` : 'Free';
+            const priceStr = session.isSkillSwap ? 'Skill Swap' : (session.price ? `${session.currency || 'INR'} ${session.price}` : 'Free');
             const dotColor = statusUpper === 'LIVE' || statusUpper === 'IN_PROGRESS' ? '#ef4444' : (statusUpper === 'COMPLETED' ? '#10b981' : '#3b82f6');
             
             return (
