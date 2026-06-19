@@ -481,7 +481,7 @@ const Profile = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', color: '#6b7280', fontSize: '14px', fontWeight: 500, marginBottom: '8px' }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <IconMapPin size={16} strokeWidth={2.5} style={{ color: '#9ca3af' }} />
-                {user?.programme || 'Not specified'} • {user?.year || 'Unknown year'}
+                {user?.rollNo ? `${user.rollNo.toUpperCase()} · ` : ''}{user?.programme || 'Not specified'} • {user?.year || 'Unknown year'}
               </span>
               <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#d1d5db' }}></span>
               <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
