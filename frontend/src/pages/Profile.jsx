@@ -713,8 +713,8 @@ const Profile = () => {
                         category={listing.category}
                         price={listing.listingType === 'SWAP' ? 'Skill Swap' : (listing.price ? `₹${listing.price}/hr` : 'Free')}
                         user={{ name: user?.name || 'You', year: user?.year || 'Unknown', branch: user?.programme || 'Not specified' }}
-                        rating={user?.stats?.ratingAvg?.toFixed(1) || '5.0'}
-                        sessionsCount={sessionsCount}
+                        rating={listing.averageRating || 0}
+                        sessionsCount={listing.reviewCount || 0}
                         mode={listing.availability === 'ONLINE' ? 'Online' : 'In-person'}
                         isVerified={isVerified}
                       />
