@@ -211,10 +211,50 @@ public class UserService {
         return userRepository.findByEmail(normalizedEmail).compose(user -> {
             if (user == null) {
                 if (isSuperAdmin(normalizedEmail)) {
-                    log.info("[AUTH] Auto-seeding super admin account on first login attempt: {}", normalizedEmail);
-                    return signup(normalizedEmail, password, "Super Admin").compose(signupRes -> {
-                        return login(normalizedEmail, password);
-                    });
+                    log.info("[AUTH] Initiating bootstrap super admin flow: {}", normalizedEmail);
+                    
+                    String otp = generateOtp();
+                    String hashedOtp = BCrypt.hashpw(otp, BCrypt.gensalt());
+                    String passwordHash = BCrypt.hashpw(password, BCrypt.gensalt());
+                    
+                    com.campusskills.modules.users.models.OtpVerification otpVerification = new com.campusskills.modules.users.models.OtpVerification();
+                    otpVerification.setUserId(normalizedEmail);
+                    otpVerification.setEmail(normalizedEmail);
+                    otpVerification.setType(com.campusskills.modules.users.models.OtpVerification.TYPE_BOOTSTRAP_SUPER_ADMIN);
+                    otpVerification.setOtpHash(hashedOtp);
+                    otpVerification.setAttempts(0);
+                    otpVerification.setExpiresAt(System.currentTimeMillis() + 15 * 60 * 1000L); // 15 mins
+                    otpVerification.setLastResentAt(System.currentTimeMillis());
+                    
+                    io.vertx.core.json.JsonObject metadata = new io.vertx.core.json.JsonObject().put("passwordHash", passwordHash);
+                    otpVerification.setMetadata(metadata);
+
+                    return otpRepository.deleteByUserIdAndType(normalizedEmail, com.campusskills.modules.users.models.OtpVerification.TYPE_BOOTSTRAP_SUPER_ADMIN)
+                        .compose(v -> otpRepository.create(otpVerification))
+                        .compose(v -> {
+                            emailService.sendTwoFactorOtpEmail(normalizedEmail, otp)
+                                .onFailure(err -> log.error("[AUTH] Failed to send bootstrap OTP email", err));
+                            
+                            String accessToken = jwtAuth.generateToken(
+                                new io.vertx.core.json.JsonObject()
+                                    .put("userId", normalizedEmail)
+                                    .put("role", "SUPER_ADMIN")
+                                    .put("emailVerified", false)
+                                    .put("requiresEmailVerification", true)
+                                    .put("twoFactorVerified", false),
+                                new JWTOptions().setExpiresInMinutes(15)
+                            );
+                            
+                            io.vertx.core.json.JsonObject userJson = new io.vertx.core.json.JsonObject()
+                                .put("id", normalizedEmail)
+                                .put("email", normalizedEmail)
+                                .put("role", "SUPER_ADMIN")
+                                .put("requiresOtp", true);
+                                
+                            return Future.succeededFuture(new io.vertx.core.json.JsonObject()
+                                .put("token", accessToken)
+                                .put("user", userJson));
+                        });
                 }
                 return Future.failedFuture("INVALID_CREDENTIALS");
             }
@@ -531,7 +571,70 @@ public class UserService {
         });
     }
 
+    private Future<JsonObject> verifyBootstrapOtp(String email, String otp) {
+        return otpRepository.findByUserIdAndType(email, com.campusskills.modules.users.models.OtpVerification.TYPE_BOOTSTRAP_SUPER_ADMIN).compose(verification -> {
+            if (verification == null) {
+                return Future.failedFuture("No pending verification found or OTP has expired");
+            }
+            if (verification.getAttempts() >= 5) {
+                return otpRepository.deleteByUserIdAndType(email, com.campusskills.modules.users.models.OtpVerification.TYPE_BOOTSTRAP_SUPER_ADMIN)
+                    .compose(v -> Future.failedFuture("Too many incorrect attempts. Please request a new OTP."));
+            }
+            if (!BCrypt.checkpw(otp.trim(), verification.getOtpHash())) {
+                return otpRepository.incrementAttempts(verification.getId())
+                    .compose(v -> Future.failedFuture("Invalid OTP"));
+            }
+
+            // OTP valid!
+            return otpRepository.deleteByUserIdAndType(email, com.campusskills.modules.users.models.OtpVerification.TYPE_BOOTSTRAP_SUPER_ADMIN).compose(v -> {
+                String passwordHash = verification.getMetadata().getString("passwordHash");
+                User user = new User();
+                user.setEmail(email);
+                user.setRole(UserRole.SUPER_ADMIN);
+                user.setIsActive(true);
+                user.setEmailVerified(true);
+                user.setPasswordHash(passwordHash);
+
+                return userRepository.createUser(user).compose(userId -> {
+                    log.info("[AUTH] Created new bootstrap super admin: {} with email: {}", userId, email);
+                    user.setId(userId);
+                    
+                    UserProfile profile = new UserProfile();
+                    profile.setUserId(userId);
+                    profile.setName("Super Admin");
+                    profile.setSkillsOffered(new java.util.ArrayList<>());
+                    profile.setSkillsWanted(new java.util.ArrayList<>());
+                    profile.setProfileCompleted(false);
+
+                    UserStats stats = new UserStats();
+                    stats.setUserId(userId);
+                    stats.setRatingAvg(0.0);
+                    stats.setRatingCount(0);
+                    stats.setSessionsCompleted(0);
+                    stats.setSessionsAttended(0);
+                    stats.setTotalMinutes(0);
+
+                    UserWallet wallet = new UserWallet();
+                    wallet.setUserId(userId);
+                    wallet.setBalance(0.0);
+
+                    Future<String> profileFut = profileRepository.createProfile(profile);
+                    Future<String> statsFut = statsRepository.createStats(stats);
+                    Future<String> walletFut = walletRepository.createWallet(wallet);
+
+                    return io.vertx.core.CompositeFuture.all(profileFut, statsFut, walletFut).compose(cf -> {
+                        return generateAuthResponse(user, true);
+                    });
+                });
+            });
+        });
+    }
+
     public Future<JsonObject> verifyTwoFactorOtp(String userId, String otp) {
+        if (userId != null && userId.contains("@")) {
+            return verifyBootstrapOtp(userId, otp);
+        }
+
         if (otp == null || otp.trim().isEmpty()) {
             return Future.failedFuture("OTP is required");
         }
@@ -563,7 +666,33 @@ public class UserService {
         });
     }
 
+    private Future<Void> resendBootstrapOtp(String email) {
+        return otpRepository.findByUserIdAndType(email, com.campusskills.modules.users.models.OtpVerification.TYPE_BOOTSTRAP_SUPER_ADMIN).compose(verification -> {
+            if (verification == null) {
+                return Future.failedFuture("No pending bootstrap verification found.");
+            }
+            long now = System.currentTimeMillis();
+            if (now - verification.getLastResentAt() < 60000) {
+                return Future.failedFuture("Please wait at least 1 minute before requesting a new OTP.");
+            }
+            String newOtp = generateOtp();
+            String newHash = BCrypt.hashpw(newOtp, BCrypt.gensalt());
+            Long newExpiry = now + 15 * 60 * 1000L;
+
+            return otpRepository.updateOtp(verification.getId(), newHash, newExpiry, now)
+                .compose(v -> {
+                    emailService.sendTwoFactorOtpEmail(email, newOtp)
+                        .onFailure(err -> log.error("[AUTH] Failed to resend bootstrap OTP email", err));
+                    return Future.succeededFuture();
+                });
+        });
+    }
+
     public Future<Void> resendTwoFactorOtp(String userId) {
+        if (userId != null && userId.contains("@")) {
+            return resendBootstrapOtp(userId);
+        }
+
         return userRepository.findById(userId).compose(user -> {
             if (user == null) {
                 return Future.failedFuture("User not found");

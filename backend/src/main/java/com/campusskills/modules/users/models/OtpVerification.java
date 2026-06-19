@@ -9,6 +9,7 @@ public class OtpVerification {
     public static final String TYPE_EMAIL_VERIFICATION = "EMAIL_VERIFICATION";
     public static final String TYPE_PASSWORD_RESET = "PASSWORD_RESET";
     public static final String TYPE_TWO_FACTOR_LOGIN = "TWO_FACTOR_LOGIN";
+    public static final String TYPE_BOOTSTRAP_SUPER_ADMIN = "BOOTSTRAP_SUPER_ADMIN";
 
     @JsonProperty("_id")
     private String id;
@@ -19,6 +20,7 @@ public class OtpVerification {
     private Integer attempts = 0;
     private Long expiresAt;
     private Long lastResentAt;
+    private io.vertx.core.json.JsonObject metadata;
 
     public OtpVerification() {}
 
@@ -45,4 +47,7 @@ public class OtpVerification {
 
     public Long getLastResentAt() { return lastResentAt; }
     public void setLastResentAt(Long lastResentAt) { this.lastResentAt = lastResentAt; }
+
+    public io.vertx.core.json.JsonObject getMetadata() { return metadata; }
+    public void setMetadata(io.vertx.core.json.JsonObject metadata) { this.metadata = metadata; }
 }
