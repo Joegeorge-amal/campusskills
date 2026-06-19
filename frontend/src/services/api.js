@@ -106,11 +106,18 @@ api.interceptors.response.use(
             })
             .catch((err) => {
               processQueue(err, null);
-              console.error('[API] Refresh token expired or invalid.');
-              localStorage.clear();
-              const path = window.location.pathname;
-              if (path !== '/login' && path !== '/setup' && path !== '/') {
-                window.location.href = '/login';
+              console.error('[API] Refresh token request failed:', err);
+              
+              // Only clear local storage and redirect if it's a definitive 400 or 401 client error
+              const isSessionExpired = err.response && (err.response.status === 400 || err.response.status === 401);
+              
+              if (isSessionExpired) {
+                console.warn('[API] Session expired or invalid. Logging out.');
+                localStorage.clear();
+                const path = window.location.pathname;
+                if (path !== '/login' && path !== '/setup' && path !== '/') {
+                  window.location.href = '/login';
+                }
               }
               reject(err);
             })
