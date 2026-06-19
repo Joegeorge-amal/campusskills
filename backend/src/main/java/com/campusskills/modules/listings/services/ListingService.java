@@ -48,6 +48,15 @@ public class ListingService {
                 statsRepository.recordActivity(listing.getOwnerId())
                     .onFailure(err -> log.error("[LISTING] Failed to record activity", err));
             }
+            try {
+                com.campusskills.web.websockets.ConnectionManager.sendMessage(listing.getOwnerId(), 
+                    new com.campusskills.web.websockets.WebSocketMessageBuilder()
+                        .type(com.campusskills.shared.constants.WebSocketEventType.LISTING_CREATED)
+                        .payload(new io.vertx.core.json.JsonObject().put("listingId", listingId))
+                        .build());
+            } catch (Exception e) {
+                log.error("[WS] Failed to send LISTING_CREATED", e);
+            }
         });
     }
 
@@ -95,6 +104,15 @@ public class ListingService {
 
             return listingRepository.update(updates).onSuccess(v -> {
                 log.info("[LISTING] Updated listing | listingId={} ownerId={}", id, ownerId);
+                try {
+                    com.campusskills.web.websockets.ConnectionManager.sendMessage(ownerId, 
+                        new com.campusskills.web.websockets.WebSocketMessageBuilder()
+                            .type(com.campusskills.shared.constants.WebSocketEventType.LISTING_UPDATED)
+                            .payload(new io.vertx.core.json.JsonObject().put("listingId", id))
+                            .build());
+                } catch (Exception e) {
+                    log.error("[WS] Failed to send LISTING_UPDATED", e);
+                }
             });
         });
     }
@@ -106,6 +124,15 @@ public class ListingService {
             }
             return listingRepository.deactivate(id).onSuccess(v -> {
                 log.info("[LISTING] Deleted/Deactivated listing | listingId={} ownerId={}", id, ownerId);
+                try {
+                    com.campusskills.web.websockets.ConnectionManager.sendMessage(ownerId, 
+                        new com.campusskills.web.websockets.WebSocketMessageBuilder()
+                            .type(com.campusskills.shared.constants.WebSocketEventType.LISTING_DELETED)
+                            .payload(new io.vertx.core.json.JsonObject().put("listingId", id))
+                            .build());
+                } catch (Exception e) {
+                    log.error("[WS] Failed to send LISTING_DELETED", e);
+                }
             });
         });
     }

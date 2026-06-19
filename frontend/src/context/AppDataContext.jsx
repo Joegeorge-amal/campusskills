@@ -24,6 +24,7 @@ export const AppDataProvider = ({ children }) => {
   const [isChatsLoading, setIsChatsLoading] = useState(true);
   const [isRequestsLoading, setIsRequestsLoading] = useState(true);
   const [isSessionsLoading, setIsSessionsLoading] = useState(true);
+  const [myListingsCount, setMyListingsCount] = useState(null);
 
   const [notifications, setNotifications] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
@@ -59,12 +60,16 @@ export const AppDataProvider = ({ children }) => {
         initialLoadDone.current = true;
       }
 
-      const [chatsRes, exchangesData, chatReqsRes, sessionsRes] = await Promise.all([
+      const [chatsRes, exchangesData, chatReqsRes, sessionsRes, listingsRes] = await Promise.all([
         chatService.getUserChats().catch(e => { console.warn('fetchInitialData: chats failed', e); return { items: [] }; }),
         exchangeService.getMyExchanges().catch(e => { console.warn('fetchInitialData: exchanges failed', e); return []; }),
         chatRequestService.getUserRequests().catch(e => { console.warn('fetchInitialData: requests failed', e); return { items: [] }; }),
-        sessionService.getSessions().catch(e => { console.warn('fetchInitialData: sessions failed', e); return { items: [] }; })
+        sessionService.getSessions().catch(e => { console.warn('fetchInitialData: sessions failed', e); return { items: [] }; }),
+        listingService.searchListings({ ownerId: user.userId }).catch(e => { return { data: [] }; })
       ]);
+
+      const listingsData = listingsRes?.listings || listingsRes?.data || (Array.isArray(listingsRes) ? listingsRes : []);
+      setMyListingsCount(listingsData.length);
 
       const chatsData = chatsRes.items || [];
       const chatReqs = chatReqsRes.items || [];
@@ -598,6 +603,10 @@ export const AppDataProvider = ({ children }) => {
     ) {
       setSessionEvent({ type: lastMessage.type, session: lastMessage.payload });
       fetchInitialData();
+    } else if (lastMessage.type === 'LISTING_CREATED') {
+      setMyListingsCount(prev => (prev || 0) + 1);
+    } else if (lastMessage.type === 'LISTING_DELETED') {
+      setMyListingsCount(prev => Math.max(0, (prev || 0) - 1));
     }
   }, [lastMessage, user?.userId, fetchInitialData]);
 
@@ -617,6 +626,9 @@ export const AppDataProvider = ({ children }) => {
         isRequestsLoading,
         sessionsData,
         isSessionsLoading,
+        myListingsCount,
+        sessionEvent,
+        notifications,
         fetchInitialData,
         fetchSessionsOnly,
         toastMessage,

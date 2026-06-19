@@ -17,6 +17,7 @@ import {
   IconActivity
 } from '@tabler/icons-react';
 
+
 const Dashboard = () => {
   const [isCreateSessionOpen, setIsCreateSessionOpen] = React.useState(false);
   const { user } = useAuth();
@@ -24,26 +25,15 @@ const Dashboard = () => {
     sessionsData = [], 
     requestsData = [],
     isSessionsLoading,
-    isRequestsLoading
+    isRequestsLoading,
+    myListingsCount
   } = useAppData();
   const navigate = useNavigate();
 
   // Get completed sessions
   const completedSessions = sessionsData.filter(s => s.status === 'COMPLETED');
 
-  // Fetch real active listing count
-  const [activeListingCount, setActiveListingCount] = useState(0);
-  useEffect(() => {
-    const userId = user?.userId || user?.id || user?._id;
-    if (userId) {
-      listingService.searchListings({ ownerId: userId })
-        .then(res => {
-          const listings = res?.listings || res?.data || (Array.isArray(res) ? res : []);
-          setActiveListingCount(listings.length);
-        })
-        .catch(() => setActiveListingCount(0));
-    }
-  }, [user?.userId, user?.id, user?._id]);
+
 
   // Stats
   const stats = {
@@ -208,7 +198,7 @@ const Dashboard = () => {
               <IconSparkles size={22} strokeWidth={1.5} />
             </div>
             <div>
-              <div style={{ fontSize: '28px', fontWeight: 800, color: '#111827', lineHeight: 1.1, marginBottom: '4px' }}>{activeListingCount}</div>
+              <div style={{ fontSize: '28px', fontWeight: 800, color: '#111827', lineHeight: 1.1, marginBottom: '4px' }}>{myListingsCount || 0}</div>
               <div style={{ fontSize: '12px', color: '#4b5563', fontWeight: 700, lineHeight: 1.3 }}>Active Listings</div>
             </div>
           </div>
