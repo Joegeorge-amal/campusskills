@@ -234,9 +234,14 @@ const PublicProfile = () => {
       <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 24px' }}>
         {/* Name and Basic Info */}
         <div style={{ marginBottom: '32px' }}>
-          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#111827', marginBottom: '8px', letterSpacing: '-0.5px' }}>
+          <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#111827', marginBottom: '4px', letterSpacing: '-0.5px' }}>
             {profileData.name}
           </h1>
+          {profileData.rollNo && (
+            <div style={{ fontSize: '14px', color: '#9ca3af', fontWeight: 500, marginBottom: '8px' }}>
+              {profileData.rollNo.toUpperCase()}
+            </div>
+          )}
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', color: '#6b7280', fontSize: '15px', fontWeight: 500 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <IconMapPin size={18} />

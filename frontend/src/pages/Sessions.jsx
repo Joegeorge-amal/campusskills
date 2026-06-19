@@ -371,7 +371,7 @@ const Sessions = () => {
               )}
             </div>
             <div style={{ fontSize: '12px', color: '#6b7280' }}>
-              {s.role === 'Teaching' ? `Teaching ${s.name}` : `Learning from ${s.name}`} · {s.time}
+              {s.role === 'Teaching' ? `Teaching ${s.name}` : `Learning from ${s.name}`}{s.otherUser?.rollNo ? ` · ${s.otherUser.rollNo.toUpperCase()}` : ''} · {s.time}
             </div>
           </div>
 
@@ -428,7 +428,7 @@ const Sessions = () => {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
               <div>
                 <div style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase' }}>Participant</div>
-                <div style={{ fontSize: '13px', color: '#374151', marginTop: '2px' }}>{s.name}</div>
+                <div style={{ fontSize: '13px', color: '#374151', marginTop: '2px' }}>{s.name}{s.otherUser?.rollNo ? ` · ${s.otherUser.rollNo.toUpperCase()}` : ''}</div>
               </div>
               <div>
                 <div style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase' }}>Date & Time</div>

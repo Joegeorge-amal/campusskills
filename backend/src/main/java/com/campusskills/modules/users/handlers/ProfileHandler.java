@@ -1,8 +1,10 @@
 package com.campusskills.modules.users.handlers;
 
 import java.util.List;
+import com.campusskills.modules.users.models.User;
 import com.campusskills.modules.users.models.UserProfile;
 import com.campusskills.modules.users.repositories.UserProfileRepository;
+import com.campusskills.modules.users.repositories.UserRepository;
 import com.campusskills.modules.sessions.models.Session;
 import com.campusskills.web.response.ApiResponse;
 import io.vertx.core.json.JsonObject;
@@ -21,12 +23,14 @@ public class ProfileHandler {
     private final UserStatsRepository userStatsRepository;
     private final ListingRepository listingRepository;
     private final SessionRepository sessionRepository;
+    private final UserRepository userRepository;
 
     public ProfileHandler(UserProfileRepository userProfileRepository, UserStatsRepository userStatsRepository, ListingRepository listingRepository, SessionRepository sessionRepository) {
         this.userProfileRepository = userProfileRepository;
         this.userStatsRepository = userStatsRepository;
         this.listingRepository = listingRepository;
         this.sessionRepository = sessionRepository;
+        this.userRepository = new UserRepository();
     }
 
     public void getPublicProfile(RoutingContext ctx) {
@@ -112,10 +116,24 @@ public class ProfileHandler {
             return scores;
         });
 
-        Future.all(profileFut, statsFut, verifFut, sessionsFut).map(composite -> {
+        Future<User> userFut = userRepository.findById(userId);
+
+        Future.all(profileFut, statsFut, verifFut, sessionsFut, userFut).map(composite -> {
             UserProfile profile = profileFut.result();
             if (profile == null) {
                 throw new RuntimeException("PROFILE_NOT_FOUND");
+            }
+
+            // Migration-on-read: populate rollNo if missing
+            if (profile.getRollNo() == null || profile.getRollNo().isEmpty()) {
+                User user = userFut.result();
+                if (user != null && user.getEmail() != null) {
+                    String derived = user.getEmail().substring(0, user.getEmail().indexOf("@")).toLowerCase();
+                    if (derived != null && !derived.isEmpty()) {
+                        profile.setRollNo(derived);
+                        userProfileRepository.updateRollNo(userId, derived);
+                    }
+                }
             }
 
             List<Session> completedSessions = sessionsFut.result();
