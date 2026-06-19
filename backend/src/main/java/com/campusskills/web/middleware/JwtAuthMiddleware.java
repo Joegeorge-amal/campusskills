@@ -31,6 +31,19 @@ public class JwtAuthMiddleware {
                         return;
                     }
                     
+                    if (userId.contains("@")) {
+                        // Bypass DB check for temporary bootstrap super admin token
+                        ctx.put("authenticatedUserId", userId);
+                        if (role != null) {
+                            ctx.put("authenticatedUserRole", role);
+                        }
+                        if (principal.containsKey("twoFactorVerified")) {
+                            ctx.put("twoFactorVerified", principal.getBoolean("twoFactorVerified"));
+                        }
+                        ctx.next();
+                        return;
+                    }
+                    
                     // Verify user still exists in DB
                     userRepository.findById(userId)
                         .onSuccess(foundUser -> {
