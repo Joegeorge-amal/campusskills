@@ -76,18 +76,20 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('cs_refresh_token', refreshToken);
       }
 
-      // Fetch full profile mapping
-      const profileRes = await userService.getMe();
-      const fullData = profileRes.data || profileRes;
-      const fullUser = {
-        ...userData,
-        ...(fullData.user || {}),
-        ...(fullData.profile || {}),
-        stats: fullData.stats,
-        wallet: fullData.wallet
-      };
+      let fullUser = { ...userData };
 
       if (!userData.requiresOtp) {
+        // Fetch full profile mapping
+        const profileRes = await userService.getMe();
+        const fullData = profileRes.data || profileRes;
+        fullUser = {
+          ...userData,
+          ...(fullData.user || {}),
+          ...(fullData.profile || {}),
+          stats: fullData.stats,
+          wallet: fullData.wallet
+        };
+
         setUser(fullUser);
         setRole(fullUser.role?.toLowerCase() || 'student');
         setIsAuthenticated(true);
