@@ -56,7 +56,7 @@ const AdminSessions = () => {
 
   // Compute stats locally from fetched data
   const liveCount = sessions.filter(s => s.status === 'LIVE' || s.status === 'IN_PROGRESS').length;
-  const upcomingCount = sessions.filter(s => s.status === 'UPCOMING' || s.status === 'PENDING').length;
+  const upcomingCount = sessions.filter(s => s.status === 'SCHEDULED' || s.status === 'PENDING').length;
   const completedCount = sessions.filter(s => s.status === 'COMPLETED').length;
   const todayCount = liveCount + upcomingCount + completedCount; // Approximate for demo
 
