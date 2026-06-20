@@ -80,10 +80,7 @@ const AppHeader = ({
         </div>
       </div>
       
-      {showSearch && !isNotificationOpen && (
-        <GlobalSearch />
-      )}
-
+      {/* GlobalSearch removed as per user request */}
       <div className="topbar-actions">
         
         {isAdminMode && (
