@@ -33,7 +33,7 @@ public class ListingRepository {
     }
 
     public Future<Listing> findById(String id) {
-        JsonObject query = new JsonObject().put("_id", id);
+        JsonObject query = new JsonObject().put("_id", new JsonObject().put("$oid", id));
         io.vertx.core.json.JsonArray pipeline = new io.vertx.core.json.JsonArray()
             .add(new JsonObject().put("$match", query))
             .add(new JsonObject().put("$lookup", new JsonObject()
@@ -70,7 +70,7 @@ public class ListingRepository {
     public Future<Void> update(Listing listing) {
         listing.prepareForSave(); // Trigger dual-write sync
         listing.setUpdatedAt(System.currentTimeMillis());
-        JsonObject query = new JsonObject().put("_id", listing.getId());
+        JsonObject query = new JsonObject().put("_id", new JsonObject().put("$oid", listing.getId()));
         JsonObject doc = JsonObject.mapFrom(listing);
         doc.remove("_id");
         JsonObject update = new JsonObject().put("$set", doc);
@@ -78,7 +78,7 @@ public class ListingRepository {
     }
 
     public Future<Void> deactivate(String id) {
-        JsonObject query = new JsonObject().put("_id", id);
+        JsonObject query = new JsonObject().put("_id", new JsonObject().put("$oid", id));
         JsonObject update = new JsonObject().put("$set", new JsonObject()
             .put("active", false)
             .put("updatedAt", System.currentTimeMillis()));
@@ -86,7 +86,7 @@ public class ListingRepository {
     }
 
     public Future<Void> incrementRequestCount(String id) {
-        JsonObject query = new JsonObject().put("_id", id);
+        JsonObject query = new JsonObject().put("_id", new JsonObject().put("$oid", id));
         JsonObject update = new JsonObject().put("$inc", new JsonObject().put("requestCount", 1));
         return client.updateCollection(COLLECTION, query, update).mapEmpty();
     }

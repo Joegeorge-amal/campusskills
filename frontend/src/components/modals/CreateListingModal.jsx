@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { useAppData } from '../../context/AppDataContext';
 import { useAuth } from '../../context/AuthContext';
-import { IconX, IconPlus, IconTrash } from '@tabler/icons-react';
+import { IconX, IconPlus, IconTrash, IconChevronDown } from '@tabler/icons-react';
+
+const formatTime12hr = (time24) => {
+  if (!time24) return '';
+  const [h, m] = time24.split(':');
+  const hours = parseInt(h, 10);
+  const period = hours >= 12 ? 'PM' : 'AM';
+  const hours12 = hours % 12 || 12;
+  return `${hours12}:${m} ${period}`;
+};
+
 import { listingService } from '../../services/listingService';
 import MarketplaceCard from '../common/MarketplaceCard/MarketplaceCard';
 import AutocompleteInput from '../AutocompleteInput';
@@ -456,7 +466,7 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
                 <div key={i} style={{ display: 'flex', justifyContent: 'space-between', background: i === 0 ? '#eff6ff' : '#fff', padding: '8px 12px', border: i === 0 ? '1px solid #bfdbfe' : '1px solid #e5e7eb', borderRadius: '6px', fontSize: '13px' }}>
                   <span>
                     <strong style={{ color: i === 0 ? '#1d4ed8' : '#6b7280', marginRight: '6px' }}>{i === 0 ? 'Primary:' : 'Alternate:'}</strong>
-                    {s.dayOfWeek} at {s.startTime} ({s.durationMinutes}m)
+                    {s.dayOfWeek} at {formatTime12hr(s.startTime)} ({s.durationMinutes}m)
                   </span>
                   <button type="button" onClick={() => handleRemoveSlot(i)} style={{background:'none', border:'none', color:'#ef4444', cursor:'pointer'}}><IconTrash size={14}/></button>
                 </div>
@@ -536,7 +546,7 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
                     {slots.map((s, i) => (
                       <div key={i} style={{ background: i === 0 ? '#eff6ff' : '#ffffff', border: i === 0 ? '1px solid #bfdbfe' : '1px solid #d1d5db', padding: '6px 12px', borderRadius: '6px', fontSize: '12px', color: i === 0 ? '#1e3a8a' : '#374151', fontWeight: 500 }}>
                         <span style={{ fontWeight: 700, marginRight: '4px', color: i === 0 ? '#1d4ed8' : '#6b7280' }}>{i === 0 ? 'Primary:' : 'Alternate:'}</span>
-                        {s.dayOfWeek} • {s.startTime} ({s.durationMinutes}m)
+                        {s.dayOfWeek} • {formatTime12hr(s.startTime)} ({s.durationMinutes}m)
                       </div>
                     ))}
                   </div>
