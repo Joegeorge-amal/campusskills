@@ -18,7 +18,8 @@ import {
   IconCircle,
   IconCamera,
   IconTrash,
-  IconX
+  IconX,
+  IconPencil
 } from '@tabler/icons-react';
 import SkillQuizModal from '../components/modals/SkillQuizModal';
 import CreateListingModal from '../components/modals/CreateListingModal';
