@@ -185,6 +185,28 @@ const Marketplace = () => {
         <div id="marketplace-scroll-container" style={{ width: '100%', flexShrink: 0, padding: selectedSkill ? '16px' : '24px 32px', overflowY: 'auto', background: 'linear-gradient(180deg, #fafafa 0%, #f8f9ff 100%)', height: '100%' }}>
           
           <div style={{ width: selectedSkill ? '320px' : '100%', maxWidth: '1200px', margin: selectedSkill ? '0' : '0 auto' }}>
+            
+            <div style={{ position: 'relative', marginBottom: '16px' }}>
+              <IconSearch style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--cs-text-inactive)' }} size={16} />
+              <input 
+                type="text" 
+                placeholder="Search listings..." 
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px 12px 10px 36px',
+                  borderRadius: '100px',
+                  border: '1px solid var(--cs-border)',
+                  background: '#fff',
+                  fontSize: '13px',
+                  outline: 'none',
+                  color: 'var(--cs-text-main)',
+                  boxShadow: '0 1px 2px rgba(0,0,0,0.05)'
+                }}
+              />
+            </div>
+
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <CategoryFilterTabs 
