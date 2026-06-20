@@ -608,7 +608,7 @@ const Profile = () => {
                         <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e' }}></div>
                         <div style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>{skill}</div>
                       </div>
-                      <button onClick={() => setSkillToRemove(skill)} style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px' }}>
+                      <button onClick={() => setSkillToRemove(skill)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', transition: 'color 0.2s' }}>
                         <IconTrash size={16} />
                       </button>
                     </div>
