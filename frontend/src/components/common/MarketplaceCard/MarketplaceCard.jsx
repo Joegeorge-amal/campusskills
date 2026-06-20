@@ -104,7 +104,7 @@ const MarketplaceCard = ({
           </div>
         </div>
         {actionButtons && (
-          <div className="mc-actions" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <div className="mc-actions" style={{ display: 'flex', flexDirection: 'row', gap: '8px' }}>
             {actionButtons}
           </div>
         )}

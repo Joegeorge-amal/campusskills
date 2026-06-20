@@ -721,15 +721,17 @@ const Profile = () => {
                         <>
                           <button 
                             onClick={(e) => { e.stopPropagation(); setEditingListing(listing); }}
-                            style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#f8fafc', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#475569', transition: 'all 0.2s', padding: 0 }}
+                            style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#475569', transition: 'color 0.2s', padding: 0, display: 'flex', alignItems: 'center' }}
+                            title="Edit Listing"
                           >
-                            <IconPencil size={16} strokeWidth={2} />
+                            <IconPencil size={18} strokeWidth={2} />
                           </button>
                           <button 
                             onClick={(e) => { e.stopPropagation(); setListingToDelete(listing); }}
-                            style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#fef2f2', border: '1px solid #fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#dc2626', transition: 'all 0.2s', padding: 0 }}
+                            style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#ef4444', transition: 'color 0.2s', padding: 0, display: 'flex', alignItems: 'center' }}
+                            title="Delete Listing"
                           >
-                            <IconTrash size={16} strokeWidth={2} />
+                            <IconTrash size={18} strokeWidth={2} />
                           </button>
                         </>
                       }
