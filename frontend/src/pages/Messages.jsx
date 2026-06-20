@@ -534,19 +534,8 @@ const Messages = () => {
         {/* Left: Chat List */}
         <div style={{ width: '280px', display: 'flex', flexDirection: 'column', borderRight: '0.5px solid var(--cs-border)' }}>
           <div style={{ boxSizing: 'border-box', padding: '16px', borderBottom: '0.5px solid var(--cs-border)', display: 'flex', flexDirection: 'column' }}>
-            <div style={{ position: 'relative' }}>
-              <IconSearch style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--cs-text-inactive)' }} size={14} />
-              <input 
-                type="text" 
-                placeholder="Search..." 
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                style={{ width: '100%', padding: '8px 12px 8px 30px', borderRadius: '100px', border: '1px solid var(--cs-border)', background: '#f3f4f6', fontSize: '13px', outline: 'none', color: 'var(--cs-text-main)' }}
-              />
-            </div>
-            
             {/* Filter Pills */}
-            <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
+            <div style={{ display: 'flex', gap: '8px' }}>
               {['all', 'unread', 'read'].map(filter => (
                 <button
                   key={filter}
