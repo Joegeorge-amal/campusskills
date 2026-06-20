@@ -6,7 +6,7 @@ import CategoryFilterTabs from '../components/common/CategoryFilterTabs/Category
 import BookSessionModal from '../components/modals/BookSessionModal';
 import InitialMessageModal from '../components/modals/InitialMessageModal';
 import LoadingSpinner from '../components/common/LoadingSpinner';
-import { IconStar, IconUser, IconMessageCircle, IconRefresh } from '@tabler/icons-react';
+import { IconStar, IconUser, IconMessageCircle, IconRefresh, IconSearch } from '@tabler/icons-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { listingService } from '../services/listingService';
 import { exchangeService } from '../services/exchangeService';
@@ -19,7 +19,7 @@ let cachedListings = null;
 
 const Marketplace = () => {
   const navigate = useNavigate();
-  const { triggerToast, searchQuery } = useAppData();
+  const { triggerToast, searchQuery, setSearchQuery } = useAppData();
   const { user } = useAuth();
   const [skills, setSkills] = useState(cachedListings || []);
   const [pendingSkills, setPendingSkills] = useState([]);
