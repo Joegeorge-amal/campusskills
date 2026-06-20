@@ -706,33 +706,33 @@ const Profile = () => {
                 const primarySkill = listing.offeredSkills?.[0]?.name || listing.requestedSkills?.[0]?.name || 'Unknown';
                 const isVerified = user?.verifiedSkills?.includes(primarySkill) || false;
                 return (
-                  <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <div style={{ pointerEvents: 'none' }}>
-                      <MarketplaceCard 
-                        title={listing.title}
-                        category={listing.category}
-                        price={listing.listingType === 'SWAP' ? 'Skill Swap' : (listing.price ? `₹${listing.price}/hr` : 'Free')}
-                        user={{ name: user?.name || 'You', year: user?.year || 'Unknown', branch: user?.programme || 'Not specified' }}
-                        rating={listing.averageRating || 0}
-                        sessionsCount={listing.reviewCount || 0}
-                        mode={listing.availability === 'ONLINE' ? 'Online' : 'In-person'}
-                        isVerified={isVerified}
-                      />
-                    </div>
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <button 
-                        onClick={() => setEditingListing(listing)}
-                        style={{ flex: 1, padding: '8px', background: '#e5e7eb', color: '#374151', border: 'none', borderRadius: '6px', fontWeight: 600, fontSize: '12px', cursor: 'pointer' }}
-                      >
-                        Edit
-                      </button>
-                      <button 
-                        onClick={() => setListingToDelete(listing)}
-                        style={{ flex: 1, padding: '8px', background: '#fee2e2', color: '#dc2626', border: 'none', borderRadius: '6px', fontWeight: 600, fontSize: '12px', cursor: 'pointer' }}
-                      >
-                        Delete
-                      </button>
-                    </div>
+                  <div key={i}>
+                    <MarketplaceCard 
+                      title={listing.title}
+                      category={listing.category}
+                      price={listing.listingType === 'SWAP' ? 'Skill Swap' : (listing.price ? `₹${listing.price}/hr` : 'Free')}
+                      user={{ name: user?.name || 'You', year: user?.year || 'Unknown', branch: user?.programme || 'Not specified' }}
+                      rating={listing.averageRating || 0}
+                      sessionsCount={listing.reviewCount || 0}
+                      mode={listing.availability === 'ONLINE' ? 'Online' : 'In-person'}
+                      isVerified={isVerified}
+                      actionButtons={
+                        <>
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); setEditingListing(listing); }}
+                            style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#f8fafc', border: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#475569', transition: 'all 0.2s', padding: 0 }}
+                          >
+                            <IconPencil size={16} strokeWidth={2} />
+                          </button>
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); setListingToDelete(listing); }}
+                            style={{ width: '32px', height: '32px', borderRadius: '50%', background: '#fef2f2', border: '1px solid #fee2e2', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#dc2626', transition: 'all 0.2s', padding: 0 }}
+                          >
+                            <IconTrash size={16} strokeWidth={2} />
+                          </button>
+                        </>
+                      }
+                    />
                   </div>
                 );
               })}

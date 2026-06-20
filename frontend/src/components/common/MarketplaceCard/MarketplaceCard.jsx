@@ -16,6 +16,7 @@ const MarketplaceCard = ({
   onClick,
   description,
   skills,
+  actionButtons,
   variant = 'marketplace'
 }) => {
   const isPureRequesting = typeLabel === 'Requesting';
@@ -91,15 +92,22 @@ const MarketplaceCard = ({
         {[user?.name, user?.year, user?.branch].filter(Boolean).join(' · ')}
       </div>
       
-      <div className="mc-footer">
-        <div className="mc-rating-block">
-          <IconStarFilled className="mc-star-icon" />
-          <span className="mc-rating-text">{rating}</span>
-          <span className="mc-sessions-text">&middot; {sessionsCount} sessions</span>
+      <div className="mc-footer" style={actionButtons ? { alignItems: 'flex-end' } : {}}>
+        <div style={actionButtons ? { display: 'flex', flexDirection: 'column', gap: '6px' } : { display: 'contents' }}>
+          <div className="mc-rating-block">
+            <IconStarFilled className="mc-star-icon" />
+            <span className="mc-rating-text">{rating}</span>
+            <span className="mc-sessions-text">&middot; {sessionsCount} sessions</span>
+          </div>
+          <div className="mc-mode">
+            <span className={`mc-dot ${mode.toLowerCase().includes('online') ? 'online' : 'offline'}`}></span> {mode}
+          </div>
         </div>
-        <div className="mc-mode">
-          <span className={`mc-dot ${mode.toLowerCase().includes('online') ? 'online' : 'offline'}`}></span> {mode}
-        </div>
+        {actionButtons && (
+          <div className="mc-actions" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {actionButtons}
+          </div>
+        )}
       </div>
     </div>
   );
