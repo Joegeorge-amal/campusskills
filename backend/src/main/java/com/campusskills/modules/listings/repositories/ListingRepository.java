@@ -33,6 +33,7 @@ public class ListingRepository {
     }
 
     public Future<Listing> findById(String id) {
+        if (id == null || id.length() != 24) return Future.succeededFuture(null);
         JsonObject query = new JsonObject().put("_id", new JsonObject().put("$oid", id));
         io.vertx.core.json.JsonArray pipeline = new io.vertx.core.json.JsonArray()
             .add(new JsonObject().put("$match", query))
@@ -68,6 +69,7 @@ public class ListingRepository {
     }
 
     public Future<Void> update(Listing listing) {
+        if (listing.getId() == null || listing.getId().length() != 24) return Future.failedFuture("INVALID_ID");
         listing.prepareForSave(); // Trigger dual-write sync
         listing.setUpdatedAt(System.currentTimeMillis());
         JsonObject query = new JsonObject().put("_id", new JsonObject().put("$oid", listing.getId()));
@@ -78,6 +80,7 @@ public class ListingRepository {
     }
 
     public Future<Void> deactivate(String id) {
+        if (id == null || id.length() != 24) return Future.failedFuture("INVALID_ID");
         JsonObject query = new JsonObject().put("_id", new JsonObject().put("$oid", id));
         JsonObject update = new JsonObject().put("$set", new JsonObject()
             .put("active", false)
@@ -86,6 +89,7 @@ public class ListingRepository {
     }
 
     public Future<Void> incrementRequestCount(String id) {
+        if (id == null || id.length() != 24) return Future.failedFuture("INVALID_ID");
         JsonObject query = new JsonObject().put("_id", new JsonObject().put("$oid", id));
         JsonObject update = new JsonObject().put("$inc", new JsonObject().put("requestCount", 1));
         return client.updateCollection(COLLECTION, query, update).mapEmpty();

@@ -209,6 +209,7 @@ public class ListingHandler {
         Listing listing;
         try {
             listing = body.mapTo(Listing.class);
+            listing.setId(id); // Ensure the ID from path parameter is set on the object
         } catch (IllegalArgumentException e) {
             ApiResponse.badRequest(ctx, "Invalid payload or enum value");
             return;
