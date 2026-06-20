@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { IconMenu2, IconFilter, IconSun, IconMoon, IconUser, IconLogout } from '@tabler/icons-react';
 import { useAuth } from '../../../context/AuthContext';
 import { useTheme } from '../../../context/ThemeContext';
@@ -31,6 +31,7 @@ const AppHeader = ({
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const { toggleTheme, isDark } = useTheme();
   const { logout } = useAuth();
 
@@ -80,7 +81,10 @@ const AppHeader = ({
         </div>
       </div>
       
-      {/* GlobalSearch removed as per user request */}
+      {showSearch && !isNotificationOpen && !location.pathname.includes('/app/messages') && !location.pathname.includes('/app/marketplace') && (
+        <GlobalSearch />
+      )}
+
       <div className="topbar-actions">
         
         {isAdminMode && (
