@@ -34,15 +34,16 @@ const Profile = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [reviewsLoaded, setReviewsLoaded] = useState(false);
+  const [hasReviews, setHasReviews] = useState(false);
+  const hasScrolledRef = useRef(false);
+
+  const handleReviewsLoaded = (items) => {
+    setHasReviews(items && items.length > 0);
+    setReviewsLoaded(true);
+  };
+
   useEffect(() => {
-    if (location.state?.scrollToReviews) {
-      setTimeout(() => {
-        const el = document.getElementById('reviews-section');
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }, 300);
-    }
     if (location.state?.scrollToVerified) {
       setTimeout(() => {
         const el = document.getElementById('verified-skills-section');
@@ -52,6 +53,26 @@ const Profile = () => {
       }, 300);
     }
   }, [location.state]);
+
+  useEffect(() => {
+    if (location.state?.scrollToReviews && reviewsLoaded && !hasScrolledRef.current) {
+      hasScrolledRef.current = true;
+      setTimeout(() => {
+        const el = document.getElementById('reviews-section');
+        const mainContent = document.querySelector('.main');
+        if (el && mainContent) {
+          if (hasReviews) {
+            const rect = el.getBoundingClientRect();
+            const mainRect = mainContent.getBoundingClientRect();
+            const scrollTop = mainContent.scrollTop + rect.top - mainRect.top - 10;
+            mainContent.scrollTo({ top: scrollTop, behavior: 'smooth' });
+          } else {
+            mainContent.scrollTo({ top: mainContent.scrollHeight, behavior: 'smooth' });
+          }
+        }
+      }, 100);
+    }
+  }, [location.state, reviewsLoaded, hasReviews]);
 
   const [newSkill, setNewSkill] = useState('');
   const [activeQuizSkill, setActiveQuizSkill] = useState(null);
@@ -749,6 +770,7 @@ const Profile = () => {
             userId={user?.userId || user?.id || user?._id}
             averageRating={user?.stats?.ratingAvg}
             reviewCount={user?.stats?.ratingCount}
+            onLoaded={handleReviewsLoaded}
           />
         </div>
       </div>

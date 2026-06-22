@@ -62,7 +62,11 @@ public class ReviewRepository {
     }
 
     public Future<List<Review>> fetchUserReviews(String userId, int skip, int limit) {
-        JsonObject query = new JsonObject().put("revieweeId", userId);
+        JsonObject query = new JsonObject()
+                .put("revieweeId", userId)
+                .put("comment", new JsonObject()
+                    .put("$nin", new io.vertx.core.json.JsonArray().add("").add(null))
+                );
         FindOptions options = new FindOptions()
                 .setSort(new JsonObject().put("createdAt", -1))
                 .setSkip(skip)

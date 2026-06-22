@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { reviewService } from '../../services/reviewService';
 import { IconStar, IconStarFilled } from '@tabler/icons-react';
 
-const ReviewSection = ({ userId, averageRating, reviewCount }) => {
+const ReviewSection = ({ userId, averageRating, reviewCount, onLoaded }) => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -11,10 +11,17 @@ const ReviewSection = ({ userId, averageRating, reviewCount }) => {
     setLoading(true);
     reviewService.getUserReviews(userId)
       .then(data => {
-        setReviews(data?.items || []);
+        const items = data?.items || [];
+        setReviews(items);
+        if (onLoaded) {
+          onLoaded(items);
+        }
       })
       .catch(err => {
         console.error("Failed to load reviews", err);
+        if (onLoaded) {
+          onLoaded([]);
+        }
       })
       .finally(() => {
         setLoading(false);
@@ -102,7 +109,7 @@ const ReviewSection = ({ userId, averageRating, reviewCount }) => {
       {loading ? (
         <div style={{ color: '#6b7280', fontSize: '14px', padding: '16px 0', textAlign: 'center' }}>Loading reviews...</div>
       ) : reviews.length > 0 ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div id="reviews-list-top" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {reviews.map((rev) => (
             <div key={rev._id || rev.id} style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
