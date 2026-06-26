@@ -139,10 +139,16 @@ public class ProfileHandler {
             List<Session> completedSessions = sessionsFut.result();
             int actualCount = completedSessions != null ? completedSessions.size() : 0;
             long actualMinutes = 0;
+            JsonArray activityTimestamps = new JsonArray();
             if (completedSessions != null) {
                 for (Session s : completedSessions) {
                     if (s.getScheduledEnd() != null && s.getScheduledStart() != null) {
                         actualMinutes += (s.getScheduledEnd() - s.getScheduledStart()) / 60000;
+                    }
+                    if (s.getScheduledEnd() != null) {
+                        activityTimestamps.add(s.getScheduledEnd());
+                    } else if (s.getUpdatedAt() != null) {
+                        activityTimestamps.add(s.getUpdatedAt());
                     }
                 }
             }
@@ -150,6 +156,7 @@ public class ProfileHandler {
             JsonObject statsJson = statsFut.result();
             statsJson.put("sessionsCompleted", actualCount);
             statsJson.put("totalMinutes", (int) actualMinutes);
+            statsJson.put("activityTimestamps", activityTimestamps);
 
             JsonObject profileJson = JsonObject.mapFrom(profile);
             profileJson.remove("_id");

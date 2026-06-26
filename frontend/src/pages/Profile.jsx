@@ -152,12 +152,44 @@ const Profile = () => {
   }, []);
 
   const heatmapData = React.useMemo(() => {
-    return [...Array(24)].map(() => 
-      [...Array(7)].map(() => {
-        return { level: 0, opacity: 0.1 };
-      })
-    );
-  }, []);
+    const data = [...Array(24)].map(() => [...Array(7)].map(() => ({ level: 0, opacity: 0.1, count: 0 })));
+    if (!user?.stats?.activityTimestamps || !Array.isArray(user.stats.activityTimestamps)) return data;
+    
+    const timestamps = user.stats.activityTimestamps;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const counts = {};
+    timestamps.forEach(ts => {
+      const d = new Date(ts);
+      d.setHours(0, 0, 0, 0);
+      const diffTime = today.getTime() - d.getTime();
+      const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays >= 0 && diffDays < 24 * 7) {
+        counts[diffDays] = (counts[diffDays] || 0) + 1;
+      }
+    });
+
+    const todayDayOfWeek = today.getDay(); // 0 (Sun) to 6 (Sat)
+    
+    for (let i = 0; i < 24 * 7; i++) {
+      const colIndex = 23 - Math.floor(i / 7);
+      let rowIndex = (todayDayOfWeek - (i % 7)) % 7;
+      if (rowIndex < 0) rowIndex += 7;
+
+      const count = counts[i] || 0;
+      let level = 0;
+      let opacity = 0.1;
+      if (count > 0) {
+        level = Math.min(count, 4);
+        opacity = 0.25 + (level * 0.15); // max 0.85 opacity
+      }
+      data[colIndex][rowIndex] = { level, opacity, count };
+    }
+    
+    return data;
+  }, [user?.stats?.activityTimestamps]);
 
   const [bannerGradient, setBannerGradient] = useState(null);
 
@@ -415,7 +447,7 @@ const Profile = () => {
                   {col.map((cell, rowIndex) => (
                     <div 
                       key={rowIndex} 
-                      onMouseEnter={() => setHoveredCell({ colIndex, rowIndex, level: cell.level })}
+                      onMouseEnter={() => setHoveredCell({ colIndex, rowIndex, level: cell.level, count: cell.count })}
                       onMouseLeave={() => setHoveredCell(null)}
                       style={{ 
                         position: 'relative',
@@ -445,7 +477,7 @@ const Profile = () => {
                           boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
                           pointerEvents: 'none'
                         }}>
-                          {cell.level === 0 ? 'No activity' : `${cell.level * 3} activities`} on this day
+                          {cell.count === 0 ? 'No activity' : `${cell.count} ${cell.count === 1 ? 'activity' : 'activities'}`} on this day
                         </div>
                       )}
                     </div>
