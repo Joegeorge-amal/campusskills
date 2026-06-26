@@ -102,7 +102,7 @@ public class UserService {
         if (email == null) return false;
         String env = Env.get("SUPER_ADMIN_EMAILS");
         if (env == null || env.trim().isEmpty()) {
-            env = "amaljogeorge@gmail.com";
+            return false;
         }
         String[] admins = env.split(",");
         for (String admin : admins) {
