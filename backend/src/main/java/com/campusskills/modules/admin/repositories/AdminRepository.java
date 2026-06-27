@@ -496,11 +496,29 @@ public class AdminRepository {
             });
     }
 
-    public Future<Boolean> updateUserStatus(String userId, boolean isActive) {
-        JsonObject query = new JsonObject().put("_id", userId);
-        JsonObject update = new JsonObject().put("$set", new JsonObject()
+    public Future<Boolean> updateUserStatus(String userId, boolean isActive, String category, String reason, String actorId) {
+        JsonObject query;
+        if (userId != null && userId.length() == 24 && userId.matches("^[0-9a-fA-F]+$")) {
+            query = new JsonObject().put("$or", new io.vertx.core.json.JsonArray()
+                .add(new JsonObject().put("_id", userId))
+                .add(new JsonObject().put("_id", new JsonObject().put("$oid", userId)))
+            );
+        } else {
+            query = new JsonObject().put("_id", userId);
+        }
+        
+        JsonObject setFields = new JsonObject()
             .put("isActive", isActive)
-            .put("updatedAt", System.currentTimeMillis()));
+            .put("updatedAt", System.currentTimeMillis());
+            
+        if (!isActive) {
+            setFields.put("suspensionCategory", category);
+            setFields.put("suspensionReason", reason);
+            setFields.put("suspendedAt", System.currentTimeMillis());
+            setFields.put("suspendedBy", actorId);
+        }
+            
+        JsonObject update = new JsonObject().put("$set", setFields);
         return client.updateCollection("users", query, update).map(res -> res.getDocModified() > 0);
     }
 

@@ -12,6 +12,7 @@ public class AdminService {
     private final com.campusskills.modules.users.repositories.UserRepository userRepository;
     private final com.campusskills.modules.users.repositories.UserProfileRepository userProfileRepository;
     private final io.vertx.core.eventbus.EventBus eventBus;
+    private com.campusskills.modules.admin.services.AuditLogService auditLogService;
 
     public AdminService(AdminRepository adminRepository, 
                         com.campusskills.modules.sessions.repositories.SessionRepository sessionRepository, 
@@ -23,6 +24,10 @@ public class AdminService {
         this.userRepository = userRepository;
         this.userProfileRepository = userProfileRepository;
         this.eventBus = eventBus;
+    }
+
+    public void setAuditLogService(com.campusskills.modules.admin.services.AuditLogService auditLogService) {
+        this.auditLogService = auditLogService;
     }
 
     public Future<Boolean> updateUserRole(String userId, com.campusskills.modules.users.models.UserRole role) {
@@ -85,11 +90,37 @@ public class AdminService {
         return adminRepository.searchSessions(q, status, page, limit);
     }
 
-    public Future<Boolean> updateUserStatus(String userId, boolean isActive) {
+    public Future<Boolean> updateUserStatus(String userId, boolean isActive, String category, String reason, com.campusskills.modules.users.models.User actor, com.campusskills.modules.users.models.UserRole actorRole, String ipAddress) {
         if (userId == null || userId.trim().isEmpty()) {
             return Future.failedFuture("User ID is required");
         }
-        return adminRepository.updateUserStatus(userId, isActive);
+        
+        return userRepository.findById(userId).compose(target -> {
+            if (target == null) {
+                return Future.succeededFuture(false);
+            }
+            
+            // Check suspension permissions
+            if (!com.campusskills.modules.admin.utils.RoleWeightUtils.canSuspend(actor.getEmail(), actorRole, target.getRole(), target.getEmail())) {
+                return Future.failedFuture("Permission denied: You do not have sufficient privileges to modify the status of this user");
+            }
+            
+            return adminRepository.updateUserStatus(userId, isActive, category, reason, actor.getId()).compose(updated -> {
+                if (updated && auditLogService != null) {
+                    String action = isActive ? "UNSUSPEND_USER" : "SUSPEND_USER";
+                    String fullReason = isActive ? "Unsuspended" : "Category: " + category + " - Reason: " + reason;
+                    
+                    auditLogService.logAction(
+                        action, 
+                        actor.getId(), actor.getEmail().split("@")[0], actor.getEmail(),
+                        target.getId(), target.getEmail().split("@")[0], target.getEmail(),
+                        target.getIsActive() != null ? target.getIsActive().toString() : "true", String.valueOf(isActive), 
+                        fullReason, ipAddress
+                    );
+                }
+                return Future.succeededFuture(updated);
+            });
+        });
     }
 
     public Future<Boolean> updateDisputeStatus(String sessionId, String status, String adminNotes) {

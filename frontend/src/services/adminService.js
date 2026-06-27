@@ -6,8 +6,12 @@ const adminService = {
     return response.data;
   },
 
-  updateUserStatus: async (userId, isActive) => {
-    const response = await api.patch(`/admin/users/${userId}/status`, { isActive });
+  updateUserStatus: async (userId, isActive, suspensionCategory, suspensionReason) => {
+    const response = await api.patch(`/admin/users/${userId}/status`, { 
+      isActive, 
+      suspensionCategory, 
+      suspensionReason 
+    });
     return response.data;
   },
 
@@ -95,6 +99,28 @@ const adminService = {
 
   updateSettings: async (settings) => {
     const response = await api.put('/admin/settings', settings);
+    return response.data;
+  },
+
+  // --- Admin Management ---
+
+  getCapabilities: async () => {
+    const response = await api.get('/admin/management/capabilities');
+    return response.data;
+  },
+
+  getStaff: async () => {
+    const response = await api.get('/admin/management/staff');
+    return response.data;
+  },
+
+  promoteUser: async (targetUserId, targetRole, reason) => {
+    const response = await api.post('/admin/management/promote', { targetUserId, targetRole, reason });
+    return response.data;
+  },
+
+  demoteUser: async (targetUserId, reason) => {
+    const response = await api.post('/admin/management/demote', { targetUserId, reason });
     return response.data;
   }
 };

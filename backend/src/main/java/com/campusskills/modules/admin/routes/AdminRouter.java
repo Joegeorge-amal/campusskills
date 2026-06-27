@@ -1,6 +1,7 @@
 package com.campusskills.modules.admin.routes;
 
 import com.campusskills.modules.admin.handlers.AdminHandler;
+import com.campusskills.modules.admin.handlers.AdminManagementHandler;
 import com.campusskills.modules.admin.repositories.AdminRepository;
 import com.campusskills.modules.admin.services.AdminService;
 import com.campusskills.web.middleware.JwtAuthMiddleware;
@@ -22,9 +23,24 @@ public class AdminRouter {
         com.campusskills.modules.notifications.repositories.NotificationRepository notificationRepository = new com.campusskills.modules.notifications.repositories.NotificationRepository();
         AdminHandler handler = new AdminHandler(service, notificationRepository);
 
+        com.campusskills.modules.admin.repositories.AuditLogRepository auditLogRepository = new com.campusskills.modules.admin.repositories.AuditLogRepository();
+        com.campusskills.modules.admin.services.AuditLogService auditLogService = new com.campusskills.modules.admin.services.AuditLogService();
+        service.setAuditLogService(auditLogService);
+        AdminManagementHandler managementHandler = new AdminManagementHandler(userRepository, auditLogService);
+
         router.route().handler(JwtAuthMiddleware.create(jwtAuth));
         
+        // Capabilities endpoint (available to any authenticated user who hits the admin panel, but mostly SUPER_ADMIN)
+        // Wait, standard users shouldn't really hit this, but we'll put it under the generic auth just in case.
+        // Or we can put it under RequireSuperAdminMiddleware. The requirement is for SUPER_ADMIN.
+        // Let's put it under RequireSuperAdminMiddleware.
+        
         // Super Admin only routes
+        router.get("/management/capabilities").handler(com.campusskills.web.middleware.RequireSuperAdminMiddleware.create()).handler(managementHandler::getCapabilities);
+        router.get("/management/staff").handler(com.campusskills.web.middleware.RequireSuperAdminMiddleware.create()).handler(managementHandler::getStaff);
+        router.post("/management/promote").handler(com.campusskills.web.middleware.RequireSuperAdminMiddleware.create()).handler(managementHandler::promote);
+        router.post("/management/demote").handler(com.campusskills.web.middleware.RequireSuperAdminMiddleware.create()).handler(managementHandler::demote);
+        
         router.patch("/users/:id/role").handler(com.campusskills.web.middleware.RequireSuperAdminMiddleware.create()).handler(handler::updateUserRole);
 
         // Admin and Super Admin routes

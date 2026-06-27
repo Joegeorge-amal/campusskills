@@ -152,13 +152,6 @@ const AdminUsers = () => {
                     )}
                   </div>
                   <div className="au-action" style={{ display: 'flex', gap: '8px' }}>
-                    {currentUser?.role === 'super_admin' && user.role !== 'SUPER_ADMIN' && (
-                      user.role === 'ADMIN' ? (
-                        <button className="au-btn-suspend" onClick={() => handleRoleChange(user, 'USER')}>Demote</button>
-                      ) : (
-                        <button className="au-btn-reinstate" onClick={() => handleRoleChange(user, 'ADMIN')}>Promote</button>
-                      )
-                    )}
                     {isActive ? (
                       <button 
                         className="au-btn-suspend"

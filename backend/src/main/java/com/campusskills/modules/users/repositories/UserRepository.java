@@ -58,6 +58,19 @@ public class UserRepository {
         });
     }
 
+    public Future<java.util.List<User>> findUsersByRoles(java.util.List<String> roles) {
+        JsonObject query = new JsonObject().put("role", new JsonObject().put("$in", new io.vertx.core.json.JsonArray(roles)));
+        return client.find(COLLECTION, query).map(list -> 
+            list.stream().map(doc -> {
+                Object idObj = doc.getValue("_id");
+                if (idObj instanceof JsonObject && ((JsonObject) idObj).containsKey("$oid")) {
+                    doc.put("_id", ((JsonObject) idObj).getString("$oid"));
+                }
+                return doc.mapTo(User.class);
+            }).collect(java.util.stream.Collectors.toList())
+        );
+    }
+
     public Future<User> findByEmailPrefix(String prefix) {
         if (prefix == null || prefix.trim().isEmpty()) {
             return Future.succeededFuture(null);
@@ -90,6 +103,29 @@ public class UserRepository {
             .put("role", role.name())
             .put("updatedAt", System.currentTimeMillis()));
         return client.updateCollection(COLLECTION, query, update).map(res -> res.getDocModified() > 0);
+    }
+
+    public Future<Boolean> promoteUser(String id, com.campusskills.modules.users.models.UserRole role, String promotedBy) {
+        JsonObject query;
+        if (id != null && id.length() == 24 && id.matches("^[0-9a-fA-F]+$")) {
+            query = new JsonObject().put("$or", new io.vertx.core.json.JsonArray()
+                .add(new JsonObject().put("_id", id))
+                .add(new JsonObject().put("_id", new JsonObject().put("$oid", id)))
+            );
+        } else {
+            query = new JsonObject().put("_id", id);
+        }
+        JsonObject update = new JsonObject().put("$set", new JsonObject()
+            .put("role", role.name())
+            .put("promotedBy", promotedBy)
+            .put("promotedAt", System.currentTimeMillis())
+            .put("updatedAt", System.currentTimeMillis()));
+        return client.updateCollection(COLLECTION, query, update).map(res -> res.getDocModified() > 0);
+    }
+
+    public Future<Long> countUsersByRole(com.campusskills.modules.users.models.UserRole role) {
+        JsonObject query = new JsonObject().put("role", role.name());
+        return client.count(COLLECTION, query);
     }
 
     public Future<java.util.List<String>> searchUserIdsByName(String q) {

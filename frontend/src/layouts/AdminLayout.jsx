@@ -12,7 +12,8 @@ import {
   IconCurrencyRupee,
   IconSettings,
   IconBook,
-  IconShieldCheck
+  IconShieldCheck,
+  IconShieldLock
 } from '@tabler/icons-react';
 import Toast from '../components/common/Toast';
 import AdminNotifications from '../components/admin/AdminNotifications';
@@ -72,6 +73,7 @@ const AdminLayout = () => {
   const navItems = [
     { label: 'Overview', path: '/admin/dashboard', icon: <IconLayoutDashboard size={18} /> },
     { label: 'Users', path: '/admin/users', icon: <IconUsers size={18} /> },
+    { label: 'Staff Management', path: '/admin/management', icon: <IconShieldLock size={18} /> },
     { label: 'User Reports', path: '/admin/user-reports', icon: <IconShieldCheck size={18} /> },
     { label: 'Disputes', path: '/admin/reports', icon: <IconAlertTriangle size={18} />, badge: disputeCount > 0 ? disputeCount.toString() : null },
     { label: 'Listings', path: '/admin/listings', icon: <IconBook size={18} /> },

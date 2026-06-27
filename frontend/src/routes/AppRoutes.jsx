@@ -32,6 +32,7 @@ import AdminSessions from '../pages/admin/AdminSessions';
 import AdminAnalytics from '../pages/admin/AdminAnalytics';
 import AdminPayments from '../pages/admin/AdminPayments';
 import AdminSettings from '../pages/admin/AdminSettings';
+import AdminManagement from '../pages/Admin/AdminManagement';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, role } = useAuth();
@@ -96,6 +97,7 @@ const AppRoutes = () => {
         <Route index element={<Navigate to="dashboard" replace />} />
         
         <Route path="dashboard" element={<AdminOverview />} />
+        <Route path="management" element={<AdminManagement />} />
         <Route path="listings" element={<AdminListings />} />
         <Route path="users" element={<AdminUsers />} />
         <Route path="user-reports" element={<AdminReports />} />

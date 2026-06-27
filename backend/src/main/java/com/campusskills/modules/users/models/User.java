@@ -15,6 +15,15 @@ public class User {
     private Boolean emailVerified;
     private Long createdAt;
     private Long updatedAt;
+    
+    // Admin Management Audit Fields
+    private String suspensionCategory; 
+    private String suspensionReason; 
+    private Long suspendedAt;
+    private String suspendedBy; // ID of the admin who suspended them
+
+    private Long promotedAt;
+    private String promotedBy; // ID of the admin who promoted them
 
     public User() {}
 
@@ -41,4 +50,22 @@ public class User {
 
     public Long getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(Long updatedAt) { this.updatedAt = updatedAt; }
+
+    public String getSuspensionCategory() { return suspensionCategory; }
+    public void setSuspensionCategory(String suspensionCategory) { this.suspensionCategory = suspensionCategory; }
+
+    public String getSuspensionReason() { return suspensionReason; }
+    public void setSuspensionReason(String suspensionReason) { this.suspensionReason = suspensionReason; }
+
+    public Long getSuspendedAt() { return suspendedAt; }
+    public void setSuspendedAt(Long suspendedAt) { this.suspendedAt = suspendedAt; }
+
+    public String getSuspendedBy() { return suspendedBy; }
+    public void setSuspendedBy(String suspendedBy) { this.suspendedBy = suspendedBy; }
+
+    public Long getPromotedAt() { return promotedAt; }
+    public void setPromotedAt(Long promotedAt) { this.promotedAt = promotedAt; }
+
+    public String getPromotedBy() { return promotedBy; }
+    public void setPromotedBy(String promotedBy) { this.promotedBy = promotedBy; }
 }

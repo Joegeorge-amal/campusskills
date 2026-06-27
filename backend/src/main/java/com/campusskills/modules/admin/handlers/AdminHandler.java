@@ -108,13 +108,24 @@ public class AdminHandler {
             return;
         }
         boolean isActive = body.getBoolean("isActive");
+        String category = body.getString("suspensionCategory");
+        String reason = body.getString("suspensionReason");
         
-        adminService.updateUserStatus(id, isActive)
+        com.campusskills.modules.users.models.User actor = ctx.get("user");
+        String actorRoleStr = ctx.get("authenticatedUserRole");
+        com.campusskills.modules.users.models.UserRole actorRole = actorRoleStr != null ? com.campusskills.modules.users.models.UserRole.fromString(actorRoleStr) : com.campusskills.modules.users.models.UserRole.USER;
+        
+        if (!isActive && (category == null || category.trim().isEmpty())) {
+            ApiResponse.badRequest(ctx, "Suspension category is required");
+            return;
+        }
+        
+        adminService.updateUserStatus(id, isActive, category, reason, actor, actorRole, ctx.request().remoteAddress().host())
             .onSuccess(updated -> {
                 if (updated) {
                     ApiResponse.ok(ctx, new JsonObject().put("message", "User status updated"));
                 } else {
-                    ApiResponse.notFound(ctx, "User not found");
+                    ApiResponse.notFound(ctx, "User not found or permission denied");
                 }
             })
             .onFailure(err -> ApiResponse.internalError(ctx, err.getMessage()));
