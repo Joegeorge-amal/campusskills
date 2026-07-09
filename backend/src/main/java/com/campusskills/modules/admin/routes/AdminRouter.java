@@ -40,6 +40,7 @@ public class AdminRouter {
         router.get("/management/staff").handler(com.campusskills.web.middleware.RequireSuperAdminMiddleware.create()).handler(managementHandler::getStaff);
         router.post("/management/promote").handler(com.campusskills.web.middleware.RequireSuperAdminMiddleware.create()).handler(managementHandler::promote);
         router.post("/management/demote").handler(com.campusskills.web.middleware.RequireSuperAdminMiddleware.create()).handler(managementHandler::demote);
+        router.get("/management/audit").handler(com.campusskills.web.middleware.RequireSuperAdminMiddleware.create()).handler(managementHandler::getAuditLogs);
         
         router.patch("/users/:id/role").handler(com.campusskills.web.middleware.RequireSuperAdminMiddleware.create()).handler(handler::updateUserRole);
 

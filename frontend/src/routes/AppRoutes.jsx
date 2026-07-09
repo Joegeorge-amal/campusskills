@@ -33,6 +33,7 @@ import AdminAnalytics from '../pages/admin/AdminAnalytics';
 import AdminPayments from '../pages/admin/AdminPayments';
 import AdminSettings from '../pages/admin/AdminSettings';
 import AdminManagement from '../pages/admin/AdminManagement';
+import AdminAuditLog from '../pages/admin/AdminAuditLog';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, role } = useAuth();

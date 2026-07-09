@@ -4,6 +4,8 @@ import { useAuth } from '../../context/AuthContext';
 import StaffTable from './StaffTable';
 import PromoteUserModal from '../../components/modals/PromoteUserModal';
 import SuspendUserModal from '../../components/modals/SuspendUserModal';
+import AdminAuditLog from './AdminAuditLog';
+import { IconUsers, IconHistory, IconUserPlus } from '@tabler/icons-react';
 import '../../styles/admin.css';
 
 const AdminManagement = () => {
@@ -15,6 +17,9 @@ const AdminManagement = () => {
   const [promoteModalOpen, setPromoteModalOpen] = useState(false);
   const [suspendModalOpen, setSuspendModalOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+
+  // Tabs state
+  const [activeTab, setActiveTab] = useState('staff'); // 'staff', 'audit', or future 'invite'
 
   const fetchData = async () => {
     try {
@@ -36,44 +41,89 @@ const AdminManagement = () => {
   }, []);
 
   if (loading) {
-    return <div className="admin-dashboard"><div className="loading-spinner">Loading...</div></div>;
+    return <div className="admin-management-container"><div className="loading-spinner">Loading...</div></div>;
   }
 
   // Fallback for security: if no capabilities load, show nothing.
   if (!capabilities) {
-    return <div className="admin-dashboard">Failed to load capabilities. Access denied.</div>;
+    return <div className="admin-management-container">Failed to load capabilities. Access denied.</div>;
   }
 
-  return (
-    <div className="admin-dashboard">
-      <div className="admin-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+  const renderStaffTab = () => (
+    <div className="admin-card">
+      <div style={{ padding: '20px 24px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h2>Staff Management</h2>
-          <p className="text-secondary" style={{ marginTop: '0.25rem', marginBottom: '0' }}>
-            Manage platform administrators and privileges securely.
-          </p>
+          <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#111827' }}>Existing Administrators</h3>
+          <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#6b7280' }}>Manage roles and privileges of your administrative team.</p>
         </div>
-        
         {capabilities?.canPromoteAdmins && (
           <button 
             className="btn btn-primary"
-            style={{ padding: '0.5rem 1rem', borderRadius: '6px', fontWeight: '500', border: 'none', background: '#3b82f6', color: 'white', cursor: 'pointer' }}
+            style={{ padding: '8px 16px', borderRadius: '8px', fontSize: '14px', fontWeight: '500', border: 'none', background: '#3b82f6', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
             onClick={() => setPromoteModalOpen(true)}
           >
-            + Promote User
+            <IconUserPlus size={18} /> Promote User
           </button>
         )}
       </div>
 
-      <div style={{ marginTop: '24px' }}>
-        <StaffTable 
-          staff={staff} 
-          capabilities={capabilities} 
-          onRefresh={fetchData}
-          onSuspend={(u) => { setSelectedUser(u); setSuspendModalOpen(true); }}
-        />
+      <StaffTable 
+        staff={staff} 
+        capabilities={capabilities} 
+        onRefresh={fetchData}
+        onSuspend={(u) => { setSelectedUser(u); setSuspendModalOpen(true); }}
+      />
+    </div>
+  );
+
+  return (
+    <div className="admin-management-container" style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
+      
+      {/* Header */}
+      <div style={{ marginBottom: '32px' }}>
+        <h1 style={{ margin: 0, fontSize: '28px', fontWeight: '700', color: '#111827' }}>Admin Management</h1>
+        <p style={{ margin: '8px 0 0 0', fontSize: '16px', color: '#4b5563' }}>
+          Centralized control for staff privileges and audit history.
+        </p>
       </div>
 
+      {/* Tabs Navigation */}
+      <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid #e5e7eb', marginBottom: '24px' }}>
+        <button
+          onClick={() => setActiveTab('staff')}
+          style={{
+            display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px',
+            background: 'none', border: 'none', borderBottom: activeTab === 'staff' ? '2px solid #3b82f6' : '2px solid transparent',
+            color: activeTab === 'staff' ? '#3b82f6' : '#6b7280', fontSize: '15px', fontWeight: activeTab === 'staff' ? '600' : '500',
+            cursor: 'pointer', transition: 'all 0.2s ease'
+          }}
+        >
+          <IconUsers size={20} /> Staff
+        </button>
+        <button
+          onClick={() => setActiveTab('audit')}
+          style={{
+            display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px',
+            background: 'none', border: 'none', borderBottom: activeTab === 'audit' ? '2px solid #3b82f6' : '2px solid transparent',
+            color: activeTab === 'audit' ? '#3b82f6' : '#6b7280', fontSize: '15px', fontWeight: activeTab === 'audit' ? '600' : '500',
+            cursor: 'pointer', transition: 'all 0.2s ease'
+          }}
+        >
+          <IconHistory size={20} /> Audit Log
+        </button>
+      </div>
+
+      {/* Tab Content */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        {activeTab === 'staff' && renderStaffTab()}
+        {activeTab === 'audit' && (
+          <div style={{ margin: '-24px' }}>
+            <AdminAuditLog isEmbedded={true} />
+          </div>
+        )}
+      </div>
+
+      {/* Modals */}
       {promoteModalOpen && (
         <PromoteUserModal 
           capabilities={capabilities}

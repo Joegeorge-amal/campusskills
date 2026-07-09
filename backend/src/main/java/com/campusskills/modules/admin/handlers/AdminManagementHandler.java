@@ -174,4 +174,41 @@ public class AdminManagementHandler {
             }
         });
     }
+
+    public void getAuditLogs(RoutingContext ctx) {
+        String q = ctx.request().getParam("q");
+        String action = ctx.request().getParam("action");
+        String actorId = ctx.request().getParam("actorId");
+        String targetId = ctx.request().getParam("targetId");
+        
+        String startDateStr = ctx.request().getParam("startDate");
+        String endDateStr = ctx.request().getParam("endDate");
+        Long startDate = startDateStr != null ? Long.parseLong(startDateStr) : null;
+        Long endDate = endDateStr != null ? Long.parseLong(endDateStr) : null;
+        
+        String pageStr = ctx.request().getParam("page");
+        String limitStr = ctx.request().getParam("limit");
+        int page = pageStr != null ? Integer.parseInt(pageStr) : 1;
+        int limit = limitStr != null ? Integer.parseInt(limitStr) : 25; // Default 25
+
+        auditLogService.searchLogs(q, action, actorId, targetId, startDate, endDate, page, limit).onSuccess(logs -> {
+            auditLogService.countLogs(q, action, actorId, targetId, startDate, endDate).onSuccess(total -> {
+                JsonObject pagination = new JsonObject()
+                        .put("total", total)
+                        .put("page", page)
+                        .put("limit", limit)
+                        .put("pages", (int) Math.ceil((double) total / limit));
+                
+                JsonObject response = new JsonObject()
+                        .put("data", new JsonArray(logs.stream().map(JsonObject::mapFrom).toList()))
+                        .put("pagination", pagination);
+                
+                ctx.response().putHeader("content-type", "application/json").end(response.encode());
+            }).onFailure(err -> {
+                ctx.response().setStatusCode(500).end();
+            });
+        }).onFailure(err -> {
+            ctx.response().setStatusCode(500).end();
+        });
+    }
 }

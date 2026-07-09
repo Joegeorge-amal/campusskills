@@ -122,6 +122,11 @@ const adminService = {
   demoteUser: async (targetUserId, reason) => {
     const response = await api.post('/admin/management/demote', { targetUserId, reason });
     return response.data;
+  },
+
+  getAuditLogs: async (params) => {
+    const response = await api.get('/admin/management/audit', { params });
+    return response.data;
   }
 };
 

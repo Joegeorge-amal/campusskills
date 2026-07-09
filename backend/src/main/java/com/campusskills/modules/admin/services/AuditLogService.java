@@ -36,7 +36,11 @@ public class AuditLogService {
         return repository.createLog(log);
     }
     
-    public Future<List<AuditLog>> fetchLogs(int page, int limit) {
-        return repository.fetchLogs(page, limit);
+    public Future<List<AuditLog>> searchLogs(String q, String action, String actorId, String targetId, Long startDate, Long endDate, int page, int limit) {
+        return repository.searchLogs(q, action, actorId, targetId, startDate, endDate, page, limit);
+    }
+
+    public Future<Long> countLogs(String q, String action, String actorId, String targetId, Long startDate, Long endDate) {
+        return repository.countLogs(q, action, actorId, targetId, startDate, endDate);
     }
 }

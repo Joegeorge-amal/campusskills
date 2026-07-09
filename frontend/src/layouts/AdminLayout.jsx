@@ -13,7 +13,8 @@ import {
   IconSettings,
   IconBook,
   IconShieldCheck,
-  IconShieldLock
+  IconShieldLock,
+  IconHistory
 } from '@tabler/icons-react';
 import Toast from '../components/common/Toast';
 import AdminNotifications from '../components/admin/AdminNotifications';
