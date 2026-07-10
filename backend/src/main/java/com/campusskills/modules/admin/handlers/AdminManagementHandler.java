@@ -6,6 +6,7 @@ import com.campusskills.modules.users.services.UserService;
 import com.campusskills.modules.users.repositories.UserRepository;
 import com.campusskills.modules.admin.services.AuditLogService;
 import com.campusskills.modules.admin.utils.RoleWeightUtils;
+import com.campusskills.web.response.ApiResponse;
 import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
@@ -30,7 +31,7 @@ public class AdminManagementHandler {
         String roleStr = ctx.get("authenticatedUserRole");
         
         if (authenticatedUserId == null) {
-            ctx.response().setStatusCode(401).end();
+            ApiResponse.unauthorized(ctx, "Access denied");
             return;
         }
 
@@ -42,7 +43,7 @@ public class AdminManagementHandler {
             // Bootstrap admin uses email as their userId in the token
             email = authenticatedUserId;
         } else {
-            ctx.response().setStatusCode(401).end();
+            ApiResponse.unauthorized(ctx, "Access denied");
             return;
         }
 
@@ -57,9 +58,7 @@ public class AdminManagementHandler {
             .put("canSuspendAdmins", isBootstrap || role == UserRole.SUPER_ADMIN)
             .put("canAccessPlatformSettings", isBootstrap || role == UserRole.SUPER_ADMIN);
 
-        ctx.response()
-            .putHeader("content-type", "application/json")
-            .end(capabilities.encode());
+        ApiResponse.ok(ctx, capabilities);
     }
 
     public void getStaff(RoutingContext ctx) {
@@ -72,10 +71,10 @@ public class AdminManagementHandler {
                     json.put("isBootstrap", UserService.isSuperAdmin(u.getEmail()));
                     arr.add(json);
                 }
-                ctx.response().putHeader("content-type", "application/json").end(arr.encode());
+                ApiResponse.ok(ctx, arr);
             })
             .onFailure(err -> {
-                ctx.response().setStatusCode(500).end();
+                ApiResponse.internalError(ctx, "Failed to load staff");
             });
     }
 
@@ -86,7 +85,7 @@ public class AdminManagementHandler {
         
         JsonObject body = ctx.body().asJsonObject();
         if (body == null || !body.containsKey("targetUserId") || !body.containsKey("targetRole")) {
-            ctx.response().setStatusCode(400).end(new JsonObject().put("error", "Missing required fields").encode());
+            ApiResponse.badRequest(ctx, "Missing required fields");
             return;
         }
         
@@ -96,12 +95,12 @@ public class AdminManagementHandler {
         
         userRepository.findById(targetId).onSuccess(target -> {
             if (target == null) {
-                ctx.response().setStatusCode(404).end(new JsonObject().put("error", "Target not found").encode());
+                ApiResponse.notFound(ctx, "Target not found");
                 return;
             }
             
             if (!RoleWeightUtils.canPromote(actor.getEmail(), actorRole, target.getRole(), targetNewRole, target.getEmail())) {
-                ctx.response().setStatusCode(403).end(new JsonObject().put("error", "You do not have permission to promote to this role").encode());
+                ApiResponse.forbidden(ctx, "You do not have permission to promote to this role");
                 return;
             }
             
@@ -115,9 +114,9 @@ public class AdminManagementHandler {
                     previousState, targetNewRole.name(), 
                     reason, ctx.request().remoteAddress().host()
                 );
-                ctx.response().setStatusCode(200).end(new JsonObject().put("success", true).encode());
+                ApiResponse.ok(ctx, new JsonObject().put("success", true));
             }).onFailure(err -> {
-                ctx.response().setStatusCode(500).end();
+                ApiResponse.internalError(ctx, "Failed to promote user");
             });
         });
     }
@@ -129,7 +128,7 @@ public class AdminManagementHandler {
         
         JsonObject body = ctx.body().asJsonObject();
         if (body == null || !body.containsKey("targetUserId")) {
-            ctx.response().setStatusCode(400).end(new JsonObject().put("error", "Missing required fields").encode());
+            ApiResponse.badRequest(ctx, "Missing required fields");
             return;
         }
         
@@ -137,18 +136,18 @@ public class AdminManagementHandler {
         String reason = body.getString("reason", "No reason provided");
         
         if (actor.getId() != null && actor.getId().equals(targetId)) {
-            ctx.response().setStatusCode(400).end(new JsonObject().put("error", "You cannot demote yourself").encode());
+            ApiResponse.badRequest(ctx, "You cannot demote yourself");
             return;
         }
         
         userRepository.findById(targetId).onSuccess(target -> {
             if (target == null) {
-                ctx.response().setStatusCode(404).end(new JsonObject().put("error", "Target not found").encode());
+                ApiResponse.notFound(ctx, "Target not found");
                 return;
             }
             
             if (!RoleWeightUtils.canDemote(actor.getEmail(), actorRole, target.getRole(), target.getEmail())) {
-                ctx.response().setStatusCode(403).end(new JsonObject().put("error", "You do not have permission to demote this user").encode());
+                ApiResponse.forbidden(ctx, "You do not have permission to demote this user");
                 return;
             }
             
@@ -164,21 +163,21 @@ public class AdminManagementHandler {
                         previousState, newRole.name(), 
                         reason, ctx.request().remoteAddress().host()
                     );
-                    ctx.response().setStatusCode(200).end(new JsonObject().put("success", true).encode());
+                    ApiResponse.ok(ctx, new JsonObject().put("success", true));
                 }).onFailure(err -> {
-                    ctx.response().setStatusCode(500).end();
+                    ApiResponse.internalError(ctx, "Failed to demote user");
                 });
             };
             
             if (target.getRole() == UserRole.SUPER_ADMIN) {
                 userRepository.countUsersByRole(UserRole.SUPER_ADMIN).onSuccess(count -> {
                     if (count <= 1 && !UserService.isSuperAdmin(target.getEmail())) {
-                        ctx.response().setStatusCode(400).end(new JsonObject().put("error", "Cannot demote the last Super Admin in the database").encode());
+                        ApiResponse.badRequest(ctx, "Cannot demote the last Super Admin in the database");
                         return;
                     }
                     executeDemotion.run();
                 }).onFailure(err -> {
-                    ctx.response().setStatusCode(500).end();
+                    ApiResponse.internalError(ctx, "Failed to count super admins");
                 });
             } else {
                 executeDemotion.run();
@@ -214,12 +213,12 @@ public class AdminManagementHandler {
                         .put("data", new JsonArray(logs.stream().map(JsonObject::mapFrom).toList()))
                         .put("pagination", pagination);
                 
-                ctx.response().putHeader("content-type", "application/json").end(response.encode());
+                ApiResponse.ok(ctx, response);
             }).onFailure(err -> {
-                ctx.response().setStatusCode(500).end();
+                ApiResponse.internalError(ctx, "Failed to count logs");
             });
         }).onFailure(err -> {
-            ctx.response().setStatusCode(500).end();
+            ApiResponse.internalError(ctx, "Failed to fetch logs");
         });
     }
 }
