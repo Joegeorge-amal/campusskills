@@ -528,22 +528,18 @@ public class GmailEmailService implements EmailService {
             .setText(textBody)
             .setHtml(htmlBody);
 
-        try {
-            File logoFile = new File("../docs/assets/kju_campus_logo.png");
-            if (!logoFile.exists()) {
-                logoFile = new File("docs/assets/kju_campus_logo.png");
-            }
-            if (logoFile.exists()) {
-                byte[] logoBytes = Files.readAllBytes(logoFile.toPath());
-                MailAttachment attachment = MailAttachment.create()
-                    .setData(Buffer.buffer(logoBytes))
-                    .setContentType("image/png")
-                    .setDisposition("inline")
-                    .setContentId("<campus_logo>");
-                message.setInlineAttachment(java.util.Collections.singletonList(attachment));
-            } else {
-                log.warn("Logo file not found for email template.");
-            }
+        try (java.io.InputStream is = getClass().getResourceAsStream("/assets/kju_campus_logo.png")) {
+              if (is != null) {
+                  byte[] logoBytes = is.readAllBytes();
+                  MailAttachment attachment = MailAttachment.create()
+                      .setData(Buffer.buffer(logoBytes))
+                      .setContentType("image/png")
+                      .setDisposition("inline")
+                      .setContentId("<campus_logo>");
+                  message.setInlineAttachment(java.util.Collections.singletonList(attachment));
+              } else {
+                  log.warn("Logo file not found for email template in classpath.");
+              }
         } catch (Exception e) {
             log.error("Failed to attach logo to email", e);
         }
