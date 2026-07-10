@@ -83,7 +83,8 @@ const StaffTable = ({ staff, capabilities, onRefresh, onSuspend }) => {
         </thead>
         <tbody>
           {staff.map((user) => {
-            const avatar = getAvatarProps(user.firstName);
+            const userName = user.name || (user.firstName ? user.firstName + (user.lastName ? ' ' + user.lastName : '') : '');
+            const avatar = getAvatarProps(userName);
             
             // Capability checks for rendering action buttons
             const canDemote = 
@@ -109,7 +110,7 @@ const StaffTable = ({ staff, capabilities, onRefresh, onSuspend }) => {
                     </div>
                     <div>
                       <div style={{ fontWeight: '500', color: '#111827' }}>
-                        {user.firstName} {user.lastName} {user.isBootstrap && <span style={{ fontSize: '12px', color: '#8b5cf6', marginLeft: '4px' }}>(Bootstrap)</span>}
+                        {userName || 'Admin'} {user.isBootstrap && <span style={{ fontSize: '12px', color: '#8b5cf6', marginLeft: '4px' }}>(Bootstrap)</span>}
                       </div>
                       <div style={{ color: '#6b7280', fontSize: '14px' }}>{user.email}</div>
                     </div>
@@ -184,8 +185,8 @@ const StaffTable = ({ staff, capabilities, onRefresh, onSuspend }) => {
           isOpen={demoteConfirmOpen}
           onClose={() => setDemoteConfirmOpen(false)}
           onConfirm={executeDemote}
-          title={`Demote ${demoteTarget?.firstName}?`}
-          message={`Are you sure you want to demote ${demoteTarget?.firstName} ${demoteTarget?.lastName}? They will be downgraded to the role of ${demoteTarget?.role === 'SUPER_ADMIN' ? 'ADMIN' : 'USER'}.`}
+          title={`Demote ${demoteTarget?.name || demoteTarget?.firstName}?`}
+          message={`Are you sure you want to demote ${demoteTarget?.name || demoteTarget?.firstName}? They will be downgraded to the role of ${demoteTarget?.role === 'SUPER_ADMIN' ? 'ADMIN' : 'USER'}.`}
           confirmText="Yes, Demote"
           isLoading={isDemoting}
         >
@@ -209,8 +210,8 @@ const StaffTable = ({ staff, capabilities, onRefresh, onSuspend }) => {
           isOpen={promoteConfirmOpen}
           onClose={() => setPromoteConfirmOpen(false)}
           onConfirm={executePromote}
-          title={`Promote ${promoteTarget?.firstName}?`}
-          message={`Are you sure you want to promote ${promoteTarget?.firstName} ${promoteTarget?.lastName} to SUPER_ADMIN? They will gain full system access including the ability to manage other admins.`}
+          title={`Promote ${promoteTarget?.name || promoteTarget?.firstName}?`}
+          message={`Are you sure you want to promote ${promoteTarget?.name || promoteTarget?.firstName} to SUPER_ADMIN? They will gain full system access including the ability to manage other admins.`}
           confirmText="Yes, Promote"
           isLoading={isPromoting}
         >
