@@ -63,9 +63,9 @@ const PromoteUserModal = ({ capabilities, onClose, onSuccess }) => {
         onClick={e => e.stopPropagation()} 
         style={{ padding: '24px', maxWidth: '500px', width: '90%', borderRadius: '16px', background: '#fff' }}
       >
-        <h3 style={{ margin: '0 0 16px 0', fontSize: '20px', fontWeight: 'bold' }}>Promote User to Admin</h3>
+        <h3 style={{ margin: '0 0 16px 0', fontSize: '20px', fontWeight: 'bold' }}>Add Administrator</h3>
         <p style={{ margin: '0 0 24px 0', color: '#6b7280', fontSize: '14px' }}>
-          Select a standard user and elevate their privileges to Administrator. This action will be logged.
+          Search for an existing user to promote, or enter a new email to invite an external administrator. This action will be logged.
         </p>
 
         <form onSubmit={handleSubmit}>
@@ -89,9 +89,11 @@ const PromoteUserModal = ({ capabilities, onClose, onSuccess }) => {
                 <button 
                   type="button" 
                   onClick={async () => {
+                    if (!window.confirm("Are you sure you want to send an administrator invitation to this email?")) return;
                     try {
                       setIsSubmitting(true);
                       await adminService.inviteAdmin(searchQuery, role);
+                      alert(`Administrator invitation sent successfully to ${searchQuery}`);
                       onSuccess();
                     } catch(err) {
                       alert(err.response?.data?.error || "Failed to invite user");
@@ -166,7 +168,7 @@ const PromoteUserModal = ({ capabilities, onClose, onSuccess }) => {
               disabled={isSubmitting || !selectedUser || !reason.trim()}
               style={{ padding: '8px 16px', borderRadius: '6px', border: 'none', background: '#4f46e5', color: '#fff', cursor: 'pointer', fontWeight: '500', opacity: (isSubmitting || !selectedUser || !reason.trim()) ? 0.7 : 1 }}
             >
-              {isSubmitting ? 'Promoting...' : 'Promote User'}
+              {isSubmitting ? 'Adding...' : 'Add Administrator'}
             </button>
           </div>
         </form>

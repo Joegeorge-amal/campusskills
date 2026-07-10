@@ -62,7 +62,7 @@ const AdminManagement = () => {
             style={{ padding: '8px 16px', borderRadius: '8px', fontSize: '14px', fontWeight: '500', border: 'none', background: '#3b82f6', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
             onClick={() => setPromoteModalOpen(true)}
           >
-            <IconUserPlus size={18} /> Promote User
+            <IconUserPlus size={18} /> Add Administrator
           </button>
         )}
       </div>
