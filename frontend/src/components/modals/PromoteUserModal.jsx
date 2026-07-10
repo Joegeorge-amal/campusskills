@@ -114,7 +114,7 @@ const PromoteUserModal = ({ capabilities, onClose, onSuccess }) => {
                 </button>
               </div>
             )}
-\n            {!selectedUser && users.length > 0 && (
+            {!selectedUser && users.length > 0 && (
               <div style={{ marginTop: '8px', border: '1px solid #e5e7eb', borderRadius: '6px', maxHeight: '150px', overflowY: 'auto' }}>
                 {users.map(u => (
                   <div 

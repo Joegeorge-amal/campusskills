@@ -54,7 +54,7 @@ const AdminInvitePage = () => {
       setSubmitting(true);
       await api.post(`/auth/invites/verify`, { token, otp });
       alert("Account created successfully. Please login.");
-      navigate('/admin/login');
+      navigate('/login');
     } catch (err) {
       alert(err.response?.data?.error || "Invalid OTP");
     } finally {
