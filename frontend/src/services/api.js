@@ -81,7 +81,8 @@ api.interceptors.response.use(
         }
 
         return new Promise(function (resolve, reject) {
-          axios.post('/api/v1/auth/refresh', { refreshToken }, {
+          const baseURL = import.meta.env.VITE_API_URL || '/api/v1';
+          axios.post(`${baseURL}/auth/refresh`, { refreshToken }, {
             headers: { 'Content-Type': 'application/json' }
           })
             .then(({ data }) => {
