@@ -110,7 +110,7 @@ const StaffTable = ({ staff, capabilities, onRefresh, onSuspend }) => {
                     </div>
                     <div>
                       <div style={{ fontWeight: '500', color: '#111827' }}>
-                        {userName || 'Admin'} {user.isBootstrap && <span style={{ fontSize: '12px', color: '#8b5cf6', marginLeft: '4px' }}>(Bootstrap)</span>}
+                        {userName} {user.isBootstrap && <span style={{ fontSize: '12px', color: '#8b5cf6', marginLeft: '4px' }}>(Bootstrap)</span>}
                       </div>
                       <div style={{ color: '#6b7280', fontSize: '14px' }}>{user.email}</div>
                     </div>

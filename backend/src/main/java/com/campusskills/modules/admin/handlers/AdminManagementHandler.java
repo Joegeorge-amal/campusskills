@@ -85,6 +85,7 @@ public class AdminManagementHandler {
                 for (User u : users) {
                     JsonObject json = JsonObject.mapFrom(u);
                     json.remove("passwordHash");
+                    json.put("id", u.getId()); // ensure frontend has .id
                     json.put("isBootstrap", UserService.isSuperAdmin(u.getEmail()));
                     io.vertx.core.json.JsonObject query = new io.vertx.core.json.JsonObject()
                         .put("$or", new io.vertx.core.json.JsonArray()
