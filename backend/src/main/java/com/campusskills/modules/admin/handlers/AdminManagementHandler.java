@@ -86,15 +86,19 @@ public class AdminManagementHandler {
                     JsonObject json = JsonObject.mapFrom(u);
                     json.remove("passwordHash");
                     json.put("isBootstrap", UserService.isSuperAdmin(u.getEmail()));
-                    
-                    Future<Void> fut = userProfileRepository.findByUserId(u.getId()).map(profile -> {
-                        if (profile != null) {
-                            json.put("firstName", profile.getName());
-                            json.put("name", profile.getName());
-                        }
-                        arr.add(json);
-                        return null;
-                    });
+                                        io.vertx.core.json.JsonObject query = new io.vertx.core.json.JsonObject().put("userId", u.getId());
+                      Future<Void> fut = com.campusskills.core.database.MongoManager.getClient().findOne("user_profiles", query, null).map(doc -> {
+                          if (doc != null) {
+                              String n = doc.getString("name", doc.getString("displayName"));
+                              json.put("firstName", n);
+                              json.put("name", n);
+                          }
+                          arr.add(json);
+                          return (Void) null;
+                      }).recover(err -> {
+                          arr.add(json);
+                          return Future.<Void>succeededFuture();
+                      });
                     futures.add(fut);
                 }
                 io.vertx.core.CompositeFuture.all(futures).onComplete(res -> {
