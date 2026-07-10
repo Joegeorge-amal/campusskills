@@ -26,15 +26,26 @@ public class AdminManagementHandler {
      * Expose frontend capabilities so React stays "dumb" regarding RBAC logic.
      */
     public void getCapabilities(RoutingContext ctx) {
-        User user = ctx.get("user");
-        if (user == null) {
+        String authenticatedUserId = ctx.get("authenticatedUserId");
+        String roleStr = ctx.get("authenticatedUserRole");
+        
+        if (authenticatedUserId == null) {
             ctx.response().setStatusCode(401).end();
             return;
         }
 
-        String email = user.getEmail();
-        String roleStr = ctx.get("authenticatedUserRole");
-        
+        String email;
+        User user = ctx.get("user");
+        if (user != null) {
+            email = user.getEmail();
+        } else if (authenticatedUserId.contains("@")) {
+            // Bootstrap admin uses email as their userId in the token
+            email = authenticatedUserId;
+        } else {
+            ctx.response().setStatusCode(401).end();
+            return;
+        }
+
         boolean isBootstrap = UserService.isSuperAdmin(email);
         UserRole role = roleStr != null ? UserRole.fromString(roleStr) : UserRole.USER;
 
