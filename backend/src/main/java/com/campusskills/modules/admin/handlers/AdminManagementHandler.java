@@ -4,6 +4,11 @@ import com.campusskills.modules.users.models.User;
 import com.campusskills.modules.users.models.UserRole;
 import com.campusskills.modules.users.services.UserService;
 import com.campusskills.modules.users.repositories.UserRepository;
+import com.campusskills.modules.users.repositories.UserProfileRepository;
+import io.vertx.core.Future;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.campusskills.modules.admin.services.AuditLogService;
 import com.campusskills.modules.admin.utils.RoleWeightUtils;
 import com.campusskills.web.response.ApiResponse;
@@ -23,12 +28,15 @@ public class AdminManagementHandler {
     private final AuditLogService auditLogService;
     private final AdminInvitationRepository invitationRepository;
     private final EmailService emailService;
+    private final UserProfileRepository userProfileRepository;
 
-    public AdminManagementHandler(UserRepository userRepository, AuditLogService auditLogService, AdminInvitationRepository invitationRepository, EmailService emailService) {
+
+    public AdminManagementHandler(UserRepository userRepository, AuditLogService auditLogService, AdminInvitationRepository invitationRepository, EmailService emailService, UserProfileRepository userProfileRepository) {
         this.userRepository = userRepository;
         this.auditLogService = auditLogService;
         this.invitationRepository = invitationRepository;
         this.emailService = emailService;
+        this.userProfileRepository = userProfileRepository;
     }
 
     /**
@@ -73,13 +81,25 @@ public class AdminManagementHandler {
         userRepository.findUsersByRoles(Arrays.asList(UserRole.ADMIN.name(), UserRole.SUPER_ADMIN.name()))
             .onSuccess(users -> {
                 JsonArray arr = new JsonArray();
+                List<Future> futures = new ArrayList<>();
                 for (User u : users) {
                     JsonObject json = JsonObject.mapFrom(u);
                     json.remove("passwordHash");
                     json.put("isBootstrap", UserService.isSuperAdmin(u.getEmail()));
-                    arr.add(json);
+                    
+                    Future<Void> fut = userProfileRepository.findByUserId(u.getId()).map(profile -> {
+                        if (profile != null) {
+                            json.put("firstName", profile.getName());
+                            json.put("name", profile.getName());
+                        }
+                        arr.add(json);
+                        return null;
+                    });
+                    futures.add(fut);
                 }
-                ApiResponse.ok(ctx, arr);
+                io.vertx.core.CompositeFuture.all(futures).onComplete(res -> {
+                    ApiResponse.ok(ctx, arr);
+                });
             })
             .onFailure(err -> {
                 ApiResponse.internalError(ctx, "Failed to load staff");

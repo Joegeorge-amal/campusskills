@@ -27,7 +27,7 @@ public class AdminRouter {
         com.campusskills.modules.admin.services.AuditLogService auditLogService = new com.campusskills.modules.admin.services.AuditLogService();
         service.setAuditLogService(auditLogService);
         com.campusskills.modules.admin.repositories.AdminInvitationRepository invitationRepository = new com.campusskills.modules.admin.repositories.AdminInvitationRepository();
-        AdminManagementHandler managementHandler = new AdminManagementHandler(userRepository, auditLogService, invitationRepository, emailService);
+        AdminManagementHandler managementHandler = new AdminManagementHandler(userRepository, auditLogService, invitationRepository, emailService, userProfileRepository);
 
         router.route().handler(JwtAuthMiddleware.create(jwtAuth));
         

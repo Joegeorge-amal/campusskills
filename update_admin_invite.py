@@ -1,4 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import os
+
+new_code = """import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { IconSchool } from '@tabler/icons-react';
 import api from '../services/api';
@@ -25,7 +27,7 @@ const AdminInvitePage = () => {
   useEffect(() => {
     const validateToken = async () => {
       try {
-        const response = await api.get(`/auth/invites/${token}`);
+        const response = await api.get(/auth/invites/);
         setInviteData(response.data);
       } catch (err) {
         setError(err.response?.data?.error || "Invalid or expired invitation link.");
@@ -44,7 +46,7 @@ const AdminInvitePage = () => {
     }
     try {
       setSubmitting(true);
-      await api.post(`/auth/invites/${token}/setup`, { fullName, password });
+      await api.post(/auth/invites//setup, { fullName, password });
       setStep(2);
     } catch (err) {
       alert(err.response?.data?.error || "Failed to setup account");
@@ -99,7 +101,7 @@ const AdminInvitePage = () => {
     }
     try {
       setSubmitting(true);
-      await api.post(`/auth/invites/verify`, { token, otp: otpString });
+      await api.post(/auth/invites/verify, { token, otp: otpString });
       alert("Account created successfully. Please login.");
       navigate('/login');
     } catch (err) {
@@ -261,3 +263,8 @@ const AdminInvitePage = () => {
 };
 
 export default AdminInvitePage;
+"""
+
+with open('frontend/src/pages/AdminInvitePage.jsx', 'w', encoding='utf-8') as f:
+    f.write(new_code)
+print("Updated AdminInvitePage.jsx successfully")

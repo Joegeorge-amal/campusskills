@@ -1,115 +1,70 @@
-﻿import re
+﻿import os
 
-with open('backend/src/main/java/com/campusskills/modules/admin/handlers/AdminManagementHandler.java', 'r') as f:
+with open('backend/src/main/java/com/campusskills/modules/admin/handlers/AdminManagementHandler.java', 'r', encoding='utf-8') as f:
     content = f.read()
 
-# Add imports
-imports = '''import com.campusskills.modules.admin.models.AdminInvitation;
-import com.campusskills.modules.admin.repositories.AdminInvitationRepository;
-import com.campusskills.shared.services.EmailService;
-import java.util.UUID;'''
-content = content.replace('import java.util.Arrays;', 'import java.util.Arrays;\\n' + imports)
+# 1. Add UserProfileRepository import
+import_statement = "import com.campusskills.modules.users.repositories.UserProfileRepository;\nimport io.vertx.core.Future;\nimport java.util.ArrayList;\nimport java.util.List;\n"
+content = content.replace('import com.campusskills.modules.users.repositories.UserRepository;', 'import com.campusskills.modules.users.repositories.UserRepository;\n' + import_statement)
 
-# Update constructor
-old_constructor = '''    private final UserRepository userRepository;
-    private final AuditLogService auditLogService;
+# 2. Add field to class
+field = "private final UserProfileRepository userProfileRepository;\n"
+content = content.replace('private final EmailService emailService;', 'private final EmailService emailService;\n    ' + field)
 
-    public AdminManagementHandler(UserRepository userRepository, AuditLogService auditLogService) {
-        this.userRepository = userRepository;
-        this.auditLogService = auditLogService;
-    }'''
+# 3. Update constructor
+constructor_old = 'public AdminManagementHandler(UserRepository userRepository, AuditLogService auditLogService, AdminInvitationRepository invitationRepository, EmailService emailService) {'
+constructor_new = 'public AdminManagementHandler(UserRepository userRepository, AuditLogService auditLogService, AdminInvitationRepository invitationRepository, EmailService emailService, UserProfileRepository userProfileRepository) {'
+content = content.replace(constructor_old, constructor_new)
+content = content.replace('this.emailService = emailService;', 'this.emailService = emailService;\n        this.userProfileRepository = userProfileRepository;')
 
-new_constructor = '''    private final UserRepository userRepository;
-    private final AuditLogService auditLogService;
-    private final AdminInvitationRepository invitationRepository;
-    private final EmailService emailService;
-
-    public AdminManagementHandler(UserRepository userRepository, AuditLogService auditLogService, AdminInvitationRepository invitationRepository, EmailService emailService) {
-        this.userRepository = userRepository;
-        this.auditLogService = auditLogService;
-        this.invitationRepository = invitationRepository;
-        this.emailService = emailService;
-    }'''
-content = content.replace(old_constructor, new_constructor)
-
-# Update promote method to send email
-promote_success = '''                auditLogService.logAction(
-                    "PROMOTE_USER", 
-                    actor.getId(), actor.getEmail().split("@")[0], actor.getEmail(),
-                    target.getId(), target.getEmail().split("@")[0], target.getEmail(),
-                    previousState, targetNewRole.name(), 
-                    reason, ctx.request().remoteAddress().host()
-                );
-                emailService.sendAdminPromotionEmail(target.getEmail(), targetNewRole.name());
-                ApiResponse.ok(ctx, new JsonObject().put("success", true));'''
-
-content = re.sub(r'auditLogService\.logAction\(.*?reason, ctx\.request\(\)\.remoteAddress\(\)\.host\(\)\s*\);\s*ApiResponse\.ok\(ctx, new JsonObject\(\)\.put\("success", true\)\);', promote_success, content, flags=re.DOTALL)
-
-# Add inviteUser method
-invite_method = '''
-    public void inviteUser(RoutingContext ctx) {
-        User actor = ctx.get("user");
-        String actorRoleStr = ctx.get("authenticatedUserRole");
-        UserRole actorRole = actorRoleStr != null ? UserRole.fromString(actorRoleStr) : UserRole.USER;
-        
-        JsonObject body = ctx.body().asJsonObject();
-        if (body == null || !body.containsKey("email")) {
-            ApiResponse.badRequest(ctx, "Target email is required");
-            return;
-        }
-        
-        String targetEmail = body.getString("email").trim().toLowerCase();
-        UserRole targetNewRole = UserRole.fromString(body.getString("targetRole", "ADMIN"));
-        
-        if (!RoleWeightUtils.canPromote(actor.getEmail(), actorRole, UserRole.USER, targetNewRole, targetEmail)) {
-            ApiResponse.forbidden(ctx, "You do not have permission to invite to this role");
-            return;
-        }
-
-        userRepository.findByEmail(targetEmail).onSuccess(existing -> {
-            if (existing != null) {
-                ApiResponse.badRequest(ctx, "User already exists. Please use the promote feature instead.");
-                return;
-            }
-
-            // Revoke any previous pending invitations
-            invitationRepository.revokeAllPendingForEmail(targetEmail).onSuccess(v -> {
-                String token = UUID.randomUUID().toString().replace("-", "") + UUID.randomUUID().toString().replace("-", "");
-                
-                AdminInvitation invitation = new AdminInvitation();
-                invitation.setEmail(targetEmail);
-                invitation.setRole(targetNewRole.name());
-                invitation.setToken(token);
-                invitation.setStatus(AdminInvitation.STATUS_PENDING);
-                invitation.setInvitedBy(actor.getId());
-                invitation.setCreatedAt(System.currentTimeMillis());
-                invitation.setExpiresAt(System.currentTimeMillis() + 7L * 24 * 60 * 60 * 1000); // 7 days
-                
-                invitationRepository.create(invitation).onSuccess(inviteId -> {
-                    String inviteLink = "https://campusskills.com/invite/" + token;
-                    emailService.sendAdminInvitationEmail(targetEmail, targetNewRole.name(), inviteLink);
-                    
-                    auditLogService.logAction(
-                        "INVITE_ADMIN", 
-                        actor.getId(), actor.getEmail().split("@")[0], actor.getEmail(),
-                        null, targetEmail.split("@")[0], targetEmail,
-                        "NONE", targetNewRole.name(), 
-                        "Invited external user to be admin", ctx.request().remoteAddress().host()
-                    );
-                    
-                    ApiResponse.ok(ctx, new JsonObject().put("success", true).put("message", "Invitation sent successfully"));
-                }).onFailure(err -> {
-                    ApiResponse.internalError(ctx, "Failed to create invitation");
-                });
-            }).onFailure(err -> {
-                ApiResponse.internalError(ctx, "Failed to revoke previous invitations");
+# 4. Update getStaff
+get_staff_old = """    public void getStaff(RoutingContext ctx) {
+        userRepository.findUsersByRoles(Arrays.asList(UserRole.ADMIN.name(), UserRole.SUPER_ADMIN.name()))
+            .onSuccess(users -> {
+                JsonArray arr = new JsonArray();
+                for (User u : users) {
+                    JsonObject json = JsonObject.mapFrom(u);
+                    json.remove("passwordHash");
+                    json.put("isBootstrap", UserService.isSuperAdmin(u.getEmail()));
+                    arr.add(json);
+                }
+                ApiResponse.ok(ctx, arr);
+            })
+            .onFailure(err -> {
+                ApiResponse.internalError(ctx, "Failed to load staff");
             });
-        }).onFailure(err -> {
-            ApiResponse.internalError(ctx, "Failed to check existing user");
-        });
-    }
-'''
-content = content.replace('    public void demote(RoutingContext ctx) {', invite_method + '\\n    public void demote(RoutingContext ctx) {')
+    }"""
 
-with open('backend/src/main/java/com/campusskills/modules/admin/handlers/AdminManagementHandler.java', 'w') as f:
+get_staff_new = """    public void getStaff(RoutingContext ctx) {
+        userRepository.findUsersByRoles(Arrays.asList(UserRole.ADMIN.name(), UserRole.SUPER_ADMIN.name()))
+            .onSuccess(users -> {
+                JsonArray arr = new JsonArray();
+                List<Future> futures = new ArrayList<>();
+                for (User u : users) {
+                    JsonObject json = JsonObject.mapFrom(u);
+                    json.remove("passwordHash");
+                    json.put("isBootstrap", UserService.isSuperAdmin(u.getEmail()));
+                    
+                    Future<Void> fut = userProfileRepository.findByUserId(u.getId()).map(profile -> {
+                        if (profile != null) {
+                            json.put("firstName", profile.getName());
+                            json.put("name", profile.getName());
+                        }
+                        arr.add(json);
+                        return null;
+                    });
+                    futures.add(fut);
+                }
+                io.vertx.core.CompositeFuture.all(futures).onComplete(res -> {
+                    ApiResponse.ok(ctx, arr);
+                });
+            })
+            .onFailure(err -> {
+                ApiResponse.internalError(ctx, "Failed to load staff");
+            });
+    }"""
+content = content.replace(get_staff_old, get_staff_new)
+
+with open('backend/src/main/java/com/campusskills/modules/admin/handlers/AdminManagementHandler.java', 'w', encoding='utf-8') as f:
     f.write(content)
+print("Updated AdminManagementHandler.java")

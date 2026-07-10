@@ -170,6 +170,7 @@ public class AdminInvitationAuthHandler {
                     user.setPasswordHash(hashedPassword);
                     user.setRole(role);
                     user.setEmailVerified(true);
+                    user.setIsActive(true);
                     user.setCreatedAt(System.currentTimeMillis());
                     user.setUpdatedAt(System.currentTimeMillis());
                     // user.setReputation(0);
