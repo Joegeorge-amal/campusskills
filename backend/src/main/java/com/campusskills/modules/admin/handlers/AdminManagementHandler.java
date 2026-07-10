@@ -170,7 +170,7 @@ public class AdminManagementHandler {
                 invitation.setExpiresAt(System.currentTimeMillis() + 7L * 24 * 60 * 60 * 1000); // 7 days
                 
                 invitationRepository.create(invitation).onSuccess(inviteId -> {
-                    String inviteLink = "https://campusskills.com/invite/" + token;
+                    String inviteLink = com.campusskills.core.config.Env.getOrDefault("FRONTEND_ORIGIN", "https://campusskills.com") + "/invite/" + token;
                     emailService.sendAdminInvitationEmail(targetEmail, targetNewRole.name(), inviteLink);
                     
                     auditLogService.logAction(
