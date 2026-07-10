@@ -74,7 +74,7 @@ const AdminLayout = () => {
   const navItems = [
     { label: 'Overview', path: '/admin/dashboard', icon: <IconLayoutDashboard size={18} /> },
     { label: 'Users', path: '/admin/users', icon: <IconUsers size={18} /> },
-    { label: 'Staff Management', path: '/admin/management', icon: <IconShieldLock size={18} /> },
+    ...(user?.role === 'SUPER_ADMIN' ? [{ label: 'Staff Management', path: '/admin/management', icon: <IconShieldLock size={18} /> }] : []),
     { label: 'User Reports', path: '/admin/user-reports', icon: <IconShieldCheck size={18} /> },
     { label: 'Disputes', path: '/admin/reports', icon: <IconAlertTriangle size={18} />, badge: disputeCount > 0 ? disputeCount.toString() : null },
     { label: 'Listings', path: '/admin/listings', icon: <IconBook size={18} /> },
@@ -106,7 +106,7 @@ const AdminLayout = () => {
             </div>
             <div className="admin-user-info">
               <span className="admin-user-name">{user?.name || 'Admin'}</span>
-              <span className="admin-user-role">Super Admin</span>
+              <span className="admin-user-role">{user?.role === 'SUPER_ADMIN' ? 'Super Admin' : 'Admin'}</span>
             </div>
 
             {isProfileOpen && (
