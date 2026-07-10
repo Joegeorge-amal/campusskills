@@ -69,4 +69,32 @@ public class OtpVerificationRepository {
         JsonObject query = new JsonObject().put("userId", userId).put("type", type);
         return client.removeDocument(COLLECTION, query).mapEmpty();
     }
+
+    public Future<OtpVerification> findByEmailAndType(String email, String type) {
+        JsonObject query = new JsonObject().put("email", email).put("type", type);
+        return client.findOne(COLLECTION, query, null).map(doc -> {
+            if (doc == null) return null;
+            if (doc.getValue("expiresAt") instanceof JsonObject) {
+                JsonObject expiresAtObj = doc.getJsonObject("expiresAt");
+                if (expiresAtObj.containsKey("$date")) {
+                    try {
+                        String isoDate = expiresAtObj.getString("$date");
+                        long millis = java.time.Instant.parse(isoDate).toEpochMilli();
+                        doc.put("expiresAt", millis);
+                    } catch (Exception e) {
+                        Object val = expiresAtObj.getValue("$date");
+                        if (val instanceof Number) {
+                            doc.put("expiresAt", ((Number) val).longValue());
+                        }
+                    }
+                }
+            }
+            return doc.mapTo(OtpVerification.class);
+        });
+    }
+
+    public Future<Void> deleteByEmailAndType(String email, String type) {
+        JsonObject query = new JsonObject().put("email", email).put("type", type);
+        return client.removeDocument(COLLECTION, query).mapEmpty();
+    }
 }

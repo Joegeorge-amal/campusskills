@@ -95,7 +95,7 @@ public class ApiRouter {
         router.mountSubRouter("/reviews", com.campusskills.modules.reviews.routes.ReviewRouter.create(vertx));
         router.mountSubRouter("/topics", com.campusskills.modules.topics.routes.TopicRouter.create(vertx, jwtAuth));
         router.mountSubRouter("/availability", com.campusskills.modules.availability.routes.AvailabilityRouter.create(vertx));
-        router.mountSubRouter("/admin", com.campusskills.modules.admin.routes.AdminRouter.create(vertx, jwtAuth));
+        router.mountSubRouter("/admin", com.campusskills.modules.admin.routes.AdminRouter.create(vertx, jwtAuth, emailService));
         router.mountSubRouter("/verifications", com.campusskills.modules.users.routes.VerificationRouter.create(vertx, jwtAuth));
         router.mountSubRouter("/images", com.campusskills.modules.images.routes.ImageRouter.create(vertx));
         router.mountSubRouter("/reports", com.campusskills.modules.reports.routes.ReportRouter.create(vertx));

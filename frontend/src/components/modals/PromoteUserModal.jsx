@@ -81,7 +81,40 @@ const PromoteUserModal = ({ capabilities, onClose, onSuccess }) => {
             />
             {isSearching && <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>Searching...</div>}
             
-            {!selectedUser && users.length > 0 && (
+            {!selectedUser && users.length === 0 && searchQuery.includes('@') && !isSearching && (
+              <div style={{ marginTop: '8px', padding: '16px', border: '1px dashed #d1d5db', borderRadius: '6px', textAlign: 'center' }}>
+                <p style={{ margin: '0 0 12px 0', color: '#4b5563', fontSize: '14px' }}>
+                  No existing CampusSkills user found with this email.
+                </p>
+                <button 
+                  type="button" 
+                  onClick={async () => {
+                    try {
+                      setIsSubmitting(true);
+                      await adminService.inviteAdmin(searchQuery, role);
+                      onSuccess();
+                    } catch(err) {
+                      alert(err.response?.data?.error || "Failed to invite user");
+                    } finally {
+                      setIsSubmitting(false);
+                    }
+                  }}
+                  disabled={isSubmitting}
+                  style={{
+                    background: '#6366f1',
+                    color: '#fff',
+                    border: 'none',
+                    padding: '8px 16px',
+                    borderRadius: '6px',
+                    cursor: isSubmitting ? 'not-allowed' : 'pointer',
+                    fontWeight: '500'
+                  }}
+                >
+                  {isSubmitting ? 'Inviting...' : 'Send Administrator Invitation'}
+                </button>
+              </div>
+            )}
+\n            {!selectedUser && users.length > 0 && (
               <div style={{ marginTop: '8px', border: '1px solid #e5e7eb', borderRadius: '6px', maxHeight: '150px', overflowY: 'auto' }}>
                 {users.map(u => (
                   <div 

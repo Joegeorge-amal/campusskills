@@ -41,12 +41,22 @@ public class AuthRouter {
             allowedDomains,
             vertx.eventBus()
         );
+        
+        com.campusskills.modules.admin.repositories.AdminInvitationRepository invitationRepository = new com.campusskills.modules.admin.repositories.AdminInvitationRepository();
+        com.campusskills.modules.admin.handlers.AdminInvitationAuthHandler inviteHandler = new com.campusskills.modules.admin.handlers.AdminInvitationAuthHandler(
+            invitationRepository, userRepository, profileRepository, statsRepository, walletRepository, otpRepository, emailService
+        );
         AuthHandler handler = new AuthHandler(service);
 
         router.post("/signup").handler(com.campusskills.web.middleware.RateLimitMiddleware.create()).handler(handler::signup);
         router.post("/login").handler(com.campusskills.web.middleware.RateLimitMiddleware.create()).handler(handler::login);
         router.post("/refresh").handler(handler::refresh);
         router.post("/logout").handler(handler::logout);
+
+        router.get("/invites/:token").handler(inviteHandler::validateToken);
+        router.post("/invites/:token/setup").handler(com.campusskills.web.middleware.RateLimitMiddleware.create()).handler(inviteHandler::setupAccount);
+        router.post("/invites/verify").handler(com.campusskills.web.middleware.RateLimitMiddleware.create()).handler(inviteHandler::verifyAndCreate);
+
 
         
         router.post("/forgot-password").handler(handler::forgotPassword);

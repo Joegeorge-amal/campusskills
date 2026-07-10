@@ -7,4 +7,6 @@ public interface EmailService {
     Future<Void> sendPasswordResetOtpEmail(String email, String otp);
     Future<Void> sendPasswordChangeConfirmationEmail(String email);
     Future<Void> sendTwoFactorOtpEmail(String email, String otp);
+    Future<Void> sendAdminPromotionEmail(String email, String role);
+    Future<Void> sendAdminInvitationEmail(String email, String role, String inviteLink);
 }

@@ -114,7 +114,11 @@ const adminService = {
     return response.data;
   },
 
-  promoteUser: async (targetUserId, targetRole, reason) => {
+  inviteAdmin: async (email, targetRole = 'ADMIN') => {
+    const response = await api.post('/admin/management/invite', { email, targetRole });
+    return response.data;
+  },
+\n  promoteUser: async (targetUserId, targetRole, reason) => {
     const response = await api.post('/admin/management/promote', { targetUserId, targetRole, reason });
     return response.data;
   },

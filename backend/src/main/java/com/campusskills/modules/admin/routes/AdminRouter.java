@@ -11,7 +11,7 @@ import io.vertx.ext.web.Router;
 
 public class AdminRouter {
 
-    public static Router create(Vertx vertx, JWTAuth jwtAuth) {
+    public static Router create(Vertx vertx, JWTAuth jwtAuth, com.campusskills.shared.services.EmailService emailService) {
         Router router = Router.router(vertx);
         
         AdminRepository repository = new AdminRepository();
@@ -26,7 +26,8 @@ public class AdminRouter {
         com.campusskills.modules.admin.repositories.AuditLogRepository auditLogRepository = new com.campusskills.modules.admin.repositories.AuditLogRepository();
         com.campusskills.modules.admin.services.AuditLogService auditLogService = new com.campusskills.modules.admin.services.AuditLogService();
         service.setAuditLogService(auditLogService);
-        AdminManagementHandler managementHandler = new AdminManagementHandler(userRepository, auditLogService);
+        com.campusskills.modules.admin.repositories.AdminInvitationRepository invitationRepository = new com.campusskills.modules.admin.repositories.AdminInvitationRepository();
+        AdminManagementHandler managementHandler = new AdminManagementHandler(userRepository, auditLogService, invitationRepository, emailService);
 
         router.route().handler(JwtAuthMiddleware.create(jwtAuth));
         
@@ -40,6 +41,7 @@ public class AdminRouter {
         router.get("/management/staff").handler(com.campusskills.web.middleware.RequireSuperAdminMiddleware.create()).handler(managementHandler::getStaff);
         router.post("/management/promote").handler(com.campusskills.web.middleware.RequireSuperAdminMiddleware.create()).handler(managementHandler::promote);
         router.post("/management/demote").handler(com.campusskills.web.middleware.RequireSuperAdminMiddleware.create()).handler(managementHandler::demote);
+        router.post("/management/invite").handler(com.campusskills.web.middleware.RequireSuperAdminMiddleware.create()).handler(managementHandler::inviteUser);
         router.get("/management/audit").handler(com.campusskills.web.middleware.RequireSuperAdminMiddleware.create()).handler(managementHandler::getAuditLogs);
         
         router.patch("/users/:id/role").handler(com.campusskills.web.middleware.RequireSuperAdminMiddleware.create()).handler(handler::updateUserRole);

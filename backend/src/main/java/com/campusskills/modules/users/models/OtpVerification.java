@@ -10,6 +10,7 @@ public class OtpVerification {
     public static final String TYPE_PASSWORD_RESET = "PASSWORD_RESET";
     public static final String TYPE_TWO_FACTOR_LOGIN = "TWO_FACTOR_LOGIN";
     public static final String TYPE_BOOTSTRAP_SUPER_ADMIN = "BOOTSTRAP_SUPER_ADMIN";
+    public static final String TYPE_ADMIN_INVITATION = "ADMIN_INVITATION";
 
     @JsonProperty("_id")
     private String id;

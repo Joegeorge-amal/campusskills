@@ -31,4 +31,16 @@ public class StubEmailService implements EmailService {
         log.info("STUB: Sending 2FA OTP {} to {}", otp, email);
         return Future.succeededFuture();
     }
+
+    @Override
+    public Future<Void> sendAdminPromotionEmail(String email, String role) {
+        log.info("STUB: Sending Admin Promotion to {} as {}", email, role);
+        return Future.succeededFuture();
+    }
+
+    @Override
+    public Future<Void> sendAdminInvitationEmail(String email, String role, String inviteLink) {
+        log.info("STUB: Sending Admin Invitation to {} as {} with link {}", email, role, inviteLink);
+        return Future.succeededFuture();
+    }
 }
