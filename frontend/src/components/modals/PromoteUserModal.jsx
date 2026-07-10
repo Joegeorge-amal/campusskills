@@ -115,7 +115,6 @@ const PromoteUserModal = ({ capabilities, onClose, onSuccess }) => {
               style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db' }}
             >
               <option value="ADMIN">ADMIN</option>
-              {capabilities?.canPromoteSuperAdmins && <option value="SUPER_ADMIN">SUPER_ADMIN</option>}
             </select>
           </div>
 

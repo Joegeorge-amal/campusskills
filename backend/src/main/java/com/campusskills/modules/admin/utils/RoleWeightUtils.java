@@ -22,6 +22,11 @@ public class RoleWeightUtils {
      * Check if an actor can promote a target to a new role.
      */
     public static boolean canPromote(String actorEmail, UserRole actorRole, UserRole targetCurrentRole, UserRole targetNewRole, String targetEmail) {
+        // Enforce Stepped Promotions: Prevent jumping directly from USER to SUPER_ADMIN
+        if (targetCurrentRole == UserRole.USER && targetNewRole == UserRole.SUPER_ADMIN) {
+            return false;
+        }
+
         boolean isActorBootstrap = UserService.isSuperAdmin(actorEmail);
         
         // A bootstrap user is effectively weight 99.

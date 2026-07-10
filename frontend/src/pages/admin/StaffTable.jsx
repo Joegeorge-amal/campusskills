@@ -15,6 +15,11 @@ const StaffTable = ({ staff, capabilities, onRefresh, onSuspend }) => {
   const [demoteReason, setDemoteReason] = useState('');
   const [isDemoting, setIsDemoting] = useState(false);
 
+  const [promoteConfirmOpen, setPromoteConfirmOpen] = useState(false);
+  const [promoteTarget, setPromoteTarget] = useState(null);
+  const [promoteReason, setPromoteReason] = useState('');
+  const [isPromoting, setIsPromoting] = useState(false);
+
   const handleDemoteClick = (user) => {
     setDemoteTarget(user);
     setDemoteReason('');
@@ -40,6 +45,31 @@ const StaffTable = ({ staff, capabilities, onRefresh, onSuspend }) => {
     }
   };
 
+  const handlePromoteClick = (user) => {
+    setPromoteTarget(user);
+    setPromoteReason('');
+    setPromoteConfirmOpen(true);
+  };
+
+  const executePromote = async () => {
+    if (!promoteTarget) return;
+    if (!promoteReason.trim()) {
+      alert("A reason is required for the audit log.");
+      return;
+    }
+    
+    try {
+      setIsPromoting(true);
+      await adminService.promoteUser(promoteTarget.id, 'SUPER_ADMIN', promoteReason);
+      setPromoteConfirmOpen(false);
+      onRefresh();
+    } catch (err) {
+      alert(err.response?.data?.error || 'Failed to promote user');
+    } finally {
+      setIsPromoting(false);
+    }
+  };
+
   return (
     <div className="bg-white" style={{ borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
@@ -60,6 +90,9 @@ const StaffTable = ({ staff, capabilities, onRefresh, onSuspend }) => {
               (user.role === 'ADMIN' && capabilities.canPromoteAdmins) || 
               (user.role === 'SUPER_ADMIN' && capabilities.canDemoteSuperAdmins);
               
+            const canPromoteToSuperAdmin = 
+              user.role === 'ADMIN' && capabilities.canPromoteSuperAdmins;
+
             const canSuspend = capabilities.canSuspendAdmins; 
             
             return (
@@ -105,6 +138,15 @@ const StaffTable = ({ staff, capabilities, onRefresh, onSuspend }) => {
                 </td>
                 <td style={{ padding: '12px 16px', textAlign: 'right' }}>
                   <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                    {canPromoteToSuperAdmin && !user.isBootstrap && (
+                      <button 
+                        onClick={() => handlePromoteClick(user)}
+                        style={{ padding: '6px 12px', fontSize: '13px', borderRadius: '4px', border: '1px solid #c7d2fe', background: '#e0e7ff', color: '#4338ca', cursor: 'pointer', fontWeight: '500' }}
+                      >
+                        Promote to Super Admin
+                      </button>
+                    )}
+
                     {canDemote && !user.isBootstrap && (
                       <button 
                         onClick={() => handleDemoteClick(user)}
@@ -148,13 +190,40 @@ const StaffTable = ({ staff, capabilities, onRefresh, onSuspend }) => {
           isLoading={isDemoting}
         >
           <div style={{ marginTop: '16px' }}>
-            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px' }}>Reason (Required for Audit Log)</label>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', marginBottom: '8px', color: '#374151' }}>
+              Reason for Demotion (Required)
+            </label>
             <input 
               type="text" 
               value={demoteReason}
               onChange={(e) => setDemoteReason(e.target.value)}
               placeholder="e.g. No longer needs admin access"
-              style={{ width: '100%', padding: '8px', border: '1px solid #d1d5db', borderRadius: '4px' }}
+              style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '14px' }}
+            />
+          </div>
+        </ConfirmModal>
+      )}
+
+      {promoteConfirmOpen && (
+        <ConfirmModal
+          isOpen={promoteConfirmOpen}
+          onClose={() => setPromoteConfirmOpen(false)}
+          onConfirm={executePromote}
+          title={`Promote ${promoteTarget?.firstName}?`}
+          message={`Are you sure you want to promote ${promoteTarget?.firstName} ${promoteTarget?.lastName} to SUPER_ADMIN? They will gain full system access including the ability to manage other admins.`}
+          confirmText="Yes, Promote"
+          isLoading={isPromoting}
+        >
+          <div style={{ marginTop: '16px' }}>
+            <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', marginBottom: '8px', color: '#374151' }}>
+              Reason for Promotion (Required)
+            </label>
+            <input 
+              type="text" 
+              value={promoteReason}
+              onChange={(e) => setPromoteReason(e.target.value)}
+              placeholder="e.g. Assigned as head administrator"
+              style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '14px' }}
             />
           </div>
         </ConfirmModal>
