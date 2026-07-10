@@ -14,7 +14,8 @@ public class UserProfile {
     @JsonProperty("_id")
     private String id;
     private String userId;
-    @JsonAlias("displayName")
+    @JsonProperty("name")
+    @JsonAlias({"displayName"})
     private String name;
     @JsonProperty("programme")
     private String programme;
@@ -51,6 +52,18 @@ public class UserProfile {
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+    
+    @JsonProperty("displayName")
+    public void setDisplayName(String displayName) { 
+        if (this.name == null) {
+            this.name = displayName; 
+        }
+    }
+    
+    @JsonProperty("displayName")
+    public String getDisplayName() {
+        return name;
+    }
 
     public String getProgramme() { return programme; }
     public void setProgramme(String programme) { this.programme = programme; }
