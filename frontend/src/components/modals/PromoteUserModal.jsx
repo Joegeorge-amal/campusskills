@@ -47,8 +47,7 @@ const PromoteUserModal = ({ capabilities, onClose, onSuccess }) => {
     
     try {
       setIsSubmitting(true);
-      const targetId = selectedUser.id || selectedUser._id;
-      await adminService.promoteUser(targetId, role, reason);
+      await adminService.promoteUser(selectedUser.id, role, reason);
       onSuccess();
     } catch (err) {
       alert(err.response?.data?.error || "Failed to promote user");
@@ -86,11 +85,11 @@ const PromoteUserModal = ({ capabilities, onClose, onSuccess }) => {
               <div style={{ marginTop: '8px', border: '1px solid #e5e7eb', borderRadius: '6px', maxHeight: '150px', overflowY: 'auto' }}>
                 {users.map(u => (
                   <div 
-                    key={u.id || u._id} 
+                    key={u.id} 
                     onClick={() => setSelectedUser(u)}
                     style={{ padding: '10px', cursor: 'pointer', borderBottom: '1px solid #f3f4f6', background: '#f9fafb' }}
                   >
-                    <div style={{ fontWeight: '500' }}>{u.profile?.name || 'Unknown User'} {u.profile?.rollNo ? `(${u.profile.rollNo})` : ''}</div>
+                    <div style={{ fontWeight: '500' }}>{u.displayName} {u.rollNo ? `(${u.rollNo})` : ''}</div>
                     <div style={{ fontSize: '12px', color: '#6b7280' }}>{u.email} - Role: {u.role}</div>
                   </div>
                 ))}
@@ -100,7 +99,7 @@ const PromoteUserModal = ({ capabilities, onClose, onSuccess }) => {
             {selectedUser && (
               <div style={{ marginTop: '8px', padding: '12px', background: '#e0e7ff', borderRadius: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <div style={{ fontWeight: '600', color: '#3730a3' }}>{selectedUser.profile?.name || 'Unknown User'} {selectedUser.profile?.rollNo ? `(${selectedUser.profile.rollNo})` : ''}</div>
+                  <div style={{ fontWeight: '600', color: '#3730a3' }}>{selectedUser.displayName} {selectedUser.rollNo ? `(${selectedUser.rollNo})` : ''}</div>
                   <div style={{ fontSize: '12px', color: '#4f46e5' }}>{selectedUser.email} - Role: {selectedUser.role}</div>
                 </div>
                 <button type="button" onClick={() => setSelectedUser(null)} style={{ background: 'none', border: 'none', color: '#4338ca', cursor: 'pointer', fontWeight: '500' }}>Change</button>
