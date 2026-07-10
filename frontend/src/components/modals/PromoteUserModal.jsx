@@ -63,9 +63,9 @@ const PromoteUserModal = ({ capabilities, onClose, onSuccess }) => {
         onClick={e => e.stopPropagation()} 
         style={{ padding: '24px', maxWidth: '500px', width: '90%', borderRadius: '16px', background: '#fff' }}
       >
-        <h3 style={{ margin: '0 0 16px 0', fontSize: '20px', fontWeight: 'bold' }}>Promote User</h3>
+        <h3 style={{ margin: '0 0 16px 0', fontSize: '20px', fontWeight: 'bold' }}>Promote User to Admin</h3>
         <p style={{ margin: '0 0 24px 0', color: '#6b7280', fontSize: '14px' }}>
-          Select a standard user and elevate their privileges. This action will be logged.
+          Select a standard user and elevate their privileges to Administrator. This action will be logged.
         </p>
 
         <form onSubmit={handleSubmit}>
@@ -107,16 +107,7 @@ const PromoteUserModal = ({ capabilities, onClose, onSuccess }) => {
             )}
           </div>
 
-          <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px' }}>Role</label>
-            <select 
-              value={role} 
-              onChange={(e) => setRole(e.target.value)}
-              style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db' }}
-            >
-              <option value="ADMIN">ADMIN</option>
-            </select>
-          </div>
+
 
           <div style={{ marginBottom: '24px' }}>
             <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px' }}>Reason (Required for Audit Log)</label>
