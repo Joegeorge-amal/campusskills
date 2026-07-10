@@ -61,12 +61,11 @@ public class AdminRepository {
             .put("preserveNullAndEmptyArrays", true)
         ));
 
-        // 4. Text/Regex Search match (if q is provided)
         if (q != null && !q.trim().isEmpty()) {
             JsonObject regex = new JsonObject().put("$regex", q.trim()).put("$options", "i");
             JsonArray orConditions = new JsonArray()
                 .add(new JsonObject().put("email", regex))
-                .add(new JsonObject().put("profile.name", regex));
+                .add(new JsonObject().put("profile.rollNo", regex));
             pipeline.add(new JsonObject().put("$match", new JsonObject().put("$or", orConditions)));
         }
 

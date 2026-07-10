@@ -47,7 +47,8 @@ const PromoteUserModal = ({ capabilities, onClose, onSuccess }) => {
     
     try {
       setIsSubmitting(true);
-      await adminService.promoteUser(selectedUser.id, role, reason);
+      const targetId = selectedUser.id || selectedUser._id;
+      await adminService.promoteUser(targetId, role, reason);
       onSuccess();
     } catch (err) {
       alert(err.response?.data?.error || "Failed to promote user");
@@ -70,7 +71,7 @@ const PromoteUserModal = ({ capabilities, onClose, onSuccess }) => {
 
         <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '16px' }}>
-            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px' }}>Search User (Email or Name)</label>
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', marginBottom: '8px' }}>Search User (Email or Roll No)</label>
             <input 
               type="text" 
               placeholder="Search..."
@@ -85,12 +86,12 @@ const PromoteUserModal = ({ capabilities, onClose, onSuccess }) => {
               <div style={{ marginTop: '8px', border: '1px solid #e5e7eb', borderRadius: '6px', maxHeight: '150px', overflowY: 'auto' }}>
                 {users.map(u => (
                   <div 
-                    key={u.id} 
+                    key={u.id || u._id} 
                     onClick={() => setSelectedUser(u)}
                     style={{ padding: '10px', cursor: 'pointer', borderBottom: '1px solid #f3f4f6', background: '#f9fafb' }}
                   >
-                    <div style={{ fontWeight: '500' }}>{u.firstName} {u.lastName}</div>
-                    <div style={{ fontSize: '12px', color: '#6b7280' }}>{u.email} ({u.role})</div>
+                    <div style={{ fontWeight: '500' }}>{u.profile?.name || 'Unknown User'} {u.profile?.rollNo ? `(${u.profile.rollNo})` : ''}</div>
+                    <div style={{ fontSize: '12px', color: '#6b7280' }}>{u.email} - Role: {u.role}</div>
                   </div>
                 ))}
               </div>
@@ -99,8 +100,8 @@ const PromoteUserModal = ({ capabilities, onClose, onSuccess }) => {
             {selectedUser && (
               <div style={{ marginTop: '8px', padding: '12px', background: '#e0e7ff', borderRadius: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
-                  <div style={{ fontWeight: '600', color: '#3730a3' }}>{selectedUser.firstName} {selectedUser.lastName}</div>
-                  <div style={{ fontSize: '12px', color: '#4f46e5' }}>{selectedUser.email} ({selectedUser.role})</div>
+                  <div style={{ fontWeight: '600', color: '#3730a3' }}>{selectedUser.profile?.name || 'Unknown User'} {selectedUser.profile?.rollNo ? `(${selectedUser.profile.rollNo})` : ''}</div>
+                  <div style={{ fontSize: '12px', color: '#4f46e5' }}>{selectedUser.email} - Role: {selectedUser.role}</div>
                 </div>
                 <button type="button" onClick={() => setSelectedUser(null)} style={{ background: 'none', border: 'none', color: '#4338ca', cursor: 'pointer', fontWeight: '500' }}>Change</button>
               </div>
