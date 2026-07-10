@@ -1,12 +1,16 @@
 ﻿import os
+import re
 
 with open('frontend/src/routes/AppRoutes.jsx', 'r', encoding='utf-8') as f:
     content = f.read()
 
-import_str = "import AdminInvitePage from '../pages/AdminInvitePage';\\n"
-if 'AdminInvitePage' not in content:
-    content = content.replace("import LoginPage from '../pages/LoginPage';", import_str + "import LoginPage from '../pages/LoginPage';")
-    content = content.replace("<Route path=\"/login\" element={<LoginPage />} />", "<Route path=\"/login\" element={<LoginPage />} />\\n        <Route path=\"/invite/:token\" element={<AdminInvitePage />} />")
+pattern = r'<Route path="/setup" element=\{<SetupPage />\} />'
+replacement = '<Route path="/setup" element={<SetupPage />} />\n      <Route path="/invite/:token" element={<AdminInvitePage />} />'
 
-with open('frontend/src/routes/AppRoutes.jsx', 'w', encoding='utf-8') as f:
-    f.write(content)
+if pattern in content:
+    content = content.replace(pattern, replacement)
+    with open('frontend/src/routes/AppRoutes.jsx', 'w', encoding='utf-8') as f:
+        f.write(content)
+    print("Replaced route successfully")
+else:
+    print("Route Pattern not found")

@@ -67,6 +67,7 @@ const AppRoutes = () => {
       <Route path="/" element={(user && user.emailVerified === true) ? <Navigate to={(role === 'admin' || role === 'super_admin') ? "/admin/dashboard" : "/app/dashboard"} replace /> : <LandingPage />} />
       <Route path="/login" element={(user && user.emailVerified === true) ? <Navigate to={(role === 'admin' || role === 'super_admin') ? "/admin/dashboard" : "/app/dashboard"} replace /> : <LoginPage />} />
       <Route path="/setup" element={<SetupPage />} />
+      <Route path="/invite/:token" element={<AdminInvitePage />} />
       
       {/* Student Layout */}
       <Route path="/app" element={
