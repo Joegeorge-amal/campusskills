@@ -386,12 +386,12 @@ const Profile = () => {
         <ModalWrapper isOpen={!!listingToDelete} onClose={() => setListingToDelete(null)} maxWidth="400px" zIndex={1000}>
           <div style={{ padding: '24px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#111827' }}>Delete Listing</h3>
+              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: 'var(--cs-text-main)' }}>Delete Listing</h3>
               <button onClick={() => setListingToDelete(null)} style={{ background: 'none', border: 'none', color: 'var(--cs-text-inactive)', cursor: 'pointer', padding: '4px', display: 'flex' }}><IconX size={20} /></button>
             </div>
-            <p style={{ margin: '0 0 16px 0', fontSize: '14px', color: 'var(--cs-text-secondary)', lineHeight: '1.5' }}>Are you sure you want to delete <strong style={{color: '#111827'}}>{listingToDelete?.title}</strong>? This action cannot be undone.</p>
+            <p style={{ margin: '0 0 16px 0', fontSize: '14px', color: 'var(--cs-text-secondary)', lineHeight: '1.5' }}>Are you sure you want to delete <strong style={{color: 'var(--cs-text-main)'}}>{listingToDelete?.title}</strong>? This action cannot be undone.</p>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-              <button onClick={() => setListingToDelete(null)} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-white)', color: '#374151', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={() => setListingToDelete(null)} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-white)', color: 'var(--cs-text-main)', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}>Cancel</button>
               <button onClick={async () => {
                 try {
                   await listingService.deactivateListing(listingToDelete._id || listingToDelete.id);
@@ -525,7 +525,7 @@ const Profile = () => {
         {/* User Info */}
         <div style={{ marginBottom: '24px', marginLeft: '2px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '4px' }}>
-            <div style={{ fontSize: '22px', fontWeight: 700, color: '#111827' }}>{user?.name || "Anonymous"}</div>
+            <div style={{ fontSize: '22px', fontWeight: 700, color: 'var(--cs-text-main)' }}>{user?.name || "Anonymous"}</div>
             {isProfileVerified && (
               <div className={isFlyingUp ? 'badge-pop-in' : ''} style={{ display: 'flex', alignItems: 'center', gap: '4px', background: '#ecfdf5', border: '1px solid #a7f3d0', padding: '2px 8px', borderRadius: '100px', color: '#059669', fontSize: '11px', fontWeight: 600 }}>
                 <IconCheck size={12} strokeWidth={3} /> Verified
@@ -544,7 +544,7 @@ const Profile = () => {
               </span>
             </div>
           {user?.bio && (
-            <div style={{ marginTop: '16px', fontSize: '14px', color: '#374151', lineHeight: '1.6', maxWidth: '600px', fontWeight: 500 }}>
+            <div style={{ marginTop: '16px', fontSize: '14px', color: 'var(--cs-text-main)', lineHeight: '1.6', maxWidth: '600px', fontWeight: 500 }}>
               {user.bio}
             </div>
           )}
@@ -555,28 +555,28 @@ const Profile = () => {
             <div style={{ width: '40px', height: '40px', borderRadius: '14px', background: 'var(--cs-bg-hover)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
               <IconCalendarMonth size={20} strokeWidth={2} style={{ color: '#3b82f6' }} />
             </div>
-            <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>{sessionsCount}</div>
+            <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--cs-text-main)', marginBottom: '4px' }}>{sessionsCount}</div>
             <div style={{ fontSize: '13px', color: '#6b7280', fontWeight: 500 }}>Sessions</div>
           </div>
           <div className="glossy-card" style={{ background: 'var(--cs-bg-white)', border: '1px solid var(--cs-border)', borderRadius: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 20px' }}>
             <div style={{ width: '40px', height: '40px', borderRadius: '14px', background: '#fefce8', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
               <IconStar size={20} strokeWidth={2} style={{ color: '#eab308' }} />
             </div>
-            <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>{user?.stats?.ratingAvg?.toFixed(1) || '0.0'}</div>
+            <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--cs-text-main)', marginBottom: '4px' }}>{user?.stats?.ratingAvg?.toFixed(1) || '0.0'}</div>
             <div style={{ fontSize: '13px', color: '#6b7280', fontWeight: 500 }}>Rating</div>
           </div>
           <div className="glossy-card" style={{ background: 'var(--cs-bg-white)', border: '1px solid var(--cs-border)', borderRadius: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 20px' }}>
             <div style={{ width: '40px', height: '40px', borderRadius: '14px', background: '#faf5ff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
               <IconSparkles size={20} strokeWidth={2} style={{ color: '#a855f7' }} />
             </div>
-            <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>{totalMinutes > 0 ? (totalMinutes / 60).toFixed(1) : '0.0'}</div>
+            <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--cs-text-main)', marginBottom: '4px' }}>{totalMinutes > 0 ? (totalMinutes / 60).toFixed(1) : '0.0'}</div>
             <div style={{ fontSize: '13px', color: '#6b7280', fontWeight: 500 }}>Hours</div>
           </div>
           <div className="glossy-card" style={{ background: 'var(--cs-bg-white)', border: '1px solid var(--cs-border)', borderRadius: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 20px' }}>
             <div style={{ width: '40px', height: '40px', borderRadius: '14px', background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
               <IconShieldCheck size={20} strokeWidth={2} style={{ color: '#22c55e' }} />
             </div>
-            <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>{verifiedCount}</div>
+            <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--cs-text-main)', marginBottom: '4px' }}>{verifiedCount}</div>
             <div style={{ fontSize: '13px', color: '#6b7280', fontWeight: 500 }}>Verified</div>
           </div>
         </div>
@@ -603,7 +603,7 @@ const Profile = () => {
         {/* My Skills Section */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
           <div>
-            <div style={{ fontSize: '18px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>My Skills</div>
+            <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--cs-text-main)', marginBottom: '4px' }}>My Skills</div>
             <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500 }}>Verify your skills to boost your profile credibility and attract more students.</div>
           </div>
           {!isAddingSkill && (
@@ -641,7 +641,7 @@ const Profile = () => {
             <div style={{ width: '24px', height: '24px', background: '#ecfdf5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <IconCheck size={14} strokeWidth={3} style={{ color: '#22c55e' }} />
             </div>
-            <span style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>Verified Skills</span>
+            <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--cs-text-main)' }}>Verified Skills</span>
             <span style={{ fontSize: '11px', color: '#6b7280', background: 'var(--cs-bg-light)', padding: '2px 8px', borderRadius: '100px', fontWeight: 600 }}>{verifiedCount}</span>
           </div>
 
@@ -659,7 +659,7 @@ const Profile = () => {
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e' }}></div>
-                        <div style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>{skill}</div>
+                        <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--cs-text-main)' }}>{skill}</div>
                       </div>
                       <button onClick={() => setSkillToRemove(skill)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px', transition: 'color 0.2s' }}>
                         <IconTrash size={16} />
@@ -699,7 +699,7 @@ const Profile = () => {
             <div style={{ width: '24px', height: '24px', background: '#fef3c7', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <IconCircle size={14} strokeWidth={3} style={{ color: '#f59e0b' }} />
             </div>
-              <span style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>Pending Verification</span>
+              <span style={{ fontSize: '14px', fontWeight: 700, color: 'var(--cs-text-main)' }}>Pending Verification</span>
               <span style={{ fontSize: '11px', color: '#6b7280', background: 'var(--cs-bg-light)', padding: '2px 8px', borderRadius: '100px', fontWeight: 600 }}>{pendingSkills.length}</span>
             </div>
 
@@ -709,7 +709,7 @@ const Profile = () => {
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#f59e0b' }}></div>
-                      <div style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>{skill}</div>
+                      <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--cs-text-main)' }}>{skill}</div>
                     </div>
                     <button onClick={() => setSkillToRemove(skill)} style={{ background: 'none', border: 'none', color: 'var(--cs-text-inactive)', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px' }}>
                       <IconTrash size={16} />
@@ -739,7 +739,7 @@ const Profile = () => {
         <div style={{ marginTop: '40px' }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{ fontSize: '18px', fontWeight: 700, color: '#111827' }}>My Active Listings</span>
+              <span style={{ fontSize: '18px', fontWeight: 700, color: 'var(--cs-text-main)' }}>My Active Listings</span>
               <span style={{ fontSize: '11px', color: '#6b7280', background: 'var(--cs-bg-light)', padding: '2px 8px', borderRadius: '100px', fontWeight: 600 }}>{myListings.length}</span>
             </div>
             <button 
@@ -811,14 +811,14 @@ const Profile = () => {
       {skillToRemove && (
         <div className="modal-overlay" onClick={() => setSkillToRemove(null)}>
           <div className="modal-content" onClick={e => e.stopPropagation()} style={{ padding: '24px', maxWidth: '400px' }}>
-            <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: '#111827' }}>Remove Skill</h3>
+            <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: 'var(--cs-text-main)' }}>Remove Skill</h3>
             <p style={{ margin: '0 0 24px 0', fontSize: '14px', color: 'var(--cs-text-secondary)', lineHeight: '1.5' }}>
               Are you sure you want to remove <strong>{skillToRemove}</strong>? You will lose any verification progress for this skill.
             </p>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
               <button 
                 onClick={() => setSkillToRemove(null)}
-                style={{ padding: '8px 16px', borderRadius: '100px', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-white)', color: '#374151', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}
+                style={{ padding: '8px 16px', borderRadius: '100px', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-white)', color: 'var(--cs-text-main)', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}
               >
                 Cancel
               </button>

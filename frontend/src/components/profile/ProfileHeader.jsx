@@ -77,7 +77,7 @@ const ProfileHeader = ({
                 <button 
                   onClick={onEditProfile} 
                   className="btn-secondary"
-                  style={{ background: 'var(--cs-bg-white)', border: '1px solid var(--cs-border)', color: '#374151', padding: '8px 16px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
+                  style={{ background: 'var(--cs-bg-white)', border: '1px solid var(--cs-border)', color: 'var(--cs-text-main)', padding: '8px 16px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
                 >
                   Edit Profile
                 </button>
