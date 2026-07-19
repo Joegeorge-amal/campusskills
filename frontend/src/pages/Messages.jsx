@@ -656,6 +656,11 @@ const Messages = () => {
                 }
                 displayTime = new Date(lastMsg.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
               }
+
+              const isTyping = Object.keys(typingUsers).some(key => key.startsWith(`${c.id}_`) && typingUsers[key]);
+              if (isTyping) {
+                displayPreview = <span style={{ color: '#10b981', fontWeight: 500 }}>typing...</span>;
+              }
               
               return (
                 <ChatListItem 
