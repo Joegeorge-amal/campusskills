@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { IconCheck, IconX, IconCalendarEvent, IconBell, IconMessage, IconTrash, IconListCheck } from '@tabler/icons-react';
 import './NotificationPanel.css';
 import LoadingSpinner from '../../common/LoadingSpinner';
@@ -95,7 +96,14 @@ const NotificationPanel = ({ notifications, loading, onClose, onMarkAllRead, onN
   };
 
   return (
-    <div className="notif-panel-overlay" onClick={onClose}>
+    <motion.div 
+      className="notif-panel-overlay" 
+      onClick={onClose}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.2 }}
+    >
       <ConfirmModal
         isOpen={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
@@ -105,7 +113,14 @@ const NotificationPanel = ({ notifications, loading, onClose, onMarkAllRead, onN
         confirmText="Delete"
         isDanger={true}
       />
-      <div className="notif-panel" onClick={(e) => e.stopPropagation()}>
+      <motion.div 
+        className="notif-panel" 
+        onClick={(e) => e.stopPropagation()}
+        initial={{ x: '100%' }}
+        animate={{ x: 0 }}
+        exit={{ x: '100%' }}
+        transition={{ type: "spring", damping: 25, stiffness: 300 }}
+      >
         {/* Header */}
         <div className="notif-header" style={{ transition: 'background 0.3s' }}>
           {isSelectionModeActive ? (
@@ -251,8 +266,8 @@ const NotificationPanel = ({ notifications, loading, onClose, onMarkAllRead, onN
             Mark all as read
           </div>
         )}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { IconBell, IconMessage, IconCalendarEvent, IconAlertCircle, IconCheck, IconLoader } from '@tabler/icons-react';
 import notificationService from '../../services/notificationService';
 import { useWebSocket } from '../../context/WebSocketContext';
@@ -246,10 +247,25 @@ const NotificationDropdown = ({ onToggle }) => {
         )}
       </button>
 
-      {isOpen && (
-        <>
-          <div className="admin-notif-overlay fade-in" onClick={() => setIsOpen(false)}></div>
-          <div className="admin-notif-dropdown fade-in" style={{right: 0, left: 'auto', top: '50px'}}>
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            <motion.div 
+              className="admin-notif-overlay" 
+              onClick={() => setIsOpen(false)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+            ></motion.div>
+            <motion.div 
+              className="admin-notif-dropdown" 
+              style={{right: 0, left: 'auto', top: '50px'}}
+              initial={{ opacity: 0, y: -10, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.98 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+            >
             <div className="admin-notif-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <h3 style={{ margin: 0, fontSize: '14px', color: 'var(--cs-text-main)' }}>Unread Inbox</h3>
@@ -324,24 +340,27 @@ const NotificationDropdown = ({ onToggle }) => {
                 Show All Notifications
               </button>
             </div>
-          </div>
-        </>
-      )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
-      {isSidePanelOpen && (
-        <NotificationPanel
-          notifications={notifications}
-          loading={loading}
-          onClose={() => setIsSidePanelOpen(false)}
-          onMarkAllRead={markAllRead}
-          onNotificationClick={(notif) => {
-            handleNotificationClick(notif);
-            setIsSidePanelOpen(false);
-          }}
-          onDeleteNotification={handleDeleteNotification}
-          onDeleteMultipleNotifications={handleDeleteMultipleNotifications}
-        />
-      )}
+      <AnimatePresence>
+        {isSidePanelOpen && (
+          <NotificationPanel
+            notifications={notifications}
+            loading={loading}
+            onClose={() => setIsSidePanelOpen(false)}
+            onMarkAllRead={markAllRead}
+            onNotificationClick={(notif) => {
+              handleNotificationClick(notif);
+              setIsSidePanelOpen(false);
+            }}
+            onDeleteNotification={handleDeleteNotification}
+            onDeleteMultipleNotifications={handleDeleteMultipleNotifications}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
