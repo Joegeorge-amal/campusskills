@@ -24,7 +24,7 @@ const ConfirmModal = ({
       >
         <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
           <div style={{ 
-            background: isDanger ? '#fee2e2' : '#e0e7ff', 
+            background: isDanger ? 'rgba(239, 68, 68, 0.15)' : 'rgba(79, 70, 229, 0.15)', 
             color: isDanger ? '#ef4444' : '#4f46e5',
             padding: '12px',
             borderRadius: '12px',
@@ -35,7 +35,7 @@ const ConfirmModal = ({
             <IconAlertTriangle size={24} stroke={2} />
           </div>
           <div>
-            <h3 style={{ margin: '0 0 8px 0', color: '#111827', fontSize: '18px', fontWeight: 700 }}>{title}</h3>
+            <h3 style={{ margin: '0 0 8px 0', color: 'var(--cs-text-main)', fontSize: '18px', fontWeight: 700 }}>{title}</h3>
             <p style={{ margin: '0 0 24px 0', color: 'var(--cs-text-secondary)', fontSize: '14px', lineHeight: '1.5' }}>{message}</p>
           </div>
         </div>
@@ -46,7 +46,7 @@ const ConfirmModal = ({
               padding: '10px 18px', 
               background: 'var(--cs-bg-light)', 
               border: 'none', 
-              color: '#374151', 
+              color: 'var(--cs-text-main)', 
               borderRadius: '8px',
               cursor: 'pointer', 
               fontWeight: 600,
