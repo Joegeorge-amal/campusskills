@@ -86,10 +86,10 @@ const Dashboard = () => {
   if (!user) return null;
 
   return (
-    <div id="home" className="pg on" style={{ padding: '24px', background: 'linear-gradient(180deg, #fafafa 0%, #f8f9ff 100%)', minHeight: '100%', boxSizing: 'border-box', position: 'relative', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+    <div id="home" className="pg on" style={{ padding: '24px', background: 'var(--cs-bg-app)', minHeight: '100%', boxSizing: 'border-box', position: 'relative', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
 
       <div style={{ width: '100%', display: 'flex', flexDirection: 'column' }}>
-        <h1 style={{ fontSize: '28px', fontWeight: 800, color: '#1e40af', margin: '0 0 20px 4px', letterSpacing: '-0.5px' }}>Dashboard</h1>
+        <h1 style={{ fontSize: '28px', fontWeight: 800, color: 'var(--cs-primary)', margin: '0 0 20px 4px', letterSpacing: '-0.5px' }}>Dashboard</h1>
         
         {/* Hero Banner */}
         <div className="dashboard-hero desktop-hero" style={{ 
@@ -130,7 +130,7 @@ const Dashboard = () => {
             </div>
             <button 
               onClick={() => setIsCreateSessionOpen(true)}
-              style={{ padding: '10px 20px', background: 'var(--cs-bg-white)', color: '#1e40af', border: 'none', borderRadius: '12px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
+              style={{ padding: '10px 20px', background: 'var(--cs-bg-white)', color: 'var(--cs-primary)', border: 'none', borderRadius: '12px', fontSize: '12px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }}
             >
               + Create Listing
             </button>
@@ -179,7 +179,7 @@ const Dashboard = () => {
           <button 
             className="hero-create-btn"
             onClick={() => setIsCreateSessionOpen(true)}
-            style={{ padding: '8px 16px', background: 'var(--cs-bg-white)', color: '#1e40af', border: 'none', borderRadius: '10px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
+            style={{ padding: '8px 16px', background: 'var(--cs-bg-white)', color: 'var(--cs-primary)', border: 'none', borderRadius: '10px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}
           >
             + Create Listing
           </button>
@@ -194,33 +194,33 @@ const Dashboard = () => {
           
           {/* Active Listings */}
           <div className="glossy-card" onClick={() => navigate('/app/marketplace')} style={{ background: 'var(--cs-bg-white)', padding: '24px 12px 16px', minHeight: '130px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', textAlign: 'center', gap: '12px', cursor: 'pointer' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#f0f6ff', color: '#1e3a8a', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 2px 3px rgba(0, 0, 0, 0.12)' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(59, 130, 246, 0.15)', color: '#60a5fa', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 2px 3px rgba(0, 0, 0, 0.12)' }}>
               <IconSparkles size={22} strokeWidth={1.5} />
             </div>
             <div>
-              <div style={{ fontSize: '28px', fontWeight: 800, color: '#111827', lineHeight: 1.1, marginBottom: '4px' }}>{myListingsCount || 0}</div>
+              <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--cs-text-main)', lineHeight: 1.1, marginBottom: '4px' }}>{myListingsCount || 0}</div>
               <div style={{ fontSize: '12px', color: 'var(--cs-text-secondary)', fontWeight: 700, lineHeight: 1.3 }}>Active Listings</div>
             </div>
           </div>
 
           {/* Sessions Completed */}
           <div className="glossy-card" onClick={() => navigate('/app/sessions')} style={{ background: 'var(--cs-bg-white)', padding: '24px 12px 16px', minHeight: '130px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', textAlign: 'center', gap: '12px', cursor: 'pointer' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#ecfdf5', color: '#065f46', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 2px 3px rgba(0, 0, 0, 0.12)' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(16, 185, 129, 0.15)', color: '#34d399', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 2px 3px rgba(0, 0, 0, 0.12)' }}>
               <IconCheck size={22} strokeWidth={1.5} />
             </div>
             <div>
-              <div style={{ fontSize: '28px', fontWeight: 800, color: '#111827', lineHeight: 1.1, marginBottom: '4px' }}>{stats.sessionsDone}</div>
+              <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--cs-text-main)', lineHeight: 1.1, marginBottom: '4px' }}>{stats.sessionsDone}</div>
               <div style={{ fontSize: '12px', color: 'var(--cs-text-secondary)', fontWeight: 700, lineHeight: 1.3 }}>Sessions Completed</div>
             </div>
           </div>
 
           {/* Community Rating */}
           <div className="glossy-card" onClick={() => navigate('/app/profile', { state: { scrollToReviews: true } })} style={{ background: 'var(--cs-bg-white)', padding: '24px 12px 16px', minHeight: '130px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'flex-start', textAlign: 'center', gap: '12px', cursor: 'pointer' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: '#fef3c7', color: '#92400e', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 2px 3px rgba(0, 0, 0, 0.12)' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '12px', background: 'rgba(245, 158, 11, 0.15)', color: '#fbbf24', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 2px 3px rgba(0, 0, 0, 0.12)' }}>
               <IconStar size={22} strokeWidth={1.5} />
             </div>
             <div>
-              <div style={{ fontSize: '28px', fontWeight: 800, color: '#111827', lineHeight: 1.1, marginBottom: '4px' }}>{stats.trustScore}</div>
+              <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--cs-text-main)', lineHeight: 1.1, marginBottom: '4px' }}>{stats.trustScore}</div>
               <div style={{ fontSize: '12px', color: 'var(--cs-text-secondary)', fontWeight: 700, lineHeight: 1.3 }}>Community Rating</div>
               <div style={{ fontSize: '11px', color: 'var(--cs-text-inactive)', fontWeight: 500, lineHeight: 1.3 }}>Based on {user?.stats?.ratingCount || 0} reviews</div>
             </div>
@@ -232,7 +232,7 @@ const Dashboard = () => {
               <IconTrophy size={22} strokeWidth={1.5} />
             </div>
             <div>
-              <div style={{ fontSize: '28px', fontWeight: 800, color: '#111827', lineHeight: 1.1, marginBottom: '4px' }}>{verifiedCount}</div>
+              <div style={{ fontSize: '28px', fontWeight: 800, color: 'var(--cs-text-main)', lineHeight: 1.1, marginBottom: '4px' }}>{verifiedCount}</div>
               <div style={{ fontSize: '12px', color: 'var(--cs-text-secondary)', fontWeight: 700, lineHeight: 1.3 }}>Verified Skills</div>
             </div>
           </div>
@@ -248,10 +248,10 @@ const Dashboard = () => {
           <div className="glossy-card" style={{ background: 'var(--cs-bg-white)', padding: '20px', display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
               <div>
-                <span style={{ fontSize: '16px', fontWeight: 800, color: '#111827', display: 'block' }}>Upcoming sessions</span>
+                <span style={{ fontSize: '16px', fontWeight: 800, color: 'var(--cs-text-main)', display: 'block' }}>Upcoming sessions</span>
                 <span style={{ fontSize: '12px', color: 'var(--cs-text-secondary)', fontWeight: 500, display: 'block', marginTop: '2px' }}>Manage your scheduled skill exchanges.</span>
               </div>
-              <button onClick={() => navigate('/app/sessions')} style={{ fontSize: '12px', color: '#1d4ed8', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}>See all</button>
+              <button onClick={() => navigate('/app/sessions')} style={{ fontSize: '12px', color: 'var(--cs-primary)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}>See all</button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto' }}>
               {isSessionsLoading ? (
@@ -260,23 +260,23 @@ const Dashboard = () => {
                 </div>
               ) : upcomingSessions.length > 0 ? upcomingSessions.map((session, i) => (
                 <div key={session.id || i} style={{ border: '1px solid rgba(29, 78, 216, 0.08)', borderRadius: '16px', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: '16px', background: 'linear-gradient(to bottom right, rgba(239, 246, 255, 0.4) 0%, rgba(255, 255, 255, 0.6) 100%)' }}>
-                  <div style={{ background: '#1d4ed8', borderRadius: '14px', width: '48px', height: '56px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#ffffff', boxShadow: '0 4px 12px rgba(29, 78, 216, 0.3)' }}>
+                  <div style={{ background: 'var(--cs-primary)', borderRadius: '14px', width: '48px', height: '56px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#ffffff', boxShadow: '0 4px 12px rgba(29, 78, 216, 0.3)' }}>
                     <div style={{ fontSize: '18px', fontWeight: 800, lineHeight: 1.1 }}>{session.day || '22'}</div>
                     <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase' }}>{session.month || 'MAY'}</div>
                   </div>
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#111827', marginBottom: '2px' }}>
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--cs-text-main)', marginBottom: '2px' }}>
                       {session.topic}
                     </div>
                     <div style={{ fontSize: '12px', color: 'var(--cs-text-secondary)', fontWeight: 600, marginBottom: '2px' }}>
                       Partner: {session.name}
                     </div>
-                    <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: 500 }}>
+                    <div style={{ fontSize: '12px', color: 'var(--cs-text-inactive)', fontWeight: 500 }}>
                       {session.time} · {session.mode}
                     </div>
                   </div>
                   <div>
-                    <button onClick={() => navigate('/app/sessions')} style={{ fontSize: '12px', padding: '8px 16px', borderRadius: '12px', border: 'none', background: '#1e3a8a', color: '#ffffff', cursor: 'pointer', fontWeight: 700 }}>Open</button>
+                    <button onClick={() => navigate('/app/sessions')} style={{ fontSize: '12px', padding: '8px 16px', borderRadius: '12px', border: 'none', background: 'var(--cs-primary-dark)', color: '#ffffff', cursor: 'pointer', fontWeight: 700 }}>Open</button>
                   </div>
                 </div>
               )) : (
@@ -284,7 +284,7 @@ const Dashboard = () => {
                   <IconCalendarMonth size={28} style={{ color: 'var(--cs-text-inactive)', marginBottom: '8px' }} />
                   <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--cs-text-main)', marginBottom: '4px' }}>No upcoming sessions</div>
                   <div style={{ fontSize: '12px', color: 'var(--cs-text-secondary)', marginBottom: '16px', maxWidth: '280px' }}>Ready to exchange skills? Browse the marketplace to connect with peers.</div>
-                  <button onClick={() => navigate('/app/marketplace')} style={{ padding: '8px 16px', borderRadius: '10px', background: '#2563eb', color: '#fff', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Browse Marketplace</button>
+                  <button onClick={() => navigate('/app/marketplace')} style={{ padding: '8px 16px', borderRadius: '10px', background: 'var(--cs-primary)', color: '#fff', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Browse Marketplace</button>
                 </div>
               )}
             </div>
@@ -294,10 +294,10 @@ const Dashboard = () => {
           <div className="glossy-card" style={{ background: 'var(--cs-bg-white)', padding: '20px', display: 'flex', flexDirection: 'column' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
               <div>
-                <span style={{ fontSize: '16px', fontWeight: 800, color: '#111827', display: 'block' }}>Pending Requests</span>
+                <span style={{ fontSize: '16px', fontWeight: 800, color: 'var(--cs-text-main)', display: 'block' }}>Pending Requests</span>
                 <span style={{ fontSize: '12px', color: 'var(--cs-text-secondary)', fontWeight: 500, display: 'block', marginTop: '2px' }}>Review incoming requests.</span>
               </div>
-              <button onClick={() => navigate('/app/requests')} style={{ fontSize: '12px', color: '#1d4ed8', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}>Open</button>
+              <button onClick={() => navigate('/app/requests')} style={{ fontSize: '12px', color: 'var(--cs-primary)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 700 }}>Open</button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', overflowY: 'auto' }}>
               {isRequestsLoading ? (
@@ -326,7 +326,7 @@ const Dashboard = () => {
                       <div style={{ fontSize: '11px', fontWeight: 800, color: 'var(--cs-primary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '2px' }}>
                         {reqType}
                       </div>
-                      <div style={{ fontSize: '13px', fontWeight: 600, color: '#111827' }}>
+                      <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--cs-text-main)' }}>
                         {listingTitle} • {participantName}
                       </div>
                     </div>
@@ -337,7 +337,7 @@ const Dashboard = () => {
                   <IconArrowsRightLeft size={28} style={{ color: 'var(--cs-text-inactive)', marginBottom: '8px' }} />
                   <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--cs-text-main)', marginBottom: '4px' }}>No pending requests</div>
                   <div style={{ fontSize: '12px', color: 'var(--cs-text-secondary)', marginBottom: '16px', maxWidth: '280px' }}>Your incoming skill requests and proposals will show up here.</div>
-                  <button onClick={() => setIsCreateSessionOpen(true)} style={{ padding: '8px 16px', borderRadius: '10px', background: '#1d4ed8', color: '#fff', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Share a Skill</button>
+                  <button onClick={() => setIsCreateSessionOpen(true)} style={{ padding: '8px 16px', borderRadius: '10px', background: 'var(--cs-primary)', color: '#fff', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Share a Skill</button>
                 </div>
               )}
             </div>
@@ -348,9 +348,9 @@ const Dashboard = () => {
         {/* Recent Activity Widget */}
         <div className="glossy-card" style={{ background: 'var(--cs-bg-white)', padding: '20px', marginBottom: '20px', display: 'flex', flexDirection: 'column' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-            <IconActivity size={20} style={{ color: '#1e40af' }} />
+            <IconActivity size={20} style={{ color: 'var(--cs-primary)' }} />
             <div>
-              <span style={{ fontSize: '16px', fontWeight: 800, color: '#111827', display: 'block' }}>Recent Activity</span>
+              <span style={{ fontSize: '16px', fontWeight: 800, color: 'var(--cs-text-main)', display: 'block' }}>Recent Activity</span>
               <span style={{ fontSize: '12px', color: 'var(--cs-text-secondary)', fontWeight: 500, display: 'block', marginTop: '2px' }}>Recent updates and achievements.</span>
             </div>
           </div>
@@ -371,7 +371,7 @@ const Dashboard = () => {
               </div>
             )) : (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 0', textAlign: 'center', color: 'var(--cs-text-inactive)' }}>
-                <div style={{ fontSize: '13px', fontWeight: 600, color: '#6b7280', marginBottom: '2px' }}>Nothing here yet</div>
+                <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--cs-text-inactive)', marginBottom: '2px' }}>Nothing here yet</div>
                 <div style={{ fontSize: '12px' }}>Your recent achievements and activity will appear here.</div>
               </div>
             )}
