@@ -161,7 +161,14 @@ const Messages = () => {
         
         if (existingIndex !== -1) {
           const newMsgs = [...chatMsgs];
-          newMsgs[existingIndex] = { ...newMsgs[existingIndex], ...msg, status: newMsgs[existingIndex].status === 'failed' ? 'failed' : 'sent' };
+          const existing = newMsgs[existingIndex];
+          newMsgs[existingIndex] = { 
+            ...existing, 
+            ...msg, 
+            isDelivered: existing.isDelivered || msg.isDelivered,
+            isRead: existing.isRead || msg.isRead,
+            status: existing.status === 'failed' ? 'failed' : (existing.isRead || msg.isRead ? 'read' : (existing.isDelivered || msg.isDelivered ? 'delivered' : 'sent'))
+          };
           return { ...prev, [chatId]: newMsgs };
         }
         
@@ -405,7 +412,14 @@ const Messages = () => {
           setChatMessages(prev => ({
             ...prev,
             [activeChatId]: prev[activeChatId].map(m => 
-              m.tempId === newMessageObj.tempId ? { ...res, tempId: m.tempId, status: 'sent', isDelivered: res.isDelivered, isRead: res.isRead } : m
+              m.tempId === newMessageObj.tempId ? { 
+                ...m, 
+                ...res, 
+                tempId: m.tempId, 
+                isDelivered: m.isDelivered || res.isDelivered, 
+                isRead: m.isRead || res.isRead,
+                status: (m.isRead || res.isRead) ? 'read' : ((m.isDelivered || res.isDelivered) ? 'delivered' : 'sent')
+              } : m
             )
           }));
 
@@ -470,7 +484,15 @@ const Messages = () => {
         
         setChatMessages(prev => {
           const msgs = prev[activeChatId] || [];
-          return { ...prev, [activeChatId]: msgs.map(m => m.tempId === tempId ? { ...sentMsg, status: 'sent', isDelivered: sentMsg.isDelivered, isRead: sentMsg.isRead } : m) };
+          return { ...prev, [activeChatId]: msgs.map(m => 
+            m.tempId === tempId ? { 
+              ...m, 
+              ...sentMsg, 
+              isDelivered: m.isDelivered || sentMsg.isDelivered, 
+              isRead: m.isRead || sentMsg.isRead,
+              status: (m.isRead || sentMsg.isRead) ? 'read' : ((m.isDelivered || sentMsg.isDelivered) ? 'delivered' : 'sent')
+            } : m
+          ) };
         });
       } catch (err) {
         setChatMessages(prev => {
