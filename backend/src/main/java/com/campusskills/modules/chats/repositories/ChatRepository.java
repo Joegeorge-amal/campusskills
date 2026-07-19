@@ -34,7 +34,10 @@ public class ChatRepository {
     }
 
     public Future<List<Chat>> fetchUserChats(String userId, String statusFilter, List<String> matchingUserIds, java.util.Set<String> blockedUsers, int skip, int limit) {
-        JsonObject query = new JsonObject().put("participants", userId);
+        JsonObject query = new JsonObject()
+            .put("participants", userId)
+            .put("hiddenFor", new JsonObject().put("$ne", userId));
+        
         if (statusFilter != null && !statusFilter.isEmpty()) {
             query.put("status", statusFilter);
         }
@@ -71,7 +74,10 @@ public class ChatRepository {
     }
 
     public Future<Long> countUserChats(String userId, String statusFilter, List<String> matchingUserIds, java.util.Set<String> blockedUsers) {
-        JsonObject query = new JsonObject().put("participants", userId);
+        JsonObject query = new JsonObject()
+            .put("participants", userId)
+            .put("hiddenFor", new JsonObject().put("$ne", userId));
+        
         if (statusFilter != null && !statusFilter.isEmpty()) {
             query.put("status", statusFilter);
         }
@@ -142,5 +148,24 @@ public class ChatRepository {
         JsonObject query = new JsonObject().put("_id", chatId);
         return client.removeDocument(COLLECTION, query)
                 .map(res -> res.getRemovedCount() > 0);
+    }
+
+    public Future<Boolean> hideChatForUser(String chatId, String userId) {
+        JsonObject query = new JsonObject().put("_id", chatId);
+        JsonObject update = new JsonObject()
+                .put("$addToSet", new JsonObject().put("hiddenFor", userId))
+                .put("$set", new JsonObject()
+                        .put("clearedAt." + userId, System.currentTimeMillis())
+                        .put("updatedAt", System.currentTimeMillis()));
+        return client.updateCollection(COLLECTION, query, update)
+                .map(res -> res.getDocModified() > 0);
+    }
+
+    public Future<Boolean> unhideChatForParticipants(String chatId, List<String> participants) {
+        JsonObject query = new JsonObject().put("_id", chatId);
+        JsonObject update = new JsonObject()
+                .put("$pullAll", new JsonObject().put("hiddenFor", new JsonArray(participants)));
+        return client.updateCollection(COLLECTION, query, update)
+                .map(res -> res.getDocModified() > 0);
     }
 }

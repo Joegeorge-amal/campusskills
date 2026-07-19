@@ -20,6 +20,8 @@ public class Chat {
     private String sourceId;
     private Long createdAt;
     private Long updatedAt;
+    private List<String> hiddenFor = new java.util.ArrayList<>();
+    private java.util.Map<String, Long> clearedAt = new java.util.HashMap<>();
 
     public Chat() {}
 
@@ -85,5 +87,21 @@ public class Chat {
 
     public void setUpdatedAt(Long updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public List<String> getHiddenFor() {
+        return hiddenFor;
+    }
+
+    public void setHiddenFor(List<String> hiddenFor) {
+        this.hiddenFor = hiddenFor;
+    }
+
+    public java.util.Map<String, Long> getClearedAt() {
+        return clearedAt;
+    }
+
+    public void setClearedAt(java.util.Map<String, Long> clearedAt) {
+        this.clearedAt = clearedAt;
     }
 }

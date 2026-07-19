@@ -54,6 +54,12 @@ public class MessageService {
             message.setMessage(content); // Store trimmed content
             return repository.createMessage(message).onSuccess(id -> {
                 message.setId(id); // Set the DB-generated ID before broadcasting
+                
+                // Unhide the chat for all participants since a new message arrived
+                new com.campusskills.modules.chats.repositories.ChatRepository()
+                    .unhideChatForParticipants(message.getChatId(), participantList)
+                    .onFailure(err -> log.error("Failed to unhide chat {}", message.getChatId(), err));
+                
                 com.campusskills.web.websockets.MessageBroadcaster.broadcastNewMessage(message, participantList);
                 typingService.clearTypingState(message.getChatId(), message.getSenderId(), participantList);
                 
@@ -113,8 +119,11 @@ public class MessageService {
                 return Future.failedFuture("UNAUTHORIZED: User is not a participant of this chat");
             }
 
-            return repository.countMessagesByChatId(chatId).compose(total -> 
-                repository.fetchChatMessages(chatId, skip, limit).map(list -> {
+            io.vertx.core.json.JsonObject clearedAtMap = chat.getJsonObject("clearedAt");
+            Long clearedAt = clearedAtMap != null ? clearedAtMap.getLong(authId) : null;
+
+            return repository.countMessagesByChatId(chatId, clearedAt).compose(total -> 
+                repository.fetchChatMessages(chatId, skip, limit, clearedAt).map(list -> {
                     java.util.Collections.reverse(list);
                     io.vertx.core.json.JsonArray items = new io.vertx.core.json.JsonArray();
                     list.forEach(msg -> items.add(io.vertx.core.json.JsonObject.mapFrom(msg)));

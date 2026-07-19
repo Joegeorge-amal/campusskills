@@ -57,6 +57,11 @@ const Messages = () => {
   const [deletingMessage, setDeletingMessage] = useState(null);
   const typingThrottleRef = useRef(0);
   const isTypingRef = useRef(false);
+  const chatsRef = useRef(chats);
+  
+  useEffect(() => {
+    chatsRef.current = chats;
+  }, [chats]);
 
   const [isMessagesLoading, setIsMessagesLoading] = useState(false);
   const [loadingOlder, setLoadingOlder] = useState(false);
@@ -76,23 +81,44 @@ const Messages = () => {
   // Load historical messages when active chat changes
   useEffect(() => {
     if (activeChatId && activeChatId !== 'requests') {
+      const unreadCountOnOpen = chatsRef.current.find(c => c.id === activeChatId)?.unread || 0;
+      
       // Always fetch history from API (merges with any WS-pre-populated messages)
       const isNewChat = !chatMessages[activeChatId];
       if (isNewChat) setIsMessagesLoading(true);
       messageService.getMessages(activeChatId, { page: 1, limit: 50 }).then(res => {
         setIsMessagesLoading(false);
+        const fetchedItems = res.items || [];
         if (isNewChat) {
-          setChatMessages(prev => ({ ...prev, [activeChatId]: res.items || [] }));
+          setChatMessages(prev => ({ ...prev, [activeChatId]: fetchedItems }));
         } else {
           setChatMessages(prev => {
             const existing = prev[activeChatId] || [];
             const existingIds = new Set(existing.map(m => m._id || m.id));
-            const newItems = (res.items || []).filter(m => !existingIds.has(m._id || m.id));
+            const newItems = fetchedItems.filter(m => !existingIds.has(m._id || m.id));
             if (newItems.length === 0) return prev;
             return { ...prev, [activeChatId]: [...newItems, ...existing] };
           });
         }
-        setHasMoreMessages(prev => ({ ...prev, [activeChatId]: res.items.length === 50 }));
+        setHasMoreMessages(prev => ({ ...prev, [activeChatId]: fetchedItems.length === 50 }));
+        
+        // Scroll to the appropriate message after render
+        setTimeout(() => {
+          if (unreadCountOnOpen > 0 && fetchedItems.length > 0) {
+            const oldestUnreadIndex = fetchedItems.length - unreadCountOnOpen;
+            if (oldestUnreadIndex >= 0) {
+              const msg = fetchedItems[oldestUnreadIndex];
+              const msgId = msg.tempId || msg._id || msg.id;
+              const el = document.getElementById('msg-' + msgId);
+              if (el) {
+                el.scrollIntoView({ behavior: 'instant', block: 'center' });
+                return;
+              }
+            }
+          }
+          messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
+        }, 100);
+
       }).catch(err => {
         setIsMessagesLoading(false);
         console.error(err);
@@ -102,10 +128,6 @@ const Messages = () => {
       window.dispatchEvent(new CustomEvent('markNotificationAsRead', { detail: { sourceType: 'CHAT', sourceId: activeChatId } }));
       setChats(prevChats => prevChats.map(c => c.id === activeChatId ? { ...c, unread: 0 } : c));
 
-      // Scroll to bottom
-      setTimeout(() => {
-         messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
-      }, 50);
       setShowScrollBottom(false);
       setUnreadNewMessages(0);
     }
@@ -134,6 +156,11 @@ const Messages = () => {
         if (container) {
           isAtBottom = container.scrollHeight - container.scrollTop - container.clientHeight < 150;
         }
+      }
+
+      // If this chat was hidden/deleted and just received a message, refetch to restore it
+      if (!chatsRef.current.some(c => c.id === chatId)) {
+        fetchInitialData();
       }
 
       setChatMessages(prev => {
@@ -766,23 +793,24 @@ const Messages = () => {
                   const canDelete = isMe && ageMs <= 15 * 60 * 1000;
 
                   return (
-                    <ChatMessageBubble 
-                      key={msg.tempId || msg._id || msg.id || i}
-                      isMe={isMe}
-                      avatarProps={{ initials: activeChat.init, bg: activeChat.bg, color: activeChat.col, backgroundImage: activeChat.avatar }}
-                      payload={{
-                        t: msg.message,
-                        time: new Date(msg.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                        f: isMe ? 'me' : 'them',
-                        status: status,
-                        ...msg
-                      }}
-                      onRetry={handleRetry}
-                      onReply={() => setReplyingTo(msg)}
-                      onEdit={canEdit ? () => setEditingMessage(msg) : undefined}
-                      onDelete={canDelete ? () => handleDeleteMessage(msg) : undefined}
-                      replyToMessage={replyToMessage}
-                    />
+                    <div key={msg.tempId || msg._id || msg.id || i} id={'msg-' + (msg.tempId || msg._id || msg.id)}>
+                      <ChatMessageBubble 
+                        isMe={isMe}
+                        avatarProps={{ initials: activeChat.init, bg: activeChat.bg, color: activeChat.col, backgroundImage: activeChat.avatar }}
+                        payload={{
+                          t: msg.message,
+                          time: new Date(msg.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                          f: isMe ? 'me' : 'them',
+                          status: status,
+                          ...msg
+                        }}
+                        onRetry={handleRetry}
+                        onReply={() => setReplyingTo(msg)}
+                        onEdit={canEdit ? () => setEditingMessage(msg) : undefined}
+                        onDelete={canDelete ? () => handleDeleteMessage(msg) : undefined}
+                        replyToMessage={replyToMessage}
+                      />
+                    </div>
                   );
                 })}
                 {isMessagesLoading && activeChatMsgs.length === 0 ? (

@@ -33,8 +33,11 @@ public class MessageRepository {
         return client.save(COLLECTION, document);
     }
 
-    public Future<List<Message>> fetchChatMessages(String chatId, int skip, int limit) {
+    public Future<List<Message>> fetchChatMessages(String chatId, int skip, int limit, Long clearedAt) {
         JsonObject query = new JsonObject().put("chatId", chatId);
+        if (clearedAt != null) {
+            query.put("createdAt", new JsonObject().put("$gt", clearedAt));
+        }
         
         FindOptions options = new FindOptions()
                 .setSort(new JsonObject().put("createdAt", -1))
@@ -47,13 +50,19 @@ public class MessageRepository {
                         .collect(Collectors.toList()));
     }
 
-    public Future<Long> countMessagesByChatId(String chatId) {
+    public Future<Long> countMessagesByChatId(String chatId, Long clearedAt) {
         JsonObject query = new JsonObject().put("chatId", chatId);
+        if (clearedAt != null) {
+            query.put("createdAt", new JsonObject().put("$gt", clearedAt));
+        }
         return client.count(COLLECTION, query);
     }
 
-    public Future<Message> findLastMessageByChatId(String chatId) {
+    public Future<Message> findLastMessageByChatId(String chatId, Long clearedAt) {
         JsonObject query = new JsonObject().put("chatId", chatId);
+        if (clearedAt != null) {
+            query.put("createdAt", new JsonObject().put("$gt", clearedAt));
+        }
         FindOptions options = new FindOptions()
                 .setSort(new JsonObject().put("createdAt", -1))
                 .setLimit(1);
@@ -122,11 +131,14 @@ public class MessageRepository {
                 .map(res -> true);
     }
 
-    public Future<Long> countUnreadMessagesForUser(String chatId, String userId) {
+    public Future<Long> countUnreadMessagesForUser(String chatId, String userId, Long clearedAt) {
         JsonObject query = new JsonObject()
                 .put("chatId", chatId)
                 .put("senderId", new JsonObject().put("$ne", userId))
                 .put("isRead", false);
+        if (clearedAt != null) {
+            query.put("createdAt", new JsonObject().put("$gt", clearedAt));
+        }
         return client.count(COLLECTION, query);
     }
 

@@ -150,7 +150,9 @@ public class ChatService {
                         JsonObject chatJson = JsonObject.mapFrom(chat);
                         items.add(chatJson);
                         
-                        Future<Void> lastMsgFut = messageRepository.findLastMessageByChatId(chat.getId()).map(lastMessage -> {
+                        Long clearedAt = chat.getClearedAt() != null ? chat.getClearedAt().get(userId) : null;
+                        
+                        Future<Void> lastMsgFut = messageRepository.findLastMessageByChatId(chat.getId(), clearedAt).map(lastMessage -> {
                             if (lastMessage != null) {
                                 chatJson.put("lastMessagePreview", lastMessage.getMessage());
                                 chatJson.put("lastMessageAt", lastMessage.getCreatedAt());
@@ -159,7 +161,7 @@ public class ChatService {
                             return null;
                         });
                         
-                        Future<Void> unreadCountFut = messageRepository.countUnreadMessagesForUser(chat.getId(), userId).map(count -> {
+                        Future<Void> unreadCountFut = messageRepository.countUnreadMessagesForUser(chat.getId(), userId, clearedAt).map(count -> {
                             chatJson.put("unreadCount", count != null ? count : 0L);
                             return null;
                         });
@@ -214,8 +216,7 @@ public class ChatService {
             if (!chat.getParticipants().contains(userId)) {
                 return Future.failedFuture("UNAUTHORIZED");
             }
-            return messageRepository.deleteMessagesByChatId(chatId)
-                .compose(v -> repository.deleteChat(chatId))
+            return repository.hideChatForUser(chatId, userId)
                 .mapEmpty();
         });
     }

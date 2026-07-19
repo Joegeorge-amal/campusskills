@@ -94,10 +94,15 @@ public class AdminManagementHandler {
                         );
                     Future<Void> fut = com.campusskills.core.database.MongoManager.getClient().findOne("user_profiles", query, null).map(doc -> {
                           if (doc != null) {
-                              String n = doc.getString("name", doc.getString("displayName"));
-                              json.put("firstName", n);
-                              json.put("name", n);
-                          }
+                            String n = doc.getString("name");
+                            if (n == null || n.trim().isEmpty()) n = doc.getString("displayName");
+                            if (n == null || n.trim().isEmpty()) n = doc.getString("fullName");
+                            if (n == null || n.trim().isEmpty()) n = doc.getString("firstName");
+                            if (n == null) n = "";
+                            
+                            json.put("firstName", n);
+                            json.put("name", n);
+                        }
                           arr.add(json);
                           return (Void) null;
                       }).recover(err -> {
