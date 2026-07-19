@@ -490,8 +490,10 @@ button, input, select, textarea {
   color: var(--cs-text-secondary);
 }
 
-[data-theme="dark"] .ni:hover {
+[data-theme="dark"] .ni:not(.on):hover {
   background: var(--cs-bg-hover);
+  box-shadow: none;
+  color: var(--cs-text-main);
 }
 
 [data-theme="dark"] .ni.on {
