@@ -8,23 +8,23 @@ import ConfirmModal from '../../modals/ConfirmModal';
 const getIconForType = (type) => {
   switch (type) {
     case 'NEW_MESSAGE':
-      return { icon: <IconMessage size={18} stroke={2} />, bg: '#f0f7ff', color: '#3b82f6' }; // Blue
+      return { icon: <IconMessage size={18} stroke={2} />, bg: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6' }; // Blue
     case 'SESSION_ACCEPTED':
     case 'SESSION_COMPLETED':
     case 'EXCHANGE_REQUEST_ACCEPTED':
     case 'CHAT_REQUEST_ACCEPTED':
-      return { icon: <IconCheck size={18} stroke={2} />, bg: '#ecfdf5', color: '#10b981' }; // Green
+      return { icon: <IconCheck size={18} stroke={2} />, bg: 'rgba(16, 185, 129, 0.15)', color: '#10b981' }; // Green
     case 'SESSION_CANCELLED':
     case 'SESSION_REJECTED':
     case 'EXCHANGE_REQUEST_REJECTED':
-      return { icon: <IconX size={18} stroke={2} />, bg: '#fef2f2', color: '#ef4444' }; // Red
+      return { icon: <IconX size={18} stroke={2} />, bg: 'rgba(239, 68, 68, 0.15)', color: '#ef4444' }; // Red
     case 'EXCHANGE_REQUEST_RECEIVED':
     case 'CHAT_REQUEST_RECEIVED':
     case 'SESSION_PROPOSED':
     case 'SESSION_COMPLETION_PENDING':
-      return { icon: <IconCalendarEvent size={18} stroke={2} />, bg: '#fffbeb', color: '#f59e0b' }; // Amber/Yellow
+      return { icon: <IconCalendarEvent size={18} stroke={2} />, bg: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b' }; // Amber/Yellow
     default:
-      return { icon: <IconBell size={18} stroke={2} />, bg: '#f3f4f6', color: 'var(--cs-text-secondary)' }; // Grey
+      return { icon: <IconBell size={18} stroke={2} />, bg: 'var(--cs-bg-light)', color: 'var(--cs-text-secondary)' }; // Grey
   }
 };
 
