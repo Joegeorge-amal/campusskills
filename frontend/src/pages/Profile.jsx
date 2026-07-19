@@ -509,7 +509,7 @@ const Profile = () => {
           <div style={{ display: 'flex', gap: '12px', marginTop: '80px' }}>
             <button 
               onClick={() => navigate('/app/edit-profile')} 
-              style={{ padding: '8px 16px', borderRadius: '12px', border: '1px solid #93c5fd', background: 'var(--cs-bg-white)', color: '#2563eb', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
+              style={{ padding: '8px 16px', borderRadius: '12px', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-white)', color: 'var(--cs-text-main)', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
             >
               Edit Profile
             </button>

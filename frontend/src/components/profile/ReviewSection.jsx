@@ -82,15 +82,15 @@ const ReviewSection = ({ userId, averageRating, reviewCount, onLoaded }) => {
   };
 
   return (
-    <div id="reviews-section" style={{ background: 'var(--cs-bg-white)', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', marginBottom: '32px', border: '1px solid #f3f4f6', scrollMarginTop: '100px' }}>
-      <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#111827', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+    <div id="reviews-section" style={{ background: 'var(--cs-bg-white)', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', marginBottom: '32px', border: '1px solid var(--cs-border)', scrollMarginTop: '100px' }}>
+      <h2 style={{ fontSize: '20px', fontWeight: 800, color: 'var(--cs-text-main)', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
         Ratings & Reviews
       </h2>
 
       {/* Trust Score & Info Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '24px', marginBottom: '24px', paddingBottom: '20px', borderBottom: '1px solid #f3f4f6' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '24px', marginBottom: '24px', paddingBottom: '20px', borderBottom: '1px solid var(--cs-border)' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <span style={{ fontSize: '48px', fontWeight: 900, color: '#111827' }}>
+          <span style={{ fontSize: '48px', fontWeight: 900, color: 'var(--cs-text-main)' }}>
             {averageRating !== undefined && averageRating !== null ? Number(averageRating).toFixed(1) : '0.0'}
           </span>
           <div style={{ display: 'inline-flex', verticalAlign: 'middle' }}>
@@ -98,8 +98,8 @@ const ReviewSection = ({ userId, averageRating, reviewCount, onLoaded }) => {
           </div>
         </div>
         <div>
-          <div style={{ fontSize: '15px', fontWeight: 700, color: '#374151' }}>Trust Score</div>
-          <div style={{ fontSize: '13px', color: '#6b7280', fontWeight: 500, marginTop: '2px' }}>
+          <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--cs-text-main)' }}>Trust Score</div>
+          <div style={{ fontSize: '13px', color: 'var(--cs-text-secondary)', fontWeight: 500, marginTop: '2px' }}>
             Based on {reviewCount || 0} reviews
           </div>
         </div>
@@ -126,10 +126,10 @@ const ReviewSection = ({ userId, averageRating, reviewCount, onLoaded }) => {
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px', borderTop: '1px solid var(--cs-border)', paddingTop: '8px' }}>
-                <span style={{ fontSize: '13px', color: '#1e3a8a', fontWeight: 700 }}>
+                <span style={{ fontSize: '13px', color: 'var(--cs-primary)', fontWeight: 700 }}>
                   — {rev.reviewerName}
                 </span>
-                <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: 600, background: 'var(--cs-bg-hover)', padding: '2px 8px', borderRadius: '100px' }}>
+                <span style={{ fontSize: '12px', color: 'var(--cs-text-secondary)', fontWeight: 600, background: 'var(--cs-bg-hover)', padding: '2px 8px', borderRadius: '100px' }}>
                   {rev.sessionTitle}
                 </span>
               </div>
