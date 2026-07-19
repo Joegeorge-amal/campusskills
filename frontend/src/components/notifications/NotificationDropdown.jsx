@@ -233,7 +233,7 @@ const NotificationDropdown = ({ onToggle }) => {
         aria-label="Notifications"
         aria-expanded={isOpen}
         style={{
-          border: '1px solid #dbeafe',
+          border: '1px solid var(--cs-border)',
           background: 'var(--cs-bg-white)',
           color: 'var(--cs-text-secondary)',
           padding: 0,
@@ -252,7 +252,7 @@ const NotificationDropdown = ({ onToggle }) => {
           <div className="admin-notif-dropdown fade-in" style={{right: 0, left: 'auto', top: '50px'}}>
             <div className="admin-notif-header">
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <h3 style={{ margin: 0, fontSize: '14px', color: '#111827' }}>Unread Inbox</h3>
+                <h3 style={{ margin: 0, fontSize: '14px', color: 'var(--cs-text-main)' }}>Unread Inbox</h3>
                 {unreadCount > 0 && (
                   <span className="admin-notif-count-badge">{unreadCount} new</span>
                 )}
