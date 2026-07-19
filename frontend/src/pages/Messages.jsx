@@ -81,8 +81,6 @@ const Messages = () => {
   // Load historical messages when active chat changes
   useEffect(() => {
     if (activeChatId && activeChatId !== 'requests') {
-      const unreadCountOnOpen = chatsRef.current.find(c => c.id === activeChatId)?.unread || 0;
-      
       // Always fetch history from API (merges with any WS-pre-populated messages)
       const isNewChat = !chatMessages[activeChatId];
       if (isNewChat) setIsMessagesLoading(true);
@@ -102,20 +100,8 @@ const Messages = () => {
         }
         setHasMoreMessages(prev => ({ ...prev, [activeChatId]: fetchedItems.length === 50 }));
         
-        // Scroll to the appropriate message after render
+        // Scroll to the bottom instantly after render
         setTimeout(() => {
-          if (unreadCountOnOpen > 0 && fetchedItems.length > 0) {
-            const oldestUnreadIndex = fetchedItems.length - unreadCountOnOpen;
-            if (oldestUnreadIndex >= 0) {
-              const msg = fetchedItems[oldestUnreadIndex];
-              const msgId = msg.tempId || msg._id || msg.id;
-              const el = document.getElementById('msg-' + msgId);
-              if (el) {
-                el.scrollIntoView({ behavior: 'instant', block: 'center' });
-                return;
-              }
-            }
-          }
           messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
         }, 100);
 
