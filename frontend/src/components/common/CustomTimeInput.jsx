@@ -88,7 +88,7 @@ const CustomTimeInput = ({ value, onChange, style }) => {
           justifyContent: 'space-between',
           padding: '0 14px',
           height: '100%',
-          background: '#ffffff',
+          background: 'var(--cs-bg-white)',
           border: `1px solid ${isOpen ? '#3b82f6' : '#e5e7eb'}`,
           borderRadius: '8px',
           cursor: 'pointer',
@@ -103,7 +103,7 @@ const CustomTimeInput = ({ value, onChange, style }) => {
         <IconChevronDown 
           size={16} 
           style={{ 
-            color: '#9ca3af', 
+            color: 'var(--cs-text-inactive)', 
             transition: 'transform 0.2s ease',
             transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
           }} 

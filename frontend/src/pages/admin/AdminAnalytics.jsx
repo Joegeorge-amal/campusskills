@@ -101,7 +101,7 @@ const AdminAnalytics = () => {
         <div className="aa-filter-left">
           <div className="aa-filter-btn">
             <IconFilter size={18} color="#2563eb" />
-            <span style={{ fontWeight: 600, color: '#0f172a' }}>Filters</span>
+            <span style={{ fontWeight: 600, color: 'var(--cs-text-main)' }}>Filters</span>
           </div>
           <div className="aa-filter-group">
             <label>YEAR</label>
@@ -151,8 +151,8 @@ const AdminAnalytics = () => {
       <div className="admin-panel" style={{ padding: '32px' }}>
         <div className="aa-chart-header">
           <div>
-            <h3 style={{ margin: '0 0 4px 0', fontSize: '1.1rem', color: '#0f172a' }}>Student Registrations Trend</h3>
-            <span style={{ fontSize: '0.85rem', color: '#64748b' }}>Jan - Dec · {meta.year} · {filters.department === 'all' ? 'All Departments' : filters.department}</span>
+            <h3 style={{ margin: '0 0 4px 0', fontSize: '1.1rem', color: 'var(--cs-text-main)' }}>Student Registrations Trend</h3>
+            <span style={{ fontSize: '0.85rem', color: 'var(--cs-text-secondary)' }}>Jan - Dec · {meta.year} · {filters.department === 'all' ? 'All Departments' : filters.department}</span>
           </div>
           <div className="aa-chart-badge">{meta.yoyGrowth}</div>
         </div>

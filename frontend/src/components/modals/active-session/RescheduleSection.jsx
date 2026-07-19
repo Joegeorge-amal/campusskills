@@ -68,7 +68,7 @@ const RescheduleSection = ({ session }) => {
               type="date" 
               value={newDate} 
               onChange={e => setNewDate(e.target.value)}
-              style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db' }}
+              style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--cs-border)' }}
               required
             />
           </div>
@@ -82,7 +82,7 @@ const RescheduleSection = ({ session }) => {
               type="button"
               onClick={() => setMode('view')}
               disabled={loading}
-              style={{ flex: 1, padding: '12px', background: '#f3f4f6', color: '#4b5563', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
+              style={{ flex: 1, padding: '12px', background: 'var(--cs-bg-light)', color: 'var(--cs-text-secondary)', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
             >
               Cancel
             </button>
@@ -104,7 +104,7 @@ const RescheduleSection = ({ session }) => {
     const pDate = new Date(proposal.proposedStart);
     return (
       <div style={{ textAlign: 'center', padding: '16px 0' }}>
-        <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: '#fffbeb', border: '2px solid #f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+        <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'var(--cs-bg-white)', border: '2px solid #f59e0b', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
           <IconClock size={32} color="#d97706" />
         </div>
         
@@ -154,7 +154,7 @@ const RescheduleSection = ({ session }) => {
     <div style={{ textAlign: 'center', padding: '16px 0' }}>
       <button
         onClick={() => setMode('propose')}
-        style={{ width: '100%', padding: '14px', background: '#f3f4f6', color: '#111827', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+        style={{ width: '100%', padding: '14px', background: 'var(--cs-bg-light)', color: '#111827', border: 'none', borderRadius: '10px', fontSize: '14px', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
       >
         <IconCalendarEvent size={18} />
         Propose Reschedule

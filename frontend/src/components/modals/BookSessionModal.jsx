@@ -56,7 +56,7 @@ const BookSessionModal = ({
   return (
     <ModalWrapper isOpen={true} onClose={onClose} maxWidth="380px" zIndex={1000}>
       <div style={{
-        background: '#ffffff',
+        background: 'var(--cs-bg-white)',
         width: '100%',
         borderRadius: '16px',
         overflow: 'hidden'

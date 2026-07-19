@@ -64,7 +64,7 @@ const ProfileHeader = ({
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
             <div 
               style={{ 
-                width: '128px', height: '128px', borderRadius: '50%', background: '#fff', 
+                width: '128px', height: '128px', borderRadius: '50%', background: 'var(--cs-bg-white)', 
                 display: 'flex', alignItems: 'center', justifyContent: 'center', 
                 boxShadow: '0 12px 32px rgba(0,0,0,0.15)', position: 'relative' 
               }}
@@ -77,7 +77,7 @@ const ProfileHeader = ({
                 <button 
                   onClick={onEditProfile} 
                   className="btn-secondary"
-                  style={{ background: '#fff', border: '1px solid #e5e7eb', color: '#374151', padding: '8px 16px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
+                  style={{ background: 'var(--cs-bg-white)', border: '1px solid var(--cs-border)', color: '#374151', padding: '8px 16px', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}
                 >
                   Edit Profile
                 </button>

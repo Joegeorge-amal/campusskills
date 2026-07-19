@@ -86,16 +86,16 @@ const ChatInput = ({ onSend, onChange, replyingTo, onCancelReply, editingMessage
     <div style={{ display: 'flex', flexDirection: 'column', borderTop: '0.5px solid var(--cs-border)', background: 'var(--cs-bg-white)' }}>
       {replyingTo && !editingMessage && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 24px 0 24px' }}>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', background: '#f8fafc', padding: '8px 12px', borderRadius: '8px', borderLeft: '3px solid #1d4ed8', flex: 1 }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', background: 'var(--cs-bg-light)', padding: '8px 12px', borderRadius: '8px', borderLeft: '3px solid #1d4ed8', flex: 1 }}>
             <Reply size={16} color="#64748b" />
             <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
               <span style={{ fontSize: '12px', fontWeight: 600, color: '#1d4ed8' }}>Replying to {replyName}</span>
-              <span style={{ fontSize: '12px', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <span style={{ fontSize: '12px', color: 'var(--cs-text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {replyingTo.message}
               </span>
             </div>
           </div>
-          <button onClick={onCancelReply} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', marginLeft: '8px', color: '#94a3b8' }}>
+          <button onClick={onCancelReply} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', marginLeft: '8px', color: 'var(--cs-text-inactive)' }}>
             <IconX size={18} />
           </button>
         </div>
@@ -103,16 +103,16 @@ const ChatInput = ({ onSend, onChange, replyingTo, onCancelReply, editingMessage
       
       {editingMessage && (
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 24px 0 24px' }}>
-          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', background: '#f8fafc', padding: '8px 12px', borderRadius: '8px', borderLeft: '3px solid #10b981', flex: 1 }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center', background: 'var(--cs-bg-light)', padding: '8px 12px', borderRadius: '8px', borderLeft: '3px solid #10b981', flex: 1 }}>
             <IconEdit size={16} color="#64748b" />
             <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
               <span style={{ fontSize: '12px', fontWeight: 600, color: '#10b981' }}>Editing message</span>
-              <span style={{ fontSize: '12px', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              <span style={{ fontSize: '12px', color: 'var(--cs-text-secondary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 {editingMessage.message}
               </span>
             </div>
           </div>
-          <button onClick={onCancelEdit} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', marginLeft: '8px', color: '#94a3b8' }}>
+          <button onClick={onCancelEdit} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '8px', marginLeft: '8px', color: 'var(--cs-text-inactive)' }}>
             <IconX size={18} />
           </button>
         </div>
@@ -132,7 +132,7 @@ const ChatInput = ({ onSend, onChange, replyingTo, onCancelReply, editingMessage
             padding: '12px 20px', 
             borderRadius: '24px', 
             border: '1px solid var(--cs-border)', 
-            background: '#f3f4f6', 
+            background: 'var(--cs-bg-light)', 
             fontSize: '14px', 
             color: 'var(--cs-text-main)', 
             outline: 'none',

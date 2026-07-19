@@ -40,7 +40,7 @@ const ReportModal = ({ isOpen, onClose, tutorName, skillName }) => {
 
         <div 
           style={{
-            background: '#FFF3CD',
+            background: 'var(--cs-bg-white)',
             border: '1px solid #F0C040',
             borderRadius: '9px',
             padding: '9px 11px',

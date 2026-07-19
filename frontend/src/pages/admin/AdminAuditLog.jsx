@@ -76,7 +76,7 @@ const AdminAuditLog = ({ isEmbedded = false }) => {
   };
 
   const getActionBadge = (action) => {
-    let style = { bg: '#f3f4f6', color: '#4b5563', border: '#e5e7eb' };
+    let style = { bg: '#f3f4f6', color: 'var(--cs-text-secondary)', border: '#e5e7eb' };
     switch(action) {
       case 'PROMOTE_USER': style = { bg: '#fdf4ff', color: '#a21caf', border: '#f5d0fe' }; break;
       case 'DEMOTE_USER': style = { bg: '#fff7ed', color: '#c2410c', border: '#ffedd5' }; break;
@@ -112,25 +112,25 @@ const AdminAuditLog = ({ isEmbedded = false }) => {
 
       <div className={isEmbedded ? 'admin-card' : 'admin-card'} style={isEmbedded ? { margin: '24px' } : {}}>
         {/* Filters Bar */}
-        <div style={{ padding: '20px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+        <div style={{ padding: '20px', borderBottom: '1px solid var(--cs-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
           <div style={{ display: 'flex', gap: '12px', flex: 1, minWidth: '300px' }}>
             <div style={{ position: 'relative', flex: 1, maxWidth: '400px' }}>
-              <IconSearch size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
+              <IconSearch size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--cs-text-inactive)' }} />
               <input 
                 type="text" 
                 placeholder="Search actor or target name/email..." 
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ width: '100%', padding: '10px 12px 10px 40px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '14px', outline: 'none' }}
+                style={{ width: '100%', padding: '10px 12px 10px 40px', border: '1px solid var(--cs-border)', borderRadius: '8px', fontSize: '14px', outline: 'none' }}
               />
             </div>
             
             <div style={{ position: 'relative' }}>
-              <IconFilter size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#9ca3af' }} />
+              <IconFilter size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--cs-text-inactive)' }} />
               <select 
                 value={actionFilter}
                 onChange={(e) => { setActionFilter(e.target.value); setPage(1); }}
-                style={{ padding: '10px 32px 10px 40px', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '14px', outline: 'none', appearance: 'none', background: 'white', cursor: 'pointer', minWidth: '150px' }}
+                style={{ padding: '10px 32px 10px 40px', border: '1px solid var(--cs-border)', borderRadius: '8px', fontSize: '14px', outline: 'none', appearance: 'none', background: 'white', cursor: 'pointer', minWidth: '150px' }}
               >
                 <option value="">All Actions</option>
                 <option value="PROMOTE_USER">Promote User</option>
@@ -141,12 +141,12 @@ const AdminAuditLog = ({ isEmbedded = false }) => {
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '14px', color: '#4b5563' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '14px', color: 'var(--cs-text-secondary)' }}>
             Rows per page:
             <select 
               value={limit}
               onChange={(e) => { setLimit(Number(e.target.value)); setPage(1); }}
-              style={{ padding: '6px 12px', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '14px', cursor: 'pointer' }}
+              style={{ padding: '6px 12px', border: '1px solid var(--cs-border)', borderRadius: '6px', fontSize: '14px', cursor: 'pointer' }}
             >
               <option value={25}>25</option>
               <option value={50}>50</option>
@@ -158,7 +158,7 @@ const AdminAuditLog = ({ isEmbedded = false }) => {
         {/* Table */}
         <div style={{ overflowX: 'auto' }}>
           <table className="admin-table" style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+            <thead style={{ background: '#f9fafb', borderBottom: '1px solid var(--cs-border)' }}>
               <tr>
                 <th style={{ padding: '16px 20px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase' }}>Time</th>
                 <th style={{ padding: '16px 20px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#6b7280', textTransform: 'uppercase' }}>Actor</th>
@@ -175,7 +175,7 @@ const AdminAuditLog = ({ isEmbedded = false }) => {
               ) : logs.length === 0 ? (
                 <tr>
                   <td colSpan="5" style={{ padding: '60px 20px', textAlign: 'center' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: '#9ca3af' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', color: 'var(--cs-text-inactive)' }}>
                       <IconFileSad size={48} stroke={1.5} style={{ marginBottom: '16px' }} />
                       <h3 style={{ fontSize: '16px', color: '#374151', fontWeight: '500', margin: '0 0 8px 0' }}>No Audit Logs Found</h3>
                       <p style={{ fontSize: '14px', margin: 0 }}>There are no records matching your current filters.</p>
@@ -184,7 +184,7 @@ const AdminAuditLog = ({ isEmbedded = false }) => {
                 </tr>
               ) : (
                 logs.map(log => (
-                  <tr key={log._id} style={{ borderBottom: '1px solid #e5e7eb', transition: 'background-color 0.15s' }}>
+                  <tr key={log._id} style={{ borderBottom: '1px solid var(--cs-border)', transition: 'background-color 0.15s' }}>
                     <td style={{ padding: '16px 20px' }}>
                       {formatTimestamp(log.timestamp)}
                     </td>
@@ -202,7 +202,7 @@ const AdminAuditLog = ({ isEmbedded = false }) => {
                     <td style={{ padding: '16px 20px', textAlign: 'right' }}>
                       <button 
                         onClick={() => setSelectedLog(log)}
-                        style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '500', cursor: 'pointer', transition: 'background 0.2s' }}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', background: 'var(--cs-bg-light)', color: '#374151', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '500', cursor: 'pointer', transition: 'background 0.2s' }}
                         onMouseEnter={(e) => e.currentTarget.style.background = '#e5e7eb'}
                         onMouseLeave={(e) => e.currentTarget.style.background = '#f3f4f6'}
                       >
@@ -218,7 +218,7 @@ const AdminAuditLog = ({ isEmbedded = false }) => {
 
         {/* Pagination */}
         {!loading && logs.length > 0 && (
-          <div style={{ padding: '16px 20px', borderTop: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ padding: '16px 20px', borderTop: '1px solid var(--cs-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ fontSize: '14px', color: '#6b7280' }}>
               Showing <span style={{ fontWeight: '500', color: '#111827' }}>{((page - 1) * limit) + 1}</span> to <span style={{ fontWeight: '500', color: '#111827' }}>{Math.min(page * limit, totalRecords)}</span> of <span style={{ fontWeight: '500', color: '#111827' }}>{totalRecords}</span> entries
             </div>
@@ -226,14 +226,14 @@ const AdminAuditLog = ({ isEmbedded = false }) => {
               <button 
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                style={{ padding: '6px 10px', background: 'white', border: '1px solid #d1d5db', borderRadius: '6px', color: page === 1 ? '#9ca3af' : '#374151', cursor: page === 1 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center' }}
+                style={{ padding: '6px 10px', background: 'white', border: '1px solid var(--cs-border)', borderRadius: '6px', color: page === 1 ? '#9ca3af' : '#374151', cursor: page === 1 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center' }}
               >
                 <IconChevronLeft size={18} />
               </button>
               <button 
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
-                style={{ padding: '6px 10px', background: 'white', border: '1px solid #d1d5db', borderRadius: '6px', color: page === totalPages ? '#9ca3af' : '#374151', cursor: page === totalPages ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center' }}
+                style={{ padding: '6px 10px', background: 'white', border: '1px solid var(--cs-border)', borderRadius: '6px', color: page === totalPages ? '#9ca3af' : '#374151', cursor: page === totalPages ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center' }}
               >
                 <IconChevronRight size={18} />
               </button>

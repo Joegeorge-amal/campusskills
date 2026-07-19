@@ -110,7 +110,7 @@ const PublicProfile = () => {
       <button 
         onClick={() => setIsMenuOpen(!isMenuOpen)}
         style={{ 
-          background: '#f1f5f9', border: 'none', color: '#475569', 
+          background: 'var(--cs-bg-light)', border: 'none', color: 'var(--cs-text-secondary)', 
           width: '36px', height: '36px', borderRadius: '8px', 
           display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' 
         }}
@@ -204,7 +204,7 @@ const PublicProfile = () => {
 
   if (loading || !profileData) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: '#f8fafc' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: 'var(--cs-bg-light)' }}>
         <svg width="32" height="32" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style={{ animation: 'spin 0.8s linear infinite' }}>
           <style>{`@keyframes spin { 100% { transform: rotate(360deg); } }`}</style>
           <circle cx="12" cy="12" r="10" stroke="rgba(37, 99, 235, 0.15)" strokeWidth="3.5" fill="none" />
@@ -228,7 +228,7 @@ const PublicProfile = () => {
   const isProfileVerified = totalSkills > 0 && verifiedCount >= totalSkills;
 
   return (
-    <div className="pg on" style={{ padding: 0, background: '#f8fafc', minHeight: '100vh', paddingBottom: '60px' }}>
+    <div className="pg on" style={{ padding: 0, background: 'var(--cs-bg-light)', minHeight: '100vh', paddingBottom: '60px' }}>
       <ProfileHeader user={profileData} isOwner={false} publicActions={publicActions} />
 
       <div style={{ maxWidth: '1000px', margin: '0 auto', padding: '0 24px' }}>
@@ -238,7 +238,7 @@ const PublicProfile = () => {
             {profileData.name}
           </h1>
           {profileData.rollNo && (
-            <div style={{ fontSize: '14px', color: '#9ca3af', fontWeight: 500, marginBottom: '8px' }}>
+            <div style={{ fontSize: '14px', color: 'var(--cs-text-inactive)', fontWeight: 500, marginBottom: '8px' }}>
               {profileData.rollNo.toUpperCase()}
             </div>
           )}
@@ -254,7 +254,7 @@ const PublicProfile = () => {
           </div>
           
           {profileData.bio && (
-            <div style={{ marginTop: '16px', fontSize: '15px', color: '#4b5563', lineHeight: '1.6', background: '#fff', padding: '16px', borderRadius: '12px', border: '1px solid #f3f4f6' }}>
+            <div style={{ marginTop: '16px', fontSize: '15px', color: 'var(--cs-text-secondary)', lineHeight: '1.6', background: 'var(--cs-bg-white)', padding: '16px', borderRadius: '12px', border: '1px solid #f3f4f6' }}>
               {profileData.bio}
             </div>
           )}
@@ -347,10 +347,10 @@ const PublicProfile = () => {
       )}
       <ModalWrapper isOpen={showBlockConfirm} onClose={() => setShowBlockConfirm(false)} maxWidth="320px" zIndex={10000}>
         <div style={{ padding: '24px' }}>
-          <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 600, color: '#0f172a' }}>Block {profileData?.name}?</h3>
-          <p style={{ margin: '0 0 24px 0', fontSize: '14px', color: '#64748b', lineHeight: '1.4' }}>Are you sure you want to block this user? They will not be able to message you or view your listings.</p>
+          <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 600, color: 'var(--cs-text-main)' }}>Block {profileData?.name}?</h3>
+          <p style={{ margin: '0 0 24px 0', fontSize: '14px', color: 'var(--cs-text-secondary)', lineHeight: '1.4' }}>Are you sure you want to block this user? They will not be able to message you or view your listings.</p>
           <div style={{ display: 'flex', gap: '12px' }}>
-            <button onClick={() => setShowBlockConfirm(false)} style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#fff', color: '#64748b', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
+            <button onClick={() => setShowBlockConfirm(false)} style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-white)', color: 'var(--cs-text-secondary)', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
             <button
               onClick={async () => {
                 setShowBlockConfirm(false);

@@ -70,24 +70,24 @@ const BlockedUsersModal = ({ onClose }) => {
       
       <motion.div 
         initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1, transition: { duration: 0.2, ease: 'easeOut' } }} exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.12, ease: 'easeOut' } }}
-        style={{ width: '90%', maxWidth: '440px', background: '#fff', borderRadius: '24px', overflow: 'hidden', position: 'relative', zIndex: 1, boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', display: 'flex', flexDirection: 'column', maxHeight: '80vh' }}
+        style={{ width: '90%', maxWidth: '440px', background: 'var(--cs-bg-white)', borderRadius: '24px', overflow: 'hidden', position: 'relative', zIndex: 1, boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', display: 'flex', flexDirection: 'column', maxHeight: '80vh' }}
       >
         <div style={{ padding: '24px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ fontSize: '18px', fontWeight: 800, color: '#0f172a' }}>Blocked Users</div>
-          <button onClick={onClose} style={{ width: '32px', height: '32px', borderRadius: '100px', border: 'none', background: '#f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: '#64748b' }}>
+          <div style={{ fontSize: '18px', fontWeight: 800, color: 'var(--cs-text-main)' }}>Blocked Users</div>
+          <button onClick={onClose} style={{ width: '32px', height: '32px', borderRadius: '100px', border: 'none', background: 'var(--cs-bg-light)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', color: 'var(--cs-text-secondary)' }}>
             <IconX size={18} />
           </button>
         </div>
 
         <div style={{ padding: '24px', overflowY: 'auto', flex: 1 }}>
           {loading ? (
-            <div style={{ textAlign: 'center', color: '#64748b', fontSize: '14px' }}>Loading...</div>
+            <div style={{ textAlign: 'center', color: 'var(--cs-text-secondary)', fontSize: '14px' }}>Loading...</div>
           ) : blockedProfiles.length === 0 ? (
-            <div style={{ textAlign: 'center', color: '#64748b', fontSize: '14px' }}>You haven't blocked anyone.</div>
+            <div style={{ textAlign: 'center', color: 'var(--cs-text-secondary)', fontSize: '14px' }}>You haven't blocked anyone.</div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               {blockedProfiles.map(p => (
-                <div key={p.userId} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', border: '1px solid #e2e8f0', borderRadius: '12px', background: '#f8fafc' }}>
+                <div key={p.userId} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px', border: '1px solid var(--cs-border)', borderRadius: '12px', background: 'var(--cs-bg-light)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <Avatar 
                       initials={p.name ? p.name.substring(0, 2).toUpperCase() : 'U'} 
@@ -96,12 +96,12 @@ const BlockedUsersModal = ({ onClose }) => {
                       fontSize="14px" 
                     />
                     <div>
-                      <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a' }}>{p.name}</div>
+                      <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--cs-text-main)' }}>{p.name}</div>
                     </div>
                   </div>
                   <button 
                     onClick={() => handleUnblock(p.userId)}
-                    style={{ padding: '6px 12px', borderRadius: '100px', border: '1px solid #cbd5e1', background: '#fff', color: '#334155', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
+                    style={{ padding: '6px 12px', borderRadius: '100px', border: '1px solid #cbd5e1', background: 'var(--cs-bg-white)', color: 'var(--cs-text-main)', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
                   >
                     Unblock
                   </button>

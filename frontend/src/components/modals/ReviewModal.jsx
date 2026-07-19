@@ -47,7 +47,7 @@ const ReviewModal = ({ isOpen, onClose, session, onSubmit }) => {
   return (
     <ModalWrapper isOpen={true} onClose={onClose} maxWidth="420px" zIndex={1000}>
       <div style={{
-        backgroundColor: '#ffffff',
+        background: 'var(--cs-bg-white)',
         borderRadius: '16px',
         padding: '24px',
         width: '100%',
@@ -63,7 +63,7 @@ const ReviewModal = ({ isOpen, onClose, session, onSubmit }) => {
           </button>
         </div>
         
-        <p style={{ fontSize: '13px', color: '#4b5563', margin: '0 0 16px', fontWeight: 500 }}>
+        <p style={{ fontSize: '13px', color: 'var(--cs-text-secondary)', margin: '0 0 16px', fontWeight: 500 }}>
           Review for <strong>{session.topic}</strong> with <strong>{session.name}</strong>.
         </p>
 
@@ -82,7 +82,7 @@ const ReviewModal = ({ isOpen, onClose, session, onSubmit }) => {
             placeholder="Write feedback about this session (e.g. Explains concepts clearly)..." 
             value={modalComment} 
             onChange={(e) => setModalComment(e.target.value)}
-            style={{ width: '100%', minHeight: '80px', borderRadius: '8px', border: '1px solid #d1d5db', padding: '10px', fontSize: '13px', boxSizing: 'border-box', resize: 'vertical' }}
+            style={{ width: '100%', minHeight: '80px', borderRadius: '8px', border: '1px solid var(--cs-border)', padding: '10px', fontSize: '13px', boxSizing: 'border-box', resize: 'vertical' }}
           />
         </div>
 

@@ -16,7 +16,7 @@
   bottom: 0;
   width: 400px;
   max-height: 100vh;
-  background: #ffffff;
+  background: var(--cs-bg-white);
   box-shadow: -10px 0 40px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
@@ -70,7 +70,7 @@
 .notif-body {
   flex: 1;
   overflow-y: auto;
-  background: #ffffff;
+  background: var(--cs-bg-white);
 }
 
 .notif-empty-state {
@@ -87,8 +87,8 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: #f3f4f6;
-  color: #9ca3af;
+  background: var(--cs-bg-light);
+  color: var(--cs-text-inactive);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -119,9 +119,9 @@
   gap: 16px;
   padding: 20px;
   border-radius: 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--cs-border);
   box-shadow: 0 2px 10px rgba(0,0,0,0.02);
-  background: #ffffff;
+  background: var(--cs-bg-white);
   transition: box-shadow 0.2s, border-color 0.2s, background-color 0.2s;
 }
 
@@ -131,7 +131,7 @@
 
 .notif-item.selected {
   border-color: #3b82f6;
-  background-color: #eff6ff;
+  background-color: var(--cs-bg-hover);
 }
 
 .notif-checkbox-container {
@@ -186,7 +186,7 @@
 
 .notif-message {
   font-size: 13px;
-  color: #4b5563;
+  color: var(--cs-text-secondary);
   line-height: 1.5;
   margin-bottom: 8px;
 }
@@ -199,7 +199,7 @@
 }
 
 .notif-time {
-  color: #9ca3af;
+  color: var(--cs-text-inactive);
 }
 
 .notif-action-btn {
@@ -222,7 +222,7 @@
   font-size: 14px;
   font-weight: 700;
   color: #1d4ed8;
-  background: #ffffff;
+  background: var(--cs-bg-white);
   cursor: pointer;
   transition: opacity 0.2s;
 }

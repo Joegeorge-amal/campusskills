@@ -3,8 +3,8 @@ import { IconCalendarMonth, IconStarFilled, IconStar } from '@tabler/icons-react
 
 const StatsCards = ({ user, stats }) => {
   const cardStyle = {
-    background: '#ffffff', 
-    border: '1px solid #e5e7eb', 
+    background: 'var(--cs-bg-white)', 
+    border: '1px solid var(--cs-border)', 
     borderRadius: '12px', 
     padding: '20px', 
     boxShadow: '0 1px 3px rgba(0,0,0,0.02)',

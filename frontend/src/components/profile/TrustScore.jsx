@@ -63,7 +63,7 @@ const TrustScore = ({ trustScorePercent, isProfileVerified, totalSkills, verifie
           <div style={{ 
             height: '100%', 
             width: `${trustScorePercent}%`, 
-            background: '#ffffff', 
+            background: 'var(--cs-bg-white)', 
             borderRadius: '100px',
             transition: 'width 1s cubic-bezier(0.34, 1.56, 0.64, 1)'
           }}></div>
@@ -73,7 +73,7 @@ const TrustScore = ({ trustScorePercent, isProfileVerified, totalSkills, verifie
   }
 
   return (
-    <div style={{ background: '#ffffff', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', marginBottom: '32px', border: '1px solid #f3f4f6', position: 'relative', overflow: 'hidden' }}>
+    <div style={{ background: 'var(--cs-bg-white)', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', marginBottom: '32px', border: '1px solid #f3f4f6', position: 'relative', overflow: 'hidden' }}>
       {isFlyingUp && (
         <motion.div
           initial={{ y: 50, opacity: 0, scale: 0.5 }}
@@ -88,7 +88,7 @@ const TrustScore = ({ trustScorePercent, isProfileVerified, totalSkills, verifie
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{ background: isProfileVerified ? '#dcfce7' : '#f3f4f6', padding: '10px', borderRadius: '12px', transition: 'background 0.3s ease' }}>
-            {isProfileVerified ? <IconShieldCheckFilled size={24} style={{ color: '#16a34a' }} /> : <IconShieldCheck size={24} style={{ color: '#9ca3af' }} />}
+            {isProfileVerified ? <IconShieldCheckFilled size={24} style={{ color: '#16a34a' }} /> : <IconShieldCheck size={24} style={{ color: 'var(--cs-text-inactive)' }} />}
           </div>
           <div>
             <div style={{ fontSize: '18px', fontWeight: 800, color: '#111827', display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -105,7 +105,7 @@ const TrustScore = ({ trustScorePercent, isProfileVerified, totalSkills, verifie
         </div>
       </div>
       
-      <div style={{ height: '8px', background: '#f3f4f6', borderRadius: '100px', overflow: 'hidden' }}>
+      <div style={{ height: '8px', background: 'var(--cs-bg-light)', borderRadius: '100px', overflow: 'hidden' }}>
         <div style={{ 
           height: '100%', 
           width: `${trustScorePercent}%`, 

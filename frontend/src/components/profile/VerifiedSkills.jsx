@@ -11,8 +11,8 @@ const VerifiedSkills = ({
   onRetakeQuiz
 }) => {
   const cardStyle = {
-    background: '#ffffff', 
-    border: '1px solid #e5e7eb', 
+    background: 'var(--cs-bg-white)', 
+    border: '1px solid var(--cs-border)', 
     borderRadius: '12px', 
     padding: '20px', 
     boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
@@ -27,16 +27,16 @@ const VerifiedSkills = ({
           <IconCheck size={14} strokeWidth={3} style={{ color: '#16a34a' }} />
         </div>
         <span style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>Verified Skills</span>
-        <span style={{ fontSize: '11px', color: '#6b7280', background: '#f3f4f6', padding: '2px 8px', borderRadius: '100px', fontWeight: 600 }}>{verifiedSkills.length}</span>
+        <span style={{ fontSize: '11px', color: '#6b7280', background: 'var(--cs-bg-light)', padding: '2px 8px', borderRadius: '100px', fontWeight: 600 }}>{verifiedSkills.length}</span>
       </div>
 
       {verifiedSkills.length === 0 ? (
-        <div style={{ padding: '32px 0', textAlign: 'center', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1', marginBottom: '40px' }}>
-          <div style={{ width: '48px', height: '48px', background: '#f1f5f9', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
+        <div style={{ padding: '32px 0', textAlign: 'center', background: 'var(--cs-bg-light)', borderRadius: '12px', border: '1px dashed #cbd5e1', marginBottom: '40px' }}>
+          <div style={{ width: '48px', height: '48px', background: 'var(--cs-bg-light)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 12px' }}>
             <IconCheck size={24} color="#94a3b8" />
           </div>
-          <div style={{ fontSize: '14px', fontWeight: 600, color: '#475569' }}>No verified skills yet</div>
-          <div style={{ fontSize: '13px', color: '#64748b', marginTop: '4px' }}>
+          <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--cs-text-secondary)' }}>No verified skills yet</div>
+          <div style={{ fontSize: '13px', color: 'var(--cs-text-secondary)', marginTop: '4px' }}>
             {isOwner ? "Take a skill quiz to get verified and boost your trust score." : "This user hasn't verified any skills yet."}
           </div>
         </div>
@@ -52,7 +52,7 @@ const VerifiedSkills = ({
                     <div style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>{skill}</div>
                   </div>
                   {isOwner && (
-                    <button onClick={() => onRemoveSkill(skill)} style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px' }}>
+                    <button onClick={() => onRemoveSkill(skill)} style={{ background: 'none', border: 'none', color: 'var(--cs-text-inactive)', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px' }}>
                       <IconTrash size={16} />
                     </button>
                   )}
@@ -100,19 +100,19 @@ const VerifiedSkills = ({
                 <IconCircle size={14} strokeWidth={3} style={{ color: '#f59e0b' }} />
               </div>
               <span style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>Pending Verification</span>
-              <span style={{ fontSize: '11px', color: '#6b7280', background: '#f3f4f6', padding: '2px 8px', borderRadius: '100px', fontWeight: 600 }}>{pendingSkills.length}</span>
+              <span style={{ fontSize: '11px', color: '#6b7280', background: 'var(--cs-bg-light)', padding: '2px 8px', borderRadius: '100px', fontWeight: 600 }}>{pendingSkills.length}</span>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
               {pendingSkills.map((skill, i) => (
-                <div key={i} className="glossy-card" style={{ ...cardStyle, border: '1px solid #fde047', background: '#fffbeb' }}>
+                <div key={i} className="glossy-card" style={{ ...cardStyle, border: '1px solid #fde047', background: 'var(--cs-bg-white)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#f59e0b' }}></div>
                       <div style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>{skill}</div>
                     </div>
                     {isOwner && (
-                      <button onClick={() => onRemoveSkill(skill)} style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px' }}>
+                      <button onClick={() => onRemoveSkill(skill)} style={{ background: 'none', border: 'none', color: 'var(--cs-text-inactive)', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px' }}>
                         <IconTrash size={16} />
                       </button>
                     )}
@@ -120,7 +120,7 @@ const VerifiedSkills = ({
                   <div style={{ fontSize: '11px', color: '#1d4ed8', marginBottom: '16px', marginLeft: '14px', fontWeight: 600 }}>{topicMap[skill] || 'General'}</div>
                   
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 'auto' }}>
-                    <div style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 500, fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <div style={{ fontSize: '11px', color: 'var(--cs-text-inactive)', fontWeight: 500, fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#d1d5db' }}></div>
                       Awaiting verification
                     </div>

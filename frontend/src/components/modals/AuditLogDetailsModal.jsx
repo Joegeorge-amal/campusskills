@@ -22,7 +22,7 @@ const AuditLogDetailsModal = ({ log, onClose }) => {
       case 'DEMOTE_USER': return { bg: '#fff7ed', color: '#c2410c', border: '#ffedd5' };
       case 'SUSPEND_USER': return { bg: '#fef2f2', color: '#dc2626', border: '#fecaca' };
       case 'UNSUSPEND_USER': return { bg: '#f0fdf4', color: '#16a34a', border: '#bbf7d0' };
-      default: return { bg: '#f3f4f6', color: '#4b5563', border: '#e5e7eb' };
+      default: return { bg: '#f3f4f6', color: 'var(--cs-text-secondary)', border: '#e5e7eb' };
     }
   };
 
@@ -41,7 +41,7 @@ const AuditLogDetailsModal = ({ log, onClose }) => {
         display: 'flex', flexDirection: 'column'
       }}>
         {/* Header */}
-        <div style={{ padding: '20px 24px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, background: 'white', zIndex: 10 }}>
+        <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--cs-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'sticky', top: 0, background: 'white', zIndex: 10 }}>
           <div>
             <h2 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#111827', display: 'flex', alignItems: 'center', gap: '12px' }}>
               Audit Record Details
@@ -62,7 +62,7 @@ const AuditLogDetailsModal = ({ log, onClose }) => {
         <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px' }}>
           
           {/* Timestamp & IP */}
-          <div style={{ display: 'flex', gap: '24px', padding: '16px', background: '#f9fafb', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+          <div style={{ display: 'flex', gap: '24px', padding: '16px', background: '#f9fafb', borderRadius: '8px', border: '1px solid var(--cs-border)' }}>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: '500', textTransform: 'uppercase', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <IconClock size={14} /> Timestamp
@@ -84,7 +84,7 @@ const AuditLogDetailsModal = ({ log, onClose }) => {
           {/* Actor vs Target */}
           <div style={{ display: 'flex', gap: '24px' }}>
             {/* Actor */}
-            <div style={{ flex: 1, border: '1px solid #e5e7eb', borderRadius: '8px', padding: '16px' }}>
+            <div style={{ flex: 1, border: '1px solid var(--cs-border)', borderRadius: '8px', padding: '16px' }}>
               <div style={{ fontSize: '13px', color: '#4f46e5', fontWeight: '600', textTransform: 'uppercase', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <IconUser size={16} /> Actor (Performed Action)
               </div>
@@ -105,7 +105,7 @@ const AuditLogDetailsModal = ({ log, onClose }) => {
             </div>
 
             {/* Target */}
-            <div style={{ flex: 1, border: '1px solid #e5e7eb', borderRadius: '8px', padding: '16px' }}>
+            <div style={{ flex: 1, border: '1px solid var(--cs-border)', borderRadius: '8px', padding: '16px' }}>
               <div style={{ fontSize: '13px', color: '#ea580c', fontWeight: '600', textTransform: 'uppercase', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <IconTarget size={16} /> Target (Affected User)
               </div>
@@ -127,7 +127,7 @@ const AuditLogDetailsModal = ({ log, onClose }) => {
           </div>
 
           {/* State Changes & Reason */}
-          <div style={{ border: '1px solid #e5e7eb', borderRadius: '8px', padding: '16px' }}>
+          <div style={{ border: '1px solid var(--cs-border)', borderRadius: '8px', padding: '16px' }}>
             <div style={{ fontSize: '13px', color: '#111827', fontWeight: '600', textTransform: 'uppercase', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <IconInfoCircle size={16} /> Action Details
             </div>
@@ -135,7 +135,7 @@ const AuditLogDetailsModal = ({ log, onClose }) => {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
               <div>
                 <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Previous State</div>
-                <div style={{ padding: '8px 12px', background: '#f3f4f6', borderRadius: '6px', fontSize: '14px', fontFamily: 'monospace', color: '#374151' }}>
+                <div style={{ padding: '8px 12px', background: 'var(--cs-bg-light)', borderRadius: '6px', fontSize: '14px', fontFamily: 'monospace', color: '#374151' }}>
                   {log.previousState || 'N/A'}
                 </div>
               </div>
@@ -150,7 +150,7 @@ const AuditLogDetailsModal = ({ log, onClose }) => {
             {log.reason && (
               <div>
                 <div style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Reason / Notes</div>
-                <div style={{ padding: '12px', background: '#fffbeb', borderRadius: '6px', fontSize: '14px', color: '#92400e', border: '1px solid #fef3c7', whiteSpace: 'pre-wrap' }}>
+                <div style={{ padding: '12px', background: 'var(--cs-bg-white)', borderRadius: '6px', fontSize: '14px', color: '#92400e', border: '1px solid #fef3c7', whiteSpace: 'pre-wrap' }}>
                   {log.reason}
                 </div>
               </div>

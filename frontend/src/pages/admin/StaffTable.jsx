@@ -71,9 +71,9 @@ const StaffTable = ({ staff, capabilities, onRefresh, onSuspend }) => {
   };
 
   return (
-    <div className="bg-white" style={{ borderRadius: '8px', border: '1px solid #e5e7eb', overflow: 'hidden' }}>
+    <div className="bg-white" style={{ borderRadius: '8px', border: '1px solid var(--cs-border)', overflow: 'hidden' }}>
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb', textAlign: 'left' }}>
+        <thead style={{ background: '#f9fafb', borderBottom: '1px solid var(--cs-border)', textAlign: 'left' }}>
           <tr>
             <th style={{ padding: '12px 16px', color: '#6b7280', fontWeight: '500', fontSize: '14px' }}>Staff Member</th>
             <th style={{ padding: '12px 16px', color: '#6b7280', fontWeight: '500', fontSize: '14px' }}>Role</th>
@@ -97,7 +97,7 @@ const StaffTable = ({ staff, capabilities, onRefresh, onSuspend }) => {
             const canSuspend = capabilities.canSuspendAdmins; 
             
             return (
-              <tr key={user.id} style={{ borderBottom: '1px solid #e5e7eb' }}>
+              <tr key={user.id} style={{ borderBottom: '1px solid var(--cs-border)' }}>
                 <td style={{ padding: '12px 16px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <div style={{
@@ -142,7 +142,7 @@ const StaffTable = ({ staff, capabilities, onRefresh, onSuspend }) => {
                     {canPromoteToSuperAdmin && !user.isBootstrap && (
                       <button 
                         onClick={() => handlePromoteClick(user)}
-                        style={{ padding: '6px 12px', fontSize: '13px', borderRadius: '4px', border: '1px solid #c7d2fe', background: '#e0e7ff', color: '#4338ca', cursor: 'pointer', fontWeight: '500' }}
+                        style={{ padding: '6px 12px', fontSize: '13px', borderRadius: '4px', border: '1px solid #c7d2fe', background: 'var(--cs-bg-hover)', color: '#4338ca', cursor: 'pointer', fontWeight: '500' }}
                       >
                         Promote to Super Admin
                       </button>
@@ -151,7 +151,7 @@ const StaffTable = ({ staff, capabilities, onRefresh, onSuspend }) => {
                     {canDemote && !user.isBootstrap && (
                       <button 
                         onClick={() => handleDemoteClick(user)}
-                        style={{ padding: '6px 12px', fontSize: '13px', borderRadius: '4px', border: '1px solid #d1d5db', background: 'white', cursor: 'pointer' }}
+                        style={{ padding: '6px 12px', fontSize: '13px', borderRadius: '4px', border: '1px solid var(--cs-border)', background: 'white', cursor: 'pointer' }}
                       >
                         Demote
                       </button>
@@ -199,7 +199,7 @@ const StaffTable = ({ staff, capabilities, onRefresh, onSuspend }) => {
               value={demoteReason}
               onChange={(e) => setDemoteReason(e.target.value)}
               placeholder="e.g. No longer needs admin access"
-              style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '14px' }}
+              style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--cs-border)', fontSize: '14px' }}
             />
           </div>
         </ConfirmModal>
@@ -224,7 +224,7 @@ const StaffTable = ({ staff, capabilities, onRefresh, onSuspend }) => {
               value={promoteReason}
               onChange={(e) => setPromoteReason(e.target.value)}
               placeholder="e.g. Assigned as head administrator"
-              style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '14px' }}
+              style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--cs-border)', fontSize: '14px' }}
             />
           </div>
         </ConfirmModal>

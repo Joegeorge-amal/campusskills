@@ -26,7 +26,7 @@ const History = () => {
         ))}
 
         {transactions.length === 0 && (
-          <div style={{ fontSize: '14px', color: '#6b7280', padding: '48px 0', textAlign: 'center', background: '#fff', borderRadius: '12px', border: '1px solid #e5e7eb' }}>
+          <div style={{ fontSize: '14px', color: '#6b7280', padding: '48px 0', textAlign: 'center', background: 'var(--cs-bg-white)', borderRadius: '12px', border: '1px solid var(--cs-border)' }}>
             No transactions found.
           </div>
         )}

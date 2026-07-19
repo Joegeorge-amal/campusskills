@@ -399,10 +399,10 @@ const SkillSwapModal = ({ isOpen, onClose, request, user, onConfirm }) => {
               {/* Auto-computed session schedule preview */}
               {sessionInfo && (
                 <div style={{
-                  background: '#f8fafc', border: '1px solid #e2e8f0',
+                  background: 'var(--cs-bg-light)', border: '1px solid var(--cs-border)',
                   borderRadius: '10px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px'
                 }}>
-                  <div style={{ fontSize: '12px', fontWeight: 700, color: '#334155', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                  <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--cs-text-main)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                     Session Schedule
                   </div>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px',
@@ -424,7 +424,7 @@ const SkillSwapModal = ({ isOpen, onClose, request, user, onConfirm }) => {
                     </div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '12px',
-                    padding: '10px', background: '#eff6ff', borderRadius: '8px', border: '1px solid #bfdbfe'
+                    padding: '10px', background: 'var(--cs-bg-hover)', borderRadius: '8px', border: '1px solid #bfdbfe'
                   }}>
                     <div style={{
                       width: '28px', height: '28px', borderRadius: '50%', background: '#dbeafe',
@@ -450,7 +450,7 @@ const SkillSwapModal = ({ isOpen, onClose, request, user, onConfirm }) => {
                   <div style={{ fontSize: '12px', fontWeight: 600, color: '#6b7280', marginBottom: '6px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                     Message from {otherName}
                   </div>
-                  <div style={{ padding: '12px', background: '#f3f4f6', borderRadius: '8px', fontSize: '13px', color: '#374151', lineHeight: 1.5 }}>
+                  <div style={{ padding: '12px', background: 'var(--cs-bg-light)', borderRadius: '8px', fontSize: '13px', color: '#374151', lineHeight: 1.5 }}>
                     {cleanMessage}
                   </div>
                 </div>
@@ -458,7 +458,7 @@ const SkillSwapModal = ({ isOpen, onClose, request, user, onConfirm }) => {
 
               {/* Info banner */}
               <div style={{
-                background: '#fffbeb', border: '1px solid #fde68a',
+                background: 'var(--cs-bg-white)', border: '1px solid #fde68a',
                 borderRadius: '8px', padding: '12px', fontSize: '12px', color: '#d97706'
               }}>
                 No money changes hands — this is a pure skill exchange!

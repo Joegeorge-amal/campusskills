@@ -16,7 +16,7 @@
   padding: 7px 10px;
   border-radius: 8px;
   border: 0.5px solid rgba(0, 0, 0, 0.1);
-  background: #fff;
+  background: var(--cs-bg-white);
   color: #222;
   font-size: 12px;
   outline: none;
@@ -38,7 +38,7 @@
 }
 
 .modal {
-  background: #fff;
+  background: var(--cs-bg-white);
   border-radius: 11px;
   border: 0.5px solid rgba(0, 0, 0, 0.08);
   padding: 16px;

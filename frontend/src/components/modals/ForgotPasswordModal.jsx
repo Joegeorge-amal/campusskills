@@ -180,7 +180,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, tab = 'student' }) => {
       >
         <button 
           onClick={handleClose} 
-          style={{ position: 'absolute', right: '16px', top: '16px', background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: '#9ca3af', lineHeight: 1 }}
+          style={{ position: 'absolute', right: '16px', top: '16px', background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: 'var(--cs-text-inactive)', lineHeight: 1 }}
         >×</button>
 
         {step < 4 && <Stepper currentStep={step} />}
@@ -195,7 +195,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, tab = 'student' }) => {
               <div className="lfld" style={{ marginBottom: '24px' }}>
                 <label className="lbl" style={{ fontWeight: 600 }}>{tab === 'student' ? 'College Email Address' : 'Admin Email Address'}</label>
                 {tab === 'student' ? (
-                  <div className="email-composite" style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px' }}>
+                  <div className="email-composite" style={{ background: '#f9fafb', border: '1px solid var(--cs-border)', borderRadius: '12px' }}>
                     <input
                       className="linp"
                       type="text"
@@ -205,7 +205,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, tab = 'student' }) => {
                       style={{ background: 'transparent', border: 'none' }}
                       required
                     />
-                    <div className="email-domain-suffix" style={{ color: '#9ca3af' }}>{APP_CONFIG.DEFAULT_DOMAIN}</div>
+                    <div className="email-domain-suffix" style={{ color: 'var(--cs-text-inactive)' }}>{APP_CONFIG.DEFAULT_DOMAIN}</div>
                   </div>
                 ) : (
                   <input
@@ -214,7 +214,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, tab = 'student' }) => {
                     placeholder="name@college.edu"
                     value={email}
                     onChange={(e) => setEmail(e.target.value.toLowerCase().replace(/\s/g, ''))}
-                    style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px' }}
+                    style={{ background: '#f9fafb', border: '1px solid var(--cs-border)', borderRadius: '12px' }}
                     required
                   />
                 )}
@@ -253,7 +253,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, tab = 'student' }) => {
                       textAlign: 'center',
                       fontWeight: '700',
                       borderRadius: '8px',
-                      border: '1px solid #e5e7eb',
+                      border: '1px solid var(--cs-border)',
                       outline: 'none',
                       color: '#111827',
                       background: '#f9fafb',
@@ -285,7 +285,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, tab = 'student' }) => {
             <form onSubmit={handleResetPassword} style={{ textAlign: 'left' }}>
               <div className="lfld" style={{ marginBottom: '16px' }}>
                 <label className="lbl" style={{ fontWeight: 600 }}>Password</label>
-                <div className="input-wrapper" style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px' }}>
+                <div className="input-wrapper" style={{ background: '#f9fafb', border: '1px solid var(--cs-border)', borderRadius: '12px' }}>
                   <input
                     className="linp"
                     type={showNewPassword ? "text" : "password"}
@@ -302,7 +302,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, tab = 'student' }) => {
               </div>
               <div className="lfld" style={{ marginBottom: '20px' }}>
                 <label className="lbl" style={{ fontWeight: 600 }}>Confirm Password</label>
-                <div className="input-wrapper" style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px' }}>
+                <div className="input-wrapper" style={{ background: '#f9fafb', border: '1px solid var(--cs-border)', borderRadius: '12px' }}>
                   <input
                     className="linp"
                     type={showConfirmPassword ? "text" : "password"}
@@ -319,7 +319,7 @@ const ForgotPasswordModal = ({ isOpen, onClose, tab = 'student' }) => {
               </div>
 
               <div style={{ background: '#f9fafb', borderRadius: '12px', padding: '16px', marginBottom: '24px' }}>
-                <div style={{ fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '12px' }}>Password must contain:</div>
+                <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-secondary)', marginBottom: '12px' }}>Password must contain:</div>
                 <CheckItem label="At least 8 characters" checked={hasMinLen} />
                 <CheckItem label="One uppercase letter" checked={hasUpper} />
                 <CheckItem label="One number" checked={hasNumber} />

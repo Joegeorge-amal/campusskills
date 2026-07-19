@@ -10,12 +10,12 @@ const SessionReminderOverlay = ({ session, onDismiss, onProposePostponement }) =
       position: 'fixed',
       bottom: '24px',
       right: '24px',
-      background: '#ffffff',
+      background: 'var(--cs-bg-white)',
       borderRadius: '16px',
       boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
       width: '320px',
       zIndex: 2000,
-      border: '1px solid #e5e7eb',
+      border: '1px solid var(--cs-border)',
       overflow: 'hidden',
       animation: 'slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
     }}>

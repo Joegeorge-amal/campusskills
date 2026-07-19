@@ -32,7 +32,7 @@ const SuspendUserModal = ({ user, capabilities, onClose, onSuccess }) => {
       <div 
         className="modal-content" 
         onClick={e => e.stopPropagation()} 
-        style={{ padding: '24px', maxWidth: '500px', width: '90%', borderRadius: '16px', background: '#fff' }}
+        style={{ padding: '24px', maxWidth: '500px', width: '90%', borderRadius: '16px', background: 'var(--cs-bg-white)' }}
       >
         <h3 style={{ margin: '0 0 16px 0', fontSize: '20px', fontWeight: 'bold' }}>
           {isCurrentlyActive ? 'Suspend User' : 'Reinstate User'}
@@ -51,7 +51,7 @@ const SuspendUserModal = ({ user, capabilities, onClose, onSuccess }) => {
               <select 
                 value={category} 
                 onChange={(e) => setCategory(e.target.value)}
-                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db' }}
+                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--cs-border)' }}
                 required
               >
                 <option value="">Select a category...</option>
@@ -73,7 +73,7 @@ const SuspendUserModal = ({ user, capabilities, onClose, onSuccess }) => {
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               rows={3}
-              style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db', resize: 'vertical' }}
+              style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--cs-border)', resize: 'vertical' }}
             />
           </div>
 
@@ -81,7 +81,7 @@ const SuspendUserModal = ({ user, capabilities, onClose, onSuccess }) => {
             <button 
               type="button" 
               onClick={onClose}
-              style={{ padding: '8px 16px', borderRadius: '6px', border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer', fontWeight: '500' }}
+              style={{ padding: '8px 16px', borderRadius: '6px', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-white)', cursor: 'pointer', fontWeight: '500' }}
             >
               Cancel
             </button>

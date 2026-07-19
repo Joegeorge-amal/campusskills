@@ -46,7 +46,7 @@
 .msg-bubble-them {
   background: var(--cs-bg-white);
   color: var(--cs-text-main);
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--cs-border);
   border-bottom-left-radius: 4px;
 }
 
@@ -173,7 +173,7 @@
 
 .msg-action-btn:hover {
   color: var(--cs-primary);
-  background: #f8fafc;
+  background: var(--cs-bg-light);
 }
 
 .msg-btn-decline {
@@ -242,8 +242,8 @@
 }
 
 .msg-system-bubble {
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
+  background: var(--cs-bg-light);
+  border: 1px solid var(--cs-border);
   border-radius: 12px;
   padding: 16px;
   max-width: 450px;
@@ -268,7 +268,7 @@
 
 .msg-system-body {
   font-size: 13px;
-  color: #334155;
+  color: var(--cs-text-main);
   line-height: 1.5;
   white-space: pre-wrap;
   margin-bottom: 12px;
@@ -302,7 +302,7 @@
 
 .msg-system-btn-secondary {
   background: #e2e8f0;
-  color: #334155;
+  color: var(--cs-text-main);
 }
 
 .msg-system-btn-secondary:hover {

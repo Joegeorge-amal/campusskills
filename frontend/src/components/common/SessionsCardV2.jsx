@@ -14,7 +14,7 @@ const SessionsCardV2 = ({
   return (
     <div className="glossy-card" style={{
       display: 'flex',
-      background: '#ffffff',
+      background: 'var(--cs-bg-white)',
       border: '1px solid #f3f4f6',
       borderRadius: '12px',
       padding: '16px',
@@ -40,7 +40,7 @@ const SessionsCardV2 = ({
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <div style={{ fontSize: '13px', fontWeight: 600, color: '#111827', marginBottom: '2px' }}>{title}</div>
-        <div style={{ fontSize: '11px', color: '#9ca3af', lineHeight: 1.4 }}>{subtitle}</div>
+        <div style={{ fontSize: '11px', color: 'var(--cs-text-inactive)', lineHeight: 1.4 }}>{subtitle}</div>
       </div>
 
       {actions && (

@@ -49,7 +49,7 @@ const PaymentModal = ({ isOpen, onClose, session, onMarkPaid }) => {
   return (
     <ModalWrapper isOpen={true} onClose={onClose} maxWidth="400px" zIndex={1000}>
       <div style={{
-        backgroundColor: '#ffffff',
+        background: 'var(--cs-bg-white)',
         borderRadius: '16px',
         padding: '24px',
         width: '100%',
@@ -65,7 +65,7 @@ const PaymentModal = ({ isOpen, onClose, session, onMarkPaid }) => {
           </button>
         </div>
         
-        <p style={{ fontSize: '14px', color: '#4b5563', margin: '0 0 24px', lineHeight: 1.5 }}>
+        <p style={{ fontSize: '14px', color: 'var(--cs-text-secondary)', margin: '0 0 24px', lineHeight: 1.5 }}>
           Please complete your payment for <strong>{session.topic}</strong>. Scan the QR code below or use the UPI ID to pay.
         </p>
 
@@ -76,10 +76,10 @@ const PaymentModal = ({ isOpen, onClose, session, onMarkPaid }) => {
         ) : paymentInfo ? (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px', marginBottom: '24px' }}>
             <div style={{ 
-              background: '#fff', 
+              background: 'var(--cs-bg-white)', 
               padding: '16px', 
               borderRadius: '12px', 
-              border: '1px solid #e5e7eb',
+              border: '1px solid var(--cs-border)',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -127,7 +127,7 @@ const PaymentModal = ({ isOpen, onClose, session, onMarkPaid }) => {
           <button 
             onClick={onClose}
             disabled={isSubmitting}
-            style={{ flex: 1, padding: '12px', background: '#f3f4f6', color: '#374151', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '14px' }}
+            style={{ flex: 1, padding: '12px', background: 'var(--cs-bg-light)', color: '#374151', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 600, fontSize: '14px' }}
           >
             I'll Pay Later
           </button>

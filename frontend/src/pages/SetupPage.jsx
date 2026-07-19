@@ -295,7 +295,7 @@ const SetupPage = () => {
         <button 
           type="button"
           onClick={() => navigate('/login')}
-          style={{ position: 'absolute', top: '32px', left: '32px', background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: '6px', color: '#4b5563', fontSize: '14px', fontWeight: 500, cursor: 'pointer', zIndex: 10 }}
+          style={{ position: 'absolute', top: '32px', left: '32px', background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--cs-text-secondary)', fontSize: '14px', fontWeight: 500, cursor: 'pointer', zIndex: 10 }}
         >
           <IconArrowLeft size={18} /> Back to Login
         </button>
@@ -304,7 +304,7 @@ const SetupPage = () => {
       {/* HEADER & STEPS OUTSIDE CARD */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: '850px', margin: '0 auto 24px', zIndex: 2 }}>
         <div className="setup-logo" style={{ marginBottom: '16px' }}>
-          <div className="setup-mark" style={{ borderRadius: '50%', background: '#ffffff', width: '44px', height: '44px', padding: '4px', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
+          <div className="setup-mark" style={{ borderRadius: '50%', background: 'var(--cs-bg-white)', width: '44px', height: '44px', padding: '4px', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
             <img src="/src/assets/kju_campus_logo.png" alt="logo" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '50%' }} onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }} />
             <IconSchool size={28} color="#1d4ed8" style={{ display: 'none', margin: 'auto' }} />
           </div>
@@ -371,7 +371,7 @@ const SetupPage = () => {
 
                 {password.length > 0 && !allCriteriaMet && (
                   <div style={{ background: '#f9fafb', borderRadius: '12px', padding: '16px', marginBottom: '24px' }}>
-                    <div style={{ fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '12px' }}>Password must contain:</div>
+                    <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-secondary)', marginBottom: '12px' }}>Password must contain:</div>
                     {visibleRules.map((rule, idx) => (
                       <CheckItem key={idx} label={rule.label} checked={rule.checked} />
                     ))}
@@ -412,7 +412,7 @@ const SetupPage = () => {
                     {isUploadingImage ? (
                       <span style={{ fontSize: '14px', fontWeight: '500', color: 'var(--cs-primary)' }}>Uploading...</span>
                     ) : avatarImg ? (
-                      <div style={{ fontSize: '13px', color: '#4b5563', fontWeight: 500 }}>
+                      <div style={{ fontSize: '13px', color: 'var(--cs-text-secondary)', fontWeight: 500 }}>
                         <button type="button" onClick={(e) => { 
                           e.stopPropagation(); 
                           setAvatarImg(null); 
@@ -421,7 +421,7 @@ const SetupPage = () => {
                       </div>
                     ) : (
                       <>
-                        <div style={{ fontSize: '13px', color: '#4b5563', marginBottom: '8px', fontWeight: 500 }}>
+                        <div style={{ fontSize: '13px', color: 'var(--cs-text-secondary)', marginBottom: '8px', fontWeight: 500 }}>
                           <span>Choose avatar colour</span>
                         </div>
                         <div className="av-colors">
@@ -546,7 +546,7 @@ const SetupPage = () => {
                 </div>
 
                 <div style={{ marginBottom: 0 }}>
-                   <label style={{ fontSize: '12px', color: '#4b5563', fontWeight: 500, display: 'block', marginBottom: '6px' }}>Pick or type a skill</label>
+                   <label style={{ fontSize: '12px', color: 'var(--cs-text-secondary)', fontWeight: 500, display: 'block', marginBottom: '6px' }}>Pick or type a skill</label>
                    <AutocompleteInput 
                      allTopics={allTopicsList} 
                      onAddSkill={addLearnSkill} 
@@ -556,7 +556,7 @@ const SetupPage = () => {
               </div>
 
               <div style={{ display: 'flex', gap: '16px' }}>
-                <button type="button" onClick={handleBack} style={{ flex: '0 0 auto', padding: '14px 28px', borderRadius: '12px', background: '#fff', border: '1px solid #e5e7eb', fontSize: '15px', fontWeight: 600, color: '#4b5563', cursor: 'pointer' }}>Back</button>
+                <button type="button" onClick={handleBack} style={{ flex: '0 0 auto', padding: '14px 28px', borderRadius: '12px', background: 'var(--cs-bg-white)', border: '1px solid var(--cs-border)', fontSize: '15px', fontWeight: 600, color: 'var(--cs-text-secondary)', cursor: 'pointer' }}>Back</button>
                 <button type="submit" style={{ flexGrow: 1, padding: '14px', borderRadius: '12px', background: '#1d4ed8', color: '#fff', border: 'none', fontSize: '15px', fontWeight: 600, cursor: 'pointer' }}>Continue</button>
               </div>
             </div>
@@ -602,7 +602,7 @@ const SetupPage = () => {
               </div>
 
               <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
-                <button type="button" onClick={handleBack} disabled={isFinishing} style={{ flex: '0 0 auto', padding: '14px 28px', borderRadius: '12px', background: '#fff', border: '1px solid #e5e7eb', fontSize: '15px', fontWeight: 600, color: '#4b5563', cursor: isFinishing ? 'not-allowed' : 'pointer', opacity: isFinishing ? 0.5 : 1 }}>Back</button>
+                <button type="button" onClick={handleBack} disabled={isFinishing} style={{ flex: '0 0 auto', padding: '14px 28px', borderRadius: '12px', background: 'var(--cs-bg-white)', border: '1px solid var(--cs-border)', fontSize: '15px', fontWeight: 600, color: 'var(--cs-text-secondary)', cursor: isFinishing ? 'not-allowed' : 'pointer', opacity: isFinishing ? 0.5 : 1 }}>Back</button>
                 <button type="submit" disabled={isFinishing} style={{ flexGrow: 1, padding: '14px', borderRadius: '12px', background: '#1d4ed8', color: '#fff', border: 'none', fontSize: '15px', fontWeight: 600, cursor: isFinishing ? 'not-allowed' : 'pointer', opacity: isFinishing ? 0.8 : 1 }}>{isFinishing ? 'Creating Account...' : 'Go to Dashboard'}</button>
               </div>
               <div style={{ textAlign: 'center' }}>

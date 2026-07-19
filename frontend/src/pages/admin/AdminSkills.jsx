@@ -115,7 +115,7 @@ const AdminSkills = () => {
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan="5" style={{ textAlign: 'center', padding: '48px', color: '#64748b' }}>
+                <td colSpan="5" style={{ textAlign: 'center', padding: '48px', color: 'var(--cs-text-secondary)' }}>
                   <IconLoader2 className="spinner" size={24} style={{ marginBottom: '8px', color: '#3b82f6' }} />
                   <div>Loading skills...</div>
                 </td>
@@ -128,7 +128,7 @@ const AdminSkills = () => {
               </tr>
             ) : skills.length === 0 ? (
               <tr>
-                <td colSpan="5" style={{ textAlign: 'center', padding: '48px', color: '#64748b' }}>
+                <td colSpan="5" style={{ textAlign: 'center', padding: '48px', color: 'var(--cs-text-secondary)' }}>
                   No skills found matching the criteria.
                 </td>
               </tr>
@@ -136,8 +136,8 @@ const AdminSkills = () => {
               skills.map((skill) => (
                 <tr key={skill.id}>
                   <td>
-                    <div style={{ fontWeight: 600, color: '#0f172a' }}>{skill.title}</div>
-                    <div style={{ fontSize: '0.75rem', color: '#64748b' }}>
+                    <div style={{ fontWeight: 600, color: 'var(--cs-text-main)' }}>{skill.title}</div>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--cs-text-secondary)' }}>
                       {skill.ownerName} · {skill.status === 'ADMIN_DISABLED' ? 'Disabled' : 'Active'}
                     </div>
                   </td>

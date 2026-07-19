@@ -28,7 +28,7 @@ const SessionRequestPopup = ({ request, remainingCount, onAccept, onDecline }) =
       top: '80px',
       right: '24px',
       width: '360px',
-      background: '#ffffff',
+      background: 'var(--cs-bg-white)',
       borderRadius: '16px',
       boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
       padding: '20px',
@@ -47,7 +47,7 @@ const SessionRequestPopup = ({ request, remainingCount, onAccept, onDecline }) =
               +{remainingCount} more
             </span>
           )}
-          <button onClick={onDecline} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', display: 'flex' }}>
+          <button onClick={onDecline} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--cs-text-inactive)', display: 'flex' }}>
             <IconX size={18} />
           </button>
         </div>
@@ -88,7 +88,7 @@ const SessionRequestPopup = ({ request, remainingCount, onAccept, onDecline }) =
         <button style={{
           flex: 1,
           padding: '10px 0',
-          background: '#ffffff',
+          background: 'var(--cs-bg-white)',
           color: '#1d4ed8',
           border: '1px solid #93c5fd',
           borderRadius: '8px',

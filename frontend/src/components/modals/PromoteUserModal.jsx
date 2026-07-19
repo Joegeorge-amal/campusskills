@@ -64,7 +64,7 @@ const PromoteUserModal = ({ capabilities, onClose, onSuccess }) => {
       <div 
         className="modal-content" 
         onClick={e => e.stopPropagation()} 
-        style={{ padding: '24px', maxWidth: '500px', width: '90%', borderRadius: '16px', background: '#fff' }}
+        style={{ padding: '24px', maxWidth: '500px', width: '90%', borderRadius: '16px', background: 'var(--cs-bg-white)' }}
       >
         <h3 style={{ margin: '0 0 16px 0', fontSize: '20px', fontWeight: 'bold' }}>Add Administrator</h3>
         <p style={{ margin: '0 0 24px 0', color: '#6b7280', fontSize: '14px' }}>
@@ -80,13 +80,13 @@ const PromoteUserModal = ({ capabilities, onClose, onSuccess }) => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               disabled={selectedUser !== null}
-              style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db' }}
+              style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--cs-border)' }}
             />
             {isSearching && <div style={{ fontSize: '12px', color: '#6b7280', marginTop: '4px' }}>Searching...</div>}
             
             {!selectedUser && users.length === 0 && searchQuery.includes('@') && !isSearching && !inviteConfirm && !inviteSuccess && (
                 <div style={{ marginTop: '8px', padding: '16px', border: '1px dashed #d1d5db', borderRadius: '6px', textAlign: 'center' }}>
-                  <p style={{ margin: '0 0 12px 0', color: '#4b5563', fontSize: '14px' }}>
+                  <p style={{ margin: '0 0 12px 0', color: 'var(--cs-text-secondary)', fontSize: '14px' }}>
                     No existing CampusSkills user found with this email.
                   </p>
                   <button 
@@ -116,7 +116,7 @@ const PromoteUserModal = ({ capabilities, onClose, onSuccess }) => {
                     <button 
                       type="button" 
                       onClick={() => setInviteConfirm(false)}
-                      style={{ padding: '6px 12px', borderRadius: '4px', border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer' }}
+                      style={{ padding: '6px 12px', borderRadius: '4px', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-white)', cursor: 'pointer' }}
                     >
                       Cancel
                     </button>
@@ -174,7 +174,7 @@ const PromoteUserModal = ({ capabilities, onClose, onSuccess }) => {
                 </div>
               )}
             {!selectedUser && users.length > 0 && (
-              <div style={{ marginTop: '8px', border: '1px solid #e5e7eb', borderRadius: '6px', maxHeight: '150px', overflowY: 'auto' }}>
+              <div style={{ marginTop: '8px', border: '1px solid var(--cs-border)', borderRadius: '6px', maxHeight: '150px', overflowY: 'auto' }}>
                 {users.map(u => (
                   <div 
                     key={u.id} 
@@ -189,7 +189,7 @@ const PromoteUserModal = ({ capabilities, onClose, onSuccess }) => {
             )}
 
             {selectedUser && (
-              <div style={{ marginTop: '8px', padding: '12px', background: '#e0e7ff', borderRadius: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ marginTop: '8px', padding: '12px', background: 'var(--cs-bg-hover)', borderRadius: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                   <div style={{ fontWeight: '600', color: '#3730a3' }}>{selectedUser.displayName} {selectedUser.rollNo ? `(${selectedUser.rollNo})` : ''}</div>
                   <div style={{ fontSize: '12px', color: '#4f46e5' }}>{selectedUser.email} - Role: {selectedUser.role}</div>
@@ -208,7 +208,7 @@ const PromoteUserModal = ({ capabilities, onClose, onSuccess }) => {
               placeholder="e.g. Needs access to moderation tools"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db' }}
+              style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--cs-border)' }}
             />
           </div>
 
@@ -216,7 +216,7 @@ const PromoteUserModal = ({ capabilities, onClose, onSuccess }) => {
             <button 
               type="button" 
               onClick={onClose}
-              style={{ padding: '8px 16px', borderRadius: '6px', border: '1px solid #d1d5db', background: '#fff', cursor: 'pointer', fontWeight: '500' }}
+              style={{ padding: '8px 16px', borderRadius: '6px', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-white)', cursor: 'pointer', fontWeight: '500' }}
             >
               Cancel
             </button>

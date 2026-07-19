@@ -20,7 +20,7 @@ const ConfirmModal = ({
       <div 
         className="modal-content" 
         onClick={e => e.stopPropagation()} 
-        style={{ padding: '24px', maxWidth: '400px', width: '90%', borderRadius: '16px', background: '#fff' }}
+        style={{ padding: '24px', maxWidth: '400px', width: '90%', borderRadius: '16px', background: 'var(--cs-bg-white)' }}
       >
         <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
           <div style={{ 
@@ -36,7 +36,7 @@ const ConfirmModal = ({
           </div>
           <div>
             <h3 style={{ margin: '0 0 8px 0', color: '#111827', fontSize: '18px', fontWeight: 700 }}>{title}</h3>
-            <p style={{ margin: '0 0 24px 0', color: '#4b5563', fontSize: '14px', lineHeight: '1.5' }}>{message}</p>
+            <p style={{ margin: '0 0 24px 0', color: 'var(--cs-text-secondary)', fontSize: '14px', lineHeight: '1.5' }}>{message}</p>
           </div>
         </div>
         
@@ -44,7 +44,7 @@ const ConfirmModal = ({
           <button 
             style={{ 
               padding: '10px 18px', 
-              background: '#f3f4f6', 
+              background: 'var(--cs-bg-light)', 
               border: 'none', 
               color: '#374151', 
               borderRadius: '8px',

@@ -198,7 +198,7 @@ const Marketplace = () => {
                   padding: '10px 12px 10px 36px',
                   borderRadius: '100px',
                   border: '1px solid var(--cs-border)',
-                  background: '#fff',
+                  background: 'var(--cs-bg-white)',
                   fontSize: '13px',
                   outline: 'none',
                   color: 'var(--cs-text-main)',
@@ -222,7 +222,7 @@ const Marketplace = () => {
                     setRefreshSpin(prev => prev + 1);
                     fetchListings(false);
                   }} 
-                  style={{ flexShrink: 0, height: '28px', background: '#fff', border: '1px solid #e5e7eb', padding: '0 12px', borderRadius: '100px', fontSize: '12px', fontWeight: 600, color: '#374151', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}
+                  style={{ flexShrink: 0, height: '28px', background: 'var(--cs-bg-white)', border: '1px solid var(--cs-border)', padding: '0 12px', borderRadius: '100px', fontSize: '12px', fontWeight: 600, color: '#374151', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', whiteSpace: 'nowrap', transition: 'all 0.2s', boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}
                   onMouseOver={(e) => { e.currentTarget.style.background = '#f9fafb'; }}
                   onMouseOut={(e) => { e.currentTarget.style.background = '#fff'; }}
                 >
@@ -267,7 +267,7 @@ const Marketplace = () => {
                       {featuredSkills.map((skill, i) => renderSkillCard(skill, i))}
                     </div>
                   ) : (
-                    <div style={{ fontSize: '15px', color: 'var(--cs-text-inactive)', padding: '24px 0', textAlign: 'center', background: '#f8fafc', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
+                    <div style={{ fontSize: '15px', color: 'var(--cs-text-inactive)', padding: '24px 0', textAlign: 'center', background: 'var(--cs-bg-light)', borderRadius: '12px', border: '1px dashed #cbd5e1' }}>
                       No listings have been requested yet.
                     </div>
                   )}
@@ -310,7 +310,7 @@ const Marketplace = () => {
             {selectedSkill && (
               <div id="sd-content" style={{ maxWidth: '720px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '20px' }}>
                 
-                <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', color: '#64748b', fontSize: '14px', fontWeight: 600, width: 'fit-content' }} onClick={() => setSelectedSkill(null)} onMouseOver={(e) => e.target.style.color='#0f172a'} onMouseOut={(e) => e.target.style.color='#64748b'}>
+                <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', color: 'var(--cs-text-secondary)', fontSize: '14px', fontWeight: 600, width: 'fit-content' }} onClick={() => setSelectedSkill(null)} onMouseOver={(e) => e.target.style.color='#0f172a'} onMouseOut={(e) => e.target.style.color='#64748b'}>
                   ← Back to Marketplace
                 </div>
               
@@ -361,7 +361,7 @@ const Marketplace = () => {
               {/* 2. User Block */}
               <div 
                 className="user-block" 
-                style={{ padding: '16px', background: '#f8fafc', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '16px', cursor: (selectedSkill.owner?.userId || selectedSkill.ownerId) ? 'pointer' : 'default', transition: 'background 0.2s', border: '1px solid #e2e8f0' }}
+                style={{ padding: '16px', background: 'var(--cs-bg-light)', borderRadius: '12px', display: 'flex', alignItems: 'center', gap: '16px', cursor: (selectedSkill.owner?.userId || selectedSkill.ownerId) ? 'pointer' : 'default', transition: 'background 0.2s', border: '1px solid var(--cs-border)' }}
                 onClick={() => {
                   const targetId = selectedSkill.owner?.userId || selectedSkill.ownerId;
                   if (targetId) navigate('/app/user/' + targetId);
@@ -376,7 +376,7 @@ const Marketplace = () => {
                   fontSize="24px" 
                 />
                 <div>
-                  <div style={{ fontSize: '18px', fontWeight: 700, color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--cs-text-main)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     {selectedSkill.owner?.name || 'Unknown User'}
                     {(() => {
                       const profileSkills = selectedSkill.owner?.skillsOffered || [];
@@ -393,14 +393,14 @@ const Marketplace = () => {
                       ) : null;
                     })()}
                   </div>
-                  <div style={{ fontSize: '13px', color: '#64748b', marginTop: '4px', fontWeight: 500 }}>
+                  <div style={{ fontSize: '13px', color: 'var(--cs-text-secondary)', marginTop: '4px', fontWeight: 500 }}>
                     {selectedSkill.owner?.year || ''} {selectedSkill.owner?.branch ? `· ${selectedSkill.owner.branch}` : ''}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '8px' }}>
                     <span style={{ fontSize: '13px', color: '#d97706', fontWeight: 700, display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <IconStar size={14} fill="currentColor" /> {selectedSkill.owner?.averageRating || 0}
                     </span>
-                    <span style={{ fontSize: '13px', color: '#94a3b8', fontWeight: 500 }}>· {selectedSkill.owner?.reviewCount || 0} sessions completed</span>
+                    <span style={{ fontSize: '13px', color: 'var(--cs-text-inactive)', fontWeight: 500 }}>· {selectedSkill.owner?.reviewCount || 0} sessions completed</span>
                   </div>
                 </div>
               </div>
@@ -408,13 +408,13 @@ const Marketplace = () => {
               {/* 3. Topics (Skill) */}
               {(selectedSkill.offeredSkills?.length > 0 || selectedSkill.requestedSkills?.length > 0) && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <div style={{ fontSize: '16px', fontWeight: 700, color: '#1e293b' }}>Topic (Skill)</div>
+                  <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--cs-text-main)' }}>Topic (Skill)</div>
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                     {selectedSkill.offeredSkills?.map((s, i) => {
                       const isSkillVerified = selectedSkill.owner?.verifiedSkills?.map(vs => (vs.name || vs).trim().toLowerCase())?.includes((s.name || s).trim().toLowerCase()) || false;
                       return (
                         <span key={`off-${i}`} style={{ display: 'inline-flex', alignItems: 'stretch', borderRadius: '100px', fontSize: '13px', fontWeight: 600 }}>
-                          <span style={{ padding: '6px 14px', background: '#eff6ff', color: '#1d4ed8', display: 'flex', alignItems: 'center', border: '1px solid #bfdbfe', borderRight: 'none', borderTopLeftRadius: '100px', borderBottomLeftRadius: '100px' }}>
+                          <span style={{ padding: '6px 14px', background: 'var(--cs-bg-hover)', color: '#1d4ed8', display: 'flex', alignItems: 'center', border: '1px solid #bfdbfe', borderRight: 'none', borderTopLeftRadius: '100px', borderBottomLeftRadius: '100px' }}>
                             {s.name ? s.name.charAt(0).toUpperCase() + s.name.slice(1) : ''} <span style={{ opacity: 0.8, marginLeft: '4px', fontSize: '11px', fontWeight: 500 }}>{s.level}</span>
                           </span>
                           {isSkillVerified ? (
@@ -437,8 +437,8 @@ const Marketplace = () => {
                   {selectedSkill.offeredSkills?.some(s => {
                     return !(selectedSkill.owner?.verifiedSkills?.map(vs => (vs.name || vs).trim().toLowerCase())?.includes((s.name || s).trim().toLowerCase()) || false);
                   }) && (
-                    <div style={{ fontSize: '13px', color: '#6b7280', lineHeight: 1.5, marginTop: '4px', background: '#f8fafc', padding: '12px 16px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                      <span style={{ fontWeight: 600, color: '#4b5563' }}>Note:</span> This skill has not been verified by CampusSkills. You can still continue with this request, but we recommend reviewing the user's ratings, completed sessions, and profile information before accepting.
+                    <div style={{ fontSize: '13px', color: '#6b7280', lineHeight: 1.5, marginTop: '4px', background: 'var(--cs-bg-light)', padding: '12px 16px', borderRadius: '8px', border: '1px solid var(--cs-border)' }}>
+                      <span style={{ fontWeight: 600, color: 'var(--cs-text-secondary)' }}>Note:</span> This skill has not been verified by CampusSkills. You can still continue with this request, but we recommend reviewing the user's ratings, completed sessions, and profile information before accepting.
                     </div>
                   )}
                 </div>
@@ -447,10 +447,10 @@ const Marketplace = () => {
               {/* 4. Syllabus */}
               {selectedSkill.topics && selectedSkill.topics.length > 0 && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  <div style={{ fontSize: '16px', fontWeight: 700, color: '#1e293b' }}>Syllabus</div>
+                  <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--cs-text-main)' }}>Syllabus</div>
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                     {selectedSkill.topics.map((t, i) => (
-                      <span key={i} style={{ padding: '6px 14px', background: '#f1f5f9', color: '#334155', borderRadius: '100px', fontSize: '13px', fontWeight: 600, border: '1px solid #e2e8f0' }}>
+                      <span key={i} style={{ padding: '6px 14px', background: 'var(--cs-bg-light)', color: 'var(--cs-text-main)', borderRadius: '100px', fontSize: '13px', fontWeight: 600, border: '1px solid var(--cs-border)' }}>
                         {t ? t.charAt(0).toUpperCase() + t.slice(1) : ''}
                       </span>
                     ))}
@@ -461,7 +461,7 @@ const Marketplace = () => {
               {/* 5. Description */}
               <div>
                 <div style={{ fontSize: '16px', fontWeight: 700, color: '#374151', marginBottom: '10px' }}>Description</div>
-                <div style={{ fontSize: '15px', color: '#4b5563', lineHeight: 1.6, maxWidth: '650px', whiteSpace: 'pre-line' }}>
+                <div style={{ fontSize: '15px', color: 'var(--cs-text-secondary)', lineHeight: 1.6, maxWidth: '650px', whiteSpace: 'pre-line' }}>
                   {selectedSkill.description}
                 </div>
               </div>
@@ -502,7 +502,7 @@ const Marketplace = () => {
                 ) : null}
 
                 <button 
-                  style={{ flex: 1, padding: '12px 20px', borderRadius: '100px', border: '1px solid #e5e7eb', background: '#ffffff', color: '#374151', fontSize: '14px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+                  style={{ flex: 1, padding: '12px 20px', borderRadius: '100px', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-white)', color: '#374151', fontSize: '14px', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
                   onClick={() => setIsMessageModalOpen(true)}
                   onMouseOver={(e) => { e.currentTarget.style.background = '#f9fafb'; e.currentTarget.style.borderColor = '#d1d5db'; }}
                   onMouseOut={(e) => { e.currentTarget.style.background = '#ffffff'; e.currentTarget.style.borderColor = '#e5e7eb'; }}
@@ -514,15 +514,15 @@ const Marketplace = () => {
               {/* 6. Rest of the stuff - Available Slots */}
               {selectedSkill.availableSlots && selectedSkill.availableSlots.length > 0 && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
-                  <div style={{ fontSize: '15px', fontWeight: 700, color: '#1e293b' }}>Available Timings</div>
+                  <div style={{ fontSize: '15px', fontWeight: 700, color: 'var(--cs-text-main)' }}>Available Timings</div>
                   <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                     {selectedSkill.availableSlots.map((slot, idx) => (
                       <div key={slot.id || idx} style={{ display: 'flex', alignItems: 'center', background: idx === 0 ? '#eff6ff' : '#fff', border: idx === 0 ? '1px solid #bfdbfe' : '1px solid #cbd5e1', borderRadius: '12px', overflow: 'hidden' }}>
                         <div style={{ padding: '8px 12px', background: idx === 0 ? '#dbeafe' : '#f8fafc', fontWeight: 700, fontSize: '13px', color: idx === 0 ? '#1e3a8a' : '#0f172a', borderRight: idx === 0 ? '1px solid #bfdbfe' : '1px solid #cbd5e1' }}>
                           {idx === 0 ? '★ ' : ''}{slot.dayOfWeek.toUpperCase()}
                         </div>
-                        <div style={{ padding: '8px 12px', fontSize: '14px', color: '#334155', fontWeight: 500 }}>
-                          {slot.startTime} <span style={{ color: '#94a3b8', fontSize: '12px' }}>({slot.durationMinutes}m)</span>
+                        <div style={{ padding: '8px 12px', fontSize: '14px', color: 'var(--cs-text-main)', fontWeight: 500 }}>
+                          {slot.startTime} <span style={{ color: 'var(--cs-text-inactive)', fontSize: '12px' }}>({slot.durationMinutes}m)</span>
                         </div>
                       </div>
                     ))}
@@ -531,22 +531,22 @@ const Marketplace = () => {
               )}
 
               {/* 7. Attribute List */}
-              <div style={{ display: 'flex', flexDirection: 'column', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '16px', overflow: 'hidden' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', background: 'var(--cs-bg-white)', border: '1px solid var(--cs-border)', borderRadius: '16px', overflow: 'hidden' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '16px', borderBottom: '1px solid #f1f5f9' }}>
-                  <span style={{ color: '#64748b', fontSize: '14px', fontWeight: 500 }}>Category</span>
-                  <span style={{ color: '#0f172a', fontSize: '14px', fontWeight: 600 }}>{selectedSkill.category}</span>
+                  <span style={{ color: 'var(--cs-text-secondary)', fontSize: '14px', fontWeight: 500 }}>Category</span>
+                  <span style={{ color: 'var(--cs-text-main)', fontSize: '14px', fontWeight: 600 }}>{selectedSkill.category}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '16px', borderBottom: '1px solid #f1f5f9' }}>
-                  <span style={{ color: '#64748b', fontSize: '14px', fontWeight: 500 }}>Mode</span>
-                  <span style={{ color: '#0f172a', fontSize: '14px', fontWeight: 600 }}>{selectedSkill.availability || 'ONLINE'}</span>
+                  <span style={{ color: 'var(--cs-text-secondary)', fontSize: '14px', fontWeight: 500 }}>Mode</span>
+                  <span style={{ color: 'var(--cs-text-main)', fontSize: '14px', fontWeight: 600 }}>{selectedSkill.availability || 'ONLINE'}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '16px', borderBottom: '1px solid #f1f5f9' }}>
-                  <span style={{ color: '#64748b', fontSize: '14px', fontWeight: 500 }}>Sessions completed</span>
-                  <span style={{ color: '#0f172a', fontSize: '14px', fontWeight: 600 }}>{selectedSkill.reviewCount || 0}</span>
+                  <span style={{ color: 'var(--cs-text-secondary)', fontSize: '14px', fontWeight: 500 }}>Sessions completed</span>
+                  <span style={{ color: 'var(--cs-text-main)', fontSize: '14px', fontWeight: 600 }}>{selectedSkill.reviewCount || 0}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', padding: '16px' }}>
-                  <span style={{ color: '#64748b', fontSize: '14px', fontWeight: 500 }}>Average rating</span>
-                  <span style={{ color: '#0f172a', fontSize: '14px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{ color: 'var(--cs-text-secondary)', fontSize: '14px', fontWeight: 500 }}>Average rating</span>
+                  <span style={{ color: 'var(--cs-text-main)', fontSize: '14px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '4px' }}>
                     {selectedSkill.averageRating || 0} <IconStar size={16} fill="#d97706" color="#d97706" />
                   </span>
                 </div>

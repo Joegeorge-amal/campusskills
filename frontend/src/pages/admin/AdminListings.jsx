@@ -172,7 +172,7 @@ const AdminListings = () => {
                     <div className="as-title-row">
                       <span className="as-title">{listing.title || 'Untitled Listing'}</span>
                       {isUserDeleted ? (
-                        <span className="as-status-pill" style={{background: '#f3f4f6', color: '#6b7280'}}>DELETED</span>
+                        <span className="as-status-pill" style={{background: 'var(--cs-bg-light)', color: '#6b7280'}}>DELETED</span>
                       ) : isAdminDisabled ? (
                         <span className="as-status-pill live" style={{background: '#fee2e2', color: '#ef4444'}}>DISABLED</span>
                       ) : statusUpper === 'PENDING' ? (
@@ -188,7 +188,7 @@ const AdminListings = () => {
                 </div>
                 <div className="as-card-right">
                   {isUserDeleted ? (
-                    <span style={{ fontSize: '13px', color: '#9ca3af', fontStyle: 'italic' }}>Deleted by user</span>
+                    <span style={{ fontSize: '13px', color: 'var(--cs-text-inactive)', fontStyle: 'italic' }}>Deleted by user</span>
                   ) : isAdminDisabled ? (
                     <button 
                       className="as-cancel-btn"

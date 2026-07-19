@@ -34,7 +34,7 @@ const ReportUserModal = ({ isOpen, onClose, userName }) => {
           </button>
         </div>
 
-        <div style={{ fontSize: '14px', color: '#4b5563', marginBottom: '16px' }}>
+        <div style={{ fontSize: '14px', color: 'var(--cs-text-secondary)', marginBottom: '16px' }}>
           Reporting <strong style={{ color: '#111827' }}>{userName}</strong>
         </div>
 
@@ -83,7 +83,7 @@ const ReportUserModal = ({ isOpen, onClose, userName }) => {
                 width: '100%',
                 padding: '10px 12px',
                 borderRadius: '8px',
-                border: '1px solid #d1d5db',
+                border: '1px solid var(--cs-border)',
                 fontSize: '14px',
                 outline: 'none',
                 minHeight: '100px', 

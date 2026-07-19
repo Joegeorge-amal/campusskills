@@ -269,20 +269,20 @@ const SkillQuizModal = ({ isOpen, skillName, onClose, onComplete }) => {
                   width: '20px', height: '20px',
                   borderRadius: '50%',
                   border: answers[qId] === i ? '6px solid #1d4ed8' : '2px solid #d1d5db',
-                  background: '#fff'
+                  background: 'var(--cs-bg-white)'
                 }} />
                 {opt}
               </button>
             ))}
           </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '32px', paddingTop: '24px', borderTop: '1px solid #e5e7eb' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '32px', paddingTop: '24px', borderTop: '1px solid var(--cs-border)' }}>
             <button
               onClick={handlePrev}
               disabled={currentQuestionIndex === 0}
               style={{
-                padding: '12px 24px', borderRadius: '8px', border: '1px solid #d1d5db',
-                background: '#fff', color: '#374151', fontWeight: 600, cursor: currentQuestionIndex === 0 ? 'not-allowed' : 'pointer',
+                padding: '12px 24px', borderRadius: '8px', border: '1px solid var(--cs-border)',
+                background: 'var(--cs-bg-white)', color: '#374151', fontWeight: 600, cursor: currentQuestionIndex === 0 ? 'not-allowed' : 'pointer',
                 display: 'flex', alignItems: 'center', gap: '8px', opacity: currentQuestionIndex === 0 ? 0.5 : 1
               }}
             >
@@ -314,7 +314,7 @@ const SkillQuizModal = ({ isOpen, skillName, onClose, onComplete }) => {
             You have answered {answeredCount} of {questions.length} questions.
           </p>
           <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
-            <button onClick={() => setStep('quiz')} style={{ padding: '12px 24px', background: '#fff', border: '1px solid #d1d5db', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}>
+            <button onClick={() => setStep('quiz')} style={{ padding: '12px 24px', background: 'var(--cs-bg-white)', border: '1px solid var(--cs-border)', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}>
               Go Back
             </button>
             <button onClick={handleSubmitScore} style={{ padding: '12px 24px', background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: '8px', fontWeight: 600, cursor: 'pointer' }}>
@@ -360,7 +360,7 @@ const SkillQuizModal = ({ isOpen, skillName, onClose, onComplete }) => {
 
   return (
     <ModalWrapper isOpen={true} onClose={onClose} maxWidth="600px" zIndex={99999}>
-      <div style={{ background: '#fff', width: '100%', height: '600px', borderRadius: '16px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ background: 'var(--cs-bg-white)', width: '100%', height: '600px', borderRadius: '16px', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         {renderContent()}
       </div>
     </ModalWrapper>

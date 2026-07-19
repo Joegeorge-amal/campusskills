@@ -24,7 +24,7 @@ const getIconForType = (type) => {
     case 'SESSION_COMPLETION_PENDING':
       return { icon: <IconCalendarEvent size={18} stroke={2} />, bg: '#fffbeb', color: '#f59e0b' }; // Amber/Yellow
     default:
-      return { icon: <IconBell size={18} stroke={2} />, bg: '#f3f4f6', color: '#4b5563' }; // Grey
+      return { icon: <IconBell size={18} stroke={2} />, bg: '#f3f4f6', color: 'var(--cs-text-secondary)' }; // Grey
   }
 };
 

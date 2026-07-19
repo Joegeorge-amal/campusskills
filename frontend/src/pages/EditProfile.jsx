@@ -246,10 +246,10 @@ const EditProfile = () => {
       <ModalWrapper isOpen={showSavePrompt} onClose={() => setShowSavePrompt(false)} maxWidth="360px" zIndex={9999}>
         <div style={{ padding: '24px' }}>
           <div style={{ fontSize: '18px', fontWeight: 600, marginBottom: '8px', color: '#111827' }}>Unsaved Changes</div>
-          <div style={{ fontSize: '14px', color: '#4b5563', marginBottom: '24px' }}>Do you want to save your changes?</div>
+          <div style={{ fontSize: '14px', color: 'var(--cs-text-secondary)', marginBottom: '24px' }}>Do you want to save your changes?</div>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end', alignItems: 'center' }}>
             <button disabled={isSaving} onClick={() => navigate('/app/profile')} style={{ background: 'none', border: 'none', color: isSaving ? '#fca5a5' : '#ef4444', fontSize: '14px', fontWeight: 600, cursor: isSaving ? 'default' : 'pointer', marginRight: 'auto' }}>Discard</button>
-            <button disabled={isSaving} onClick={() => setShowSavePrompt(false)} style={{ padding: '8px 16px', background: '#f3f4f6', border: 'none', borderRadius: '8px', color: isSaving ? '#9ca3af' : '#374151', fontSize: '14px', fontWeight: 600, cursor: isSaving ? 'default' : 'pointer' }}>Cancel</button>
+            <button disabled={isSaving} onClick={() => setShowSavePrompt(false)} style={{ padding: '8px 16px', background: 'var(--cs-bg-light)', border: 'none', borderRadius: '8px', color: isSaving ? '#9ca3af' : '#374151', fontSize: '14px', fontWeight: 600, cursor: isSaving ? 'default' : 'pointer' }}>Cancel</button>
             <button disabled={isSaving} onClick={handleSave} style={{ padding: '8px 16px', background: isSaving ? '#93c5fd' : 'var(--cs-primary)', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '14px', fontWeight: 600, cursor: isSaving ? 'default' : 'pointer', minWidth: '70px' }}>{isSaving ? 'Saving...' : 'Yes'}</button>
           </div>
         </div>
@@ -380,7 +380,7 @@ const EditProfile = () => {
           </div>
           <div style={{ width: '40px', height: '24px', background: showHeatmap ? 'var(--cs-primary)' : 'var(--cs-border)', borderRadius: '12px', position: 'relative', transition: 'background 0.3s' }}>
             <input type="checkbox" checked={showHeatmap} onChange={(e) => setShowHeatmap(e.target.checked)} style={{ display: 'none' }} />
-            <div style={{ width: '18px', height: '18px', background: '#fff', borderRadius: '50%', position: 'absolute', top: '3px', left: showHeatmap ? '19px' : '3px', transition: 'left 0.3s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }}></div>
+            <div style={{ width: '18px', height: '18px', background: 'var(--cs-bg-white)', borderRadius: '50%', position: 'absolute', top: '3px', left: showHeatmap ? '19px' : '3px', transition: 'left 0.3s', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }}></div>
           </div>
         </label>
       </div>

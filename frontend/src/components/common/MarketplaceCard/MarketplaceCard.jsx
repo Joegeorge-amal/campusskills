@@ -59,7 +59,7 @@ const MarketplaceCard = ({
       </div>
       
       {description && (
-        <div className="mc-description" style={{ fontSize: '13px', color: '#64748b', marginTop: '4px', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: '1.5' }}>
+        <div className="mc-description" style={{ fontSize: '13px', color: 'var(--cs-text-secondary)', marginTop: '4px', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden', lineHeight: '1.5' }}>
           {description}
         </div>
       )}
@@ -67,12 +67,12 @@ const MarketplaceCard = ({
       {skills && skills.length > 0 && (
         <div style={{ display: 'flex', gap: '6px', marginTop: '8px', flexWrap: 'wrap' }}>
           {skills.slice(0, 3).map((s, i) => (
-            <span key={i} style={{ fontSize: '11px', padding: '2px 8px', background: '#f1f5f9', color: '#475569', borderRadius: '100px', border: '1px solid #e2e8f0', whiteSpace: 'nowrap' }}>
+            <span key={i} style={{ fontSize: '11px', padding: '2px 8px', background: 'var(--cs-bg-light)', color: 'var(--cs-text-secondary)', borderRadius: '100px', border: '1px solid var(--cs-border)', whiteSpace: 'nowrap' }}>
               {s.name || s}
             </span>
           ))}
           {skills.length > 3 && (
-            <span style={{ fontSize: '11px', padding: '2px 8px', background: '#f8fafc', color: '#94a3b8', borderRadius: '100px', border: '1px solid #e2e8f0' }}>
+            <span style={{ fontSize: '11px', padding: '2px 8px', background: 'var(--cs-bg-light)', color: 'var(--cs-text-inactive)', borderRadius: '100px', border: '1px solid var(--cs-border)' }}>
               +{skills.length - 3}
             </span>
           )}

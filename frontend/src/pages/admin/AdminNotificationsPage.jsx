@@ -16,22 +16,22 @@ const AdminNotificationsPage = () => {
 
   return (
     <div className="admin-page fade-in" style={{ padding: '24px' }}>
-      <h2 style={{ marginBottom: '24px', color: '#0f172a' }}>All Notifications</h2>
-      <div style={{ background: '#fff', borderRadius: '12px', padding: '24px', boxShadow: '0 8px 30px rgba(0,0,0,0.04)' }}>
+      <h2 style={{ marginBottom: '24px', color: 'var(--cs-text-main)' }}>All Notifications</h2>
+      <div style={{ background: 'var(--cs-bg-white)', borderRadius: '12px', padding: '24px', boxShadow: '0 8px 30px rgba(0,0,0,0.04)' }}>
         {mockNotifications.map(notif => (
           <div key={notif.id} style={{ display: 'flex', gap: '16px', padding: '16px 0', borderBottom: '1px solid #f1f5f9' }}>
-            <div style={{ padding: '10px', background: '#f8fafc', borderRadius: '50%', height: 'fit-content', border: '1px solid #e2e8f0' }}>
+            <div style={{ padding: '10px', background: 'var(--cs-bg-light)', borderRadius: '50%', height: 'fit-content', border: '1px solid var(--cs-border)' }}>
               {getIcon(notif.type)}
             </div>
             <div>
-              <div style={{ fontWeight: 600, color: '#0f172a', marginBottom: '4px' }}>{notif.title}</div>
-              <div style={{ color: '#475569', fontSize: '14px', marginBottom: '8px' }}>{notif.message}</div>
-              <div style={{ color: '#94a3b8', fontSize: '12px', fontWeight: 500 }}>{notif.time}</div>
+              <div style={{ fontWeight: 600, color: 'var(--cs-text-main)', marginBottom: '4px' }}>{notif.title}</div>
+              <div style={{ color: 'var(--cs-text-secondary)', fontSize: '14px', marginBottom: '8px' }}>{notif.message}</div>
+              <div style={{ color: 'var(--cs-text-inactive)', fontSize: '12px', fontWeight: 500 }}>{notif.time}</div>
             </div>
           </div>
         ))}
         {mockNotifications.length === 0 && (
-          <div style={{ color: '#64748b', textAlign: 'center', padding: '24px' }}>No notifications to display</div>
+          <div style={{ color: 'var(--cs-text-secondary)', textAlign: 'center', padding: '24px' }}>No notifications to display</div>
         )}
       </div>
     </div>

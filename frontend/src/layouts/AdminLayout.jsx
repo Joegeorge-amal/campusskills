@@ -129,7 +129,7 @@ const AdminLayout = () => {
                   style={{
                     display: 'flex', alignItems: 'center', gap: 10, width: '100%',
                     padding: '12px 16px', border: 'none', background: 'none',
-                    fontSize: 13, fontWeight: 500, color: '#0f172a', cursor: 'pointer',
+                    fontSize: 13, fontWeight: 500, color: 'var(--cs-text-main)', cursor: 'pointer',
                     textAlign: 'left', transition: 'background 0.15s',
                   }}
                   onMouseEnter={(e) => e.currentTarget.style.background = '#f1f5f9'}

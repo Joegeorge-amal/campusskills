@@ -40,7 +40,7 @@ const Heatmap = ({ visible = true }) => {
                   position: 'relative',
                   width: '12px', 
                   height: '12px', 
-                  backgroundColor: '#ffffff', 
+                  background: 'var(--cs-bg-white)', 
                   opacity: hoveredCell?.colIndex === colIndex && hoveredCell?.rowIndex === rowIndex ? 1 : cell.opacity,
                   borderRadius: '2px',
                   cursor: 'pointer',

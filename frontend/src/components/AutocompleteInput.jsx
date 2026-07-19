@@ -85,7 +85,7 @@ const AutocompleteInput = ({ allTopics = [], onAddSkill, placeholder }) => {
 
   return (
     <div style={{ width: '100%' }}>
-      <div style={{ position: 'relative', display: 'flex', border: '1px solid #e5e7eb', borderRadius: '10px', padding: '4px', background: '#fff', marginBottom: '12px' }}>
+      <div style={{ position: 'relative', display: 'flex', border: '1px solid var(--cs-border)', borderRadius: '10px', padding: '4px', background: 'var(--cs-bg-white)', marginBottom: '12px' }}>
 
         {suffix && (
           <div style={{
@@ -101,7 +101,7 @@ const AutocompleteInput = ({ allTopics = [], onAddSkill, placeholder }) => {
             overflow: 'hidden'
           }}>
             <span style={{ visibility: 'hidden', whiteSpace: 'pre', fontSize: '14px', fontFamily: 'inherit' }}>{inputValue}</span>
-            <span style={{ color: '#9ca3af', fontSize: '14px', whiteSpace: 'pre', fontFamily: 'inherit' }}>{suffix}</span>
+            <span style={{ color: 'var(--cs-text-inactive)', fontSize: '14px', whiteSpace: 'pre', fontFamily: 'inherit' }}>{suffix}</span>
           </div>
         )}
 
@@ -124,7 +124,7 @@ const AutocompleteInput = ({ allTopics = [], onAddSkill, placeholder }) => {
       </div>
 
       {pending ? (
-        <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '16px', marginBottom: '12px' }}>
+        <div style={{ background: 'var(--cs-bg-light)', border: '1px solid var(--cs-border)', borderRadius: '10px', padding: '16px', marginBottom: '12px' }}>
           {pending.match ? (
             <>
               <div style={{ fontSize: '14px', fontWeight: 600, color: '#111827', marginBottom: '4px' }}>
@@ -137,7 +137,7 @@ const AutocompleteInput = ({ allTopics = [], onAddSkill, placeholder }) => {
                 <button onClick={useSuggestion} style={{ padding: '6px 14px', background: '#1d4ed8', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>
                   Use "{pending.match.item}"
                 </button>
-                <button onClick={addCustom} style={{ padding: '6px 14px', background: '#ffffff', color: '#374151', border: '1px solid #d1d5db', borderRadius: '8px', fontSize: '13px', fontWeight: 500, cursor: 'pointer' }}>
+                <button onClick={addCustom} style={{ padding: '6px 14px', background: 'var(--cs-bg-white)', color: '#374151', border: '1px solid var(--cs-border)', borderRadius: '8px', fontSize: '13px', fontWeight: 500, cursor: 'pointer' }}>
                   Add "{pending.input}"
                 </button>
                 <button onClick={cancelPending} style={{ padding: '6px 14px', background: 'transparent', color: '#6b7280', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: 500, cursor: 'pointer' }}>
@@ -170,7 +170,7 @@ const AutocompleteInput = ({ allTopics = [], onAddSkill, placeholder }) => {
           {suggestions.length > 0 ? suggestions.map(s => (
             <span key={s} onClick={() => { onAddSkill(s); setInputValue(''); }} style={{ fontSize: '12px', padding: '3px 10px', borderRadius: '20px', background: '#eef2ff', color: '#1d4ed8', cursor: 'pointer', border: '1px solid #dbeafe' }}>{s}</span>
           )) : (
-            <span style={{ fontSize: '12px', color: '#9ca3af', fontStyle: 'italic' }}>Press Enter to add custom skill</span>
+            <span style={{ fontSize: '12px', color: 'var(--cs-text-inactive)', fontStyle: 'italic' }}>Press Enter to add custom skill</span>
           )}
         </div>
       )}

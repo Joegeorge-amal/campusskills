@@ -126,7 +126,7 @@ const AdminInvitePage = () => {
         <div className="bg-circle bg-circle-2"></div>
         <div className="setup-card" style={{ padding: '32px', textAlign: 'center', maxWidth: '400px', zIndex: 10 }}>
           <h2 style={{ color: '#dc2626', margin: '0 0 16px 0' }}>Invalid Invitation</h2>
-          <p style={{ color: '#4b5563', margin: '0 0 24px 0' }}>{error}</p>
+          <p style={{ color: 'var(--cs-text-secondary)', margin: '0 0 24px 0' }}>{error}</p>
           <button 
             onClick={() => navigate('/')}
             style={{ background: '#4f46e5', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '6px', cursor: 'pointer', fontWeight: '500' }}
@@ -146,7 +146,7 @@ const AdminInvitePage = () => {
       {/* HEADER & STEPS OUTSIDE CARD */}
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', maxWidth: '850px', margin: '0 auto 24px', zIndex: 2 }}>
         <div className="setup-logo" style={{ marginBottom: '16px' }}>
-          <div className="setup-mark" style={{ borderRadius: '50%', background: '#ffffff', width: '44px', height: '44px', padding: '4px', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
+          <div className="setup-mark" style={{ borderRadius: '50%', background: 'var(--cs-bg-white)', width: '44px', height: '44px', padding: '4px', boxShadow: '0 2px 10px rgba(0,0,0,0.06)' }}>
             <img src="/src/assets/kju_campus_logo.png" alt="logo" style={{ width: '100%', height: '100%', objectFit: 'contain', borderRadius: '50%' }} onError={(e) => { e.target.style.display='none'; e.target.nextSibling.style.display='block'; }} />
             <IconSchool size={28} color="#1d4ed8" style={{ display: 'none', margin: 'auto' }} />
           </div>
@@ -168,7 +168,7 @@ const AdminInvitePage = () => {
                 value={inviteData?.email}
                 disabled
                 className="su-input"
-                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db', background: '#f3f4f6', color: '#6b7280' }}
+                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-light)', color: '#6b7280' }}
               />
             </div>
             <div style={{ marginBottom: '16px' }}>
@@ -179,7 +179,7 @@ const AdminInvitePage = () => {
                 onChange={e => setFullName(e.target.value)}
                 required
                 className="su-input"
-                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db' }}
+                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--cs-border)' }}
               />
             </div>
             <div style={{ marginBottom: '16px' }}>
@@ -191,7 +191,7 @@ const AdminInvitePage = () => {
                 required
                 minLength={6}
                 className="su-input"
-                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db' }}
+                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--cs-border)' }}
               />
             </div>
             <div style={{ marginBottom: '24px' }}>
@@ -203,7 +203,7 @@ const AdminInvitePage = () => {
                 required
                 minLength={6}
                 className="su-input"
-                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #d1d5db' }}
+                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid var(--cs-border)' }}
               />
             </div>
             <button 
@@ -217,7 +217,7 @@ const AdminInvitePage = () => {
         ) : (
           <form onSubmit={handleVerify}>
             <div style={{ marginBottom: '24px', textAlign: 'center' }}>
-              <p style={{ margin: '0 0 16px 0', color: '#4b5563' }}>
+              <p style={{ margin: '0 0 16px 0', color: 'var(--cs-text-secondary)' }}>
                 We've sent a 6-digit verification code to <br/><strong>{inviteData?.email}</strong>.
               </p>
               <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginBottom: '20px' }}>
@@ -237,8 +237,8 @@ const AdminInvitePage = () => {
                       fontSize: '24px',
                       textAlign: 'center',
                       borderRadius: '8px',
-                      border: '1px solid #d1d5db',
-                      background: '#fff',
+                      border: '1px solid var(--cs-border)',
+                      background: 'var(--cs-bg-white)',
                       fontWeight: '600',
                       color: '#111827'
                     }}

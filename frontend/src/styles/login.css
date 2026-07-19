@@ -43,7 +43,7 @@
   width: 100%;
   border-radius: 16px;
   padding: 32px 40px;
-  background: #ffffff;
+  background: var(--cs-bg-white);
   box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15), 0 12px 24px rgba(0, 0, 0, 0.1);
   z-index: 2;
   margin: auto;
@@ -137,8 +137,8 @@
   justify-content: center;
   padding: 14px 20px;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  background: #ffffff;
+  border: 1px solid var(--cs-border);
+  background: var(--cs-bg-white);
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); /* Smoother, premium animation */
 }
@@ -147,8 +147,8 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #f3f4f6;
-  color: #9ca3af;
+  background: var(--cs-bg-light);
+  color: var(--cs-text-inactive);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -170,14 +170,14 @@
 }
 
 .type-card:hover {
-  border-color: #d1d5db;
+  border-color: var(--cs-border);
   transform: translateY(-2px); /* Slight lift on hover */
 }
 
 /* Active State */
 .type-card.active {
   border-color: #1d4ed8;
-  background: #f8fafc; 
+  background: var(--cs-bg-light); 
   transform: translateY(-6px); 
   box-shadow: 0 0 0 1px #1d4ed8, 0 14px 28px -6px rgba(33, 59, 138, 0.25); 
 }
@@ -204,7 +204,7 @@
 .lbl {
   font-size: 0.9rem;
   font-weight: 500;
-  color: #4b5563;
+  color: var(--cs-text-secondary);
 }
 
 .input-wrapper {
@@ -217,7 +217,7 @@
 .input-icon {
   position: absolute;
   left: 14px;
-  color: #94a3b8;
+  color: var(--cs-text-inactive);
   pointer-events: none;
 }
 
@@ -226,7 +226,7 @@
   right: 14px;
   background: transparent;
   border: none;
-  color: #94a3b8;
+  color: var(--cs-text-inactive);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -236,13 +236,13 @@
 }
 
 .password-toggle:hover {
-  color: #4b5563;
+  color: var(--cs-text-secondary);
 }
 
 .linp {
   width: 100%;
   padding: 12px 16px;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--cs-border);
   border-radius: 12px;
   font-size: 0.95rem;
   color: #111827;
@@ -257,14 +257,14 @@
 }
 
 .linp::placeholder {
-  color: #9ca3af;
+  color: var(--cs-text-inactive);
 }
 
 .linp:focus {
   outline: none;
   border-color: #6366f1;
   box-shadow: 0 0 12px rgba(99, 102, 241, 0.25);
-  background: #ffffff;
+  background: var(--cs-bg-white);
 }
 
 /* Hide native Edge password reveal eye to prevent duplicate icons */
@@ -322,7 +322,7 @@
   align-items: center;
   gap: 12px;
   margin: 24px 0;
-  color: #9ca3af;
+  color: var(--cs-text-inactive);
   font-size: 0.85rem;
 }
 
@@ -336,8 +336,8 @@
 .gbtn {
   width: 100%;
   padding: 12px;
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: var(--cs-bg-white);
+  border: 1px solid var(--cs-border);
   border-radius: 8px;
   display: flex;
   align-items: center;
@@ -380,7 +380,7 @@
 .footer-divider span {
   position: relative;
   z-index: 2;
-  background: #ffffff;
+  background: var(--cs-bg-white);
   padding: 0 16px;
   color: #6b7280;
   font-size: 0.85rem;

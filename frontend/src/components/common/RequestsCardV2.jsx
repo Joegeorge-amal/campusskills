@@ -106,7 +106,7 @@ const RequestsCardV2 = ({
   return (
     <div 
       style={{
-        background: '#ffffff',
+        background: 'var(--cs-bg-white)',
         border: isExpanded ? '1px solid #c7d2fe' : '1px solid #e5e7eb',
         borderRadius: '12px',
         marginBottom: '12px',
@@ -184,7 +184,7 @@ const RequestsCardV2 = ({
               <button 
                 onClick={(e) => { e.stopPropagation(); onDecline(); }}
                 disabled={!!actionLoading}
-                style={{ padding: '6px 16px', background: '#ffffff', color: '#1e40af', border: '1px solid #93c5fd', borderRadius: '8px', fontWeight: 700, fontSize: '12px', cursor: actionLoading ? 'not-allowed' : 'pointer', transition: 'background 0.2s', opacity: actionLoading ? 0.6 : 1 }}
+                style={{ padding: '6px 16px', background: 'var(--cs-bg-white)', color: '#1e40af', border: '1px solid #93c5fd', borderRadius: '8px', fontWeight: 700, fontSize: '12px', cursor: actionLoading ? 'not-allowed' : 'pointer', transition: 'background 0.2s', opacity: actionLoading ? 0.6 : 1 }}
                 onMouseOver={(e) => { if (!actionLoading) e.currentTarget.style.background = '#eff6ff' }}
                 onMouseOut={(e) => { if (!actionLoading) e.currentTarget.style.background = '#ffffff' }}
               >
@@ -197,7 +197,7 @@ const RequestsCardV2 = ({
             <button 
               onClick={(e) => { e.stopPropagation(); if (onCancel) onCancel(); }}
               disabled={!!actionLoading}
-              style={{ padding: '6px 16px', background: '#ffffff', color: '#b91c1c', border: '1px solid #fecaca', borderRadius: '8px', fontWeight: 700, fontSize: '12px', cursor: actionLoading ? 'not-allowed' : 'pointer', transition: 'background 0.2s', opacity: actionLoading ? 0.6 : 1 }}
+              style={{ padding: '6px 16px', background: 'var(--cs-bg-white)', color: '#b91c1c', border: '1px solid #fecaca', borderRadius: '8px', fontWeight: 700, fontSize: '12px', cursor: actionLoading ? 'not-allowed' : 'pointer', transition: 'background 0.2s', opacity: actionLoading ? 0.6 : 1 }}
               onMouseOver={(e) => { if (!actionLoading) e.currentTarget.style.background = '#fee2e2' }}
               onMouseOut={(e) => { if (!actionLoading) e.currentTarget.style.background = '#ffffff' }}
             >
@@ -231,8 +231,8 @@ const RequestsCardV2 = ({
         <div style={{ overflow: 'hidden' }}>
           <div style={{ 
             padding: '24px', 
-            borderTop: '1px solid #e5e7eb',
-            background: '#ffffff',
+            borderTop: '1px solid var(--cs-border)',
+            background: 'var(--cs-bg-white)',
             cursor: 'default' 
           }} onClick={e => e.stopPropagation()}>
             <div style={{ display: 'flex', gap: '32px', flexWrap: 'wrap' }}>
@@ -269,11 +269,11 @@ const RequestsCardV2 = ({
                 </div>
                 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-                  <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px' }}>
+                  <div style={{ background: 'var(--cs-bg-light)', padding: '12px', borderRadius: '8px' }}>
                     <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#6b7280', fontWeight: 600, marginBottom: '4px' }}>Sessions</div>
                     <div style={{ fontSize: '16px', fontWeight: 700, color: '#111827' }}>{otherUserStats.sessionsCompleted || 0}</div>
                   </div>
-                  <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px' }}>
+                  <div style={{ background: 'var(--cs-bg-light)', padding: '12px', borderRadius: '8px' }}>
                     <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', color: '#6b7280', fontWeight: 600, marginBottom: '4px' }}>Member Since</div>
                     <div style={{ fontSize: '14px', fontWeight: 600, color: '#374151', marginTop: '2px' }}>{memberSince || 'Unknown'}</div>
                   </div>
@@ -281,7 +281,7 @@ const RequestsCardV2 = ({
 
                 {otherUser.verifiedSkills && otherUser.verifiedSkills.length > 0 && (
                   <div>
-                    <div style={{ fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '8px' }}>Verified Skills</div>
+                    <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-secondary)', marginBottom: '8px' }}>Verified Skills</div>
                     <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                       {otherUser.verifiedSkills.map((sk, idx) => (
                         <span key={idx} style={{ display: 'flex', alignItems: 'center', gap: '4px', padding: '4px 8px', background: '#ecfdf5', color: '#059669', borderRadius: '6px', fontSize: '11px', fontWeight: 600 }}>
@@ -304,7 +304,7 @@ const RequestsCardV2 = ({
               
                 {requestTitle && (
                   <div>
-                    <div style={{ fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Listing</div>
+                    <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-secondary)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Listing</div>
                     <div style={{ fontSize: '16px', fontWeight: 700, color: '#111827' }}>
                       {requestTitle}
                     </div>
@@ -313,17 +313,17 @@ const RequestsCardV2 = ({
 
                 {(theirOffer || myOffer) && (
                   <div>
-                    <div style={{ fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Request Details</div>
+                    <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-secondary)', marginBottom: '12px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Request Details</div>
                     
                     {isSwap ? (
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', gap: '24px', flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px', background: 'var(--cs-bg-white)', border: '1px solid var(--cs-border)', borderRadius: '12px', gap: '24px', flexWrap: 'wrap' }}>
                         <div style={{ flex: 1, minWidth: '120px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
                           <div style={{ fontSize: '12px', fontWeight: 700, color: '#1d4ed8', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{`${otherName} OFFERS`}</div>
                           <div style={{ fontSize: '20px', fontWeight: 800, color: '#1e3a8a', textAlign: 'center' }}>{displayTheirOffer}</div>
                           {renderVerificationPill(isTheirOfferVerified)}
                         </div>
                         
-                        <div style={{ color: '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div style={{ color: 'var(--cs-text-inactive)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                           <IconArrowsExchange size={32} stroke={2} />
                         </div>
                         
@@ -334,18 +334,18 @@ const RequestsCardV2 = ({
                         </div>
                       </div>
                     ) : (
-                      <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                      <div style={{ background: 'var(--cs-bg-light)', padding: '16px', borderRadius: '12px', border: '1px solid var(--cs-border)', display: 'flex', flexDirection: 'column', gap: '12px' }}>
                         {theirOffer && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                            <span style={{ fontSize: '13px', fontWeight: 700, color: '#4b5563', textTransform: 'uppercase' }}>{`${otherName} OFFERS:`}</span>
-                            <span style={{ padding: '4px 12px', background: '#eff6ff', color: '#1d4ed8', borderRadius: '100px', fontWeight: 700, fontSize: '14px', border: '1px solid #bfdbfe' }}>{theirOffer}</span>
+                            <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--cs-text-secondary)', textTransform: 'uppercase' }}>{`${otherName} OFFERS:`}</span>
+                            <span style={{ padding: '4px 12px', background: 'var(--cs-bg-hover)', color: '#1d4ed8', borderRadius: '100px', fontWeight: 700, fontSize: '14px', border: '1px solid #bfdbfe' }}>{theirOffer}</span>
                             {renderVerificationPill(isTheirOfferVerified)}
                           </div>
                         )}
                         
                         {myOffer && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                            <span style={{ fontSize: '13px', fontWeight: 700, color: '#4b5563', textTransform: 'uppercase' }}>YOU TEACH:</span>
+                            <span style={{ fontSize: '13px', fontWeight: 700, color: 'var(--cs-text-secondary)', textTransform: 'uppercase' }}>YOU TEACH:</span>
                             <span style={{ padding: '4px 12px', background: '#f0fdf4', color: '#065f46', borderRadius: '100px', fontWeight: 700, fontSize: '14px', border: '1px solid #bbf7d0' }}>{myOffer}</span>
                             {renderVerificationPill(isMyOfferVerified)}
                           </div>
@@ -354,7 +354,7 @@ const RequestsCardV2 = ({
                     )}
 
                     {showDisclaimer && (
-                      <div style={{ fontSize: '12px', color: '#6b7280', lineHeight: 1.5, marginTop: '12px', background: '#fffbeb', padding: '12px', borderRadius: '8px', border: '1px solid #fde68a' }}>
+                      <div style={{ fontSize: '12px', color: '#6b7280', lineHeight: 1.5, marginTop: '12px', background: 'var(--cs-bg-white)', padding: '12px', borderRadius: '8px', border: '1px solid #fde68a' }}>
                         ⚠️ <strong>Skill Verification Notice:</strong> One or more skills in this request have not been verified by CampusSkills. You can still continue with this request, but we recommend reviewing the user's ratings, completed sessions, and profile information before accepting.
                       </div>
                     )}
@@ -363,8 +363,8 @@ const RequestsCardV2 = ({
 
                 {isSwap && preferredSlot && (
                   <div>
-                    <div style={{ fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{otherName}'s Preferred Timing from your Listing</div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#eff6ff', border: '1px solid #bfdbfe', padding: '12px', borderRadius: '8px' }}>
+                    <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-secondary)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{otherName}'s Preferred Timing from your Listing</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'var(--cs-bg-hover)', border: '1px solid #bfdbfe', padding: '12px', borderRadius: '8px' }}>
                       <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: '#dbeafe', color: '#1d4ed8', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <IconClock size={20} />
                       </div>
@@ -375,11 +375,11 @@ const RequestsCardV2 = ({
                 
                 {isSwap && reqDetails.requesterAvailableTimes && reqDetails.requesterAvailableTimes.length > 0 && (
                   <div>
-                    <div style={{ fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{otherName}'s Available Timings</div>
+                    <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-secondary)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{otherName}'s Available Timings</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       {reqDetails.requesterAvailableTimes.map((time, idx) => (
-                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#ffffff', border: '1px solid #e5e7eb', padding: '12px', borderRadius: '8px' }}>
-                          <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: '#f8fafc', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'var(--cs-bg-white)', border: '1px solid var(--cs-border)', padding: '12px', borderRadius: '8px' }}>
+                          <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: 'var(--cs-bg-light)', color: 'var(--cs-text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <IconClock size={20} />
                           </div>
                           <div>
@@ -393,9 +393,9 @@ const RequestsCardV2 = ({
 
                 {actualMessage && (
                   <div>
-                    <div style={{ fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Message</div>
+                    <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-secondary)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Message</div>
                     <div style={{ 
-                      background: '#f3f4f6', 
+                      background: 'var(--cs-bg-light)', 
                       padding: '16px', 
                       borderRadius: '12px', 
                       borderTopLeftRadius: type === 'incoming' ? '4px' : '12px',
@@ -412,11 +412,11 @@ const RequestsCardV2 = ({
 
                 {reqDetails.proposedSessions && reqDetails.proposedSessions.length > 0 && (
                   <div>
-                    <div style={{ fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Proposed Timings</div>
+                    <div style={{ fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-secondary)', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Proposed Timings</div>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       {reqDetails.proposedSessions.map((session, idx) => (
-                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: '#ffffff', border: '1px solid #e5e7eb', padding: '12px', borderRadius: '8px' }}>
-                          <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: '#eff6ff', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'var(--cs-bg-white)', border: '1px solid var(--cs-border)', padding: '12px', borderRadius: '8px' }}>
+                          <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: 'var(--cs-bg-hover)', color: '#2563eb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                             <IconClock size={20} />
                           </div>
                           <div>

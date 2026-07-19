@@ -306,7 +306,7 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
             
             {(listingType === 'TEACH' || listingType === 'SWAP' || listingType === 'TEACH_SWAP' || listingType === 'LEARN_SWAP') && (
               <div>
-                <label style={{fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '4px', display: 'block'}}>What are you offering?</label>
+                <label style={{fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-secondary)', marginBottom: '4px', display: 'block'}}>What are you offering?</label>
                 {(!user?.skillsOffered || user.skillsOffered.length === 0) ? (
                   <div style={{ fontSize: '13px', color: '#dc2626', background: '#fef2f2', padding: '8px', borderRadius: '4px' }}>
                     You haven't added any skills to teach yet. Please go to your Profile and add a skill to your "I can teach" list first.
@@ -344,7 +344,7 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
                 )}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: offeredSkills.length ? '8px' : '0' }}>
                   {offeredSkills.map((s, i) => (
-                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', background: '#fff', padding: '8px 12px', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '13px' }}>
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', background: 'var(--cs-bg-white)', padding: '8px 12px', border: '1px solid var(--cs-border)', borderRadius: '6px', fontSize: '13px' }}>
                       <span><strong style={{color: '#1d4ed8'}}>Offering:</strong> {s.name} ({s.level})</span>
                       <button type="button" onClick={() => setOfferedSkills(offeredSkills.filter((_, idx) => idx !== i))} style={{background:'none', border:'none', color:'#ef4444', cursor:'pointer'}}><IconTrash size={14}/></button>
                     </div>
@@ -355,7 +355,7 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
 
             {(listingType === 'LEARN' || listingType === 'SWAP' || listingType === 'TEACH_SWAP' || listingType === 'LEARN_SWAP') && (
               <div style={{marginTop: listingType === 'LEARN' ? '0' : '8px'}}>
-                <label style={{fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '4px', display: 'block'}}>What are you requesting to learn?</label>
+                <label style={{fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-secondary)', marginBottom: '4px', display: 'block'}}>What are you requesting to learn?</label>
                 <AutocompleteInput 
                   allTopics={Object.keys(topicMap)} 
                   placeholder="e.g. Figma, Python, Guitar..."
@@ -367,7 +367,7 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
                 />
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: requestedSkills.length ? '8px' : '0' }}>
                   {requestedSkills.map((s, i) => (
-                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', background: '#fff', padding: '8px 12px', border: '1px solid #e5e7eb', borderRadius: '6px', fontSize: '13px' }}>
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', background: 'var(--cs-bg-white)', padding: '8px 12px', border: '1px solid var(--cs-border)', borderRadius: '6px', fontSize: '13px' }}>
                       <span><strong style={{color: '#059669'}}>Requesting:</strong> {s.name}</span>
                       <button type="button" onClick={() => setRequestedSkills(requestedSkills.filter((_, idx) => idx !== i))} style={{background:'none', border:'none', color:'#ef4444', cursor:'pointer'}}><IconTrash size={14}/></button>
                     </div>
@@ -380,9 +380,9 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
           {!(listingType === 'LEARN' || listingType === 'LEARN_SWAP') && (
             <div className="clm-field">
               <label>Syllabus <span style={{fontWeight: 400, color: '#6b7280'}}>(optional)</span></label>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', padding: '6px 12px', border: '1px solid #e5e7eb', borderRadius: '8px', minHeight: '42px', alignItems: 'center', background: '#fff' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', padding: '6px 12px', border: '1px solid var(--cs-border)', borderRadius: '8px', minHeight: '42px', alignItems: 'center', background: 'var(--cs-bg-white)' }}>
                 {topicsStr.split(',').map(t => t.trim()).filter(Boolean).map((t, i) => (
-                  <div key={i} style={{ background: '#e0e7ff', color: '#3730a3', padding: '4px 10px', borderRadius: '100px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <div key={i} style={{ background: 'var(--cs-bg-hover)', color: '#3730a3', padding: '4px 10px', borderRadius: '100px', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '4px' }}>
                     {t}
                     <IconX size={14} style={{ cursor: 'pointer', opacity: 0.7 }} onClick={() => {
                       const newTopics = topicsStr.split(',').map(t => t.trim()).filter(Boolean);
@@ -481,7 +481,7 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
             <h3 style={{marginTop: 0, marginBottom: '4px'}}>Review Listing Details</h3>
             <p style={{fontSize: '13px', color: '#6b7280', marginTop: 0, marginBottom: '16px'}}>Please review the details below before publishing.</p>
             
-            <div style={{ width: '100%', background: '#f9fafb', borderRadius: '12px', padding: '20px', border: '1px solid #e5e7eb', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div style={{ width: '100%', background: '#f9fafb', borderRadius: '12px', padding: '20px', border: '1px solid var(--cs-border)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
                 <div style={{ fontSize: '12px', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{getAutoCategory()} • {listingType.replace('_', ' ')}</div>
                 <div style={{ fontSize: '20px', fontWeight: 700, color: '#111827', marginTop: '4px' }}>{title || 'Untitled Listing'}</div>
@@ -490,7 +490,7 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
 
               <div>
                 <div style={{ fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '4px' }}>Description</div>
-                <div style={{ fontSize: '14px', color: '#4b5563', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{description || 'No description provided.'}</div>
+                <div style={{ fontSize: '14px', color: 'var(--cs-text-secondary)', lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{description || 'No description provided.'}</div>
               </div>
 
               {topicsStr && (
@@ -498,22 +498,22 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
                   <div style={{ fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '4px' }}>Syllabus / Topics</div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                     {topicsStr.split(',').map(t => t.trim()).filter(Boolean).map((t, i) => (
-                      <span key={i} style={{ background: '#e0e7ff', color: '#3730a3', padding: '4px 10px', borderRadius: '100px', fontSize: '12px', fontWeight: 500 }}>{t}</span>
+                      <span key={i} style={{ background: 'var(--cs-bg-hover)', color: '#3730a3', padding: '4px 10px', borderRadius: '100px', fontSize: '12px', fontWeight: 500 }}>{t}</span>
                     ))}
                   </div>
                 </div>
               )}
 
               {(offeredSkills.length > 0 || requestedSkills.length > 0) && (
-                <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', background: '#ffffff', padding: '16px', borderRadius: '8px', border: '1px solid #e5e7eb' }}>
+                <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap', background: 'var(--cs-bg-white)', padding: '16px', borderRadius: '8px', border: '1px solid var(--cs-border)' }}>
                   {offeredSkills.length > 0 && (
                     <div style={{ flex: 1, minWidth: '200px' }}>
                       <div style={{ fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '8px' }}>Offering</div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                         {offeredSkills.map((s, i) => (
-                          <div key={i} style={{ fontSize: '13px', color: '#4b5563', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <div key={i} style={{ fontSize: '13px', color: 'var(--cs-text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#1d4ed8' }}></div>
-                            {s.name} <span style={{ color: '#9ca3af', fontSize: '12px' }}>({s.level})</span>
+                            {s.name} <span style={{ color: 'var(--cs-text-inactive)', fontSize: '12px' }}>({s.level})</span>
                           </div>
                         ))}
                       </div>
@@ -524,9 +524,9 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
                       <div style={{ fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '8px' }}>Requesting</div>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                         {requestedSkills.map((s, i) => (
-                          <div key={i} style={{ fontSize: '13px', color: '#4b5563', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          <div key={i} style={{ fontSize: '13px', color: 'var(--cs-text-secondary)', display: 'flex', alignItems: 'center', gap: '6px' }}>
                             <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#059669' }}></div>
-                            {s.name} {s.level && <span style={{ color: '#9ca3af', fontSize: '12px' }}>({s.level})</span>}
+                            {s.name} {s.level && <span style={{ color: 'var(--cs-text-inactive)', fontSize: '12px' }}>({s.level})</span>}
                           </div>
                         ))}
                       </div>
@@ -537,7 +537,7 @@ const CreateListingModal = ({ isOpen, onClose, editData = null }) => {
 
               <div>
                 <div style={{ fontSize: '13px', fontWeight: 600, color: '#374151', marginBottom: '8px' }}>Availability</div>
-                <div style={{ fontSize: '13px', color: '#4b5563', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <div style={{ fontSize: '13px', color: 'var(--cs-text-secondary)', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: availability === 'ONLINE' ? '#10b981' : '#f59e0b' }}></div>
                   {availability === 'ONLINE' ? 'Online Mode' : availability === 'OFFLINE' ? 'In-Person Mode' : 'Online or In-Person'}
                 </div>

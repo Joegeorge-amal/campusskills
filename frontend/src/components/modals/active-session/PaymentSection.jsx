@@ -103,15 +103,15 @@ const PaymentSection = ({ session }) => {
       </div>
       
       <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '16px' }}>
-        <img src={qrUrl} alt="UPI QR Code" style={{ width: '200px', height: '200px', borderRadius: '8px', border: '1px solid #e5e7eb', padding: '8px' }} />
+        <img src={qrUrl} alt="UPI QR Code" style={{ width: '200px', height: '200px', borderRadius: '8px', border: '1px solid var(--cs-border)', padding: '8px' }} />
       </div>
 
-      <div style={{ background: '#f8fafc', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+      <div style={{ background: 'var(--cs-bg-light)', border: '1px solid var(--cs-border)', borderRadius: '8px', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
         <div>
           <div style={{ fontSize: '11px', color: '#6b7280', textAlign: 'left', marginBottom: '2px' }}>UPI ID</div>
           <div style={{ fontSize: '14px', fontWeight: 600, color: '#111827' }}>{paymentInfo.upiId}</div>
         </div>
-        <button onClick={copyUpi} style={{ background: '#eff6ff', border: 'none', borderRadius: '6px', padding: '8px', color: '#1d4ed8', cursor: 'pointer', display: 'flex' }}>
+        <button onClick={copyUpi} style={{ background: 'var(--cs-bg-hover)', border: 'none', borderRadius: '6px', padding: '8px', color: '#1d4ed8', cursor: 'pointer', display: 'flex' }}>
           <IconCopy size={18} />
         </button>
       </div>

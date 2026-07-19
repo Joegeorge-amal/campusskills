@@ -82,7 +82,7 @@ const ReviewSection = ({ userId, averageRating, reviewCount, onLoaded }) => {
   };
 
   return (
-    <div id="reviews-section" style={{ background: '#ffffff', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', marginBottom: '32px', border: '1px solid #f3f4f6', scrollMarginTop: '100px' }}>
+    <div id="reviews-section" style={{ background: 'var(--cs-bg-white)', borderRadius: '16px', padding: '24px', boxShadow: '0 4px 20px rgba(0,0,0,0.04)', marginBottom: '32px', border: '1px solid #f3f4f6', scrollMarginTop: '100px' }}>
       <h2 style={{ fontSize: '20px', fontWeight: 800, color: '#111827', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
         Ratings & Reviews
       </h2>
@@ -111,25 +111,25 @@ const ReviewSection = ({ userId, averageRating, reviewCount, onLoaded }) => {
       ) : reviews.length > 0 ? (
         <div id="reviews-list-top" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {reviews.map((rev) => (
-            <div key={rev._id || rev.id} style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #e2e8f0', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div key={rev._id || rev.id} style={{ background: 'var(--cs-bg-light)', padding: '16px', borderRadius: '12px', border: '1px solid var(--cs-border)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <div style={{ display: 'flex', gap: '2px' }}>
                   {renderStars(rev.rating)}
                 </div>
-                <span style={{ fontSize: '12px', color: '#94a3b8', fontWeight: 500 }}>
+                <span style={{ fontSize: '12px', color: 'var(--cs-text-inactive)', fontWeight: 500 }}>
                   {getRelativeTime(rev.createdAt)}
                 </span>
               </div>
 
-              <div style={{ fontSize: '14px', color: '#334155', lineHeight: '1.5', fontStyle: 'italic', fontWeight: 500 }}>
+              <div style={{ fontSize: '14px', color: 'var(--cs-text-main)', lineHeight: '1.5', fontStyle: 'italic', fontWeight: 500 }}>
                 "{rev.comment || 'No comment provided.'}"
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px', borderTop: '1px solid #e2e8f0', paddingTop: '8px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px', borderTop: '1px solid var(--cs-border)', paddingTop: '8px' }}>
                 <span style={{ fontSize: '13px', color: '#1e3a8a', fontWeight: 700 }}>
                   — {rev.reviewerName}
                 </span>
-                <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: 600, background: '#eff6ff', padding: '2px 8px', borderRadius: '100px' }}>
+                <span style={{ fontSize: '12px', color: '#6b7280', fontWeight: 600, background: 'var(--cs-bg-hover)', padding: '2px 8px', borderRadius: '100px' }}>
                   {rev.sessionTitle}
                 </span>
               </div>
@@ -137,7 +137,7 @@ const ReviewSection = ({ userId, averageRating, reviewCount, onLoaded }) => {
           ))}
         </div>
       ) : (
-        <div style={{ fontSize: '14px', color: '#9ca3af', padding: '24px 0', textAlign: 'center' }}>
+        <div style={{ fontSize: '14px', color: 'var(--cs-text-inactive)', padding: '24px 0', textAlign: 'center' }}>
           No reviews yet.
         </div>
       )}

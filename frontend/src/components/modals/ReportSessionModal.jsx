@@ -70,12 +70,12 @@ const ReportSessionModal = () => {
             <div style={{ fontSize: '16px', fontWeight: 600, color: '#111827' }}>Report Session</div>
             <button 
               onClick={handleClose} 
-              style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#9ca3af', lineHeight: 1 }}
+              style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: 'var(--cs-text-inactive)', lineHeight: 1 }}
             >
               ×
             </button>
           </div>
-          <div style={{ fontSize: '12px', color: '#9ca3af' }}>
+          <div style={{ fontSize: '12px', color: 'var(--cs-text-inactive)' }}>
             {context} · {target}
           </div>
         </div>
@@ -93,7 +93,7 @@ const ReportSessionModal = () => {
                     minHeight: '120px', 
                     padding: '12px', 
                     borderRadius: '8px', 
-                    border: '1px solid #e5e7eb', 
+                    border: '1px solid var(--cs-border)', 
                     fontSize: '14px',
                     fontFamily: 'inherit',
                     resize: 'vertical',
@@ -137,7 +137,7 @@ const ReportSessionModal = () => {
                 <IconCheck size={32} color="#22c55e" stroke={3} />
               </div>
               <div style={{ fontSize: '16px', fontWeight: 600, color: '#111827', marginBottom: '8px' }}>Report submitted</div>
-              <div style={{ fontSize: '14px', color: '#9ca3af', marginBottom: '32px', lineHeight: 1.5 }}>
+              <div style={{ fontSize: '14px', color: 'var(--cs-text-inactive)', marginBottom: '32px', lineHeight: 1.5 }}>
                 Our team will review and follow up within 24 hours.
               </div>
               <button 

@@ -157,7 +157,7 @@
 
 .sfld label {
   font-size: 11px;
-  color: #4b5563;
+  color: var(--cs-text-secondary);
   display: block;
   margin-bottom: 6px;
   font-weight: 600;
@@ -170,7 +170,7 @@
   padding: 8px 12px;
   border-radius: 8px;
   border: 1.5px solid #E0DFF0;
-  background: #FAFAFA;
+  background: var(--cs-bg-light);
   color: #222;
   font-size: 14px;
   outline: none;
@@ -182,7 +182,7 @@
 .sfld select:focus,
 .sfld textarea:focus {
   border-color: #1d4ed8;
-  background: #fff;
+  background: var(--cs-bg-white);
 }
 
 .sfld textarea {
@@ -301,7 +301,7 @@
 }
 
 .photo-modal {
-  background: #fff;
+  background: var(--cs-bg-white);
   border-radius: 18px 18px 0 0;
   padding: 20px 16px 28px;
   width: 100%;
@@ -367,7 +367,7 @@
   padding: 11px;
   border-radius: 11px;
   border: 1.5px solid #E0DFF0;
-  background: #fff;
+  background: var(--cs-bg-white);
   color: #555;
   font-size: 13px;
   cursor: pointer;
@@ -499,7 +499,7 @@
   padding: 11px;
   border-radius: 11px;
   border: 1.5px solid #E0DFF0;
-  background: #fff;
+  background: var(--cs-bg-white);
   color: #555;
   font-size: 13px;
   cursor: pointer;
@@ -520,7 +520,7 @@
   padding: 11px 16px;
   border-radius: 11px;
   border: 1.5px solid #E0DFF0;
-  background: #fff;
+  background: var(--cs-bg-white);
   color: #555;
   font-size: 13px;
   cursor: pointer;
@@ -557,7 +557,7 @@
   padding: 8px 12px;
   border-radius: 8px;
   border: 1.5px solid #E0DFF0;
-  background: #FAFAFA;
+  background: var(--cs-bg-light);
   color: #222;
   font-size: 14px;
   cursor: pointer;
@@ -569,22 +569,22 @@
 }
 
 .custom-select-trigger.placeholder {
-  color: #9CA3AF;
+  color: var(--cs-text-inactive);
 }
 
 .custom-select-trigger:hover {
-  border-color: #cbd5e1;
+  border-color: var(--cs-text-inactive);
 }
 
 .custom-select-trigger.open {
   border-color: #1d4ed8;
-  background: #fff;
+  background: var(--cs-bg-white);
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
 }
 
 .custom-select-icon {
-  color: #9CA3AF;
+  color: var(--cs-text-inactive);
   transition: transform 0.2s ease;
 }
 
@@ -598,7 +598,7 @@
   top: 100%;
   left: 0;
   right: 0;
-  background: #fff;
+  background: var(--cs-bg-white);
   border: 1.5px solid #E0DFF0;
   border-top: none;
   border-bottom-left-radius: 8px;
@@ -618,12 +618,12 @@
 }
 
 .custom-select-option:hover {
-  background: #f1f5f9;
+  background: var(--cs-bg-light);
   color: #1d4ed8;
 }
 
 .custom-select-option.selected {
-  background: #eff6ff;
+  background: var(--cs-bg-hover);
   color: #1d4ed8;
   font-weight: 500;
 }

@@ -103,9 +103,9 @@ const AdminLineChart = ({ data }) => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px', paddingLeft: '40px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div style={{ width: '24px', height: '4px', background: '#2563eb', borderRadius: '2px' }}></div>
-          <span style={{ fontSize: '12px', color: '#64748b', fontWeight: 500 }}>Student Registrations</span>
+          <span style={{ fontSize: '12px', color: 'var(--cs-text-secondary)', fontWeight: 500 }}>Student Registrations</span>
         </div>
-        <span style={{ fontSize: '11px', color: '#94a3b8' }}>Hover over data points for details</span>
+        <span style={{ fontSize: '11px', color: 'var(--cs-text-inactive)' }}>Hover over data points for details</span>
       </div>
     </div>
   );

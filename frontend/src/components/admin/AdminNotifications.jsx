@@ -226,7 +226,7 @@ const AdminNotifications = () => {
             )}
           </div>
           {notifications.length > 0 && (
-            <div className="admin-notif-footer" style={{ borderTop: '1px solid #e5e7eb', padding: '12px', textAlign: 'center' }}>
+            <div className="admin-notif-footer" style={{ borderTop: '1px solid var(--cs-border)', padding: '12px', textAlign: 'center' }}>
               <button 
                 onClick={() => { setIsOpen(false); setIsSidePanelOpen(true); }} 
                 style={{ background: 'none', border: 'none', color: '#2563eb', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}

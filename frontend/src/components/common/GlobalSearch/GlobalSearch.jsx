@@ -191,7 +191,7 @@ const GlobalSearch = () => {
               {/* --- Dashboard Results --- */}
               {results.listings.length > 0 && (
                 <div className="search-section">
-                  <div style={{ padding: '8px 12px', fontSize: '11px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', backgroundColor: '#f9fafb' }}>Listings</div>
+                  <div style={{ padding: '8px 12px', fontSize: '11px', fontWeight: 600, color: 'var(--cs-text-inactive)', textTransform: 'uppercase', letterSpacing: '0.05em', backgroundColor: '#f9fafb' }}>Listings</div>
                   {results.listings.map(l => (
                     <div 
                       key={l.id} 
@@ -202,7 +202,7 @@ const GlobalSearch = () => {
                     >
                       <IconBook size={16} color="#10b981" />
                       <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '14px', color: '#1f2937' }}>{l.title}</span>
+                        <span style={{ fontSize: '14px', color: 'var(--cs-text-main)' }}>{l.title}</span>
                         <span style={{ fontSize: '12px', color: '#6b7280' }}>{l.category} · {l.listingType}</span>
                       </div>
                     </div>
@@ -212,7 +212,7 @@ const GlobalSearch = () => {
 
               {results.sessions.length > 0 && (
                 <div className="search-section">
-                  <div style={{ padding: '8px 12px', fontSize: '11px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', backgroundColor: '#f9fafb' }}>Sessions</div>
+                  <div style={{ padding: '8px 12px', fontSize: '11px', fontWeight: 600, color: 'var(--cs-text-inactive)', textTransform: 'uppercase', letterSpacing: '0.05em', backgroundColor: '#f9fafb' }}>Sessions</div>
                   {results.sessions.map(s => (
                     <div 
                       key={s.id} 
@@ -223,7 +223,7 @@ const GlobalSearch = () => {
                     >
                       <IconCalendarEvent size={16} color="#3b82f6" />
                       <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '14px', color: '#1f2937' }}>{s.topic}</span>
+                        <span style={{ fontSize: '14px', color: 'var(--cs-text-main)' }}>{s.topic}</span>
                         <span style={{ fontSize: '12px', color: '#6b7280' }}>With {s.name} · {s.status}</span>
                       </div>
                     </div>
@@ -233,7 +233,7 @@ const GlobalSearch = () => {
 
               {results.requests.length > 0 && (
                 <div className="search-section">
-                  <div style={{ padding: '8px 12px', fontSize: '11px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', backgroundColor: '#f9fafb' }}>Requests</div>
+                  <div style={{ padding: '8px 12px', fontSize: '11px', fontWeight: 600, color: 'var(--cs-text-inactive)', textTransform: 'uppercase', letterSpacing: '0.05em', backgroundColor: '#f9fafb' }}>Requests</div>
                   {results.requests.map(r => (
                     <div 
                       key={r.id} 
@@ -244,7 +244,7 @@ const GlobalSearch = () => {
                     >
                       <IconGitPullRequest size={16} color="#f59e0b" />
                       <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '14px', color: '#1f2937' }}>{r.title}</span>
+                        <span style={{ fontSize: '14px', color: 'var(--cs-text-main)' }}>{r.title}</span>
                         <span style={{ fontSize: '12px', color: '#6b7280' }}>{r.type} · {r.status}</span>
                       </div>
                     </div>
@@ -254,7 +254,7 @@ const GlobalSearch = () => {
 
               {results.chats.length > 0 && (
                 <div className="search-section">
-                  <div style={{ padding: '8px 12px', fontSize: '11px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', backgroundColor: '#f9fafb' }}>Chats</div>
+                  <div style={{ padding: '8px 12px', fontSize: '11px', fontWeight: 600, color: 'var(--cs-text-inactive)', textTransform: 'uppercase', letterSpacing: '0.05em', backgroundColor: '#f9fafb' }}>Chats</div>
                   {results.chats.map(c => (
                     <div 
                       key={c.id} 
@@ -265,7 +265,7 @@ const GlobalSearch = () => {
                     >
                       <IconMessageCircle size={16} color="#8b5cf6" />
                       <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '14px', color: '#1f2937' }}>With {c.name}</span>
+                        <span style={{ fontSize: '14px', color: 'var(--cs-text-main)' }}>With {c.name}</span>
                         <span style={{ fontSize: '12px', color: '#6b7280' }}>{c.preview}</span>
                       </div>
                     </div>
@@ -276,7 +276,7 @@ const GlobalSearch = () => {
               {/* --- Admin Results --- */}
               {results.adminUsers.length > 0 && (
                 <div className="search-section">
-                  <div style={{ padding: '8px 12px', fontSize: '11px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', backgroundColor: '#f9fafb' }}>Users</div>
+                  <div style={{ padding: '8px 12px', fontSize: '11px', fontWeight: 600, color: 'var(--cs-text-inactive)', textTransform: 'uppercase', letterSpacing: '0.05em', backgroundColor: '#f9fafb' }}>Users</div>
                   {results.adminUsers.map(u => (
                     <div 
                       key={u.id} 
@@ -286,7 +286,7 @@ const GlobalSearch = () => {
                       onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                     >
                       <IconUser size={16} color="#3b82f6" />
-                      <span style={{ fontSize: '14px', color: '#1f2937' }}>{u.displayName || u.name} ({u.email})</span>
+                      <span style={{ fontSize: '14px', color: 'var(--cs-text-main)' }}>{u.displayName || u.name} ({u.email})</span>
                     </div>
                   ))}
                 </div>
@@ -294,7 +294,7 @@ const GlobalSearch = () => {
 
               {results.adminReports.length > 0 && (
                 <div className="search-section">
-                  <div style={{ padding: '8px 12px', fontSize: '11px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', backgroundColor: '#f9fafb' }}>Reports</div>
+                  <div style={{ padding: '8px 12px', fontSize: '11px', fontWeight: 600, color: 'var(--cs-text-inactive)', textTransform: 'uppercase', letterSpacing: '0.05em', backgroundColor: '#f9fafb' }}>Reports</div>
                   {results.adminReports.map(r => (
                     <div 
                       key={r.id} 
@@ -305,7 +305,7 @@ const GlobalSearch = () => {
                     >
                       <IconGitPullRequest size={16} color="#ef4444" />
                       <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '14px', color: '#1f2937' }}>{r.title || r.reason}</span>
+                        <span style={{ fontSize: '14px', color: 'var(--cs-text-main)' }}>{r.title || r.reason}</span>
                         <span style={{ fontSize: '12px', color: '#6b7280' }}>Status: {r.status}</span>
                       </div>
                     </div>
@@ -315,7 +315,7 @@ const GlobalSearch = () => {
 
               {results.adminListings.length > 0 && (
                 <div className="search-section">
-                  <div style={{ padding: '8px 12px', fontSize: '11px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.05em', backgroundColor: '#f9fafb' }}>Listings</div>
+                  <div style={{ padding: '8px 12px', fontSize: '11px', fontWeight: 600, color: 'var(--cs-text-inactive)', textTransform: 'uppercase', letterSpacing: '0.05em', backgroundColor: '#f9fafb' }}>Listings</div>
                   {results.adminListings.map(l => (
                     <div 
                       key={l.id} 
@@ -326,7 +326,7 @@ const GlobalSearch = () => {
                     >
                       <IconBook size={16} color="#10b981" />
                       <div style={{ display: 'flex', flexDirection: 'column' }}>
-                        <span style={{ fontSize: '14px', color: '#1f2937' }}>{l.title}</span>
+                        <span style={{ fontSize: '14px', color: 'var(--cs-text-main)' }}>{l.title}</span>
                         <span style={{ fontSize: '12px', color: '#6b7280' }}>Type: {l.listingType}</span>
                       </div>
                     </div>

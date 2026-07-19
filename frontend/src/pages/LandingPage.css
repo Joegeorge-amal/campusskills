@@ -5,7 +5,7 @@ html {
 .landing-page {
   font-family: 'Inter', sans-serif;
   color: #1a1a1a;
-  background-color: #fafafa;
+  background-color: var(--cs-bg-light);
   overflow-x: clip;
 }
 
@@ -231,7 +231,7 @@ html {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: #fafafa;
+  background-color: var(--cs-bg-light);
   z-index: -2;
 }
 
@@ -354,7 +354,7 @@ html {
 
 .section-header p {
   font-size: 1.125rem;
-  color: #4b5563;
+  color: var(--cs-text-secondary);
   line-height: 1.6;
 }
 
@@ -379,7 +379,7 @@ html {
 
 .about-text-content p {
   font-size: 1rem;
-  color: #4b5563;
+  color: var(--cs-text-secondary);
   line-height: 1.6;
   max-width: 450px;
 }
@@ -391,7 +391,7 @@ html {
 }
 
 .about-card {
-  background: #fafafa;
+  background: var(--cs-bg-light);
   border: 1px solid #f3f4f6;
   padding: 1.5rem;
   border-radius: 16px;
@@ -441,10 +441,10 @@ html {
    How It Works
    ================== */
 .how-it-works {
-  background-color: #eff6ff; /* Just a touch more purple */
+  background-color: var(--cs-bg-hover); /* Just a touch more purple */
   max-width: 100%;
-  border-top: 1px solid #d1d5db; /* Thinner but crisp 1px line */
-  border-bottom: 1px solid #d1d5db;
+  border-top: 1px solid var(--cs-border); /* Thinner but crisp 1px line */
+  border-bottom: 1px solid var(--cs-border);
   padding: 8rem 4rem; /* Increased vertical padding */
 }
 
@@ -491,7 +491,7 @@ html {
 .step-icon {
   width: 72px;
   height: 72px;
-  background: #ffffff; /* Solid white to perfectly mask the line behind it */
+  background: var(--cs-bg-white); /* Solid white to perfectly mask the line behind it */
   border: 1px solid rgba(37, 99, 235, 0.15); /* Very subtle purple border matching the image */
   border-radius: 50%;
   display: flex;
@@ -536,7 +536,7 @@ html {
 }
 
 .feature-card {
-  background: #fafafa;
+  background: var(--cs-bg-light);
   border: 1px solid #f3f4f6;
   padding: 1.5rem; /* Reduced from 2rem */
   border-radius: 12px;
@@ -590,8 +590,8 @@ html {
   border-radius: 24px;
   padding: 6rem 2rem;
   text-align: center;
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0; /* Added subtle border */
+  background-color: var(--cs-bg-light);
+  border: 1px solid var(--cs-border); /* Added subtle border */
   overflow: hidden;
 }
 
@@ -624,7 +624,7 @@ html {
 
 .access-content p {
   font-size: 1.125rem;
-  color: #4b5563;
+  color: var(--cs-text-secondary);
   line-height: 1.6;
   margin-bottom: 3rem;
 }
@@ -662,8 +662,8 @@ html {
   max-width: 100%;
   margin-top: 6rem;
   padding: 4rem;
-  background-color: #eff6ff;
-  border-top: 1px solid #d1d5db;
+  background-color: var(--cs-bg-hover);
+  border-top: 1px solid var(--cs-border);
 }
 
 .bottom-cta h2 {

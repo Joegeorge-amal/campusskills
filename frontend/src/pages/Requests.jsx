@@ -193,7 +193,7 @@ const Requests = () => {
         <>
           <div style={{ marginBottom: '28px' }}>
             <div 
-              style={{ fontSize: '12px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+              style={{ fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-inactive)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
               onClick={() => setIsIncomingOpen(!isIncomingOpen)}
             >
               <span>{isIncomingOpen ? '▼' : '▶'}</span> Incoming requests ({incomingRequests.length})
@@ -242,10 +242,10 @@ const Requests = () => {
                 ))}
                 
                 {incomingRequests.length === 0 && (
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 16px', textAlign: 'center', background: '#ffffff', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 30px -5px rgba(0,0,0,.04)' }}>
-                    <IconArrowsRightLeft size={28} style={{ color: '#94a3b8', marginBottom: '8px' }} />
-                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#1e293b', marginBottom: '4px' }}>No incoming requests</div>
-                    <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '16px', maxWidth: '280px' }}>No incoming requests right now. Explore the marketplace to send requests to others!</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 16px', textAlign: 'center', background: 'var(--cs-bg-white)', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 30px -5px rgba(0,0,0,.04)' }}>
+                    <IconArrowsRightLeft size={28} style={{ color: 'var(--cs-text-inactive)', marginBottom: '8px' }} />
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--cs-text-main)', marginBottom: '4px' }}>No incoming requests</div>
+                    <div style={{ fontSize: '12px', color: 'var(--cs-text-secondary)', marginBottom: '16px', maxWidth: '280px' }}>No incoming requests right now. Explore the marketplace to send requests to others!</div>
                     <button onClick={() => navigate('/app/marketplace')} style={{ padding: '8px 16px', borderRadius: '10px', background: '#2563eb', color: '#fff', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Browse Marketplace</button>
                   </div>
                 )}
@@ -255,7 +255,7 @@ const Requests = () => {
 
           <div style={{ marginBottom: '28px' }}>
             <div 
-              style={{ fontSize: '12px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+              style={{ fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-inactive)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
               onClick={() => setIsSentOpen(!isSentOpen)}
             >
               <span>{isSentOpen ? '▼' : '▶'}</span> Sent Requests ({outgoingRequests.length})
@@ -283,10 +283,10 @@ const Requests = () => {
                 ))}
 
                 {outgoingRequests.length === 0 && (
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 16px', textAlign: 'center', background: '#ffffff', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 30px -5px rgba(0,0,0,.04)' }}>
-                    <IconArrowsRightLeft size={28} style={{ color: '#94a3b8', marginBottom: '8px' }} />
-                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#1e293b', marginBottom: '4px' }}>No sent requests</div>
-                    <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '16px', maxWidth: '280px' }}>You haven't sent any skill swap or session requests yet.</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 16px', textAlign: 'center', background: 'var(--cs-bg-white)', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 30px -5px rgba(0,0,0,.04)' }}>
+                    <IconArrowsRightLeft size={28} style={{ color: 'var(--cs-text-inactive)', marginBottom: '8px' }} />
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--cs-text-main)', marginBottom: '4px' }}>No sent requests</div>
+                    <div style={{ fontSize: '12px', color: 'var(--cs-text-secondary)', marginBottom: '16px', maxWidth: '280px' }}>You haven't sent any skill swap or session requests yet.</div>
                     <button onClick={() => navigate('/app/marketplace')} style={{ padding: '8px 16px', borderRadius: '10px', background: '#2563eb', color: '#fff', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Find Swaps</button>
                   </div>
                 )}
@@ -296,7 +296,7 @@ const Requests = () => {
 
           <div>
             <div 
-              style={{ fontSize: '12px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+              style={{ fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-inactive)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
               onClick={() => setIsHistoryOpen(!isHistoryOpen)}
             >
               <span>{isHistoryOpen ? '▼' : '▶'}</span> History ({historyRequests.length})
@@ -323,10 +323,10 @@ const Requests = () => {
                 ))}
                 
                 {historyRequests.length === 0 && (
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 16px', textAlign: 'center', background: '#ffffff', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 30px -5px rgba(0,0,0,.04)' }}>
-                    <IconArrowsRightLeft size={28} style={{ color: '#94a3b8', marginBottom: '8px' }} />
-                    <div style={{ fontSize: '14px', fontWeight: 700, color: '#1e293b', marginBottom: '4px' }}>No past requests</div>
-                    <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '16px', maxWidth: '280px' }}>History of accepted, declined, or cancelled requests will appear here.</div>
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 16px', textAlign: 'center', background: 'var(--cs-bg-white)', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 30px -5px rgba(0,0,0,.04)' }}>
+                    <IconArrowsRightLeft size={28} style={{ color: 'var(--cs-text-inactive)', marginBottom: '8px' }} />
+                    <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--cs-text-main)', marginBottom: '4px' }}>No past requests</div>
+                    <div style={{ fontSize: '12px', color: 'var(--cs-text-secondary)', marginBottom: '16px', maxWidth: '280px' }}>History of accepted, declined, or cancelled requests will appear here.</div>
                   </div>
                 )}
               </div>
@@ -367,7 +367,7 @@ const Requests = () => {
       {bookingModalReq && (
         <ModalWrapper isOpen={true} onClose={() => setBookingModalReq(null)} maxWidth="400px" zIndex={1000}>
           <div style={{
-            backgroundColor: '#ffffff', borderRadius: '16px', padding: '24px',
+            background: 'var(--cs-bg-white)', borderRadius: '16px', padding: '24px',
             width: '100%', boxSizing: 'border-box'
           }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
@@ -390,7 +390,7 @@ const Requests = () => {
 
               {/* Skills */}
               {bookingModalReq.otherUserExtras?.listingTitle && (
-                <div style={{ display: 'flex', gap: '8px', marginBottom: '6px', fontSize: '13px', color: '#4b5563' }}>
+                <div style={{ display: 'flex', gap: '8px', marginBottom: '6px', fontSize: '13px', color: 'var(--cs-text-secondary)' }}>
                   <span style={{ fontWeight: 600, minWidth: '70px' }}>Topic:</span>
                   <span>{bookingModalReq.otherUserExtras.listingTitle}</span>
                 </div>
@@ -403,7 +403,7 @@ const Requests = () => {
                 if (startTime) {
                   const d = new Date(startTime);
                   return (
-                    <div style={{ display: 'flex', gap: '8px', marginBottom: '6px', fontSize: '13px', color: '#4b5563' }}>
+                    <div style={{ display: 'flex', gap: '8px', marginBottom: '6px', fontSize: '13px', color: 'var(--cs-text-secondary)' }}>
                       <span style={{ fontWeight: 600, minWidth: '70px' }}>Time:</span>
                       <span>{d.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })} at {d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
@@ -420,8 +420,8 @@ const Requests = () => {
 
               {/* Message */}
               {bookingModalReq.message && (
-                <div style={{ marginTop: '12px', padding: '12px', background: '#f9fafb', borderRadius: '8px', fontSize: '13px', color: '#374151', border: '1px solid #e5e7eb' }}>
-                  <div style={{ fontWeight: 600, marginBottom: '4px', fontSize: '11px', color: '#9ca3af', textTransform: 'uppercase' }}>Message</div>
+                <div style={{ marginTop: '12px', padding: '12px', background: '#f9fafb', borderRadius: '8px', fontSize: '13px', color: '#374151', border: '1px solid var(--cs-border)' }}>
+                  <div style={{ fontWeight: 600, marginBottom: '4px', fontSize: '11px', color: 'var(--cs-text-inactive)', textTransform: 'uppercase' }}>Message</div>
                   {bookingModalReq.message}
                 </div>
               )}

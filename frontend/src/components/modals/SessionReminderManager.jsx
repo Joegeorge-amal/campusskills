@@ -89,7 +89,7 @@ const SessionReminderManager = () => {
       {rescheduleSession && (
         <ModalWrapper isOpen={true} onClose={() => setRescheduleSession(null)} maxWidth="400px" zIndex={1000}>
           <div style={{
-            backgroundColor: '#ffffff',
+            background: 'var(--cs-bg-white)',
             borderRadius: '16px',
             padding: '24px',
             width: '100%',
@@ -101,22 +101,22 @@ const SessionReminderManager = () => {
             </div>
             
             <div style={{ marginBottom: '12px' }}>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '4px' }}>Date</label>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-secondary)', marginBottom: '4px' }}>Date</label>
               <input 
                 type="date" 
                 value={rescheduleDate} 
                 onChange={(e) => setRescheduleDate(e.target.value)}
-                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '13px', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--cs-border)', fontSize: '13px', boxSizing: 'border-box' }}
               />
             </div>
 
             <div style={{ marginBottom: '12px' }}>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '4px' }}>Start Time</label>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-secondary)', marginBottom: '4px' }}>Start Time</label>
               <CustomTimeInput value={rescheduleTime} onChange={setRescheduleTime} />
             </div>
 
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '4px' }}>Duration</label>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-secondary)', marginBottom: '4px' }}>Duration</label>
               <CustomSelect 
                 value={rescheduleDuration} 
                 onChange={val => setRescheduleDuration(val)}

@@ -50,7 +50,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, style, disabled }
         <IconChevronDown 
           size={16} 
           style={{ 
-            color: '#9ca3af', 
+            color: 'var(--cs-text-inactive)', 
             transition: 'transform 0.2s ease',
             transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)'
           }} 
@@ -78,7 +78,7 @@ const CustomSelect = ({ value, onChange, options, placeholder, style, disabled }
           }}
         >
           {options.length === 0 ? (
-            <div style={{ padding: '8px 12px', fontSize: '13px', color: '#9ca3af', textAlign: 'center' }}>
+            <div style={{ padding: '8px 12px', fontSize: '13px', color: 'var(--cs-text-inactive)', textAlign: 'center' }}>
               No options available
             </div>
           ) : (

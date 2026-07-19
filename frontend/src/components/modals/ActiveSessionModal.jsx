@@ -25,7 +25,7 @@ const ActiveSessionModal = ({ isOpen, onClose, session }) => {
       return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           <HandshakeSection session={session} />
-          <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '24px' }}>
+          <div style={{ borderTop: '1px solid var(--cs-border)', paddingTop: '24px' }}>
             <RescheduleSection session={session} />
           </div>
         </div>

@@ -90,7 +90,7 @@ const AdminOverview = () => {
       {/* OVERLAPPING STAT CARDS */}
       <div className="admin-overview-stats">
         <div className="admin-ostard">
-          <div className="ostard-icon" style={{background: '#eff6ff', color: '#2563eb'}}>
+          <div className="ostard-icon" style={{background: 'var(--cs-bg-hover)', color: '#2563eb'}}>
             <IconUsers size={20} />
           </div>
           <div className="ostard-label">TOTAL STUDENTS</div>
@@ -177,8 +177,8 @@ const AdminOverview = () => {
           </div>
           <div className="cat-perf-list">
             {categoryPerformance.categories.length === 0 ? (
-              <div style={{ padding: '40px 0', textAlign: 'center', color: '#9ca3af', fontSize: '0.95rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <IconBook size={28} style={{ marginBottom: '12px', color: '#cbd5e1' }} />
+              <div style={{ padding: '40px 0', textAlign: 'center', color: 'var(--cs-text-inactive)', fontSize: '0.95rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <IconBook size={28} style={{ marginBottom: '12px', color: 'var(--cs-text-inactive)' }} />
                 <div>No active sessions yet.</div>
               </div>
             ) : (
@@ -290,14 +290,14 @@ const AdminOverview = () => {
           <div className="admin-list-widget">
             {recentRegistrations.map(reg => (
               <div key={reg.id} className="alw-item">
-                <div className="alw-avatar" style={{background: '#f3f4f6', color: '#4b5563'}}>{reg.initial}</div>
+                <div className="alw-avatar" style={{background: 'var(--cs-bg-light)', color: 'var(--cs-text-secondary)'}}>{reg.initial}</div>
                 <div className="alw-info">
                   <div className="alw-name">{reg.name}</div>
                   <div className="alw-sub">{reg.info}</div>
                 </div>
                 <div className="alw-right" style={{textAlign: 'right'}}>
                   <div className={`alw-role-pill ${reg.role.toLowerCase()}`}>{reg.role}</div>
-                  <div className="alw-time" style={{fontSize: '11px', color: '#9ca3af', marginTop: '4px'}}>{reg.time}</div>
+                  <div className="alw-time" style={{fontSize: '11px', color: 'var(--cs-text-inactive)', marginTop: '4px'}}>{reg.time}</div>
                 </div>
               </div>
             ))}

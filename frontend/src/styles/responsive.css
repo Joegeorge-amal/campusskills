@@ -55,8 +55,8 @@
     height: 36px;
     border-radius: 10px;
     border: 1px solid #dbeafe;
-    background: #ffffff;
-    color: #475569;
+    background: var(--cs-bg-white);
+    color: var(--cs-text-secondary);
     margin-left: 4px;
     padding: 0;
   }
@@ -115,7 +115,7 @@
 
   .mobile-search-modal {
     width: 100%;
-    background: #ffffff;
+    background: var(--cs-bg-white);
     border-radius: 0 0 20px 20px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     padding: 16px 16px 24px;
@@ -133,14 +133,14 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    background: #f1f5f9;
+    background: var(--cs-bg-light);
     border-radius: 12px;
     padding: 0 14px;
     height: 44px;
   }
 
   .mobile-search-input-icon {
-    color: #94a3b8;
+    color: var(--cs-text-inactive);
     flex-shrink: 0;
   }
 
@@ -149,14 +149,14 @@
     background: transparent;
     outline: none;
     font-size: 16px;
-    color: #0f172a;
+    color: var(--cs-text-main);
     width: 100%;
     height: 100%;
     font-family: inherit;
   }
 
   .mobile-search-input::placeholder {
-    color: #94a3b8;
+    color: var(--cs-text-inactive);
   }
 
   .mobile-search-close {
@@ -164,7 +164,7 @@
     height: 40px;
     border: none;
     background: none;
-    color: #64748b;
+    color: var(--cs-text-secondary);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -175,7 +175,7 @@
   }
 
   .mobile-search-close:hover {
-    background: #f1f5f9;
+    background: var(--cs-bg-light);
   }
 
   .mobile-search-hints {
@@ -189,7 +189,7 @@
   .mobile-search-hint-label {
     font-size: 13px;
     font-weight: 600;
-    color: #64748b;
+    color: var(--cs-text-secondary);
     margin-bottom: 10px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -204,9 +204,9 @@
   .mobile-search-hint-chip {
     padding: 8px 16px;
     border-radius: 20px;
-    border: 1px solid #e2e8f0;
-    background: #ffffff;
-    color: #334155;
+    border: 1px solid var(--cs-border);
+    background: var(--cs-bg-white);
+    color: var(--cs-text-main);
     font-size: 13px;
     font-weight: 500;
     cursor: pointer;
@@ -215,8 +215,8 @@
   }
 
   .mobile-search-hint-chip:hover {
-    background: #f1f5f9;
-    border-color: #cbd5e1;
+    background: var(--cs-bg-light);
+    border-color: var(--cs-text-inactive);
   }
 
   @keyframes fadeIn {

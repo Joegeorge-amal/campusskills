@@ -285,7 +285,7 @@ const Sessions = () => {
       const sConf = s.rawSession.studentConfirmedCompletion;
       if (tConf || sConf) {
         guidanceText = "Waiting for completion confirmation";
-        guidanceStyle = { background: '#fffbeb', color: '#d97706', border: '1px solid #fde68a' };
+        guidanceStyle = { background: 'var(--cs-bg-white)', color: '#d97706', border: '1px solid #fde68a' };
       }
     } else if (s.status === 'COMPLETED') {
       if (isPaidSession) {
@@ -294,13 +294,13 @@ const Sessions = () => {
           guidanceStyle = { background: '#fef2f2', color: '#dc2626', border: '1px solid #fecaca' };
         } else if (!s.rawSession.teacherConfirmedPayment) {
           guidanceText = "Waiting for payment confirmation";
-          guidanceStyle = { background: '#fffbeb', color: '#d97706', border: '1px solid #fde68a' };
+          guidanceStyle = { background: 'var(--cs-bg-white)', color: '#d97706', border: '1px solid #fde68a' };
         } else {
           const hasReviewed = s.rawSession.hasReviewed ||
             (s.rawSession.reviews && s.rawSession.reviews.some(r => r.reviewerId === user?.userId));
           if (!hasReviewed) {
             guidanceText = "Please leave a review";
-            guidanceStyle = { background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe' };
+            guidanceStyle = { background: 'var(--cs-bg-hover)', color: '#2563eb', border: '1px solid #bfdbfe' };
           }
         }
       } else {
@@ -308,7 +308,7 @@ const Sessions = () => {
           (s.rawSession.reviews && s.rawSession.reviews.some(r => r.reviewerId === user?.userId));
         if (!hasReviewed) {
           guidanceText = "Please leave a review";
-          guidanceStyle = { background: '#eff6ff', color: '#2563eb', border: '1px solid #bfdbfe' };
+          guidanceStyle = { background: 'var(--cs-bg-hover)', color: '#2563eb', border: '1px solid #bfdbfe' };
         }
       }
     }
@@ -427,15 +427,15 @@ const Sessions = () => {
           <div style={{ borderTop: '1px solid #f3f4f6', marginTop: '16px', paddingTop: '16px' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '16px' }}>
               <div>
-                <div style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase' }}>Participant</div>
+                <div style={{ fontSize: '11px', color: 'var(--cs-text-inactive)', fontWeight: 600, textTransform: 'uppercase' }}>Participant</div>
                 <div style={{ fontSize: '13px', color: '#374151', marginTop: '2px' }}>{s.name}{s.otherUser?.rollNo ? ` · ${s.otherUser.rollNo.toUpperCase()}` : ''}</div>
               </div>
               <div>
-                <div style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase' }}>Date & Time</div>
+                <div style={{ fontSize: '11px', color: 'var(--cs-text-inactive)', fontWeight: 600, textTransform: 'uppercase' }}>Date & Time</div>
                 <div style={{ fontSize: '13px', color: '#374151', marginTop: '2px' }}>{formatSessionFullTime(s.rawSession.scheduledStart, s.rawSession.scheduledEnd)}</div>
               </div>
               <div>
-                <div style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase' }}>Mode</div>
+                <div style={{ fontSize: '11px', color: 'var(--cs-text-inactive)', fontWeight: 600, textTransform: 'uppercase' }}>Mode</div>
                 <div style={{ fontSize: '13px', color: '#374151', marginTop: '2px', display: 'flex', gap: '8px', alignItems: 'center' }}>
                   {s.mode}
                   {s.rawSession.meetingLink && (
@@ -451,7 +451,7 @@ const Sessions = () => {
                 </div>
               </div>
               <div>
-                <div style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase' }}>Topic</div>
+                <div style={{ fontSize: '11px', color: 'var(--cs-text-inactive)', fontWeight: 600, textTransform: 'uppercase' }}>Topic</div>
                 <div style={{ fontSize: '13px', color: '#374151', marginTop: '2px' }}>{s.topic}</div>
               </div>
             </div>
@@ -459,8 +459,8 @@ const Sessions = () => {
             {/* Notes Section if exists */}
             {s.rawSession.notes && (
               <div style={{ marginBottom: '16px' }}>
-                <div style={{ fontSize: '11px', color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase' }}>Notes</div>
-                <div style={{ fontSize: '13px', color: '#4b5563', marginTop: '4px', whiteSpace: 'pre-wrap' }}>{s.rawSession.notes}</div>
+                <div style={{ fontSize: '11px', color: 'var(--cs-text-inactive)', fontWeight: 600, textTransform: 'uppercase' }}>Notes</div>
+                <div style={{ fontSize: '13px', color: 'var(--cs-text-secondary)', marginTop: '4px', whiteSpace: 'pre-wrap' }}>{s.rawSession.notes}</div>
               </div>
             )}
 
@@ -560,7 +560,7 @@ const Sessions = () => {
                     style={{ 
                       fontSize: '12px', 
                       padding: '8px 16px', 
-                      background: '#ffffff', 
+                      background: 'var(--cs-bg-white)', 
                       color: '#dc2626', 
                       border: '1px solid #fecaca', 
                       borderRadius: '8px', 
@@ -584,7 +584,7 @@ const Sessions = () => {
                   s.role === 'Learning' ? (
                     // We are the student
                     !s.rawSession.studentMarkedPaid ? (
-                      <div style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '16px', marginBottom: '16px' }}>
+                      <div style={{ background: '#f9fafb', border: '1px solid var(--cs-border)', borderRadius: '12px', padding: '16px', marginBottom: '16px' }}>
                         {loadingPaymentId === s.id ? (
                           <div style={{ fontSize: '13px', color: '#6b7280' }}>Loading payment info...</div>
                         ) : paymentInfos[s.id] ? (
@@ -594,10 +594,10 @@ const Sessions = () => {
                             <img 
                               src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(`upi://pay?pa=${paymentInfos[s.id].upiId}&pn=${encodeURIComponent(s.name)}`)}`} 
                               alt="UPI QR Code" 
-                              style={{ width: '150px', height: '150px', border: '1px solid #e5e7eb', padding: '6px', borderRadius: '8px', background: '#fff' }} 
+                              style={{ width: '150px', height: '150px', border: '1px solid var(--cs-border)', padding: '6px', borderRadius: '8px', background: 'var(--cs-bg-white)' }} 
                             />
                             
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#fff', border: '1px solid #e5e7eb', padding: '6px 12px', borderRadius: '6px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'var(--cs-bg-white)', border: '1px solid var(--cs-border)', padding: '6px 12px', borderRadius: '6px' }}>
                               <span style={{ fontSize: '12px', fontWeight: 600 }}>UPI ID: {paymentInfos[s.id].upiId}</span>
                               <button onClick={() => copyUpi(paymentInfos[s.id].upiId)} style={{ background: 'none', border: 'none', color: '#2563eb', cursor: 'pointer', display: 'flex' }}>
                                 <IconCopy size={16} />
@@ -636,7 +636,7 @@ const Sessions = () => {
                   ) : (
                     // We are the teacher
                     s.rawSession.studentMarkedPaid && !s.rawSession.teacherConfirmedPayment ? (
-                      <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '12px', padding: '16px', marginBottom: '16px' }}>
+                      <div style={{ background: 'var(--cs-bg-white)', border: '1px solid #fde68a', borderRadius: '12px', padding: '16px', marginBottom: '16px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#92400e', fontSize: '13px', fontWeight: 600, marginBottom: '12px' }}>
                           <IconCheck size={18} /> {s.name} claims payment was made.
                         </div>
@@ -712,7 +712,7 @@ const Sessions = () => {
                       </div>
                     ) : (
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <span style={{ fontSize: '12px', fontWeight: 600, color: '#4b5563' }}>Reviews are unlocked for this session.</span>
+                        <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-secondary)' }}>Reviews are unlocked for this session.</span>
                         <button 
                           onClick={() => {
                             setPendingReviewRequest({
@@ -741,7 +741,7 @@ const Sessions = () => {
                     )}
                   </div>
                 ) : (
-                  <div style={{ fontSize: '12px', color: '#9ca3af', fontStyle: 'italic' }}>
+                  <div style={{ fontSize: '12px', color: 'var(--cs-text-inactive)', fontStyle: 'italic' }}>
                     Review section will unlock once payment has been completed.
                   </div>
                 )}
@@ -760,7 +760,7 @@ const Sessions = () => {
       {/* Coming up soon Section */}
       <div style={{ marginBottom: '28px' }}>
         <div 
-          style={{ fontSize: '12px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+          style={{ fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-inactive)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
           onClick={() => setIsSoonOpen(!isSoonOpen)}
         >
           <span>{isSoonOpen ? '▼' : '▶'}</span> Coming up soon ({upcomingSoon.length})
@@ -771,10 +771,10 @@ const Sessions = () => {
             {upcomingSoon.map((s, idx) => renderSessionCard(s, idx))}
             
             {upcomingSoon.length === 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 16px', textAlign: 'center', background: '#ffffff', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 30px -5px rgba(0,0,0,.04)' }}>
-                <IconCalendarMonth size={28} style={{ color: '#94a3b8', marginBottom: '8px' }} />
-                <div style={{ fontSize: '14px', fontWeight: 700, color: '#1e293b', marginBottom: '4px' }}>No upcoming sessions</div>
-                <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '16px', maxWidth: '280px' }}>No sessions scheduled for the next 48 hours. Ready to exchange skills?</div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 16px', textAlign: 'center', background: 'var(--cs-bg-white)', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 30px -5px rgba(0,0,0,.04)' }}>
+                <IconCalendarMonth size={28} style={{ color: 'var(--cs-text-inactive)', marginBottom: '8px' }} />
+                <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--cs-text-main)', marginBottom: '4px' }}>No upcoming sessions</div>
+                <div style={{ fontSize: '12px', color: 'var(--cs-text-secondary)', marginBottom: '16px', maxWidth: '280px' }}>No sessions scheduled for the next 48 hours. Ready to exchange skills?</div>
                 <button onClick={() => navigate('/app/marketplace')} style={{ padding: '8px 16px', borderRadius: '10px', background: '#2563eb', color: '#fff', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Browse Marketplace</button>
               </div>
             )}
@@ -785,7 +785,7 @@ const Sessions = () => {
       {/* All Scheduled Sessions Section */}
       <div style={{ marginBottom: '28px' }}>
         <div 
-          style={{ fontSize: '12px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+          style={{ fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-inactive)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
           onClick={() => setIsAllOpen(!isAllOpen)}
         >
           <span>{isAllOpen ? '▼' : '▶'}</span> All Scheduled Sessions ({activeSessions.length})
@@ -796,10 +796,10 @@ const Sessions = () => {
             {activeSessions.map((s, idx) => renderSessionCard(s, idx))}
             
             {activeSessions.length === 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 16px', textAlign: 'center', background: '#ffffff', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 30px -5px rgba(0,0,0,.04)' }}>
-                <IconCalendarMonth size={28} style={{ color: '#94a3b8', marginBottom: '8px' }} />
-                <div style={{ fontSize: '14px', fontWeight: 700, color: '#1e293b', marginBottom: '4px' }}>No other active sessions</div>
-                <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '16px', maxWidth: '280px' }}>Your active skill exchanges will appear here.</div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 16px', textAlign: 'center', background: 'var(--cs-bg-white)', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 30px -5px rgba(0,0,0,.04)' }}>
+                <IconCalendarMonth size={28} style={{ color: 'var(--cs-text-inactive)', marginBottom: '8px' }} />
+                <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--cs-text-main)', marginBottom: '4px' }}>No other active sessions</div>
+                <div style={{ fontSize: '12px', color: 'var(--cs-text-secondary)', marginBottom: '16px', maxWidth: '280px' }}>Your active skill exchanges will appear here.</div>
                 <button onClick={() => navigate('/app/marketplace')} style={{ padding: '8px 16px', borderRadius: '10px', background: '#2563eb', color: '#fff', border: 'none', fontSize: '12px', fontWeight: 700, cursor: 'pointer' }}>Find Swaps</button>
               </div>
             )}
@@ -810,7 +810,7 @@ const Sessions = () => {
       {/* History / Past Sessions Section */}
       <div>
         <div 
-          style={{ fontSize: '12px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
+          style={{ fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-inactive)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '12px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}
           onClick={() => setIsHistoryOpen(!isHistoryOpen)}
         >
           <span>{isHistoryOpen ? '▼' : '▶'}</span> Past Sessions & History ({pastSessions.length})
@@ -821,10 +821,10 @@ const Sessions = () => {
             {pastSessions.map((s, idx) => renderSessionCard(s, idx))}
             
             {pastSessions.length === 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 16px', textAlign: 'center', background: '#ffffff', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 30px -5px rgba(0,0,0,.04)' }}>
-                <IconCalendarMonth size={28} style={{ color: '#94a3b8', marginBottom: '8px' }} />
-                <div style={{ fontSize: '14px', fontWeight: 700, color: '#1e293b', marginBottom: '4px' }}>No past sessions</div>
-                <div style={{ fontSize: '12px', color: '#64748b', marginBottom: '16px', maxWidth: '280px' }}>History of your completed and cancelled sessions will be displayed here.</div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px 16px', textAlign: 'center', background: 'var(--cs-bg-white)', borderRadius: '16px', border: '1px solid rgba(0,0,0,0.05)', boxShadow: '0 10px 30px -5px rgba(0,0,0,.04)' }}>
+                <IconCalendarMonth size={28} style={{ color: 'var(--cs-text-inactive)', marginBottom: '8px' }} />
+                <div style={{ fontSize: '14px', fontWeight: 700, color: 'var(--cs-text-main)', marginBottom: '4px' }}>No past sessions</div>
+                <div style={{ fontSize: '12px', color: 'var(--cs-text-secondary)', marginBottom: '16px', maxWidth: '280px' }}>History of your completed and cancelled sessions will be displayed here.</div>
               </div>
             )}
           </div>
@@ -835,7 +835,7 @@ const Sessions = () => {
       {rescheduleSession && (
         <ModalWrapper isOpen={true} onClose={() => setRescheduleSession(null)} maxWidth="400px" zIndex={1000}>
           <div style={{
-            backgroundColor: '#ffffff',
+            background: 'var(--cs-bg-white)',
             borderRadius: '16px',
             padding: '24px',
             width: '100%',
@@ -847,22 +847,22 @@ const Sessions = () => {
             </div>
             
             <div style={{ marginBottom: '12px' }}>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '4px' }}>Date</label>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-secondary)', marginBottom: '4px' }}>Date</label>
               <input 
                 type="date" 
                 value={rescheduleDate} 
                 onChange={(e) => setRescheduleDate(e.target.value)}
-                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #d1d5db', fontSize: '13px', boxSizing: 'border-box' }}
+                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid var(--cs-border)', fontSize: '13px', boxSizing: 'border-box' }}
               />
             </div>
 
             <div style={{ marginBottom: '12px' }}>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '4px' }}>Start Time</label>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-secondary)', marginBottom: '4px' }}>Start Time</label>
               <CustomTimeInput value={rescheduleTime} onChange={setRescheduleTime} />
             </div>
 
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#4b5563', marginBottom: '4px' }}>Duration</label>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: 'var(--cs-text-secondary)', marginBottom: '4px' }}>Duration</label>
               <CustomSelect 
                 value={rescheduleDuration} 
                 onChange={val => setRescheduleDuration(val)}
@@ -898,7 +898,7 @@ const Sessions = () => {
       {cancelSessionItem && (
         <ModalWrapper isOpen={true} onClose={() => setCancelSessionItem(null)} maxWidth="400px" zIndex={1000}>
           <div style={{
-            backgroundColor: '#ffffff',
+            background: 'var(--cs-bg-white)',
             borderRadius: '16px',
             padding: '24px',
             width: '100%',
@@ -909,7 +909,7 @@ const Sessions = () => {
               <button onClick={() => setCancelSessionItem(null)} style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', padding: 0 }}><IconX size={20} /></button>
             </div>
             
-            <p style={{ fontSize: '13px', color: '#4b5563', margin: '0 0 16px' }}>
+            <p style={{ fontSize: '13px', color: 'var(--cs-text-secondary)', margin: '0 0 16px' }}>
               Please select the reason for cancelling this session. Both participants will be notified.
             </p>
 

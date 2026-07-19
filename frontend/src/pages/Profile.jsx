@@ -354,8 +354,8 @@ const Profile = () => {
 
   // Common card style scaled down
   const cardStyle = {
-    background: '#ffffff', 
-    border: '1px solid #e5e7eb', 
+    background: 'var(--cs-bg-white)', 
+    border: '1px solid var(--cs-border)', 
     borderRadius: '12px', 
     padding: '20px', 
     boxShadow: '0 1px 3px rgba(0,0,0,0.02)',
@@ -364,7 +364,7 @@ const Profile = () => {
   };
 
   return (
-    <div id="profile" className="pg on" style={{ padding: 0, background: '#f8fafc', minHeight: '100vh', paddingBottom: '60px' }}>
+    <div id="profile" className="pg on" style={{ padding: 0, background: 'var(--cs-bg-light)', minHeight: '100vh', paddingBottom: '60px' }}>
       
       <SkillQuizModal 
         isOpen={!!activeQuizSkill}
@@ -387,11 +387,11 @@ const Profile = () => {
           <div style={{ padding: '24px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
               <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#111827' }}>Delete Listing</h3>
-              <button onClick={() => setListingToDelete(null)} style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', padding: '4px', display: 'flex' }}><IconX size={20} /></button>
+              <button onClick={() => setListingToDelete(null)} style={{ background: 'none', border: 'none', color: 'var(--cs-text-inactive)', cursor: 'pointer', padding: '4px', display: 'flex' }}><IconX size={20} /></button>
             </div>
-            <p style={{ margin: '0 0 16px 0', fontSize: '14px', color: '#4b5563', lineHeight: '1.5' }}>Are you sure you want to delete <strong style={{color: '#111827'}}>{listingToDelete?.title}</strong>? This action cannot be undone.</p>
+            <p style={{ margin: '0 0 16px 0', fontSize: '14px', color: 'var(--cs-text-secondary)', lineHeight: '1.5' }}>Are you sure you want to delete <strong style={{color: '#111827'}}>{listingToDelete?.title}</strong>? This action cannot be undone.</p>
             <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-              <button onClick={() => setListingToDelete(null)} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #e5e7eb', background: '#fff', color: '#374151', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={() => setListingToDelete(null)} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-white)', color: '#374151', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}>Cancel</button>
               <button onClick={async () => {
                 try {
                   await listingService.deactivateListing(listingToDelete._id || listingToDelete.id);
@@ -453,7 +453,7 @@ const Profile = () => {
                         position: 'relative',
                         width: '12px', 
                         height: '12px', 
-                        backgroundColor: '#ffffff', 
+                        background: 'var(--cs-bg-white)', 
                         opacity: hoveredCell?.colIndex === colIndex && hoveredCell?.rowIndex === rowIndex ? 1 : cell.opacity,
                         borderRadius: '2px',
                         cursor: 'pointer',
@@ -498,7 +498,7 @@ const Profile = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
             <div 
             style={{ 
-              width: '128px', height: '128px', borderRadius: '50%', background: '#fff', 
+              width: '128px', height: '128px', borderRadius: '50%', background: 'var(--cs-bg-white)', 
               display: 'flex', alignItems: 'center', justifyContent: 'center', 
               boxShadow: '0 12px 32px rgba(0,0,0,0.15)', position: 'relative' 
             }}
@@ -509,7 +509,7 @@ const Profile = () => {
           <div style={{ display: 'flex', gap: '12px', marginTop: '80px' }}>
             <button 
               onClick={() => navigate('/app/edit-profile')} 
-              style={{ padding: '8px 16px', borderRadius: '12px', border: '1px solid #93c5fd', background: '#ffffff', color: '#2563eb', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
+              style={{ padding: '8px 16px', borderRadius: '12px', border: '1px solid #93c5fd', background: 'var(--cs-bg-white)', color: '#2563eb', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}
             >
               Edit Profile
             </button>
@@ -534,12 +534,12 @@ const Profile = () => {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px', color: '#6b7280', fontSize: '14px', fontWeight: 500, marginBottom: '8px' }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <IconMapPin size={16} strokeWidth={2.5} style={{ color: '#9ca3af' }} />
+                <IconMapPin size={16} strokeWidth={2.5} style={{ color: 'var(--cs-text-inactive)' }} />
                 {(() => { const r = user?.rollNo || (user?.email?.split('@')[0]?.toLowerCase() || ''); return r ? `${r.toUpperCase()} · ` : ''; })()}{user?.programme || 'Not specified'} • {user?.year || 'Unknown year'}
               </span>
               <span style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#d1d5db' }}></span>
               <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <IconCalendarMonth size={16} strokeWidth={2.5} style={{ color: '#9ca3af' }} />
+                <IconCalendarMonth size={16} strokeWidth={2.5} style={{ color: 'var(--cs-text-inactive)' }} />
                 Joined {user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : 'Recently'}
               </span>
             </div>
@@ -551,28 +551,28 @@ const Profile = () => {
         </div>
 
         <div className="grid-4" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '24px' }}>
-          <div className="glossy-card" style={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 20px' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '14px', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
+          <div className="glossy-card" style={{ background: 'var(--cs-bg-white)', border: '1px solid var(--cs-border)', borderRadius: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 20px' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '14px', background: 'var(--cs-bg-hover)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
               <IconCalendarMonth size={20} strokeWidth={2} style={{ color: '#3b82f6' }} />
             </div>
             <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>{sessionsCount}</div>
             <div style={{ fontSize: '13px', color: '#6b7280', fontWeight: 500 }}>Sessions</div>
           </div>
-          <div className="glossy-card" style={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 20px' }}>
+          <div className="glossy-card" style={{ background: 'var(--cs-bg-white)', border: '1px solid var(--cs-border)', borderRadius: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 20px' }}>
             <div style={{ width: '40px', height: '40px', borderRadius: '14px', background: '#fefce8', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
               <IconStar size={20} strokeWidth={2} style={{ color: '#eab308' }} />
             </div>
             <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>{user?.stats?.ratingAvg?.toFixed(1) || '0.0'}</div>
             <div style={{ fontSize: '13px', color: '#6b7280', fontWeight: 500 }}>Rating</div>
           </div>
-          <div className="glossy-card" style={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 20px' }}>
+          <div className="glossy-card" style={{ background: 'var(--cs-bg-white)', border: '1px solid var(--cs-border)', borderRadius: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 20px' }}>
             <div style={{ width: '40px', height: '40px', borderRadius: '14px', background: '#faf5ff', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
               <IconSparkles size={20} strokeWidth={2} style={{ color: '#a855f7' }} />
             </div>
             <div style={{ fontSize: '24px', fontWeight: 700, color: '#111827', marginBottom: '4px' }}>{totalMinutes > 0 ? (totalMinutes / 60).toFixed(1) : '0.0'}</div>
             <div style={{ fontSize: '13px', color: '#6b7280', fontWeight: 500 }}>Hours</div>
           </div>
-          <div className="glossy-card" style={{ background: '#ffffff', border: '1px solid #e5e7eb', borderRadius: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 20px' }}>
+          <div className="glossy-card" style={{ background: 'var(--cs-bg-white)', border: '1px solid var(--cs-border)', borderRadius: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px 20px' }}>
             <div style={{ width: '40px', height: '40px', borderRadius: '14px', background: '#f0fdf4', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '16px' }}>
               <IconShieldCheck size={20} strokeWidth={2} style={{ color: '#22c55e' }} />
             </div>
@@ -594,7 +594,7 @@ const Profile = () => {
               <span style={{ fontSize: '14px', opacity: 0.9, fontWeight: 400 }}>{verifiedCount} / {totalSkills} verified</span>
             </div>
             <div style={{ width: '100%', height: '6px', background: 'rgba(255, 255, 255, 0.2)', borderRadius: '100px' }}>
-              <div style={{ width: `${trustScorePercent}%`, height: '100%', background: '#fff', borderRadius: '100px' }}></div>
+              <div style={{ width: `${trustScorePercent}%`, height: '100%', background: 'var(--cs-bg-white)', borderRadius: '100px' }}></div>
             </div>
           </div>
         </div>
@@ -618,7 +618,7 @@ const Profile = () => {
 
         {/* Add Skill Flow Inline */}
         {isAddingSkill && (
-          <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', background: '#ffffff', padding: '16px', borderRadius: '10px', border: '1px solid #f3f4f6', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.02)' }}>
+          <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', background: 'var(--cs-bg-white)', padding: '16px', borderRadius: '10px', border: '1px solid #f3f4f6', boxShadow: '0 2px 10px rgba(0, 0, 0, 0.02)' }}>
             <div style={{ flex: 1 }}>
               <AutocompleteInput 
                 allTopics={allTopicsList} 
@@ -628,7 +628,7 @@ const Profile = () => {
             </div>
             <button 
               onClick={() => setIsAddingSkill(false)}
-              style={{ height: 'fit-content', padding: '8px 16px', borderRadius: '100px', border: '1px solid #e5e7eb', background: '#ffffff', color: '#4b5563', fontSize: '12px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', alignSelf: 'flex-start' }}
+              style={{ height: 'fit-content', padding: '8px 16px', borderRadius: '100px', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-white)', color: 'var(--cs-text-secondary)', fontSize: '12px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap', alignSelf: 'flex-start' }}
             >
               Cancel
             </button>
@@ -642,7 +642,7 @@ const Profile = () => {
               <IconCheck size={14} strokeWidth={3} style={{ color: '#22c55e' }} />
             </div>
             <span style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>Verified Skills</span>
-            <span style={{ fontSize: '11px', color: '#6b7280', background: '#f3f4f6', padding: '2px 8px', borderRadius: '100px', fontWeight: 600 }}>{verifiedCount}</span>
+            <span style={{ fontSize: '11px', color: '#6b7280', background: 'var(--cs-bg-light)', padding: '2px 8px', borderRadius: '100px', fontWeight: 600 }}>{verifiedCount}</span>
           </div>
 
           {verifiedCount === 0 ? (
@@ -655,7 +655,7 @@ const Profile = () => {
                 const score = user?.verificationScores?.[skill];
                 const meta = { domain: topicMap[skill] || 'General', confidence: score ?? 100 };
                 return (
-                  <div key={i} className="glossy-card" style={{ ...cardStyle, border: '1px solid #e5e7eb' }}>
+                  <div key={i} className="glossy-card" style={{ ...cardStyle, border: '1px solid var(--cs-border)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#22c55e' }}></div>
@@ -672,7 +672,7 @@ const Profile = () => {
                         <span style={{ fontSize: '11px', color: '#6b7280', fontWeight: 500 }}>Confidence Score</span>
                         <span style={{ fontSize: '11px', color: '#22c55e', fontWeight: 700 }}>{meta.confidence}%</span>
                       </div>
-                      <div style={{ width: '100%', height: '4px', background: '#f3f4f6', borderRadius: '2px', overflow: 'hidden' }}>
+                      <div style={{ width: '100%', height: '4px', background: 'var(--cs-bg-light)', borderRadius: '2px', overflow: 'hidden' }}>
                         <div style={{ width: `${meta.confidence}%`, height: '100%', background: '#22c55e', borderRadius: '2px' }}></div>
                       </div>
                     </div>
@@ -700,18 +700,18 @@ const Profile = () => {
               <IconCircle size={14} strokeWidth={3} style={{ color: '#f59e0b' }} />
             </div>
               <span style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>Pending Verification</span>
-              <span style={{ fontSize: '11px', color: '#6b7280', background: '#f3f4f6', padding: '2px 8px', borderRadius: '100px', fontWeight: 600 }}>{pendingSkills.length}</span>
+              <span style={{ fontSize: '11px', color: '#6b7280', background: 'var(--cs-bg-light)', padding: '2px 8px', borderRadius: '100px', fontWeight: 600 }}>{pendingSkills.length}</span>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
               {pendingSkills.map((skill, i) => (
-                <div key={i} className="glossy-card" style={{ ...cardStyle, border: '1px solid #fde047', background: '#fffbeb' }}>
+                <div key={i} className="glossy-card" style={{ ...cardStyle, border: '1px solid #fde047', background: 'var(--cs-bg-white)' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#f59e0b' }}></div>
                       <div style={{ fontSize: '14px', fontWeight: 700, color: '#111827' }}>{skill}</div>
                     </div>
-                    <button onClick={() => setSkillToRemove(skill)} style={{ background: 'none', border: 'none', color: '#9ca3af', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px' }}>
+                    <button onClick={() => setSkillToRemove(skill)} style={{ background: 'none', border: 'none', color: 'var(--cs-text-inactive)', cursor: 'pointer', padding: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px' }}>
                       <IconTrash size={16} />
                     </button>
                   </div>
@@ -740,7 +740,7 @@ const Profile = () => {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ fontSize: '18px', fontWeight: 700, color: '#111827' }}>My Active Listings</span>
-              <span style={{ fontSize: '11px', color: '#6b7280', background: '#f3f4f6', padding: '2px 8px', borderRadius: '100px', fontWeight: 600 }}>{myListings.length}</span>
+              <span style={{ fontSize: '11px', color: '#6b7280', background: 'var(--cs-bg-light)', padding: '2px 8px', borderRadius: '100px', fontWeight: 600 }}>{myListings.length}</span>
             </div>
             <button 
               onClick={() => setIsCreateSessionOpen(true)}
@@ -774,7 +774,7 @@ const Profile = () => {
                         <>
                           <button 
                             onClick={(e) => { e.stopPropagation(); setEditingListing(listing); }}
-                            style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: '#475569', transition: 'color 0.2s', padding: 0, display: 'flex', alignItems: 'center' }}
+                            style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--cs-text-secondary)', transition: 'color 0.2s', padding: 0, display: 'flex', alignItems: 'center' }}
                             title="Edit Listing"
                           >
                             <IconPencil size={18} strokeWidth={2} />
@@ -812,13 +812,13 @@ const Profile = () => {
         <div className="modal-overlay" onClick={() => setSkillToRemove(null)}>
           <div className="modal-content" onClick={e => e.stopPropagation()} style={{ padding: '24px', maxWidth: '400px' }}>
             <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: '#111827' }}>Remove Skill</h3>
-            <p style={{ margin: '0 0 24px 0', fontSize: '14px', color: '#4b5563', lineHeight: '1.5' }}>
+            <p style={{ margin: '0 0 24px 0', fontSize: '14px', color: 'var(--cs-text-secondary)', lineHeight: '1.5' }}>
               Are you sure you want to remove <strong>{skillToRemove}</strong>? You will lose any verification progress for this skill.
             </p>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
               <button 
                 onClick={() => setSkillToRemove(null)}
-                style={{ padding: '8px 16px', borderRadius: '100px', border: '1px solid #e5e7eb', background: '#fff', color: '#374151', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}
+                style={{ padding: '8px 16px', borderRadius: '100px', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-white)', color: '#374151', fontSize: '14px', fontWeight: 600, cursor: 'pointer' }}
               >
                 Cancel
               </button>

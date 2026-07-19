@@ -582,7 +582,7 @@ const Messages = () => {
                 placeholder="Search..." 
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                style={{ width: '100%', padding: '8px 12px 8px 30px', borderRadius: '100px', border: '1px solid var(--cs-border)', background: '#f3f4f6', fontSize: '13px', outline: 'none', color: 'var(--cs-text-main)' }}
+                style={{ width: '100%', padding: '8px 12px 8px 30px', borderRadius: '100px', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-light)', fontSize: '13px', outline: 'none', color: 'var(--cs-text-main)' }}
               />
             </div>
             
@@ -637,7 +637,7 @@ const Messages = () => {
               </div>
             )}
 
-            <div style={{ fontSize: '11px', fontWeight: 600, color: '#9ca3af', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px', paddingLeft: '4px' }}>
+            <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--cs-text-inactive)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '8px', paddingLeft: '4px' }}>
               Conversations
             </div>
 
@@ -680,9 +680,9 @@ const Messages = () => {
             })}
 
             {!loading && filteredChats.length === 0 && (
-              <div style={{ fontSize: '13px', color: '#94a3b8', textAlign: 'center', padding: '24px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
-                <div style={{ fontWeight: 700, color: '#1f2937' }}>No conversations yet</div>
-                <div style={{ fontSize: '11px', color: '#64748b', maxWidth: '200px', margin: '0 auto', lineHeight: '1.4' }}>Start exploring the marketplace to connect with peers.</div>
+              <div style={{ fontSize: '13px', color: 'var(--cs-text-inactive)', textAlign: 'center', padding: '24px 12px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}>
+                <div style={{ fontWeight: 700, color: 'var(--cs-text-main)' }}>No conversations yet</div>
+                <div style={{ fontSize: '11px', color: 'var(--cs-text-secondary)', maxWidth: '200px', margin: '0 auto', lineHeight: '1.4' }}>Start exploring the marketplace to connect with peers.</div>
               </div>
             )}
           </div>
@@ -693,16 +693,16 @@ const Messages = () => {
           
           {activeChatId === 'requests' ? (
             <div style={{ padding: '24px', overflowY: 'auto', flex: 1 }}>
-              <div style={{ fontSize: '20px', fontWeight: 700, color: '#0f172a', marginBottom: '24px' }}>
+              <div style={{ fontSize: '20px', fontWeight: 700, color: 'var(--cs-text-main)', marginBottom: '24px' }}>
                 Message Requests
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {requests.map(req => (
-                  <div key={req.id} style={{ background: '#fff', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '16px', display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
+                  <div key={req.id} style={{ background: 'var(--cs-bg-white)', border: '1px solid var(--cs-border)', borderRadius: '16px', padding: '16px', display: 'flex', alignItems: 'flex-start', gap: '16px' }}>
                     <Avatar initials={req.init} bg={req.bg} color={req.col} backgroundImage={req.avatar} size="48px" fontSize="18px" />
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: '15px', fontWeight: 600, color: '#0f172a' }}>{req.name}</div>
-                      <div style={{ fontSize: '14px', color: '#475569', marginTop: '4px' }}>{req.message || 'Wants to chat with you'}</div>
+                      <div style={{ fontSize: '15px', fontWeight: 600, color: 'var(--cs-text-main)' }}>{req.name}</div>
+                      <div style={{ fontSize: '14px', color: 'var(--cs-text-secondary)', marginTop: '4px' }}>{req.message || 'Wants to chat with you'}</div>
                     </div>
                     <div style={{ display: 'flex', gap: '8px' }}>
                       <button 
@@ -713,13 +713,13 @@ const Messages = () => {
                             callback: fetchChatsAndRequests
                           });
                         }}
-                        style={{ width: '36px', height: '36px', borderRadius: '100px', border: '1px solid #e2e8f0', background: '#fff', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', title: 'Block User' }}
+                        style={{ width: '36px', height: '36px', borderRadius: '100px', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-white)', color: 'var(--cs-text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', title: 'Block User' }}
                       >
                         <span style={{ fontSize: '14px', fontWeight: 'bold' }}>🚫</span>
                       </button>
                       <button 
                         onClick={() => handleDeclineRequest(req.id)}
-                        style={{ width: '36px', height: '36px', borderRadius: '100px', border: '1px solid #e2e8f0', background: '#fff', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', title: 'Decline' }}
+                        style={{ width: '36px', height: '36px', borderRadius: '100px', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-white)', color: '#ef4444', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', title: 'Decline' }}
                       >
                         <IconX size={18} />
                       </button>
@@ -741,7 +741,7 @@ const Messages = () => {
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <button 
                     onClick={() => navigate('/app/messages')}
-                    style={{ background: 'none', border: 'none', color: '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', padding: '4px', borderRadius: '50%' }}
+                    style={{ background: 'none', border: 'none', color: 'var(--cs-text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', padding: '4px', borderRadius: '50%' }}
                   >
                     <IconArrowLeft size={20} />
                   </button>
@@ -784,7 +784,7 @@ const Messages = () => {
                 ref={messagesContainerRef}
                 onScroll={handleScroll}
                 style={{ 
-                flex: 1, height: '100%', background: '#f8fafc', 
+                flex: 1, height: '100%', background: 'var(--cs-bg-light)', 
                 display: 'flex', flexDirection: 'column',
                 overflowY: 'auto', padding: '16px', boxSizing: 'border-box', position: 'relative'
               }}>
@@ -837,7 +837,7 @@ const Messages = () => {
                     <LoadingSpinner />
                   </div>
                 ) : !isMessagesLoading && activeChatMsgs.length === 0 ? (
-                  <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: '13px', margin: 'auto' }}>
+                  <div style={{ textAlign: 'center', color: 'var(--cs-text-inactive)', fontSize: '13px', margin: 'auto' }}>
                     No messages yet. Send a message to start the conversation!
                   </div>
                 ) : null}
@@ -898,10 +898,10 @@ const Messages = () => {
                     <button
                       onClick={scrollToBottom}
                       style={{
-                        background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '100px',
+                        background: 'var(--cs-bg-white)', border: '1px solid var(--cs-border)', borderRadius: '100px',
                         padding: '8px 16px', display: 'flex', alignItems: 'center', gap: '8px',
                         boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-                        cursor: 'pointer', color: '#1e293b', fontWeight: 600, fontSize: '13px',
+                        cursor: 'pointer', color: 'var(--cs-text-main)', fontWeight: 600, fontSize: '13px',
                         transition: 'transform 0.2s, box-shadow 0.2s'
                       }}
                       onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
@@ -914,7 +914,7 @@ const Messages = () => {
                       ) : (
                         <IconArrowLeft size={16} style={{ transform: 'rotate(-90deg)' }} />
                       )}
-                      <span style={{ color: '#64748b' }}>Scroll to bottom</span>
+                      <span style={{ color: 'var(--cs-text-secondary)' }}>Scroll to bottom</span>
                     </button>
                   </div>
                 )}
@@ -932,11 +932,11 @@ const Messages = () => {
 
               {/* Delete Message Modal */}
               <ModalWrapper isOpen={!!deletingMessage} onClose={() => setDeletingMessage(null)} maxWidth="320px" zIndex={1000}>
-                <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', width: '100%' }}>
+                <div style={{ background: 'var(--cs-bg-white)', borderRadius: '16px', padding: '24px', width: '100%' }}>
                   <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 600, color: 'var(--cs-text-main)' }}>Delete message?</h3>
                   <p style={{ margin: '0 0 24px 0', fontSize: '14px', color: 'var(--cs-text-inactive)' }}>Are you sure you want to delete this message? This action cannot be undone.</p>
                   <div style={{ display: 'flex', gap: '12px' }}>
-                    <button onClick={() => setDeletingMessage(null)} style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#fff', color: '#64748b', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
+                    <button onClick={() => setDeletingMessage(null)} style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-white)', color: 'var(--cs-text-secondary)', fontWeight: 600, cursor: 'pointer' }}>Cancel</button>
                     <button onClick={confirmDeleteMessage} style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: '#ef4444', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>Delete</button>
                   </div>
                 </div>
@@ -946,7 +946,7 @@ const Messages = () => {
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--cs-text-inactive)' }}>
               <div style={{ 
                 width: '80px', height: '80px', borderRadius: '100px', 
-                background: '#f1f5f9', display: 'flex', alignItems: 'center', 
+                background: 'var(--cs-bg-light)', display: 'flex', alignItems: 'center', 
                 justifyContent: 'center', marginBottom: '16px' 
               }}>
                 <IconMessageCircle size={40} color="#94a3b8" stroke={1.5} />
@@ -954,7 +954,7 @@ const Messages = () => {
               <div style={{ fontSize: '20px', fontWeight: 600, color: 'var(--cs-text-main)', marginBottom: '8px' }}>
                 Your Messages
               </div>
-              <div style={{ fontSize: '14px', color: '#64748b' }}>
+              <div style={{ fontSize: '14px', color: 'var(--cs-text-secondary)' }}>
                 Select a conversation to start chatting.
               </div>
             </div>
@@ -973,14 +973,14 @@ const Messages = () => {
       </AnimatePresence>
 
       <ModalWrapper isOpen={!!blockingUser} onClose={() => { if (!blockingUser?.loading) setBlockingUser(null) }} maxWidth="320px" zIndex={1000}>
-        <div style={{ background: '#fff', borderRadius: '16px', padding: '24px', width: '100%' }}>
+        <div style={{ background: 'var(--cs-bg-white)', borderRadius: '16px', padding: '24px', width: '100%' }}>
           <h3 style={{ margin: '0 0 8px 0', fontSize: '18px', fontWeight: 600, color: 'var(--cs-text-main)' }}>Block {blockingUser?.name}?</h3>
           <p style={{ margin: '0 0 24px 0', fontSize: '14px', color: 'var(--cs-text-inactive)', lineHeight: '1.4' }}>Are you sure you want to block this user? They will not be able to message you or view your listings.</p>
           <div style={{ display: 'flex', gap: '12px' }}>
             <button 
               onClick={() => setBlockingUser(null)} 
               disabled={blockingUser?.loading}
-              style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', background: '#fff', color: '#64748b', fontWeight: 600, cursor: 'pointer', opacity: blockingUser?.loading ? 0.7 : 1 }}
+              style={{ flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid var(--cs-border)', background: 'var(--cs-bg-white)', color: 'var(--cs-text-secondary)', fontWeight: 600, cursor: 'pointer', opacity: blockingUser?.loading ? 0.7 : 1 }}
             >
               Cancel
             </button>

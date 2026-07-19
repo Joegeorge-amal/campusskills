@@ -51,7 +51,7 @@ const AdminManagement = () => {
 
   const renderStaffTab = () => (
     <div className="admin-card">
-      <div style={{ padding: '20px 24px', borderBottom: '1px solid #e5e7eb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--cs-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <h3 style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#111827' }}>Existing Administrators</h3>
           <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#6b7280' }}>Manage roles and privileges of your administrative team.</p>
@@ -82,13 +82,13 @@ const AdminManagement = () => {
       {/* Header */}
       <div style={{ marginBottom: '32px' }}>
         <h1 style={{ margin: 0, fontSize: '28px', fontWeight: '700', color: '#111827' }}>Admin Management</h1>
-        <p style={{ margin: '8px 0 0 0', fontSize: '16px', color: '#4b5563' }}>
+        <p style={{ margin: '8px 0 0 0', fontSize: '16px', color: 'var(--cs-text-secondary)' }}>
           Centralized control for staff privileges and audit history.
         </p>
       </div>
 
       {/* Tabs Navigation */}
-      <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid #e5e7eb', marginBottom: '24px' }}>
+      <div style={{ display: 'flex', gap: '8px', borderBottom: '1px solid var(--cs-border)', marginBottom: '24px' }}>
         <button
           onClick={() => setActiveTab('staff')}
           style={{

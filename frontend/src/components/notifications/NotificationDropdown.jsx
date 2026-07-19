@@ -234,8 +234,8 @@ const NotificationDropdown = ({ onToggle }) => {
         aria-expanded={isOpen}
         style={{
           border: '1px solid #dbeafe',
-          background: '#ffffff',
-          color: '#475569',
+          background: 'var(--cs-bg-white)',
+          color: 'var(--cs-text-secondary)',
           padding: 0,
           margin: 0
         }}

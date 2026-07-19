@@ -42,7 +42,7 @@ const ModalWrapper = ({ isOpen, onClose, children, maxWidth = '500px', zIndex = 
             exit="exit"
             onClick={e => e.stopPropagation()}
             style={{
-              background: '#ffffff',
+              background: 'var(--cs-bg-white)',
               borderRadius: '16px',
               width: '100%',
               maxWidth,

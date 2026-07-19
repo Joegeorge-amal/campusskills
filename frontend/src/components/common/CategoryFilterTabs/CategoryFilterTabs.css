@@ -61,9 +61,9 @@
   align-items: center;
   justify-content: center;
   border-radius: 100px;
-  background: #f8fafc;
-  border: 1px solid #e2e8f0;
-  color: #475569;
+  background: var(--cs-bg-light);
+  border: 1px solid var(--cs-border);
+  color: var(--cs-text-secondary);
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
@@ -74,7 +74,7 @@
 }
 
 .cat-tab:hover {
-  background: #f1f5f9;
+  background: var(--cs-bg-light);
 }
 
 .cat-tab.active {
