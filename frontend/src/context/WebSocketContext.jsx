@@ -12,6 +12,7 @@ export const WebSocketProvider = ({ children }) => {
 
   const handleMessage = useCallback((msg) => {
     setLastMessage(msg);
+    window.dispatchEvent(new CustomEvent('ws_message', { detail: msg }));
   }, []);
 
   const handleStatusChange = useCallback((newStatus) => {

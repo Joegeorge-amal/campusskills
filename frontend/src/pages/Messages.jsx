@@ -102,7 +102,12 @@ const Messages = () => {
         
         // Scroll to the bottom instantly after render
         setTimeout(() => {
-          messagesEndRef.current?.scrollIntoView({ behavior: 'instant' });
+          const container = messagesContainerRef.current;
+          if (container) {
+            container.scrollTop = container.scrollHeight;
+          } else {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+          }
         }, 100);
 
       }).catch(err => {
@@ -120,18 +125,15 @@ const Messages = () => {
   }, [activeChatId]);
 
   // Handle incoming WebSocket messages
-  // Backend sends { type, timestamp, payload } — NOT { event, data }
-  // Only depends on lastMessage (NOT activeChatId) to avoid stale re-processing on chat switch.
-  // activeChatIdRef provides the current chat context without triggering re-runs.
   useEffect(() => {
-    if (!lastMessage || !lastMessage.type) return;
-    if (processedWsRef.current === lastMessage) return;
-    processedWsRef.current = lastMessage;
+    const handleWsMessage = (event) => {
+      const lastMessage = event.detail;
+      if (!lastMessage || !lastMessage.type) return;
 
-    const currentChatId = activeChatIdRef.current;
-    const { type, payload } = lastMessage;
+      const currentChatId = activeChatIdRef.current;
+      const { type, payload } = lastMessage;
 
-    if (type === 'NEW_MESSAGE') {
+      if (type === 'NEW_MESSAGE') {
       const msg = payload;
       const chatId = msg.chatId;
       const isOwnMessage = msg.senderId === user?.userId;
@@ -305,7 +307,11 @@ const Messages = () => {
       const { chatId, userId } = payload;
       setTypingUsers(prev => ({ ...prev, [`${chatId}_${userId}`]: false }));
     }
-  }, [lastMessage]);
+  };
+
+  window.addEventListener('ws_message', handleWsMessage);
+  return () => window.removeEventListener('ws_message', handleWsMessage);
+  }, [user?.userId, fetchInitialData, setChats, setChatMessages, activeChatIdRef]);
 
   const filteredChats = chats.filter(c => {
     const matchesSearch = (c.name || '').toLowerCase().includes(searchQuery.toLowerCase());

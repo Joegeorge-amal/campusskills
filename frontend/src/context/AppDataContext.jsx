@@ -402,11 +402,13 @@ export const AppDataProvider = ({ children }) => {
 
   const processedMessageRef = useRef(null);
 
+  // Handle all websocket events here
   useEffect(() => {
-    if (!lastMessage || processedMessageRef.current === lastMessage) return;
-    processedMessageRef.current = lastMessage;
+    const handleWsMessage = (event) => {
+      const lastMessage = event.detail;
+      if (!lastMessage || !lastMessage.type) return;
 
-    if (lastMessage.type === 'NOTIFICATION') {
+      if (lastMessage.type === 'NOTIFICATION') {
       const notifType = lastMessage.payload.type;
       const newNotif = {
         id: lastMessage.payload.id || Date.now(),
@@ -614,7 +616,11 @@ export const AppDataProvider = ({ children }) => {
     } else if (lastMessage.type === 'LISTING_DELETED') {
       setMyListingsCount(prev => Math.max(0, (prev || 0) - 1));
     }
-  }, [lastMessage, user?.userId, fetchInitialData]);
+  };
+
+  window.addEventListener('ws_message', handleWsMessage);
+  return () => window.removeEventListener('ws_message', handleWsMessage);
+  }, [user?.userId, fetchInitialData, sendMessage]);
 
   const unreadMessagesCount = chats.reduce((acc, c) => acc + (c.unread || 0), 0);
   const pendingRequestsCount = requestsData.filter(r => r.status.toLowerCase() === 'pending').length;
