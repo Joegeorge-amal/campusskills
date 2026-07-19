@@ -301,7 +301,7 @@ const NotificationDropdown = ({ onToggle }) => {
               )}
             </div>
             
-            <div style={{ borderTop: '1px solid #f1f5f9', padding: '12px', textAlign: 'center' }}>
+            <div style={{ borderTop: '1px solid var(--cs-border)', padding: '12px', textAlign: 'center' }}>
               <button 
                 onClick={() => {
                   if (document.activeElement && typeof document.activeElement.blur === 'function') {

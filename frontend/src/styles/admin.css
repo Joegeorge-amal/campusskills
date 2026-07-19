@@ -250,12 +250,10 @@
   top: 48px;
   right: 0;
   width: 360px;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: var(--cs-bg-white);
   border-radius: 12px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.5);
+  border: 1px solid var(--cs-border);
   color: var(--cs-text-main);
   z-index: 100;
   overflow: hidden;
@@ -270,7 +268,7 @@
 }
 
 .admin-notif-header h3 {
-  color: #0f172a !important;
+  color: var(--cs-text-main) !important;
 }
 
 .admin-notif-count-badge {
@@ -302,7 +300,7 @@
 .admin-notif-empty {
   padding: 32px 16px;
   text-align: center;
-  color: #6b7280;
+  color: var(--cs-text-secondary);
   font-size: 0.9rem;
 }
 
@@ -310,7 +308,7 @@
   padding: 16px;
   display: flex;
   gap: 12px;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--cs-border);
   position: relative;
 }
 
@@ -336,7 +334,7 @@
 .admin-notif-title {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #111827;
+  color: var(--cs-text-main);
   margin-bottom: 2px;
 }
 
@@ -354,7 +352,7 @@
 .admin-notif-dot {
   width: 8px;
   height: 8px;
-  background: #3b82f6;
+  background: var(--cs-primary);
   border-radius: 50%;
   position: absolute;
   right: 16px;
