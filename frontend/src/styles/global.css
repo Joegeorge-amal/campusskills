@@ -346,28 +346,28 @@ button, input, select, textarea {
 
 /* ─── DARK MODE ─── */
 [data-theme="dark"] {
-  --cs-bg-light: #0f172a;
-  --cs-bg-white: #1E293B;
-  --cs-bg-hover: #273548;
-  --cs-bg-app: #0a0e17;
-  --cs-bg-card: #1E293B;
-  --cs-bg-elevated: #2a3a4e;
-  --cs-bg-input: #1a2738;
+  --cs-bg-light: #020617; /* Slate 950 */
+  --cs-bg-white: #0f172a; /* Slate 900 */
+  --cs-bg-hover: #1e293b; /* Slate 800 */
+  --cs-bg-app: #020617;
+  --cs-bg-card: #0f172a;
+  --cs-bg-elevated: #1e293b;
+  --cs-bg-input: #020617;
 
-  --cs-text-main: #f1f5f9;
-  --cs-text-secondary: #94a3b8;
-  --cs-text-inactive: #64748b;
-  --cs-text-muted: #4b5565;
+  --cs-text-main: #f8fafc; /* Slate 50 */
+  --cs-text-secondary: #cbd5e1; /* Slate 300 */
+  --cs-text-inactive: #94a3b8; /* Slate 400 */
+  --cs-text-muted: #64748b; /* Slate 500 */
 
   --cs-border: rgba(255, 255, 255, 0.08);
   --cs-border-light: rgba(255, 255, 255, 0.04);
-  --cs-card-border: #334155;
+  --cs-card-border: #1e293b;
 
-  --cs-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
-  --cs-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
-  --cs-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5), 0 4px 8px rgba(0, 0, 0, 0.3);
+  --cs-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.25);
+  --cs-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.35);
+  --cs-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.6), 0 4px 8px rgba(0, 0, 0, 0.4);
 
-  --cs-overlay: rgba(0, 0, 0, 0.75);
+  --cs-overlay: rgba(2, 6, 23, 0.85);
 }
 
 [data-theme="dark"] body {
