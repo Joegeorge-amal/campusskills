@@ -250,13 +250,21 @@
   top: 48px;
   right: 0;
   width: 360px;
-  background: var(--cs-bg-white);
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-radius: 12px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
-  border: 1px solid var(--cs-border);
+  border: 1px solid rgba(255, 255, 255, 0.5);
   color: var(--cs-text-main);
   z-index: 100;
   overflow: hidden;
+}
+
+[data-theme="dark"] .admin-notif-dropdown {
+  background: rgba(27, 29, 42, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
 }
 
 .admin-notif-header {
